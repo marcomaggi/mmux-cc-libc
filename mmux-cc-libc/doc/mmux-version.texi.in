@@ -1,7 +1,0 @@
-@set MmuxPkgMajorVersion	@MMUX_PKG_MAJOR_VERSION@
-@set MmuxPkgMinorVersion	@MMUX_PKG_MINOR_VERSION@
-@set MmuxPkgPatchLevel          @MMUX_PKG_PATCH_LEVEL@
-@set MmuxPkgPrereleaseTag	@MMUX_PKG_PRERELEASE_TAG@
-@set MmuxPkgBuildMetadata	@MMUX_PKG_BUILD_METADATA@
-@set MmuxPkgVersion             @MMUX_PKG_VERSION@
-@set MmuxPkgSemanticVersion	@MMUX_PKG_SEMANTIC_VERSION@

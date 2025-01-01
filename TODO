@@ -1,6 +1,6 @@
 -*- coding: utf-8-unix -*-
 
-* Add builtins interfacing functions in the "endian(3)" manual page?
+* Add functions interfacing functions in the "endian(3)" manual page?
 
 * Add a builtin interfacing "flock(2)"? (Documented in a manual page.)
 
@@ -48,25 +48,25 @@
 
 * Scan the manual page of "iontl()" for additional commands.
 
-* Add builtins interfacing "inotify(7)"?  (Documented in a manual page.)
+* Add functions interfacing "inotify(7)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "fallocate(2)"?  (Documented in a manual page.)
+* Add functions interfacing "fallocate(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "posix_fallocate(2)"?  (Documented in a manual page.)
+* Add functions interfacing "posix_fallocate(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "posix_fadvise(2)"?  (Documented in a manual page.)
+* Add functions interfacing "posix_fadvise(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "posix_madvise(3)"?  (Documented in a manual page.)
+* Add functions interfacing "posix_madvise(3)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "mincore(2)"?  (Documented in a manual page.)
+* Add functions interfacing "mincore(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "readahead(2)"?  (Documented in a manual page.)
+* Add functions interfacing "readahead(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "sync_file_range(2)"?  (Documented in a manual page.)
+* Add functions interfacing "sync_file_range(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "ptrace(2)"?  (Documented in a manual page.)
+* Add functions interfacing "ptrace(2)"?  (Documented in a manual page.)
 
-* Add builtins interfacing "pidfd_getfd(2)"?  (Documented in a manual page.)
+* Add functions interfacing "pidfd_getfd(2)"?  (Documented in a manual page.)
 
 ### end of file
 # Local Variables:

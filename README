@@ -1,7 +1,7 @@
 -*- coding: utf-8-unix -*-
 
-			   MMUX Bash Pointers
-			   ==================
+			      MMUX CC Libc
+			      ============
 
 
 Topics
@@ -19,39 +19,10 @@ Topics
 1. Introduction
 ---------------
 
-This package implements loadable builtins for  the GNU Bash shell; to do
-so it installs a C11 language  library and shell scripts which are meant
-to be sourced in a GNU Bash session or script.
-
-  This package makes raw memory  pointers available in shell scripts; it
-also  interfaces  some  basic  functions from  the  C11  language  POSIX
-standard library.
-
-    source libmmux-bash-packages.bash
-    source libmmux-bash-pointers.bash
-
-    declare PTR VALUE
-
-    mmux_libc_malloc PTR 1024
-    {
-      mmux_sint_pointer_set $PTR 0 123
-      mmux_sint_pointer_ref VALUE $PTR 0
-    }
-    mmux_libc_free $PTR
-    $VALUE => 123
+This package  implements a  C11 language  library to  make it  easier to
+interface the GNU C Library to higher-level platforms.
 
   The package targets POSIX systems.
-
-  This package depends upon external packages (see Resources):
-
-* MMUX CC Types at least version v0.1.0-devel.0, it implements a unified
-  API to use the standard C11 language numeric data types;
-
-* MMUX CC Libc at least  version v0.1.0-devel.0, it implements a unified
-  API to the facilities implemented by the C language standard library.
-
-  Only for  testing: this package  depends on the external  package MBFL
-(see Resources), at least version v3.0.0-devel.9.
 
   The  package uses  the GNU  Autotools and  it is  tested on  GNU+Linux
 systems;  only to  build from  a  repository checkout:  it requires  the
@@ -65,6 +36,10 @@ with the older releases:
 the new  packages of today  will be the  old packages of  tomorrow.  The
 package relies on "pkg-config" to find the dependencies installed on the
 system.
+
+  The package depends upon the external packages (see Resources):
+
+* MMUX CC Types at least version 0.1.0-devel.0.
 
 
 2. License
@@ -92,7 +67,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 To install from a proper release tarball, do this:
 
-    $ cd mmux-bash-pointers-0.1.0
+    $ cd mmux-cc-libc-0.1.0
     $ mkdir build
     $ cd build
     $ ../configure
@@ -104,10 +79,6 @@ to inspect the available configuration options:
 
     $ ../configure --help
 
-  By default the  configuration searches for the package  MBFL to enable
-testing;  to  disable this  search:  when  configuring, use  the  option
-"--disable-mbfl".
-
   The Makefile is designed to allow parallel builds, so we can do:
 
    $ make -j4 all && make -j4 check
@@ -118,11 +89,11 @@ significantly.
   The  Makefile supports  the  DESTDIR environment  variable to  install
 files in a temporary location, example: to see what will happen:
 
-    $ make -n install DESTDIR=/tmp/mmux-bash-pointers
+    $ make -n install DESTDIR=/tmp/mmux-cc-libc
 
 to really do it:
 
-    $ make install DESTDIR=/tmp/mmux-bash-pointers
+    $ make install DESTDIR=/tmp/mmux-cc-libc
 
   After the installation it is  possible to verify the installed library
 against the test suite with:
@@ -134,7 +105,7 @@ site): we  must install the  GNU Autotools (GNU Automake,  GNU Autoconf,
 GNU Libtool),  then we must first  run the script "autogen.sh"  from the
 top source directory, to generate the needed files:
 
-    $ cd mmux-bash-pointers
+    $ cd mmux-cc-libc
     $ sh autogen.sh
 
 notice  that  "autogen.sh"  will   run  the  programs  "autoreconf"  and
@@ -185,23 +156,15 @@ C. Resources
 
 Development of this package takes place at:
 
-	  <https://github.com/marcomaggi/mmux-bash-pointers/>
+	     <https://github.com/marcomaggi/mmux-cc-libc/>
 
 the documentation is available online:
 
-      <https://marcomaggi.github.io/docs/mmux-bash-pointers.html>
+	 <https://marcomaggi.github.io/docs/mmux-cc-libc.html>
 
-the package MMUX CC Types is available online:
+the package "mmux-cc-types" is available online:
 
 	     <https://github.com/marcomaggi/mmux-cc-types/>
-
-the package MMUX CC Libc is available online:
-
-	     <https://github.com/marcomaggi/mmux-cc-libc/>
-
-the package MBFL is available online:
-
-		 <https://github.com/marcomaggi/mbfl/>
 
 the GNU Project software can be found here:
 
