@@ -66,9 +66,10 @@ PKG_PREREQ([0.29])
 PKG_INSTALLDIR
 MMUX_CHECK_PKG_CONFIG_MACROS
 
-AC_CHECK_HEADERS([libgen.h])
+#AC_CHECK_HEADERS([libgen.h])
 
 AC_SEARCH_LIBS(cos, m,, [AC_MSG_ERROR([Cannot find libm])])
+PKG_CHECK_MODULES([MMUX_CC_TYPES],[mmux-cc-types >= 0.1.0])
 
 AC_CACHE_SAVE
 
@@ -292,7 +293,6 @@ AC_CONFIG_FILES([Makefile]
   [meta/scripts/mmux-cc-libc.pc]
   [meta/slackware/slack-desc])
 MMUX_OUTPUT
-AC_CONFIG_SUBDIRS([mmux-cc-types])
 AC_OUTPUT
 
 ### end of file

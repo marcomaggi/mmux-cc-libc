@@ -286,6 +286,8 @@ m4_define([[[mmux_libc_VALUEOF_S_IXUSR]]],			[[[@MMUX_VALUEOF_S_IXUSR@]]])
 m4_define([[[mmux_libc_VALUEOF_W_OK]]],				[[[@MMUX_VALUEOF_W_OK@]]])
 m4_define([[[mmux_libc_VALUEOF_X_OK]]],				[[[@MMUX_VALUEOF_X_OK@]]])
 
+m4_define([[[mmux_libc_VALUEOF_SIOCATMARK]]],			[[[@MMUX_VALUEOF_SIOCATMARK@]]])
+
 m4_define([[[mmux_libc_VALUEOF_RWF_APPEND]]],			[[[@MMUX_VALUEOF_RWF_APPEND@]]])
 m4_define([[[mmux_libc_VALUEOF_RWF_DSYNC]]],			[[[@MMUX_VALUEOF_RWF_DSYNC@]]])
 m4_define([[[mmux_libc_VALUEOF_RWF_HIPRI]]],			[[[@MMUX_VALUEOF_RWF_HIPRI@]]])

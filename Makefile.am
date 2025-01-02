@@ -4,14 +4,11 @@ ACLOCAL_AMFLAGS		= -I meta/autotools
 AUTOMAKE_OPTIONS	= foreign
 EXTRA_DIST		= INSTALL
 dist_doc_DATA		= README COPYING
-AM_CFLAGS		= $(MMUX_CFLAGS)
-AM_CPPFLAGS		=  -I$(srcdir)/src/ -I$(builddir)/src/
-AM_CPPFLAGS		+= -I$(builddir)/mmux-cc-types/src
+AM_CFLAGS		= $(MMUX_CFLAGS) $(MMUX_CC_TYPES)
+AM_CPPFLAGS		= -I$(srcdir)/src/ -I$(builddir)/src/
 CLEANFILES		=
 DISTCLEANFILES		=
 BUILT_SOURCES		=
-
-SUBDIRS			= $(subdirs)
 
 ## --------------------------------------------------------------------
 
@@ -111,7 +108,7 @@ EXTRA_DIST	+= \
 	src/mmux-cc-libc-system-configuration.c.m4	\
 	src/mmux-cc-libc-time.c.m4
 
-MMUX_CC_TYPES_BUILT_SOURCES	= \
+MMUX_CC_LIBC_BUILT_SOURCES	= \
 	src/mmux-cc-libc.h				\
 	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-constants.h			\
@@ -129,9 +126,9 @@ MMUX_CC_TYPES_BUILT_SOURCES	= \
 	src/mmux-cc-libc-system-configuration.c		\
 	src/mmux-cc-libc-time.c
 
-BUILT_SOURCES	+= $(MMUX_CC_TYPES_BUILT_SOURCES)
-CLEANFILES	+= $(MMUX_CC_TYPES_BUILT_SOURCES)
-DISTCLEANFILES	+= $(MMUX_CC_TYPES_BUILT_SOURCES)
+BUILT_SOURCES	+= $(MMUX_CC_LIBC_BUILT_SOURCES)
+CLEANFILES	+= $(MMUX_CC_LIBC_BUILT_SOURCES)
+DISTCLEANFILES	+= $(MMUX_CC_LIBC_BUILT_SOURCES)
 
 mmux_cc_libc_CURRENT		= @mmux_cc_libc_VERSION_INTERFACE_CURRENT@
 mmux_cc_libc_REVISION		= @mmux_cc_libc_VERSION_INTERFACE_REVISION@
@@ -148,7 +145,7 @@ lib_LTLIBRARIES			= libmmux-cc-libc.la
 libmmux_cc_libc_la_CPPFLAGS	= $(AM_CPPFLAGS) -I$(builddir)/src
 libmmux_cc_libc_la_CFLAGS	= $(AM_CFLAGS) $(BASH_CFLAGS)
 libmmux_cc_libc_la_LDFLAGS	= $(mmux_cc_libc_LINKER_VERSION) $(AM_LDFLAGS)
-libmmux_cc_libc_la_LIBADD	= mmux-cc-types/libmmux-cc-types.la
+libmmux_cc_libc_la_LIBADD	= $(MMUX_CC_TYPES_LIBS)
 libmmux_cc_libc_la_SOURCES	= \
 	src/mmux-cc-libc.h				\
 	src/mmux-cc-libc-config.h			\

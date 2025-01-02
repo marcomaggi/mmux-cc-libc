@@ -7,7 +7,7 @@
 
 	This module implements file descriptor functions.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -313,8 +313,8 @@ mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
  ** Input/output: file descriptor scatter-gather API.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_base,	mmux_pointer_t);
-DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_len,	mmux_usize_t);
+DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_base,	mmux_pointer_t)
+DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_len,	mmux_usize_t)
 DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_pointer,	mmux_pointer_t)
 DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_length,	mmux_usize_t)
 

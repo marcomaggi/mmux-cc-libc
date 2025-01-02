@@ -7,7 +7,7 @@
 
 	This module implements the networking API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -452,7 +452,7 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
     mmux_libc_s_addr_ref(&raw_number, in_addr_p);
     DPRINTF(fd, "%s.s_addr = ", struct_name);
     if (mmux_uint32_dprintf(fd, raw_number)) {
-      return false;
+      return true;
     };
 
     {
@@ -461,11 +461,13 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
       char	str[IS_THIS_ENOUGH_QUESTION_MARK];
 
       if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET, (mmux_pointer_t)in_addr_p)) {
-	return false;
+	return true;
       }
       DPRINTF(fd, " (%s)\n", str);
     }
   }
+
+  return false;
 }
 
 
@@ -501,10 +503,12 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
     char	str[IS_THIS_ENOUGH_QUESTION_MARK];
 
     if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET6, (mmux_pointer_t)insix_addr_p)) {
-      return false;
+      return true;
     }
     DPRINTF(fd, "%s = (%s)\n", struct_name, str);
   }
+
+  return false;
 }
 
 
@@ -512,7 +516,7 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
  ** Struct sockaddr.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	mmux_sshort_t);
+DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	mmux_sshort_t)
 
 bool
 mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_t const * sockaddr_p, mmux_asciizcp_t struct_name)
@@ -1060,7 +1064,6 @@ bool
 mmux_libc_protoent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
 {
   int	aliases_idx = 0;
-  int	rv;
 
   if (NULL == struct_name) {
     struct_name = "struct protoent";
@@ -1095,22 +1098,23 @@ DEFINE_STRUCT_SETTER_GETTER(netent, n_net,		mmux_ulong_t)
 bool
 mmux_libc_netent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
 {
-  int	aliases_idx = 0;
-  int	rv;
-
   if (NULL == struct_name) {
     struct_name = "struct netent";
   }
 
   DPRINTF(fd, "%s.n_name = \"%s\"\n", struct_name, netent_p->n_name);
 
-  if (NULL != netent_p->n_aliases) {
-    for (; netent_p->n_aliases[aliases_idx]; ++aliases_idx) {
-      DPRINTF(fd, "%s.n_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, netent_p->n_aliases[aliases_idx]);
+  {
+    int		aliases_idx = 0;
+
+    if (NULL != netent_p->n_aliases) {
+      for (; netent_p->n_aliases[aliases_idx]; ++aliases_idx) {
+	DPRINTF(fd, "%s.n_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, netent_p->n_aliases[aliases_idx]);
+      }
     }
-  }
-  if (0 == aliases_idx) {
-    DPRINTF(fd, "%s.n_aliases = \"0x0\"\n", struct_name);
+    if (0 == aliases_idx) {
+      DPRINTF(fd, "%s.n_aliases = \"0x0\"\n", struct_name);
+    }
   }
 
   {
@@ -1531,6 +1535,8 @@ mmux_libc_if_nameindex_dump (mmux_libc_file_descriptor_t fd, mmux_libc_if_namein
 
   DPRINTF(fd, "%s.if_index = \"%d\"\n", struct_name, nameindex_p->if_index);
   DPRINTF(fd, "%s.if_name  = \"%s\"\n", struct_name, nameindex_p->if_name);
+
+  return false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1777,6 +1783,7 @@ mmux_libc_linger_dump (mmux_libc_file_descriptor_t fd, mmux_libc_linger_t const 
   }
   DPRINTF(fd, "%s.l_onoff  = \"%s\"\n", struct_name, linger_p->l_onoff);
   DPRINTF(fd, "%s.l_linger = \"%s\"\n", struct_name, linger_p->l_linger);
+  return false;
 }
 bool
 mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_socklen_t * result_optlen_p,
