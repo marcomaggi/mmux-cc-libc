@@ -7,7 +7,7 @@
 
 	This module implements the file system API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -28,6 +28,8 @@
 
 #include <mmux-cc-libc-internals.h>
 
+#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
+
 
 /** --------------------------------------------------------------------
  ** File system: types.
@@ -46,9 +48,10 @@ mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * pathname
   }
 }
 bool
-mmux_libc_file_system_pathname_asciizp_ref (mmux_asciizcp_t * asciiz_pathname_p, mmux_libc_file_system_pathname_t pathname)
+mmux_libc_file_system_pathname_asciizp_ref (mmux_asciizcpp_t asciiz_pathname_p, mmux_libc_file_system_pathname_t pathname)
 {
   *asciiz_pathname_p = pathname.value;
+  return false;
 }
 bool
 mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t pathname)
@@ -92,17 +95,21 @@ mmux_libc_readlink (mmux_usize_t * required_nbytes_p, mmux_libc_file_system_path
 
   if (required_nbytes < 0) {
     return true;
-  } else if (required_nbytes == provided_nbytes) {
-    *required_nbytes_p = required_nbytes;
-    return false;
   } else {
-    return false;
+    mmux_usize_t	required_nbytes1 = required_nbytes;
+
+    if (required_nbytes1 == provided_nbytes) {
+      *required_nbytes_p = required_nbytes1;
+      return false;
+    } else {
+      return false;
+    }
   }
 }
 bool
 mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t linkname)
 {
-  mmux_ssize_t	provided_nbytes_with_nul = 0;
+  mmux_usize_t	provided_nbytes_with_nul = 0;
 
   while (true) {
     provided_nbytes_with_nul += 1024;
@@ -141,18 +148,22 @@ mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descripto
 
   if (required_nbytes < 0) {
     return true;
-  } else if (required_nbytes == provided_nbytes) {
-    *required_nbytes_p = required_nbytes;
-    return false;
   } else {
-    return false;
+    mmux_usize_t	required_nbytes1 = required_nbytes;
+
+    if (required_nbytes1 == provided_nbytes) {
+      *required_nbytes_p = required_nbytes1;
+      return false;
+    } else {
+      return false;
+    }
   }
 }
 bool
 mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd,
 			     mmux_libc_file_system_pathname_t linkname)
 {
-  mmux_ssize_t	provided_nbytes_with_nul = 0;
+  mmux_usize_t	provided_nbytes_with_nul = 0;
 
   while (true) {
     provided_nbytes_with_nul += 1024;
@@ -598,24 +609,18 @@ mmux_libc_st_blksize_ref (mmux_uint_t * value_p, mmux_libc_stat_t const * stat_p
 bool
 mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * const stat_p, char const * struct_name)
 {
-  int	rv;
-
   if (NULL == struct_name) {
     struct_name = "struct stat";
   }
 
-  {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)stat_p);
-    if (0 > rv) { return true; }
-  }
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)stat_p);
 
   {
     int		len = mmux_mode_sprint_size(stat_p->st_mode);
     char	str[len];
 
     mmux_mode_sprint(str, len, stat_p->st_mode);
-    rv = dprintf(fd.value, "%s->st_mode = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_mode = %s\n", struct_name, str);
   }
 
   {
@@ -623,8 +628,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_ino));
-    rv = dprintf(fd.value, "%s->st_ino = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
   }
 
   {
@@ -632,8 +636,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uintmax_sprint(str, len, stat_p->st_dev);
-    rv = dprintf(fd.value, "%s->st_dev = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_dev = %s\n", struct_name, str);
   }
 
   {
@@ -641,8 +644,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_nlink));
-    rv = dprintf(fd.value, "%s->st_nlink = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_nlink = %s\n", struct_name, str);
   }
 
   {
@@ -650,8 +652,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_ino));
-    rv = dprintf(fd.value, "%s->st_ino = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
   }
 
   {
@@ -659,8 +660,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uid_sprint(str, len, stat_p->st_uid);
-    rv = dprintf(fd.value, "%s->st_uid = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_uid = %s\n", struct_name, str);
   }
 
   {
@@ -668,8 +668,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_gid_sprint(str, len, stat_p->st_gid);
-    rv = dprintf(fd.value, "%s->st_gid = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_gid = %s\n", struct_name, str);
   }
 
   {
@@ -677,8 +676,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_off_sprint(str, len, stat_p->st_size);
-    rv = dprintf(fd.value, "%s->st_size = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_size = %s\n", struct_name, str);
   }
 
   {
@@ -686,8 +684,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_atim.tv_sec);
-    rv = dprintf(fd.value, "%s->st_atime_sec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_atime_sec = %s\n", struct_name, str);
   }
 
   {
@@ -695,8 +692,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_atim.tv_nsec);
-    rv = dprintf(fd.value, "%s->st_atime_nsec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_atime_nsec = %s\n", struct_name, str);
   }
 
   {
@@ -704,8 +700,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_mtim.tv_sec);
-    rv = dprintf(fd.value, "%s->st_mtime_sec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_mtime_sec = %s\n", struct_name, str);
   }
 
   {
@@ -713,8 +708,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_mtim.tv_nsec);
-    rv = dprintf(fd.value, "%s->st_mtime_nsec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_mtime_nsec = %s\n", struct_name, str);
   }
 
   {
@@ -722,8 +716,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_ctim.tv_sec);
-    rv = dprintf(fd.value, "%s->st_ctime_sec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_ctime_sec = %s\n", struct_name, str);
   }
 
   {
@@ -731,8 +724,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_ctim.tv_nsec);
-    rv = dprintf(fd.value, "%s->st_ctime_nsec = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_ctime_nsec = %s\n", struct_name, str);
   }
 
   {
@@ -740,8 +732,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_blocks));
-    rv = dprintf(fd.value, "%s->st_blocks = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_blocks = %s\n", struct_name, str);
   }
 
   {
@@ -749,8 +740,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_uint_sprint(str, len, stat_p->st_blksize);
-    rv = dprintf(fd.value, "%s->st_blksize = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_blksize = %s\n", struct_name, str);
   }
 
   return false;
@@ -829,24 +819,18 @@ DEFINE_STRUCT_SETTER_GETTER(utimbuf, modtime, mmux_time_t)
 bool
 mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t const * const utimbuf_p, char const * struct_name)
 {
-  int	rv;
-
   if (NULL == struct_name) {
     struct_name = "struct utimbuf";
   }
 
-  {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)utimbuf_p);
-    if (0 > rv) { return true; }
-  }
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)utimbuf_p);
 
   {
     int		len = mmux_time_sprint_size(utimbuf_p->actime);
     char	str[len];
 
     mmux_time_sprint(str, len, utimbuf_p->actime);
-    rv = dprintf(fd.value, "%s->st_actime = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_actime = %s\n", struct_name, str);
   }
 
   {
@@ -854,8 +838,7 @@ mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t cons
     char	str[len];
 
     mmux_time_sprint(str, len, utimbuf_p->modtime);
-    rv = dprintf(fd.value, "%s->st_modtime = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->st_modtime = %s\n", struct_name, str);
   }
 
   return false;

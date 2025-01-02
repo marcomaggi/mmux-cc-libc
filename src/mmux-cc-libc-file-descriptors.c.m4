@@ -28,6 +28,8 @@
 
 #include <mmux-cc-libc-internals.h>
 
+#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
+
 
 /** --------------------------------------------------------------------
  ** Input/output: file descriptor core API.
@@ -321,29 +323,18 @@ DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_length,	mmux_usize_t)
 bool
 mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * const iovec_p, char const * struct_name)
 {
-  int	rv;
-
   if (NULL == struct_name) {
     struct_name = "struct iovec";
   }
 
-  {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)iovec_p);
-    if (0 > rv) { return true; }
-  }
-
-  {
-    rv = dprintf(fd.value, "%s->iov_base = %p\n", struct_name, iovec_p->iov_base);
-    if (0 > rv) { return true; }
-  }
-
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iovec_p);
+  DPRINTF(fd, "%s->iov_base = %p\n", struct_name, iovec_p->iov_base);
   {
     int		len = mmux_usize_sprint_size(iovec_p->iov_len);
     char	str[len];
 
     mmux_usize_sprint(str, len, iovec_p->iov_len);
-    rv = dprintf(fd.value, "%s->iov_len = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    DPRINTF(fd, "%s->iov_len = %s\n", struct_name, str);
   }
 
   return false;
@@ -484,15 +475,11 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
     struct_name = "struct flock";
   }
 
-  {
-    int		rv = dprintf(fd.value, "%s = \"%p\"\n", struct_name, (mmux_pointer_t)flock_p);
-    if (0 > rv) { return true; }
-  }
+  DPRINTF(fd, "%s = \"%p\"\n", struct_name, (mmux_pointer_t)flock_p);
 
   /* Print l_type. */
   {
     mmux_sint_t	required_nbytes = mmux_sshort_sprint_size(flock_p->l_type);
-    int		rv;
 
     if (0 > required_nbytes) {
       return true;
@@ -507,8 +494,7 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 	char const *	symstr;
 
 	mmux_libc_flag_to_symbol_struct_flock_l_type(&symstr, flock_p->l_type);
-	rv = dprintf(fd.value, "%s.l_type = \"%s\" (%s)\n", struct_name, str, symstr);
-	if (0 > rv) { return true; }
+	DPRINTF(fd, "%s.l_type = \"%s\" (%s)\n", struct_name, str, symstr);
       }
     }
   }
@@ -516,7 +502,6 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
   /* Print l_whence. */
   {
     mmux_sint_t	required_nbytes = mmux_sshort_sprint_size(flock_p->l_whence);
-    int		rv;
 
     if (0 > required_nbytes) {
       mmux_libc_dprintfer("%s: error converting \"l_whence\" to string\n", __func__);
@@ -546,8 +531,7 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 	  break;
 	}
 
-	rv = dprintf(fd.value, "%s.l_whence = \"%s\" (%s)\n", struct_name, str, symstr);
-	if (0 > rv) { return true; }
+	DPRINTF(fd, "%s.l_whence = \"%s\" (%s)\n", struct_name, str, symstr);
       }
     }
   }
@@ -555,7 +539,6 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
   /* Print l_start. */
   {
     mmux_sint_t	required_nbytes = mmux_off_sprint_size(flock_p->l_start);
-    int		rv;
 
     if (0 > required_nbytes) {
       mmux_libc_dprintfer("%s: error converting \"l_start\" to string\n", __func__);
@@ -568,8 +551,7 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 	mmux_libc_dprintfer("%s: error converting \"l_start\" to string\n", __func__);
 	return true;
       } else {
-	rv = dprintf(fd.value, "%s.l_start = \"%s\"\n", struct_name, str);
-	if (0 > rv) { return true; }
+	DPRINTF(fd, "%s.l_start = \"%s\"\n", struct_name, str);
       }
     }
   }
@@ -577,7 +559,6 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
   /* Print l_len. */
   {
     mmux_sint_t	required_nbytes = mmux_off_sprint_size(flock_p->l_len);
-    int		rv;
 
     if (0 > required_nbytes) {
       mmux_libc_dprintfer("%s: error converting \"l_len\" to string\n", __func__);
@@ -590,8 +571,7 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 	mmux_libc_dprintfer("%s: error converting \"l_len\" to string\n", __func__);
 	return true;
       } else {
-	rv = dprintf(fd.value, "%s.l_len = \"%s\"\n", struct_name, str);
-	if (0 > rv) { return true; }
+	DPRINTF(fd, "%s.l_len = \"%s\"\n", struct_name, str);
       }
     }
   }
@@ -599,7 +579,6 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
   /* Print l_pid. */
   {
     mmux_sint_t	required_nbytes = mmux_pid_sprint_size(flock_p->l_pid);
-    int		rv;
 
     if (0 > required_nbytes) {
       mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__);
@@ -612,8 +591,7 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 	mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__);
 	return true;
       } else {
-	rv = dprintf(fd.value, "%s.l_pid = \"%s\"\n", struct_name, str);
-	if (0 > rv) { return true; }
+	DPRINTF(fd, "%s.l_pid = \"%s\"\n", struct_name, str);
       }
     }
   }

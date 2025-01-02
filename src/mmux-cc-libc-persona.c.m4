@@ -7,7 +7,7 @@
 
 	This module implements the operative system persona management API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -27,6 +27,8 @@
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc-internals.h>
+
+#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
 
 m4_define([[[DEFINE_ASCIIZP_SETTER_GETTER]]],[[[bool
 mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_asciizcp_t value)
@@ -49,12 +51,8 @@ mmux_libc_$2_ref (mmux_asciizcp_t * result_p, mmux_libc_$1_t const * const P)
 bool
 mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_uid_t uid_num)
 {
-  if (0 <= uid_num) {
-    result_p->value = uid_num;
-    return false;
-  } else {
-    return true;
-  }
+  result_p->value = uid_num;
+  return false;
 }
 bool
 mmux_libc_uid_parse (mmux_libc_uid_t * p_value, char const * s_value, char const * who)
@@ -94,9 +92,9 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
   if (NULL == struct_name) {
     struct_name = "struct passwd";
   }
-  mmux_libc_dprintf(fd, "%s *         = %p\n", struct_name, (mmux_pointer_t)passwd_p);
-  mmux_libc_dprintf(fd, "%s.pw_name   = %s\n",   struct_name, passwd_p->pw_name);
-  mmux_libc_dprintf(fd, "%s.pw_passwd = %s\n", struct_name, passwd_p->pw_passwd);
+  DPRINTF(fd, "%s *         = %p\n", struct_name, (mmux_pointer_t)passwd_p);
+  DPRINTF(fd, "%s.pw_name   = %s\n",   struct_name, passwd_p->pw_name);
+  DPRINTF(fd, "%s.pw_passwd = %s\n", struct_name, passwd_p->pw_passwd);
   {
     mmux_usize_t	required_nchars;
     mmux_libc_uid_t	uid;
@@ -110,7 +108,7 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
       if (mmux_libc_uid_sprint(str, required_nchars, uid)) {
 	return true;
       } else {
-	mmux_libc_dprintf(fd, "%s.pw_uid = %s\n", struct_name, str);
+	DPRINTF(fd, "%s.pw_uid = %s\n", struct_name, str);
       }
     }
   }
@@ -127,13 +125,15 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
       if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
 	return true;
       } else {
-	mmux_libc_dprintf(fd, "%s.pw_gid = %s\n", struct_name, str);
+	DPRINTF(fd, "%s.pw_gid = %s\n", struct_name, str);
       }
     }
   }
-  mmux_libc_dprintf(fd, "%s.pw_gecos  = %s\n", struct_name, passwd_p->pw_gecos);
-  mmux_libc_dprintf(fd, "%s.pw_dir    = %s\n", struct_name, passwd_p->pw_dir);
-  mmux_libc_dprintf(fd, "%s.pw_shell  = %s\n", struct_name, passwd_p->pw_shell);
+  DPRINTF(fd, "%s.pw_gecos  = %s\n", struct_name, passwd_p->pw_gecos);
+  DPRINTF(fd, "%s.pw_dir    = %s\n", struct_name, passwd_p->pw_dir);
+  DPRINTF(fd, "%s.pw_shell  = %s\n", struct_name, passwd_p->pw_shell);
+
+  return false;
 }
 
 
@@ -144,12 +144,8 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
 bool
 mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_gid_t gid_num)
 {
-  if (0 <= gid_num) {
-    result_p->value = gid_num;
-    return false;
-  } else {
-    return true;
-  }
+  result_p->value = gid_num;
+  return false;
 }
 bool
 mmux_libc_gid_parse (mmux_libc_gid_t * p_value, char const * s_value, char const * who)
@@ -190,7 +186,7 @@ mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * 
   if (NULL == struct_name) {
     struct_name = "struct group";
   }
-  mmux_libc_dprintf(fd, "%s = %p\n", struct_name, (mmux_pointer_t)group_p);
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)group_p);
   {
     mmux_usize_t	required_nchars;
     mmux_libc_gid_t	gid;
@@ -204,7 +200,7 @@ mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * 
       if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
 	return true;
       } else {
-	mmux_libc_dprintf(fd, "%s.gr_gid = %s\n", struct_name, str);
+	DPRINTF(fd, "%s.gr_gid = %s\n", struct_name, str);
       }
     }
   }
@@ -214,9 +210,11 @@ mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * 
 
     mmux_libc_gr_mem_ref(&mem, group_p);
     for (; *mem; ++mem, ++i) {
-      mmux_libc_dprintf(fd, "%s.gr_mem[%d] = %s\n", struct_name, i, *mem);
+      DPRINTF(fd, "%s.gr_mem[%d] = %s\n", struct_name, i, *mem);
     }
   }
+
+  return false;
 }
 
 
