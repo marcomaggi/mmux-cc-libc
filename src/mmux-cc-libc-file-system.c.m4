@@ -847,35 +847,35 @@ mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t cons
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_utime (mmux_libc_file_system_pathname_t pathname, mmux_libc_utimbuf_t * utimbuf_p)
+mmux_libc_utime (mmux_libc_file_system_pathname_t pathname, mmux_libc_utimbuf_t utimbuf)
 {
-  int	rv = utime(pathname.value, utimbuf_p);
+  int	rv = utime(pathname.value, &utimbuf);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_utimes (mmux_libc_file_system_pathname_t pathname,
-		  mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
+		  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { *access_timeval_pointer, *modification_timeval_pointer };
+  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
   int			rv   = utimes(pathname.value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_lutimes (mmux_libc_file_system_pathname_t pathname,
-		   mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
+		   mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { *access_timeval_pointer, *modification_timeval_pointer };
+  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
   int			rv   = lutimes(pathname.value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_futimes (mmux_libc_file_descriptor_t fd,
-		   mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
+		   mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { *access_timeval_pointer, *modification_timeval_pointer };
+  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
   int			rv   = futimes(fd.value, T);
 
   return ((0 == rv)? false : true);

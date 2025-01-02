@@ -1014,20 +1014,16 @@ mmux_cc_libc_decl bool mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, m
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_utime (mmux_libc_file_system_pathname_t pathname, mmux_libc_utimbuf_t * utimbuf_p)
-  __attribute__((__nonnull__(2)));
+mmux_cc_libc_decl bool mmux_libc_utime (mmux_libc_file_system_pathname_t pathname, mmux_libc_utimbuf_t utimbuf);
 
 mmux_cc_libc_decl bool mmux_libc_utimes (mmux_libc_file_system_pathname_t pathname,
-					 mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
-  __attribute__((__nonnull__(2,3)));
+					 mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval);
 
 mmux_cc_libc_decl bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t pathname,
-					  mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
-  __attribute__((__nonnull__(2,3)));
+					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval);
 
 mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_file_descriptor_t fd,
-					  mmux_libc_timeval_t * access_timeval_pointer, mmux_libc_timeval_t * modification_timeval_pointer)
-  __attribute__((__nonnull__(2,3)));
+					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval);
 
 
 /** --------------------------------------------------------------------

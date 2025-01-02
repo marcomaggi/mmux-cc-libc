@@ -3132,26 +3132,26 @@ current mask.
 
 
 @MmuxCStructOpaqueTypedef{utimbuf}
-@MmuxSetterGetter{utimbuf, actime,   mmux_time_t}
-@MmuxSetterGetter{utimbuf, modtime,   mmux_time_t}
+@MmuxSetterGetter{utimbuf, actime,  mmux_time_t}
+@MmuxSetterGetter{utimbuf, modtime, mmux_time_t}
 @MmuxStructDumper{utimbuf}
 
 
-@deftypefun bool mmux_libc_utime (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_utimbuf_t * @var{utimbuf_p})
+@deftypefun bool mmux_libc_utime (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_utimbuf_t @var{utimbuf})
 @MmuxCInterface{utime}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_utimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t * @var{access_p}, mmux_libc_timeval_t * @var{modification_p})
+@deftypefun bool mmux_libc_utimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{utimes}.
 @end deftypefun
 
-@deftypefun bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t * @var{access_p}, mmux_libc_timeval_t * @var{modification_p})
+@deftypefun bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{lutimes}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_futimes (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{access_p}, mmux_libc_timeval_t * @var{modification_p})
+@deftypefun bool mmux_libc_futimes (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{futimes}.
 @end deftypefun
 
