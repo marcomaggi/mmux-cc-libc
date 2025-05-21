@@ -359,7 +359,7 @@ mmux_cc_libc_decl bool mmux_libc_asctime   (mmux_asciizcp_t * result_p, mmux_lib
        __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_strftime (char * bufptr, mmux_usize_t * buflen_p, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
-  __attribute__((__nonnull__(1,2,3,4)));
+  __attribute__((__nonnull__(1,2,3,4),__format__(__strftime__,3,0)));
 
 mmux_cc_libc_decl bool mmux_libc_strptime (char ** first_unprocessed_after_timestamp_p,
 					   mmux_asciizcp_t input_string, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
