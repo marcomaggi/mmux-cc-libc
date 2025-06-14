@@ -546,6 +546,9 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{SOCK_SEQPACKET}
 @MmuxDefineConstant{SOCK_STREAM}
 
+@MmuxDefineConstant{EXIT_SUCCESS}
+@MmuxDefineConstant{EXIT_FAILURE}
+
 @defvr Constant MMUX_LIBC_MSG_ZERO
 @defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_MSG_ZERO
 The symbol @code{MMUX_LIBC_MSG_ZERO} evaluates to zero; it is meant to be used as @var{flags}
@@ -2012,6 +2015,7 @@ the actual number of values stored in the array.
 @menu
 * processes pids::              Representing PIDs.
 * processes getting::           Getting PIDs.
+* processes exiting::           Exiting processes.
 @end menu
 
 @c page
@@ -2087,6 +2091,25 @@ wide.
 
 @deftypefun bool mmux_libc_gettid (mmux_libc_pid_t * @var{result_p})
 @MmuxCInterface{gittid}.
+@end deftypefun
+
+@c page
+@node processes exiting
+@section Exiting processes
+
+
+@deftypefun bool mmux_libc_exit (mmux_sint_t @var{status})
+@MmuxCInterface{exit}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc__exit (mmux_sint_t @var{status})
+@MmuxCInterface{_exit}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_atexit (void (* @var{function_pointer}) (void))
+@MmuxCInterface{atexit}.
 @end deftypefun
 
 @c page

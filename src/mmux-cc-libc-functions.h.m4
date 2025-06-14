@@ -699,6 +699,14 @@ mmux_cc_libc_decl bool mmux_libc_getppid (mmux_libc_pid_t * result_p)
 mmux_cc_libc_decl bool mmux_libc_gettid (mmux_libc_pid_t * result_p)
   __attribute__((__nonnull__(1)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status);
+
+mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status);
+
+mmux_cc_libc_decl bool mmux_libc_atexit (void (*function_pointer) (void));
+
 
 /** --------------------------------------------------------------------
  ** Persona.

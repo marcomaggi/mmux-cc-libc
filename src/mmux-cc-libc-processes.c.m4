@@ -7,7 +7,7 @@
 
 	This module implements the operative system processes management API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -101,5 +101,30 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_GETTID]]],[[[
   return mmux_libc_make_pid(result_p, rv);
 ]]])
 }
+
+
+/** --------------------------------------------------------------------
+ ** Identifier functions.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_exit (mmux_sint_t status)
+{
+  exit(status);
+  return false;
+}
+bool
+mmux_libc__exit (mmux_sint_t status)
+{
+  _exit(status);
+  return false;
+}
+bool
+mmux_libc_atexit (void (*function_pointer) (void))
+{
+  atexit(function_pointer);
+  return false;
+}
+
 
 /* end of file */
