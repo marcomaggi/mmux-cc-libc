@@ -68,6 +68,10 @@
 
 * Add functions interfacing "pidfd_getfd(2)"?  (Documented in a manual page.)
 
+* Add functions interfacing "clone(2)"?  (Documented in a manual page.)
+
+* Add functions interfacing "unshare(2)"?  (Documented in a manual page.)
+
 ### end of file
 # Local Variables:
 # mode: text
