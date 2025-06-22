@@ -546,6 +546,11 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{SOCK_SEQPACKET}
 @MmuxDefineConstant{SOCK_STREAM}
 
+@MmuxDefineConstant{WAIT_ANY}
+@MmuxDefineConstant{WAIT_MYPGRP}
+@MmuxDefineConstant{WNOHANG}
+@MmuxDefineConstant{WUNTRACED}
+
 @MmuxDefineConstant{EXIT_SUCCESS}
 @MmuxDefineConstant{EXIT_FAILURE}
 
@@ -2015,6 +2020,8 @@ the actual number of values stored in the array.
 @menu
 * processes pids::              Representing PIDs.
 * processes getting::           Getting PIDs.
+* processes forking::           Forking processes.
+* processes waiting::           Waiting for process completion.
 * processes exiting::           Exiting processes.
 @end menu
 
@@ -2091,6 +2098,205 @@ wide.
 
 @deftypefun bool mmux_libc_gettid (mmux_libc_pid_t * @var{result_p})
 @MmuxCInterface{gittid}.
+@end deftypefun
+
+@c page
+@node processes forking
+@section Forking processes
+
+
+@deftypefun bool mmux_libc_fork (bool * @var{this_is_the_parent_process_p}, mmux_libc_pid_t * @var{child_process_pid_p})
+@MmuxCInterface{fork}.  When a call is successful:
+
+Regarding the argument @var{this_is_the_parent_process_p}: the referenced variable is mutated only
+when a call is successful, otherwise it is left untouched.
+
+@itemize
+@item
+In the parent process: the referenced variable is set to @ctrue{}.
+
+@item
+In the child process: the referenced variable is set to @cfalse{}.
+@end itemize
+
+Regarding the argument @var{child_process_pid_p}: the referenced variable is mutated only in the
+parent process and when a call is successful, otherwise it is left untouched.
+
+@itemize
+@item
+In the parent process: the referenced variable is set to the child process identifier.
+
+@item
+In the child process: the referenced variable is left untouched.
+@end itemize
+
+@example
+bool                    this_is_the_parent_process;
+mmux_libc_pid_t         child_pid;
+
+if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
+  mmux_sint_t         errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else if (this_is_the_parent_process) @{
+  ... /* do something in the parent process, maybe using "child_pid" */
+@} else @{
+  ... /* do something in the child process */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node processes waiting
+@section Waiting for process completion
+
+
+@MmuxCInterface{waitpid}.  For all the following functions:
+
+@itemize
+@item
+regarding the pointer argument @var{completed_process_status_available_p}, when a call is
+successful:
+
+@itemize
+@item
+if we have collected the completion status of a process: the referenced variable is set to @ctrue{};
+
+@item
+if no completion status was collected: the referenced variable is set to @cfalse{};
+@end itemize
+
+@item
+regarding the pointer argument @var{completed_process_pid_p}: it cannot be @cnull{}; when a call is
+successful and we have collected the completion status of a process, such status is stored in the
+referenced variable, otherwise the variable is left untouched;
+
+@item
+regarding the pointer argument @var{completed_process_status_p}: it cannot be @cnull{}; the
+referenced variable is mutated only when a call is successful and we have collected the completion
+status of a process, otherwise it is left untouched.
+@end itemize
+
+
+@deftypefun bool mmux_libc_wait_any_process (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_sint_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+Wait for the termination of any child process.
+
+@example
+bool                  completed_process_status_available;
+mmux_libc_pid_t       completed_process_pid;
+mmux_sint_t           completed_process_status;
+
+if (mmux_libc_wait_any_process(&completed_process_status_available, &completed_process_pid,
+                               &completed_process_status, MMUX_LIBC_WNOHANG)) @{
+  mmux_sint_t         errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else @{
+  if (completed_process_status_available) @{
+    ... /* do something with "completed_process_status" */
+  @} else @{
+    ... /* no completed process status was collected */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_wait_my_process_group (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_sint_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+Wait for the termination of any child process in the same process group of the calling process.
+
+@example
+bool                  completed_process_status_available;
+mmux_libc_pid_t       completed_process_pid;
+mmux_sint_t           completed_process_status;
+
+if (mmux_libc_wait_my_process_group(&completed_process_status_available, &completed_process_pid,
+                                    &completed_process_status, MMUX_LIBC_WNOHANG)) @{
+  mmux_sint_t         errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else @{
+  if (completed_process_status_available) @{
+    ... /* do something with "completed_process_status" */
+  @} else @{
+    ... /* no completed process status was collected */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_wait_process_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_sint_t * @var{completed_process_status_p}, mmux_libc_pid_t @var{pid}, mmux_sint_t @var{options})
+Wait for the termination of a specific process whose process identifier is @var{pid}.
+
+@example
+bool                    this_is_the_parent_process;
+mmux_libc_pid_t         child_pid;
+
+if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
+  mmux_sint_t         errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else if (this_is_the_parent_process) @{
+  bool                  completed_process_status_available;
+  mmux_libc_pid_t       completed_process_pid;
+  mmux_sint_t           completed_process_status;
+
+  if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
+                                &completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) @{
+    mmux_sint_t         errnum;
+
+    mmux_libc_errno_consume(&errnum);
+    ... /* handle the error */
+  @} else @{
+    if (completed_process_status_available) @{
+      ... /* do something with "completed_process_status" */
+    @} else @{
+      ... /* no completed process status was collected */
+    @}
+  @}
+@} else @{
+  ... /* do something in the child process */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_wait_group_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_sint_t * @var{completed_process_status_p}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{options})
+Wait for the termination of any process belonging to the process group @var{gid}.
+
+@example
+mmux_libc_gid_t       the_gid;
+
+if (mmux_libc_getgid(&the_gid)) @{
+  mmux_sint_t         errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else @{
+  bool *              completed_process_status_available;
+  mmux_libc_pid_t     completed_process_pid;
+  mmux_sint_t         completed_process_status;
+
+  if (mmux_libc_wait_any_process(&completed_process_status_available, &completed_process_pid,
+                                 &completed_process_status, the_gid, MMUX_LIBC_WNOHANG)) @{
+    mmux_sint_t         errnum;
+
+    mmux_libc_errno_consume(&errnum);
+    ... /* handle the error */
+  @} else @{
+    if (completed_process_status_available) @{
+      ... /* do something with "completed_process_status" */
+    @} else @{
+      ... /* no completed process status was collected */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page

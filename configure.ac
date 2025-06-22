@@ -77,8 +77,7 @@ AC_CACHE_SAVE
 #### inspecting functions and data structured
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
-AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h arpa/inet.h
-                  netdb.h sys/resource.h])
+AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h arpa/inet.h netdb.h])
 
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
@@ -262,6 +261,9 @@ MMUX_CONSTANT_TESTS([_PC_ASYNC_IO _PC_CHOWN_RESTRICTED _PC_FILESIZEBITS _PC_LINK
 MMUX_CONSTANT_TESTS([RLIMIT_AS RLIMIT_CORE RLIMIT_CPU RLIMIT_DATA RLIMIT_FSIZE RLIMIT_LOCKS RLIMIT_MEMLOCK
                      RLIMIT_MSGQUEUE RLIMIT_NICE RLIMIT_NOFILE RLIMIT_NPROC RLIMIT_RSS RLIMIT_RTPRIO
                      RLIMIT_RTTIME RLIMIT_SIGPENDING RLIMIT_STACK RLIM_INFINITY])
+
+## waiting for process completion
+MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WNOHANG WUNTRACED])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE])

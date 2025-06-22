@@ -435,6 +435,11 @@ m4_define([[[mmux_libc_VALUEOF_INADDR_NONE]]],			[[[@MMUX_VALUEOF_INADDR_NONE@]]
 m4_define([[[mmux_libc_VALUEOF_EXIT_SUCCESS]]],			[[[@MMUX_VALUEOF_EXIT_SUCCESS@]]])
 m4_define([[[mmux_libc_VALUEOF_EXIT_FAILURE]]],			[[[@MMUX_VALUEOF_EXIT_FAILURE@]]])
 
+m4_define([[[mmux_libc_VALUEOF_WAIT_ANY]]],			[[[@MMUX_VALUEOF_WAIT_ANY@]]])
+m4_define([[[mmux_libc_VALUEOF_WAIT_MYPGRP]]],			[[[@MMUX_VALUEOF_WAIT_MYPGRP@]]])
+m4_define([[[mmux_libc_VALUEOF_WNOHANG]]],			[[[@MMUX_VALUEOF_WNOHANG@]]])
+m4_define([[[mmux_libc_VALUEOF_WUNTRACED]]],			[[[@MMUX_VALUEOF_WUNTRACED@]]])
+
 m4_define([[[mmux_libc_VALUEOF__SC_2_CHAR_TERM]]],		[[[@MMUX_VALUEOF__SC_2_CHAR_TERM@]]])
 m4_define([[[mmux_libc_VALUEOF__SC_2_C_BIND]]],			[[[@MMUX_VALUEOF__SC_2_C_BIND@]]])
 m4_define([[[mmux_libc_VALUEOF__SC_2_C_DEV]]],			[[[@MMUX_VALUEOF__SC_2_C_DEV@]]])

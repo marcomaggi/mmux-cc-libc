@@ -701,6 +701,37 @@ mmux_cc_libc_decl bool mmux_libc_gettid (mmux_libc_pid_t * result_p)
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_fork (bool * this_is_the_parent_process_p, mmux_libc_pid_t * child_process_pid_p)
+  __attribute__((__nonnull__(1,2)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_wait_any_process (bool * completed_process_status_available_p,
+						   mmux_libc_pid_t * completed_process_pid_p,
+						   mmux_sint_t * completed_process_status_p,
+						   mmux_sint_t options)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
+							mmux_libc_pid_t * completed_process_pid_p,
+							mmux_sint_t * completed_process_status_p,
+							mmux_sint_t options)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_wait_process_id (bool * completed_process_status_available_p,
+						  mmux_libc_pid_t * completed_process_pid_p,
+						  mmux_sint_t * completed_process_status_p,
+						  mmux_libc_pid_t pid, mmux_sint_t options)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_wait_group_id (bool * completed_process_status_available_p,
+						mmux_libc_pid_t * completed_process_pid_p,
+						mmux_sint_t * completed_process_status_p,
+						mmux_libc_gid_t gid, mmux_sint_t options)
+  __attribute__((__nonnull__(1,2,3)));
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status);
 
 mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status);

@@ -8,7 +8,7 @@
 	This header file is for internal definitions.  It must be included by all the
 	source files in this package.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -230,6 +230,10 @@ extern "C" {
 
 #ifdef HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
+#endif
+
+#ifdef HAVE_SYS_WAIT_H
+#  include <sys/wait.h>
 #endif
 
 #ifdef HAVE_WCHAR_H

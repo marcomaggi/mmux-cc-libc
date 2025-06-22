@@ -11,7 +11,7 @@
 #
 #               m4_include(path/to/mmux.m4)
 #
-# Copyright (c) 2018, 2019, 2024 Marco Maggi <mrc.mgg@gmail.com>
+# Copyright (c) 2018, 2019, 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public  License as  published by  the Free Software  Foundation, either  version 3  of the
@@ -593,7 +593,7 @@ AC_DEFUN([MMUX_CC_CHECK_COMMON_HEADERS],
    AC_HEADER_STDBOOL
    AC_HEADER_SYS_WAIT
    AC_CHECK_HEADERS([complex.h ctype.h errno.h fcntl.h float.h limits.h math.h regex.h stddef.h stdarg.h
-                     time.h wchar.h sys/ioctl.h sys/time.h sys/resource.h])
+                     time.h wchar.h sys/ioctl.h sys/time.h sys/resource.h sys/wait.h])
    AC_CACHE_SAVE])
 
 
@@ -742,6 +742,10 @@ AC_INCLUDES_DEFAULT([
 
 #ifdef HAVE_SYS_UN_H
 #  include <sys/un.h>
+#endif
+
+#ifdef HAVE_SYS_WAIT_H
+#  include <sys/wait.h>
 #endif
 
 #ifdef HAVE_TIME_H
