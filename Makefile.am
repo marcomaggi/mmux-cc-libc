@@ -185,7 +185,9 @@ src/%.$(OBJEXT): \
 #### TESTS
 
 check_PROGRAMS	= \
-	tests/version
+	tests/version			\
+	\
+	tests/mmux_libc_fork
 
 TESTS				= $(check_PROGRAMS)
 
@@ -196,6 +198,9 @@ mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
 
 tests_version_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_version_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_mmux_libc_fork_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_fork_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"
