@@ -43,6 +43,15 @@ mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_pid_t pid_num)
     return true;
   }
 }
+bool
+mmux_libc_pid_equal (mmux_libc_pid_t one, mmux_libc_pid_t two)
+{
+  if (one.value == two.value) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -111,6 +120,18 @@ bool
 mmux_libc_exit (mmux_sint_t status)
 {
   exit(status);
+  return true;
+}
+bool
+mmux_libc_exit_success (void)
+{
+  exit(MMUX_LIBC_EXIT_SUCCESS);
+  return true;
+}
+bool
+mmux_libc_exit_failure (void)
+{
+  exit(MMUX_LIBC_EXIT_FAILURE);
   return true;
 }
 bool

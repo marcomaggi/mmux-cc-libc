@@ -14,7 +14,7 @@
 
 #include <mmux-cc-libc.h>
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_fork";
+static mmux_asciizcp_t	PROGNAME = "mmux_libc_wait_group_id";
 
 static void
 print_error (mmux_asciizcp_t errmsg)
@@ -48,17 +48,29 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       }
     }
 
-    if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
-				  &completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) {
-      print_error("waiting");
-      goto error;
-    } else {
-      if (completed_process_status_available) {
-	mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status);
-	mmux_libc_exit_success();
+    {
+      mmux_libc_gid_t       the_gid;
+
+      if (mmux_libc_getgid(&the_gid)) {
+	print_error("getting gid");
+	goto error;
+      } else if (mmux_libc_wait_group_id(&completed_process_status_available, &completed_process_pid,
+					 &completed_process_status, the_gid, MMUX_LIBC_WNOHANG)) {
+	print_error("waiting");
+	goto error;
       } else {
-	mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME, completed_process_status);
-	mmux_libc_exit_failure();
+	if (completed_process_status_available) {
+	  mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status);
+	  if (mmux_libc_pid_equal(completed_process_pid, child_pid)) {
+	    mmux_libc_exit_success();
+	  } else {
+	    print_error("unexpected completed process PID\n");
+	    mmux_libc_exit_failure();
+	  }
+	} else {
+	  mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME, completed_process_status);
+	  mmux_libc_exit_failure();
+	}
       }
     }
   } else {

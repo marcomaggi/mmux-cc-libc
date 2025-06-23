@@ -2040,6 +2040,11 @@ Build a new value of type @objtype{mmux_libc_pid_t}.
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_pid_equal (mmux_libc_pid_t @vari{pid}, mmux_libc_pid_t @varii{pid})
+Return true if @vari{pid} and  @varii{pid} are equal.
+@end deftypefun
+
+
 To convert a file descriptor to string we can do:
 
 @example
@@ -2306,6 +2311,13 @@ if (mmux_libc_getgid(&the_gid)) @{
 
 @deftypefun bool mmux_libc_exit (mmux_sint_t @var{status})
 @MmuxCInterface{exit}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_exit_success (void)
+@deftypefunx bool mmux_libc_exit_failure (void)
+Wrappers for @cfunc{mmux_libc_exit} that terminate the current process with, respectively, the
+status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 @end deftypefun
 
 

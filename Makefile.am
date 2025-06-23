@@ -188,7 +188,10 @@ check_PROGRAMS	= \
 	tests/version					\
 	\
 	tests/mmux_libc_fork				\
-	tests/mmux_libc_wait_process_id
+	tests/mmux_libc_wait_any_process		\
+	tests/mmux_libc_wait_my_process_group		\
+	tests/mmux_libc_wait_process_id			\
+	tests/mmux_libc_wait_group_id
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -206,8 +209,17 @@ tests_version_LDADD		= $(mmux_cc_libc_tests_ldadd)
 tests_mmux_libc_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_mmux_libc_fork_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
+tests_mmux_libc_wait_any_process_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_mmux_libc_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_wait_my_process_group_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
 tests_mmux_libc_wait_process_id_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_mmux_libc_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_mmux_libc_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

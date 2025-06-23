@@ -22,7 +22,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 		      mmux_cc_libc_version_interface_current(),
 		      mmux_cc_libc_version_interface_revision(),
 		      mmux_cc_libc_version_interface_age());
-  mmux_libc_exit(MMUX_LIBC_EXIT_SUCCESS);
+  mmux_libc_exit_success();
 }
 
 /* end of file */
