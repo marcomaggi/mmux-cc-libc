@@ -56,7 +56,12 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (completed_process_status_available) {
 	mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status);
 	if (mmux_libc_pid_equal(completed_process_pid, child_pid)) {
-	  mmux_libc_exit_success();
+	  if (mmux_libc_WIFEXITED(completed_process_status)) {
+	    mmux_libc_exit_success();
+	  } else {
+	    print_error("child process not exited normally");
+	    mmux_libc_exit_failure();
+	  }
 	} else {
 	  print_error("unexpected completed process PID\n");
 	  mmux_libc_exit_failure();
