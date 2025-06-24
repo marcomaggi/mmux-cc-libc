@@ -255,7 +255,9 @@ extern "C" {
 #define MMUX_LIBC_PID_MAXIMUM_STRING_REPRESENTATION_LENGTH	256
 #define MMUX_LIBC_UID_MAXIMUM_STRING_REPRESENTATION_LENGTH	256
 #define MMUX_LIBC_GID_MAXIMUM_STRING_REPRESENTATION_LENGTH	256
+
 #define MMUX_LIBC_COMPLETED_PROCESS_STATUS_MAXIMUM_STRING_REPRESENTATION_LENGTH		256
+#define MMUX_LIBC_INTERPROCESS_SIGNAL_MAXIMUM_STRING_REPRESENTATION_LENGTH		256
 
 #define MMUX_LIBC_GETGROUPLIST_MAXIMUM_GROUPS_NUMBER		4096
 
@@ -278,6 +280,7 @@ typedef struct mmux_libc_pid_t	{ mmux_pid_t  value; } mmux_libc_pid_t;
 typedef struct mmux_libc_uid_t	{ mmux_uid_t  value; } mmux_libc_uid_t;
 typedef struct mmux_libc_gid_t	{ mmux_gid_t  value; } mmux_libc_gid_t;
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t value; } mmux_libc_completed_process_status_t;
+typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t value; } mmux_libc_interprocess_signal_t;
 
 typedef struct mmux_libc_file_system_pathname_t { mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
 

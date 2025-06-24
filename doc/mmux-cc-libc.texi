@@ -89,6 +89,14 @@ Interface to the function @cfunc{\FUNCNAME\}, @MmuxCFuncpage{\MANPAGE\}
 @MmuxCInterfaceTwo{\FUNCNAME\,\FUNCNAME\}
 @end macro
 
+@macro MmuxCMacroInterfaceTwo{FUNCNAME,MANPAGE}
+Interface to the preprocessor macro @cfunc{\FUNCNAME\}, @MmuxCFuncpage{\MANPAGE\}
+@end macro
+
+@macro MmuxCMacroInterface{FUNCNAME}
+@MmuxCMacroInterfaceTwo{\FUNCNAME\,\FUNCNAME\}
+@end macro
+
 @c ------------------------------------------------------------------------
 
 @macro MmuxCStructOpaqueTypedef{STRUCTNAME}
@@ -204,6 +212,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * system::                      System configuration.
 * persona::                     Persona operations.
 * processes::                   Processes.
+* signals::                     Interprocess signals handling.
 * fds::                         File descriptors.
 * fs::                          File system.
 * sockets::                     Networking sockets.
@@ -548,7 +557,12 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 
 @MmuxDefineConstant{WAIT_ANY}
 @MmuxDefineConstant{WAIT_MYPGRP}
+
+@MmuxDefineConstant{WEXITED}
 @MmuxDefineConstant{WNOHANG}
+@MmuxDefineConstant{WNOWAIT}
+@MmuxDefineConstant{WSTOPPED}
+@MmuxDefineConstant{WCONTINUED}
 @MmuxDefineConstant{WUNTRACED}
 
 @MmuxDefineConstant{EXIT_SUCCESS}
@@ -2187,6 +2201,47 @@ the terminating nul character, in the array referenced by @var{str}, which must 
 wide.
 @end deftypefun
 
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_WIFEXITED (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WIFEXITED,waitpid}.
+@end deftypefun
+
+
+@deftypefun mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WIFSIGNALED,waitpid}.
+@end deftypefun
+
+
+@deftypefun mmux_libc_interprocess_signal_t mmux_libc_WTERMSIG (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WTERMSIG,waitpid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_WCOREDUMP (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WCOREDUMP,waitpid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_WIFSTOPPED (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WIFSTOPPED,waitpid}.
+@end deftypefun
+
+
+@deftypefun mmux_libc_interprocess_signal_t mmux_libc_WSTOPSIG (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WSTOPSIG,waitpid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_WIFCONTINUED (mmux_libc_completed_process_status_t completed_process_status)
+@MmuxCMacroInterfaceTwo{WIFCONTINUED,waitpid}.
+@end deftypefun
+
 @c page
 @node processes getting
 @section Getting PIDs
@@ -2465,6 +2520,84 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 
 @deftypefun bool mmux_libc_atexit (void (* @var{function_pointer}) (void))
 @MmuxCInterface{atexit}.
+@end deftypefun
+
+@c page
+@node signals
+@chapter Interprocess signals handling
+
+
+@menu
+* signals signals::             Representing interprocess signals.
+@end menu
+
+@c page
+@node signals signals
+@section Representing interprocess signals
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_interprocess_signal_t
+Opaque data structure type representing an interprocess signal number.
+@end deftp
+
+
+@deftypefun bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_sint_t @var{signal_number})
+Build a new value of type @objtype{mmux_libc_interprocess_signal_t}.
+
+@example
+mmux_libc_interprocess_signal_t ipxsig;
+
+if (mmux_libc_make_interprocess_signal(&ipxsig, MMUX_LIBC_SIGUSR1) @{
+  ... /* this error happens only if @var{signal_NUMBER} is negative */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t @vari{ipxsig}, mmux_libc_interprocess_signal_t @varii{ipxsig})
+Return true if @vari{ipxsig} and  @varii{ipxsig} are equal.
+@end deftypefun
+
+
+To convert a file descriptor to string we can do:
+
+@example
+mmux_libc_interprocess_signal_t         ipxsig;
+mmux_usize_t                            required_nchars;
+
+mmux_libc_make_signal_number(&the_signal_number, MMUX_LIBC_SIGUSR1);
+
+if (mmux_libc_interprocess_signal_sprint_size(&required_nchars, ipxsig) @{
+  /* error */
+@} else @{
+  char  str[required_nchars];
+
+  if (mmux_libc_interprocess_signal_sprint(str, required_nchars, ipxsig) @{
+    /* error */
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * @var{ipxsig_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
+Parse the @asciiz{} string referenced by @var{str} and convert it into a
+@objtype{mmux_libc_interprocess_signal_t} value; store the value in the location referenced by
+@var{ipxsig_p}.  If an error occurs and @var{who} is not @cnull{}: print an error message to
+@stderr{} using @var{who} as name of the entity that performed the function call.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_interprocess_signal_t @var{ipxsig})
+Determine the number of characters required to contain the string representation of @var{ipxsig} as
+@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
+referenced by @var{required_nchars_p}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signal_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_interprocess_signal_t @var{ipxsig})
+Convert @var{ipxsig} to its @asciiz{} string representation and store the result, @strong{including}
+the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
+wide.
 @end deftypefun
 
 @c page

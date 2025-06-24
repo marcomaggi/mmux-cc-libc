@@ -639,6 +639,9 @@ mmux_cc_libc_decl bool mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mm
 mmux_cc_libc_decl bool mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t fd,
 								   mmux_libc_completed_process_status_t value);
 
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_dprintf (mmux_libc_file_descriptor_t fd,
+							mmux_libc_interprocess_signal_t value);
+
 
 /** --------------------------------------------------------------------
  ** System configuration.
@@ -762,6 +765,24 @@ mmux_cc_libc_decl bool mmux_libc_wait (bool * completed_process_status_available
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_WIFEXITED (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl mmux_libc_interprocess_signal_t mmux_libc_WTERMSIG (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl bool mmux_libc_WCOREDUMP (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl bool mmux_libc_WIFSTOPPED (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl mmux_libc_interprocess_signal_t mmux_libc_WSTOPSIG (mmux_libc_completed_process_status_t completed_process_status);
+
+mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (mmux_libc_completed_process_status_t completed_process_status);
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status);
 mmux_cc_libc_decl bool mmux_libc_exit_success (void);
 mmux_cc_libc_decl bool mmux_libc_exit_failure (void);
@@ -769,6 +790,25 @@ mmux_cc_libc_decl bool mmux_libc_exit_failure (void);
 mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status);
 
 mmux_cc_libc_decl bool mmux_libc_atexit (void (*function_pointer) (void));
+
+
+/** --------------------------------------------------------------------
+ ** Interprocess signals.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p, mmux_sint_t signal_num)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t one, mmux_libc_interprocess_signal_t two);
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_sprint (char * ptr, mmux_usize_t len, mmux_libc_interprocess_signal_t signum)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_interprocess_signal_t signum)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------

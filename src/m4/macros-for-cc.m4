@@ -8,7 +8,7 @@ m4_dnl Abstract
 m4_dnl
 m4_dnl		This library  defines macros to  generate C language code.
 m4_dnl
-m4_dnl Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+m4_dnl Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 m4_dnl
 m4_dnl This program is free  software: you can redistribute it and/or  modify it under the
 m4_dnl terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -126,7 +126,7 @@ $3
 m4_dnl $1 - Preprocessor symbol: if defined to 1, include the body of code; otherwise include the alternative body.
 m4_dnl $2 - The body of code.
 m4_dnl $3 - The alternative of code.
-m4_define([[[MMUX_CONDITIONAL_FUNCTION_BODY]]],[[[MMUX_CONDITIONAL_CODE([[[$1]]],[[[$2]]],[[[errno = MMUX_LIBC_ENOSYS;
+m4_define([[[MMUX_CONDITIONAL_FUNCTION_BODY]]],[[[MMUX_CONDITIONAL_CODE([[[$1]]],[[[$2]]],[[[mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
 return true;
 ]]])]]])
 

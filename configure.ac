@@ -84,6 +84,42 @@ AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp s
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
                 wait waitid])
 
+dnl --------------------------------------------------------------------
+
+AC_CHECK_DECL([WIFEXITED])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WIFEXITED)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WIFEXITED],[1],[defined to 1 if WIFEXITED is defined])])
+
+AC_CHECK_DECL([WEXITSTATUS])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WEXITSTATUS)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WEXITSTATUS],[1],[defined to 1 if WEXITSTATUS is defined])])
+
+AC_CHECK_DECL([WIFSIGNALED])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WIFSIGNALED)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WIFSIGNALED],[1],[defined to 1 if WIFSIGNALED is defined])])
+
+AC_CHECK_DECL([WTERMSIG])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WTERMSIG)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WTERMSIG],[1],[defined to 1 if WTERMSIG is defined])])
+
+AC_CHECK_DECL([WCOREDUMP])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WCOREDUMP)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WCOREDUMP],[1],[defined to 1 if WCOREDUMP is defined])])
+
+AC_CHECK_DECL([WIFSTOPPED])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WIFSTOPPED)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WIFSTOPPED],[1],[defined to 1 if WIFSTOPPED is defined])])
+
+AC_CHECK_DECL([WSTOPSIG])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WSTOPSIG)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WSTOPSIG],[1],[defined to 1 if WSTOPSIG is defined])])
+
+AC_CHECK_DECL([WIFCONTINUED])
+AS_IF([mmux_test_variable_is_yes(ac_cv_have_decl_WIFCONTINUED)],
+      [AC_DEFINE([MMUX_LIBC_HAVE_WIFCONTINUED],[1],[defined to 1 if WIFCONTINUED is defined])])
+
+dnl --------------------------------------------------------------------
+
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_RLIMIT],       [sizeof(struct rlimit)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_PASSWD],       [sizeof(struct passwd)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_GROUP],        [sizeof(struct group)])
@@ -264,7 +300,7 @@ MMUX_CONSTANT_TESTS([RLIMIT_AS RLIMIT_CORE RLIMIT_CPU RLIMIT_DATA RLIMIT_FSIZE R
                      RLIMIT_RTTIME RLIMIT_SIGPENDING RLIMIT_STACK RLIM_INFINITY])
 
 ## waiting for process completion
-MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WNOHANG WUNTRACED])
+MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WEXITED WNOHANG WNOWAIT WSTOPPED WCONTINUED WUNTRACED])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE])
