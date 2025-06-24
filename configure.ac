@@ -81,7 +81,8 @@ AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in
 
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
-                renameat2 group_member dup3 accept4 copy_file_range gettid prlimit])
+                renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
+                wait waitid])
 
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_RLIMIT],       [sizeof(struct rlimit)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_PASSWD],       [sizeof(struct passwd)])

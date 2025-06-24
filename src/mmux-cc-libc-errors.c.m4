@@ -7,7 +7,7 @@
 
 	This module implements the errors API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -37,7 +37,7 @@ bool
 mmux_libc_errno_ref (mmux_sint_t * result_errnum_p)
 {
   *result_errnum_p = errno;
-  return false;
+  return (errno)? false : true;
 }
 bool
 mmux_libc_errno_set (mmux_sint_t errnum)
@@ -50,7 +50,7 @@ mmux_libc_errno_consume (mmux_sint_t * result_errnum_p)
 {
   *result_errnum_p = errno;
   errno            = 0;
-  return false;
+  return (*result_errnum_p)? false : true;
 }
 bool
 mmux_libc_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)

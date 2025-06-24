@@ -1042,5 +1042,10 @@ mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pat
 {
   return mmux_libc_dprintf(fd, "%s", value.value);
 }
+bool
+mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t fd, struct mmux_libc_completed_process_status_t value)
+{
+  return mmux_sint_dprintf(fd, value.value);
+}
 
 /* end of file */

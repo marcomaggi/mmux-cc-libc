@@ -636,6 +636,9 @@ mmux_cc_libc_decl bool mmux_libc_gid_dprintf (mmux_libc_file_descriptor_t fd, mm
 
 mmux_cc_libc_decl bool mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value);
 
+mmux_cc_libc_decl bool mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t fd,
+								   mmux_libc_completed_process_status_t value);
+
 
 /** --------------------------------------------------------------------
  ** System configuration.
@@ -692,6 +695,26 @@ mmux_cc_libc_decl bool mmux_libc_pid_sprint_size (mmux_usize_t * required_nchars
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * result_p, mmux_sint_t status)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_completed_process_status_equal (mmux_libc_completed_process_status_t one,
+								 mmux_libc_completed_process_status_t two);
+
+mmux_cc_libc_decl bool mmux_libc_completed_process_status_parse (mmux_libc_completed_process_status_t * p_value,
+								 mmux_asciizcp_t s_value, mmux_asciizcp_t who)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_completed_process_status_sprint (char * ptr, mmux_usize_t len,
+								  mmux_libc_completed_process_status_t pid)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_completed_process_status_sprint_size (mmux_usize_t * required_nchars_p,
+								       mmux_libc_completed_process_status_t pid)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_getpid  (mmux_libc_pid_t * result_p)
   __attribute__((__nonnull__(1)));
 
@@ -710,26 +733,31 @@ mmux_cc_libc_decl bool mmux_libc_fork (bool * this_is_the_parent_process_p, mmux
 
 mmux_cc_libc_decl bool mmux_libc_wait_any_process (bool * completed_process_status_available_p,
 						   mmux_libc_pid_t * completed_process_pid_p,
-						   mmux_sint_t * completed_process_status_p,
+						   mmux_libc_completed_process_status_t * completed_process_status_p,
 						   mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
 							mmux_libc_pid_t * completed_process_pid_p,
-							mmux_sint_t * completed_process_status_p,
+							mmux_libc_completed_process_status_t * completed_process_status_p,
 							mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_wait_process_id (bool * completed_process_status_available_p,
 						  mmux_libc_pid_t * completed_process_pid_p,
-						  mmux_sint_t * completed_process_status_p,
+						  mmux_libc_completed_process_status_t * completed_process_status_p,
 						  mmux_libc_pid_t pid, mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_wait_group_id (bool * completed_process_status_available_p,
 						mmux_libc_pid_t * completed_process_pid_p,
-						mmux_sint_t * completed_process_status_p,
+						mmux_libc_completed_process_status_t * completed_process_status_p,
 						mmux_libc_gid_t gid, mmux_sint_t options)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_wait (bool * completed_process_status_available_p,
+				       mmux_libc_pid_t * completed_process_pid_p,
+				       mmux_libc_completed_process_status_t * completed_process_status_p)
   __attribute__((__nonnull__(1,2,3)));
 
 /* ------------------------------------------------------------------ */

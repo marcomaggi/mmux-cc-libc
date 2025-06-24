@@ -32,9 +32,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     print_error("forking");
     goto error;
   } else if (this_is_the_parent_process) {
-    bool                  completed_process_status_available;
-    mmux_libc_pid_t       completed_process_pid;
-    mmux_sint_t           completed_process_status;
+    bool					completed_process_status_available;
+    mmux_libc_pid_t				completed_process_pid;
+    mmux_libc_completed_process_status_t	completed_process_status;
 
     /* Give the child process a bit of time to exit. */
     {
