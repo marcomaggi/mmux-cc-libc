@@ -28,6 +28,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   bool                    this_is_the_parent_process;
   mmux_libc_pid_t         child_pid;
 
+  mmux_cc_libc_init();
+
   if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
     print_error("forking");
     goto error;
