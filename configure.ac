@@ -77,7 +77,15 @@ AC_CACHE_SAVE
 #### inspecting functions and data structured
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
-AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h arpa/inet.h netdb.h])
+AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
+                  arpa/inet.h netdb.h ])
+
+dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
+dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
+dnl for the "pidof_open(2)" system call and similar, which  is not yet in glibc 2.33.  (Marco Maggi;
+dnl Jun 25, 2025)
+dnl
+dnl AC_CHECK_HEADERS([linux/wait.h])
 
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
@@ -148,6 +156,8 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_NETENT],       [sizeof(struct netent)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IF_NAMEINDEX], [sizeof(struct if_nameindex)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_ADDRINFO],     [sizeof(struct addrinfo)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_LINGER],       [sizeof(struct linger)])
+
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGINFO],      [sizeof(struct siginfo)])
 
 
 #### inspecting errno constants
@@ -301,6 +311,9 @@ MMUX_CONSTANT_TESTS([RLIMIT_AS RLIMIT_CORE RLIMIT_CPU RLIMIT_DATA RLIMIT_FSIZE R
 
 ## waiting for process completion
 MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WEXITED WNOHANG WNOWAIT WSTOPPED WCONTINUED WUNTRACED])
+
+# These are Linux-specific and defined in "sys/wait.h"; for the function "waitid(2)".
+MMUX_CONSTANT_TESTS([P_ALL P_PID P_PIDFD P_PGID])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE])

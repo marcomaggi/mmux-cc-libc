@@ -438,6 +438,11 @@ m4_define([[[mmux_libc_VALUEOF_EXIT_FAILURE]]],			[[[@MMUX_VALUEOF_EXIT_FAILURE@
 m4_define([[[mmux_libc_VALUEOF_WAIT_ANY]]],			[[[@MMUX_VALUEOF_WAIT_ANY@]]])
 m4_define([[[mmux_libc_VALUEOF_WAIT_MYPGRP]]],			[[[@MMUX_VALUEOF_WAIT_MYPGRP@]]])
 
+m4_define([[[mmux_libc_VALUEOF_P_ALL]]],			[[[@MMUX_VALUEOF_P_ALL@]]])
+m4_define([[[mmux_libc_VALUEOF_P_PID]]],			[[[@MMUX_VALUEOF_P_PID@]]])
+m4_define([[[mmux_libc_VALUEOF_P_PIDFD]]],			[[[@MMUX_VALUEOF_P_PIDFD@]]])
+m4_define([[[mmux_libc_VALUEOF_P_PGID]]],			[[[@MMUX_VALUEOF_P_PGID@]]])
+
 m4_define([[[mmux_libc_VALUEOF_WEXITED]]],			[[[@MMUX_VALUEOF_WEXITED@]]])
 m4_define([[[mmux_libc_VALUEOF_WNOHANG]]],			[[[@MMUX_VALUEOF_WNOHANG@]]])
 m4_define([[[mmux_libc_VALUEOF_WNOWAIT]]],			[[[@MMUX_VALUEOF_WNOWAIT@]]])

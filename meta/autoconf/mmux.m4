@@ -668,6 +668,16 @@ AC_INCLUDES_DEFAULT([
 #  include <linux/fs.h>
 #endif
 
+/* Right now, on my Slackware64 15.0, including this header is in
+   conflict with sys/wait.h so I do not include it.  The reason for
+   including it is to get the definition of P_PIDFD, which is not
+   yet in glibc 2.33 (Marco Maggi; Jun 25, 2025) */
+#if 0
+#  ifdef HAVE_LINUX_WAIT_H
+#    include <linux/wait.h>
+#  endif
+#endif
+
 #ifdef HAVE_MATH_H
 #  include <math.h>
 #endif

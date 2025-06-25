@@ -565,6 +565,11 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{WCONTINUED}
 @MmuxDefineConstant{WUNTRACED}
 
+@MmuxDefineConstant{P_ALL}
+@MmuxDefineConstant{P_PID}
+@MmuxDefineConstant{P_PIDFD}
+@MmuxDefineConstant{P_PGID}
+
 @MmuxDefineConstant{EXIT_SUCCESS}
 @MmuxDefineConstant{EXIT_FAILURE}
 

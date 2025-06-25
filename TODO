@@ -66,7 +66,11 @@
 
 * Add functions interfacing "ptrace(2)"?  (Documented in a manual page.)
 
+* Add functions interfacing "pidfd_open(2)"?  (Documented in a manual page.)
 * Add functions interfacing "pidfd_getfd(2)"?  (Documented in a manual page.)
+* Add functions interfacing "pidfd_send_signal(2)"?  (Documented in a manual page.)
+
+* Add functions interfacing "waitid(2)"?  (Documented in a manual page.)
 
 * Add functions interfacing "clone(2)"?  (Documented in a manual page.)
 

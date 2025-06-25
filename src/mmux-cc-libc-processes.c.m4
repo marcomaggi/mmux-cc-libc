@@ -240,10 +240,10 @@ static bool
 mmux_p_libc_waitpid (bool * completed_process_status_available_p,
 		     mmux_libc_pid_t * completed_process_pid_p,
 		     mmux_libc_completed_process_status_t * completed_process_status_p,
-		     mmux_pid_t the_pid, mmux_sint_t options)
+		     mmux_pid_t pidnum, mmux_sint_t options)
 {
   mmux_sint_t	status_num;
-  mmux_pid_t	rv = waitpid(the_pid, &status_num, options);
+  mmux_pid_t	rv = waitpid(pidnum, &status_num, options);
 
   if (-1 == rv) {
     return true;
@@ -267,12 +267,12 @@ mmux_libc_wait_process_id (bool * completed_process_status_available_p,
 			   mmux_libc_completed_process_status_t * completed_process_status_p,
 			   mmux_libc_pid_t pid, mmux_sint_t options)
 {
-  mmux_pid_t	the_pid		= pid.value;
+  mmux_pid_t	pidnum		= pid.value;
 
   return mmux_p_libc_waitpid(completed_process_status_available_p,
 			     completed_process_pid_p,
 			     completed_process_status_p,
-			     the_pid,
+			     pidnum,
 			     options);
 }
 bool
@@ -281,12 +281,12 @@ mmux_libc_wait_group_id (bool * completed_process_status_available_p,
 			 mmux_libc_completed_process_status_t * completed_process_status_p,
 			 mmux_libc_gid_t gid, mmux_sint_t options)
 {
-  mmux_pid_t	the_pid		= (mmux_pid_t)(- gid.value);
+  mmux_pid_t	pidnum		= (mmux_pid_t)(- gid.value);
 
   return mmux_p_libc_waitpid(completed_process_status_available_p,
 			     completed_process_pid_p,
 			     completed_process_status_p,
-			     the_pid,
+			     pidnum,
 			     options);
 }
 bool
@@ -295,12 +295,12 @@ mmux_libc_wait_any_process (bool * completed_process_status_available_p,
 			    mmux_libc_completed_process_status_t * completed_process_status_p,
 			    mmux_sint_t options)
 {
-  mmux_pid_t	the_pid		= MMUX_LIBC_WAIT_ANY;
+  mmux_pid_t	pidnum		= MMUX_LIBC_WAIT_ANY;
 
   return mmux_p_libc_waitpid(completed_process_status_available_p,
 			     completed_process_pid_p,
 			     completed_process_status_p,
-			     the_pid,
+			     pidnum,
 			     options);
 }
 bool
@@ -309,12 +309,12 @@ mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
 				 mmux_libc_completed_process_status_t * completed_process_status_p,
 				 mmux_sint_t options)
 {
-  mmux_pid_t	the_pid		= MMUX_LIBC_WAIT_MYPGRP;
+  mmux_pid_t	pidnum		= MMUX_LIBC_WAIT_MYPGRP;
 
   return mmux_p_libc_waitpid(completed_process_status_available_p,
 			     completed_process_pid_p,
 			     completed_process_status_p,
-			     the_pid,
+			     pidnum,
 			     options);
 }
 
@@ -346,6 +346,34 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_WAIT]]],[[[
   }
 ]]])
 }
+
+/* Someday I will implement this.  But not today.  (Marco Maggi; Jun 25, 2025) */
+#if 0
+bool
+mmux_libc_waitid (bool * completed_process_status_available_p,
+		  mmux_libc_pid_t * completed_process_pid_p,
+		  mmux_libc_completed_process_status_t * completed_process_status_p,
+		  mmux_sint_t idtype, mmux_libc_pid_t pid, mmux_libc_siginfo_t * info_p, mmux_sint_t options)
+{
+  mmux_pid_t	rv = waitid((idtype_t) idtype, pidnum.value, info_p, options);
+
+  if (-1 == rv) {
+    return true;
+  } else if ((0 == rv) && (MMUX_LIBC_WNOHANG & options)) {
+    /* We requested not to block if no process  has completed.  It is not an error if
+       we are here. */
+    *completed_process_status_available_p = false;
+    return false;
+  } else {
+    if (mmux_libc_make_pid(completed_process_pid_p, rv)) {
+      return true;
+    } else {
+      *completed_process_status_available_p	= true;
+      return mmux_libc_make_completed_process_status(completed_process_status_p, status_num);
+    }
+  }
+}
+#endif
 
 
 /** --------------------------------------------------------------------
