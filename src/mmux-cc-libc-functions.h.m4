@@ -783,13 +783,20 @@ mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (mmux_libc_completed_process_statu
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status);
-mmux_cc_libc_decl bool mmux_libc_exit_success (void);
-mmux_cc_libc_decl bool mmux_libc_exit_failure (void);
+mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status)
+  __attribute__((__noreturn__));
+mmux_cc_libc_decl bool mmux_libc_exit_success (void)
+  __attribute__((__noreturn__));
+mmux_cc_libc_decl bool mmux_libc_exit_failure (void)
+  __attribute__((__noreturn__));
 
-mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status);
+mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status)
+  __attribute__((__noreturn__));
 
 mmux_cc_libc_decl bool mmux_libc_atexit (void (*function_pointer) (void));
+
+mmux_cc_libc_decl bool mmux_libc_abort (void)
+  __attribute__((__noreturn__));
 
 
 /** --------------------------------------------------------------------

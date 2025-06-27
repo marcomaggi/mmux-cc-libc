@@ -195,7 +195,9 @@ check_PROGRAMS	= \
 	tests/mmux_libc_wait_my_process_group		\
 	tests/mmux_libc_wait_process_id			\
 	tests/mmux_libc_wait_group_id			\
-	tests/mmux_libc_wait
+	tests/mmux_libc_wait				\
+	\
+	tests/mmux_libc_select
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -227,6 +229,12 @@ tests_mmux_libc_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_mmux_libc_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_mmux_libc_wait_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+## waiting for input/output
+
+tests_mmux_libc_select_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_select_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

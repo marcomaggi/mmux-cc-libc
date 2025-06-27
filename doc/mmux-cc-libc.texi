@@ -3014,6 +3014,37 @@ if (mmux_libc_dup3(fd1, fd2, MMUX_LIBC_O_CLOEXEC)) @{
 
 @deftypefun bool mmux_libc_pipe (mmux_libc_file_descriptor_t @var{fds}[2])
 @MmuxCInterface{pipe}.
+
+@example
+@{
+  bool                this_is_the_paren_process;
+  mmux_libc_pid_t     child_pid;
+  mmux_libc_fd_t      paren_to_child_fds[2];
+  mmux_libc_fd_t      paren_fr_child_fds[2];
+
+  if        (mmux_libc_pipe(paren_to_child_fds)) @{
+    ... /* error */
+  @} else if (mmux_libc_pipe(paren_fr_child_fds)) @{
+    ... /* error */
+  @} else if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) @{
+    ... /* error */
+  @} else if (this_is_the_paren_process) @{
+    paren_play(paren_fr_child_fds[0], paren_to_child_fds[1], child_pid);
+  @} else @{
+    child_play(paren_to_child_fds[0], paren_fr_child_fds[1]);
+  @}
+@}
+void
+paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mmux_libc_pid_t child_pid)
+@{
+  ...
+@}
+void
+child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
+@{
+  ...
+@}
+@end example
 @end deftypefun
 
 
@@ -3032,10 +3063,10 @@ This function might be useful when an error occurs after we have created a pipe.
 Example:
 
 @example
-mmux_libc_fd_set_t      read_fd_set, writ_fd_set, exce_fd_set;
+mmux_libc_fd_set_t      read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
 mmux_uint_t             nfds_ready;
 mmux_uint_t             maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-mmux_libc_timeval_t     timeout;
+mmux_libc_timeval_t     timeout[1];
 mmux_libc_fd_t          in, ou;
 bool                    isset;
 
@@ -3049,18 +3080,28 @@ mmux_libc_FD_ZERO(exce_fd_set);
 mmux_libc_FD_SET(in, read_fd_set);
 mmux_libc_FD_SET(ou, writ_fd_set);
 
-mmux_timeval_set(&timeout, 1, 0);
+mmux_libc_timeval_set(timeout, 1, 0);
 
 if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
-                     &read_fd_set, &writ_fd_set, &exce_fd_set,
-                     &timeout)) @{
+                     read_fd_set, writ_fd_set, exce_fd_set,
+                     timeout)) @{
   /* error */
 @}
 
 mmux_libc_FD_ISSET(&isset, in, read_fd_set);
-/* do something */
+if (isset) @{
+  /* do something */
+@}
+
 mmux_libc_FD_ISSET(&isset, ou, writ_fd_set);
-/* do something */
+if (isset) @{
+  /* do something */
+@}
+
+mmux_libc_FD_ISSET(&isset, in, exce_fd_set);
+if (isset) @{
+  /* do something */
+@}
 @end example
 
 

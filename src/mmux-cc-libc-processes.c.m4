@@ -177,31 +177,32 @@ bool
 mmux_libc_exit (mmux_sint_t status)
 {
   exit(status);
-  return true;
 }
 bool
 mmux_libc_exit_success (void)
 {
-  exit(MMUX_LIBC_EXIT_SUCCESS);
-  return true;
+  mmux_libc_exit(MMUX_LIBC_EXIT_SUCCESS);
 }
 bool
 mmux_libc_exit_failure (void)
 {
-  exit(MMUX_LIBC_EXIT_FAILURE);
-  return true;
+  mmux_libc_exit(MMUX_LIBC_EXIT_FAILURE);
 }
 bool
 mmux_libc__exit (mmux_sint_t status)
 {
   _exit(status);
-  return true;
 }
 bool
 mmux_libc_atexit (void (*function_pointer) (void))
 {
   atexit(function_pointer);
   return false;
+}
+bool
+mmux_libc_abort (void)
+{
+  abort();
 }
 
 
