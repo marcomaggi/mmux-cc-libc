@@ -28,7 +28,7 @@
 
 #include <mmux-cc-libc-internals.h>
 
-#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
+#define DPRINTF(FD,TEMPLATE,...)	if (mmux_libc_dprintf(FD,TEMPLATE,__VA_ARGS__)) { return true; }
 
 
 /** --------------------------------------------------------------------
@@ -69,6 +69,12 @@ mmux_libc_make_fd (mmux_libc_file_descriptor_t * result_p, mmux_sint_t fd_num)
 {
   result_p->value = fd_num;
   return false;
+}
+
+bool
+mmux_libc_fd_equal (mmux_libc_fd_t one, mmux_libc_fd_t two)
+{
+  return (one.value == two.value)? true : false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -112,7 +118,7 @@ bool
 mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, char const * template, ...)
 {
   va_list	ap;
-  int		rv;
+  mmux_sint_t	rv;
 
   va_start(ap, template);
   {
@@ -125,7 +131,7 @@ bool
 mmux_libc_dprintfou (char const * template, ...)
 {
   va_list	ap;
-  int		rv;
+  mmux_sint_t	rv;
 
   va_start(ap, template);
   {
@@ -138,7 +144,7 @@ bool
 mmux_libc_dprintfer (char const * template, ...)
 {
   va_list	ap;
-  int		rv;
+  mmux_sint_t	rv;
 
   va_start(ap, template);
   {
@@ -153,7 +159,7 @@ mmux_libc_dprintfer (char const * template, ...)
 bool
 mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
 {
-  int	fdval = open(pathname.value, flags, mode);
+  mmux_sint_t	fdval = open(pathname.value, flags, mode);
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -165,7 +171,7 @@ mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname
 bool
 mmux_libc_close (mmux_libc_file_descriptor_t fd)
 {
-  int	rv = close(fd.value);
+  mmux_sint_t	rv = close(fd.value);
 
   return ((-1 != rv)? false : true);
 }
@@ -173,7 +179,7 @@ bool
 mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
 		  mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
 {
-  int	fdval = openat(dirfd.value, pathname.value, flags, mode);
+  mmux_sint_t	fdval = openat(dirfd.value, pathname.value, flags, mode);
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -188,7 +194,7 @@ mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t 
 bool
 mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen)
 {
-  ssize_t	nbytes_done = read(fd.value, bufptr, buflen);
+  mmux_ssize_t	nbytes_done = read(fd.value, bufptr, buflen);
 
   if (0 <= nbytes_done) {
     *nbytes_done_p = nbytes_done;
@@ -198,9 +204,9 @@ mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mm
   }
 }
 bool
-mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen)
+mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
 {
-  ssize_t	nbytes_done = write(fd.value, bufptr, buflen);
+  mmux_ssize_t	nbytes_done = write(fd.value, bufptr, buflen);
 
   if (0 <= nbytes_done) {
     *nbytes_done_p = nbytes_done;
@@ -216,7 +222,7 @@ bool
 mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen,
 		 mmux_off_t offset)
 {
-  ssize_t	nbytes_done = pread(fd.value, bufptr, buflen, offset);
+  mmux_ssize_t	nbytes_done = pread(fd.value, bufptr, buflen, offset);
 
   if (0 <= nbytes_done) {
     *nbytes_done_p = nbytes_done;
@@ -226,10 +232,10 @@ mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, m
   }
 }
 bool
-mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen,
+mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen,
 		  mmux_off_t offset)
 {
-  ssize_t	nbytes_done = pwrite(fd.value, bufptr, buflen, offset);
+  mmux_ssize_t	nbytes_done = pwrite(fd.value, bufptr, buflen, offset);
 
   if (0 <= nbytes_done) {
     *nbytes_done_p = nbytes_done;
@@ -271,7 +277,7 @@ mmux_libc_dup (mmux_libc_file_descriptor_t * new_fd_p, mmux_libc_file_descriptor
 bool
 mmux_libc_dup2 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd)
 {
-  int	rv = dup2(old_fd.value, new_fd.value);
+  mmux_sint_t	rv = dup2(old_fd.value, new_fd.value);
 
   return ((-1 != rv)? false : true);
 }
@@ -279,7 +285,7 @@ bool
 mmux_libc_dup3 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd, mmux_sint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
-  int	rv = dup3(old_fd.value, new_fd.value, flags);
+  mmux_sint_t	rv = dup3(old_fd.value, new_fd.value, flags);
 
   return ((-1 != rv)? false : true);
 ]]])
@@ -290,8 +296,8 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
 bool
 mmux_libc_pipe (mmux_libc_file_descriptor_t fds[2])
 {
-  int		fdvals[2];
-  int		rv = pipe(fdvals);
+  mmux_sint_t		fdvals[2];
+  mmux_sint_t		rv = pipe(fdvals);
 
   if (-1 != rv) {
     fds[0].value = fdvals[0];

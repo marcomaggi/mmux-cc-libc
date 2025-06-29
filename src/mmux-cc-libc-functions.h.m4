@@ -261,7 +261,7 @@ mmux_cc_libc_decl bool mmux_libc_memccpy (mmux_pointer_t * result_p, mmux_pointe
 mmux_cc_libc_decl bool mmux_libc_memmove (mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_memcmp (mmux_sint_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
+mmux_cc_libc_decl bool mmux_libc_memcmp (mmux_sint_t * result_p, mmux_pointerc_t ptr1, mmux_pointerc_t ptr2, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_memchr (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t nbytes)
@@ -391,6 +391,8 @@ mmux_cc_libc_decl bool mmux_libc_stder (mmux_libc_file_descriptor_t * result_p)
 mmux_cc_libc_decl bool mmux_libc_at_fdcwd (mmux_libc_file_descriptor_t * result_p)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_fd_equal (mmux_libc_fd_t one, mmux_libc_fd_t two);
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_fd_parse (mmux_libc_fd_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
@@ -426,7 +428,7 @@ mmux_cc_libc_decl bool mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_f
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
-					mmux_pointer_t bufptr, mmux_usize_t buflen)
+					mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
@@ -434,7 +436,7 @@ mmux_cc_libc_decl bool mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
-					 mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_off_t offset)
+					 mmux_pointerc_t bufptr, mmux_usize_t buflen, mmux_off_t offset)
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_lseek (mmux_libc_file_descriptor_t fd, mmux_off_t * offset_p, mmux_sint_t whence)

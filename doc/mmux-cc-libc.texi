@@ -1068,7 +1068,7 @@ if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memcmp (mmux_sint_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
+@deftypefun bool mmux_libc_memcmp (mmux_sint_t * @var{result_p}, mmux_pointerc_t @vari{ptr}, mmux_pointerc_t @varii{ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memcmp}.
 @end deftypefun
 
@@ -2664,6 +2664,12 @@ Return the file descriptor associated to the constant @code{AT_FDCWD}.  We can u
 Make a new file descriptor value.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_fd_equal (mmux_libc_fd_t @vari{fd}, mmux_libc_fd_t @varii{fd})
+Return @ctrue{} if @vari{fd} is equal to @varii{fd}; otherwise return @cfalse{}.
+@end deftypefun
+
+
 To convert a file descriptor to string we can do:
 
 @example
@@ -2922,23 +2928,25 @@ if (mmux_libc_read(&nbytes_done, fd, bufptr, bulen)) @{
 @section Writing to file descriptors
 
 
-@deftypefun bool mmux_libc_write (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_write (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 @MmuxCInterface{write}.
 
 @example
 mmux_libc_file_descriptor_t     fd;
 mmux_usize_t                    nbytes_done;
-mmux_asciizcp_t                    bufptr = "ciao";
+mmux_usize_t                    buflen;
+mmux_asciizcp_t                 bufptr = "ciao";
 
+mmux_libc_strlen(&buflen, bufptr);
 mmux_libc_stdou(&fd);
-if (mmux_libc_write(&nbytes_done, fd, bufptr, strlen(bufptr))) @{
+if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pwrite (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
+@deftypefun bool mmux_libc_pwrite (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
 @MmuxCInterface{pwrite}.
 @end deftypefun
 
