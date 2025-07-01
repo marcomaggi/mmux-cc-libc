@@ -201,7 +201,8 @@ check_PROGRAMS	= \
 	\
 	tests/mmux_libc_open_write_read_close		\
 	tests/mmux_libc_open_pwrite_pread_close		\
-	tests/mmux_libc_openat_write_read_close
+	tests/mmux_libc_openat_write_read_close		\
+	tests/mmux_libc_openat2_write_read_close
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -251,6 +252,9 @@ tests_mmux_libc_open_pwrite_pread_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_mmux_libc_openat_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_mmux_libc_openat_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_mmux_libc_openat2_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_openat2_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

@@ -21,7 +21,7 @@
 
 static mmux_asciizcp_t	PROGNAME = "mmux_libc_open_write_read_close";
 
-static mmux_asciizcp_t	pathname_asciiz = "./file.ext";
+static mmux_asciizcp_t	pathname_asciiz = "./mmux_libc_open_write_read_close.file.ext";
 
 
 /** --------------------------------------------------------------------

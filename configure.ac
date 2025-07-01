@@ -78,7 +78,7 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h ])
+                  arpa/inet.h netdb.h sys/syscall.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -87,10 +87,12 @@ dnl Jun 25, 2025)
 dnl
 dnl AC_CHECK_HEADERS([linux/wait.h])
 
+AC_CHECK_HEADERS([linux/openat2.h])
+
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
-                wait waitid])
+                wait waitid syscall])
 
 dnl --------------------------------------------------------------------
 
@@ -141,6 +143,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_TM],           [sizeof(struct tm)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IOVEC],        [sizeof(struct iovec)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_FLOCK],        [sizeof(struct flock)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_FD_SET],       [sizeof(fd_set)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_OPEN_HOW],     [sizeof(struct open_how)])
 
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN_ADDR],      [sizeof(struct in_addr)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN6_ADDR],     [sizeof(struct in6_addr)])
@@ -229,6 +232,7 @@ MMUX_CONSTANT_TESTS([SIOCATMARK])
 ## file system stuff
 MMUX_CONSTANT_TESTS([AT_FDCWD AT_EACCESS AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW AT_EMPTY_PATH AT_REMOVEDIR AT_NOAUTOMOUNT MAXSYMLINKS])
 MMUX_CONSTANT_TESTS([RENAME_EXCHANGE RENAME_NOREPLACE RENAME_WITHEOUT])
+MMUX_CONSTANT_TESTS([RESOLVE_BENEATH RESOLVE_IN_ROOT RESOLVE_NO_MAGICLINKS RESOLVE_NO_SYMLINKS RESOLVE_NO_XDEV RESOLVE_CACHED])
 
 ## networking
 MMUX_CONSTANT_TESTS([SOCK_CLOEXEC SOCK_DCCP SOCK_DGRAM SOCK_NONBLOCK SOCK_PACKET SOCK_RAW SOCK_RDM SOCK_SEQPACKET SOCK_STREAM])

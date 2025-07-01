@@ -413,6 +413,10 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_dprintf_newline   (mmux_libc_file_descriptor_t fd);
+mmux_cc_libc_decl bool mmux_libc_dprintfou_newline (void);
+mmux_cc_libc_decl bool mmux_libc_dprintfer_newline (void);
+
 mmux_cc_libc_decl bool mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname,
 				       mmux_sint_t flags, mmux_mode_t mode)
   __attribute__((__nonnull__(1)));
@@ -420,6 +424,33 @@ mmux_cc_libc_decl bool mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_li
 mmux_cc_libc_decl bool mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
 					 mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
   __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_open_how_flags_set (mmux_libc_open_how_t * const P, mmux_uint64_t value)
+  __attribute__((__nonnull__(1)));
+mmux_cc_libc_decl bool mmux_libc_open_how_flags_ref (mmux_uint64_t * result_p, mmux_libc_open_how_t const * const P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_open_how_mode_set (mmux_libc_open_how_t * const P, mmux_uint64_t value)
+  __attribute__((__nonnull__(1)));
+mmux_cc_libc_decl bool mmux_libc_open_how_mode_ref (mmux_uint64_t * result_p, mmux_libc_open_how_t const * const P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_open_how_resolve_set (mmux_libc_open_how_t * const P, mmux_uint64_t value)
+  __attribute__((__nonnull__(1)));
+mmux_cc_libc_decl bool mmux_libc_open_how_resolve_ref (mmux_uint64_t * result_p, mmux_libc_open_how_t const * const P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t const * const open_how_p,
+						char const * struct_name)
+  __attribute__((__nonnull__(2)));
+
+mmux_cc_libc_decl bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
+					  mmux_libc_file_system_pathname_t pathname, mmux_libc_open_how_t const * const how_p)
+  __attribute__((__nonnull__(1,4)));
+
+/* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_close (mmux_libc_file_descriptor_t fd);
 

@@ -28,7 +28,7 @@
 
 #include <mmux-cc-libc-internals.h>
 
-#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
+#define DPRINTF(FD,...)		if (mmux_libc_dprintf(FD,__VA_ARGS__)) { return true; }
 
 
 /** --------------------------------------------------------------------

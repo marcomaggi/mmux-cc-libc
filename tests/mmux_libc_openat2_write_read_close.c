@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Jun 29, 2025
+  Date: Jul  1, 2025
 
   Abstract
 
@@ -19,9 +19,9 @@
 
 #include <mmux-cc-libc.h>
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_open_write_read_close";
+static mmux_asciizcp_t	PROGNAME = "mmux_libc_openat2_write_read_close";
 
-static mmux_asciizcp_t	pathname_asciiz = "./mmux_libc_open_write_read_close.file.ext";
+static mmux_asciizcp_t	pathname_asciiz = "./mmux_libc_openat2_write_read_close.file.ext";
 
 
 /** --------------------------------------------------------------------
@@ -75,19 +75,39 @@ handle_error (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  mmux_libc_file_descriptor_t		fder;
   mmux_libc_file_system_pathname_t	ptn;
+  mmux_libc_file_descriptor_t		dirfd;
   mmux_libc_file_descriptor_t		fd;
+  mmux_libc_open_how_t			open_how;
 
-  mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+  mmux_libc_open_how_flags_set(&open_how, MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+  mmux_libc_open_how_mode_set(&open_how,  MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+  /* We do not use "MMUX_LIBC_RESOLVE_CACHED" and "MMUX_LIBC_RESOLVE_IN_ROOT" because
+     their rules would not work for this test file. */
+  mmux_libc_open_how_resolve_set(&open_how, MMUX_LIBC_RESOLVE_BENEATH \
+				 | MMUX_LIBC_RESOLVE_NO_MAGICLINKS	\
+				 | MMUX_LIBC_RESOLVE_NO_SYMLINKS	\
+				 | MMUX_LIBC_RESOLVE_NO_XDEV
+				 );
 
   cleanfiles();
+
+  mmux_libc_stder(&fder);
+
+  if (mmux_libc_open_how_dump(fder, &open_how, NULL)) {
+    handle_error();
+  }
 
   if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
     handle_error();
   };
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) {
+  mmux_libc_at_fdcwd(&dirfd);
+
+  if (mmux_libc_openat2(&fd, dirfd, ptn, &open_how)) {
     handle_error();
   }
 
@@ -96,11 +116,20 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_usize_t	nbytes_done;
     mmux_asciizcp_t	bufptr = "ciao";
     mmux_usize_t	buflen;
-    mmux_off_t		off = 0;
 
     mmux_libc_strlen(&buflen, bufptr);
 
-    if (mmux_libc_pwrite(&nbytes_done, fd, bufptr, buflen, off)) {
+    if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
+      handle_error();
+    }
+  }
+
+  /* seeking */
+  {
+    mmux_off_t		offset = 0;
+    mmux_sint_t		whence = MMUX_LIBC_SEEK_SET;
+
+    if (mmux_libc_lseek(fd, &offset, whence)) {
       handle_error();
     }
   }
@@ -113,9 +142,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_usize_t	nbytes_done;
     mmux_usize_t	buflen = 4096;
     mmux_uint8_t	bufptr[buflen];
-    mmux_off_t		off = 0;
 
-    if (mmux_libc_pread(&nbytes_done, fd, bufptr, buflen, off)) {
+    if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) {
       handle_error();
     }
 

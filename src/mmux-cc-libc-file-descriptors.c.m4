@@ -28,7 +28,160 @@
 
 #include <mmux-cc-libc-internals.h>
 
-#define DPRINTF(FD,TEMPLATE,...)	if (mmux_libc_dprintf(FD,TEMPLATE,__VA_ARGS__)) { return true; }
+#define DPRINTF(FD,...)		if (mmux_libc_dprintf(FD,__VA_ARGS__)) { return true; }
+
+#define DPRINTF_NEWLINE(FD)	if (mmux_libc_dprintf_newline(FD)) { return true; }
+
+
+
+/** --------------------------------------------------------------------
+ ** Helpers.
+ ** ----------------------------------------------------------------- */
+
+m4_define([[[DUMP_OPEN_FLAGS_FLAG]]],[[[
+#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+  if (MMUX_LIBC_$1 & value) {
+    if (not_first_flags) {
+      DPRINTF(fd, " | $1");
+    } else {
+      DPRINTF(fd, " ($1");
+      not_first_flags = true;
+    }
+  }
+#endif
+]]])
+
+static bool
+dump_open_flags (mmux_libc_fd_t fd, mmux_uint64_t value)
+{
+  bool		not_first_flags = false;
+
+  if (0 != value) {
+
+  DUMP_OPEN_FLAGS_FLAG(O_ACCMODE)
+  DUMP_OPEN_FLAGS_FLAG(O_APPEND)
+  DUMP_OPEN_FLAGS_FLAG(O_ASYNC)
+  DUMP_OPEN_FLAGS_FLAG(O_CLOEXEC)
+  DUMP_OPEN_FLAGS_FLAG(O_CREAT)
+  DUMP_OPEN_FLAGS_FLAG(O_DIRECT)
+  DUMP_OPEN_FLAGS_FLAG(O_DIRECTORY)
+  DUMP_OPEN_FLAGS_FLAG(O_DSYNC)
+  DUMP_OPEN_FLAGS_FLAG(O_EXCL)
+  DUMP_OPEN_FLAGS_FLAG(O_EXEC)
+  DUMP_OPEN_FLAGS_FLAG(O_EXLOCK)
+  DUMP_OPEN_FLAGS_FLAG(O_FSYNC)
+  DUMP_OPEN_FLAGS_FLAG(O_IGNORE_CTTY)
+  DUMP_OPEN_FLAGS_FLAG(O_LARGEFILE)
+  DUMP_OPEN_FLAGS_FLAG(O_NDELAY)
+  DUMP_OPEN_FLAGS_FLAG(O_NOATIME)
+  DUMP_OPEN_FLAGS_FLAG(O_NOCTTY)
+  DUMP_OPEN_FLAGS_FLAG(O_NOFOLLOW)
+  DUMP_OPEN_FLAGS_FLAG(O_NOLINK)
+  DUMP_OPEN_FLAGS_FLAG(O_NONBLOCK)
+  DUMP_OPEN_FLAGS_FLAG(O_NOTRANS)
+  DUMP_OPEN_FLAGS_FLAG(O_PATH)
+  DUMP_OPEN_FLAGS_FLAG(O_RDONLY)
+  DUMP_OPEN_FLAGS_FLAG(O_RDWR)
+  DUMP_OPEN_FLAGS_FLAG(O_READ)
+  DUMP_OPEN_FLAGS_FLAG(O_SHLOCK)
+  DUMP_OPEN_FLAGS_FLAG(O_SYNC)
+  DUMP_OPEN_FLAGS_FLAG(O_TMPFILE)
+  DUMP_OPEN_FLAGS_FLAG(O_TRUNC)
+  DUMP_OPEN_FLAGS_FLAG(O_WRITE)
+  DUMP_OPEN_FLAGS_FLAG(O_WRONLY)
+
+    if (mmux_libc_dprintf(fd, ")")) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+m4_define([[[DUMP_OPEN_MODE_FLAG]]],[[[
+#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+  if (MMUX_LIBC_$1 & value) {
+    if (not_first_flags) {
+      DPRINTF(fd, " | $1");
+    } else {
+      DPRINTF(fd, " ($1");
+      not_first_flags = true;
+    }
+  }
+#endif
+]]])
+
+static bool
+dump_open_mode (mmux_libc_fd_t fd, mmux_uint64_t value)
+{
+  bool		not_first_flags = false;
+
+  if (0 != value) {
+
+    DUMP_OPEN_MODE_FLAG(S_IRGRP)
+    DUMP_OPEN_MODE_FLAG(S_IROTH)
+    DUMP_OPEN_MODE_FLAG(S_IRUSR)
+    DUMP_OPEN_MODE_FLAG(S_IRWXG)
+    DUMP_OPEN_MODE_FLAG(S_IRWXO)
+    DUMP_OPEN_MODE_FLAG(S_IRWXU)
+    DUMP_OPEN_MODE_FLAG(S_ISGID)
+    DUMP_OPEN_MODE_FLAG(S_ISUID)
+    DUMP_OPEN_MODE_FLAG(S_ISVTX)
+    DUMP_OPEN_MODE_FLAG(S_IWGRP)
+    DUMP_OPEN_MODE_FLAG(S_IWOTH)
+    DUMP_OPEN_MODE_FLAG(S_IWUSR)
+    DUMP_OPEN_MODE_FLAG(S_IXGRP)
+    DUMP_OPEN_MODE_FLAG(S_IXOTH)
+    DUMP_OPEN_MODE_FLAG(S_IXUSR)
+
+    if (mmux_libc_dprintf(fd, ")")) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+
+m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[
+#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+  if (MMUX_LIBC_$1 & value) {
+    if (not_first_flags) {
+      DPRINTF(fd, " | $1");
+    } else {
+      DPRINTF(fd, " ($1");
+      not_first_flags = true;
+    }
+  }
+#endif
+]]])
+
+static bool
+dump_open_resolve (mmux_libc_fd_t fd, mmux_uint64_t value)
+{
+  bool		not_first_flags = false;
+
+  if (0 != value) {
+
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_BENEATH)
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_IN_ROOT)
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_NO_MAGICLINKS)
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_NO_SYMLINKS)
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_NO_XDEV)
+    DUMP_OPEN_RESOLVE_FLAG(RESOLVE_CACHED)
+
+    if (mmux_libc_dprintf(fd, ")")) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 
 /** --------------------------------------------------------------------
@@ -154,6 +307,22 @@ mmux_libc_dprintfer (char const * template, ...)
   return ((0 <= rv)? false : true);
 }
 
+bool
+mmux_libc_dprintf_newline (mmux_libc_file_descriptor_t fd)
+{
+  return mmux_libc_dprintf(fd, "\n");
+}
+bool
+mmux_libc_dprintfou_newline (void)
+{
+  return mmux_libc_dprintfou("\n");
+}
+bool
+mmux_libc_dprintfer_newline (void)
+{
+  return mmux_libc_dprintfer("\n");
+}
+
 /* ------------------------------------------------------------------ */
 
 bool
@@ -187,6 +356,101 @@ mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t 
   } else {
     return true;
   }
+}
+
+/* ------------------------------------------------------------------ */
+
+m4_define([[[DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER]]],[[[bool
+mmux_libc_open_how_$1_set (mmux_libc_open_how_t * const P, $2 value)
+{
+  P->$1 = value;
+  return false;
+}
+bool
+mmux_libc_open_how_$1_ref ($2 * result_p, mmux_libc_open_how_t const * const P)
+{
+  *result_p = P->$1;
+  return false;
+}]]])
+
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(flags,	mmux_uint64_t)
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(mode,	mmux_uint64_t)
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(resolve,	mmux_uint64_t)
+
+bool
+mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t const * const open_how_p, char const * struct_name)
+{
+  if (NULL == struct_name) {
+    struct_name = "struct open_how";
+  }
+
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)open_how_p);
+
+  /* Dump the field "flags". */
+  {
+    mmux_uint64_t	value;
+
+    mmux_libc_open_how_flags_ref(&value, open_how_p);
+
+    DPRINTF(fd, "%s->flags = ", struct_name);
+    if (mmux_uint64_dprintf(fd, value)) {
+      return true;
+    }
+    if (dump_open_flags(fd, value)) {
+      return true;
+    }
+    DPRINTF_NEWLINE(fd);
+  }
+
+  /* Dump the field "mode". */
+  {
+    mmux_uint64_t	value;
+
+    mmux_libc_open_how_mode_ref(&value, open_how_p);
+
+    DPRINTF(fd, "%s->mode = ", struct_name);
+    if (mmux_uint64_dprintf(fd, value)) {
+      return true;
+    }
+    if (dump_open_mode(fd, value)) {
+      return true;
+    }
+    DPRINTF_NEWLINE(fd);
+  }
+
+  /* Dump the field "resolve". */
+  {
+    mmux_uint64_t	value;
+
+    mmux_libc_open_how_resolve_ref(&value, open_how_p);
+
+    DPRINTF(fd, "%s->resolve = ", struct_name);
+    if (mmux_uint64_dprintf(fd, value)) {
+      return true;
+    }
+    if (dump_open_resolve(fd, value)) {
+      return true;
+    }
+    DPRINTF_NEWLINE(fd);
+  }
+
+  return false;
+}
+
+bool
+mmux_libc_openat2 (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
+		   mmux_libc_file_system_pathname_t pathname, mmux_libc_open_how_t const * const how_p)
+{
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
+  mmux_slong_t	fdval = syscall(SYS_openat2, dirfd.value, pathname.value, how_p, sizeof(mmux_libc_open_how_t));
+
+  if (-1 != fdval) {
+    fd->value = fdval;
+    return false;
+  } else {
+    return true;
+  }
+]]])
 }
 
 /* ------------------------------------------------------------------ */

@@ -172,6 +172,10 @@ extern "C" {
 #  include <limits.h>
 #endif
 
+#ifdef HAVE_LINUX_OPENAT2_H
+#  include <linux/openat2.h>
+#endif
+
 #ifdef HAVE_MATH_H
 #  include <math.h>
 #endif
@@ -210,6 +214,10 @@ extern "C" {
 
 #ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h>
+#endif
+
+#ifdef HAVE_SYS_SYSCALL_H
+#  include <sys/syscall.h>
 #endif
 
 #ifdef HAVE_SYS_TIME_H
@@ -288,6 +296,15 @@ typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
 typedef struct tm		mmux_libc_tm_t;
 typedef struct iovec		mmux_libc_iovec_t;
+#if ((defined HAVE_OPEN_HOW) && (1 == HAVE_OPEN_HOW))
+typedef struct open_how		mmux_libc_open_how_t;
+#else
+typedef struct mmux_libc_open_how_t {
+  mmux_uint64_t		flags;
+  mmux_uint64_t		mode;
+  mmux_uint64_t		resolve;
+} mmux_libc_open_how_t;
+#endif
 typedef struct flock		mmux_libc_flock_t;
 typedef fd_set			mmux_libc_fd_set_t;
 typedef struct rlimit		mmux_libc_rlimit_t;

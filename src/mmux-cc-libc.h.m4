@@ -122,6 +122,7 @@ typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD
 typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP];    } mmux_libc_group_t;
 typedef struct mmux_libc_stat_t     { mmux_uint8_t value[MMUX_LIBC_SIZEOF_STAT];     } mmux_libc_stat_t;
 typedef struct mmux_libc_utimbuf_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_UTIMBUF];  } mmux_libc_utimbuf_t;
+typedef struct mmux_libc_open_how_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW]; } mmux_libc_open_how_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_pointer;

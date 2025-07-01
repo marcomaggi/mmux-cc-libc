@@ -386,6 +386,12 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{RENAME_EXCHANGE}
 @MmuxDefineConstant{RENAME_NOREPLACE}
 @MmuxDefineConstant{RENAME_WITHEOUT}
+@MmuxDefineConstant{RESOLVE_BENEATH}
+@MmuxDefineConstant{RESOLVE_IN_ROOT}
+@MmuxDefineConstant{RESOLVE_NO_MAGICLINKS}
+@MmuxDefineConstant{RESOLVE_NO_SYMLINKS}
+@MmuxDefineConstant{RESOLVE_NO_XDEV}
+@MmuxDefineConstant{RESOLVE_CACHED}
 @MmuxDefineConstant{SEEK_CUR}
 @MmuxDefineConstant{SEEK_DATA}
 @MmuxDefineConstant{SEEK_END}
@@ -2730,6 +2736,14 @@ Like @cfunc{mmux_libc_dprintf} but prints on @stderr{}.
 
 @c ------------------------------------------------------------------------
 
+@deftypefun bool mmux_libc_dprintf_newline (mmux_libc_file_descriptor_t @var{fd})
+@deftypefunx bool mmux_libc_dprintfou_newline (void)
+@deftypefunx bool mmux_libc_dprintfer_newline (void)
+Print a single newline character, respectively: on @var{fd}, on @stdout{}, on @stderr{}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
 @macro MmuxDefineTypePrinterFunc{STEM}
 @deftypefun bool mmux_\STEM\_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_\STEM\_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
@@ -2844,6 +2858,16 @@ Print to @var{fd} the string representation of @var{value}.
 @section Opening file descriptors
 
 
+@menu
+* fds opening standard::        Standard file descriptor opening.
+* fds opening extended::        Extended file descriptor opening.
+@end menu
+
+@c page
+@node fds opening standard
+@subsection Standard file descriptor opening
+
+
 @deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
 @MmuxCInterface{open}.
 
@@ -2887,6 +2911,98 @@ if (mmux_libc_openat(&fd, dirfd, pathname, flags, mode)) @{
 @}
 @end example
 @end deftypefun
+
+@c page
+@node fds opening extended
+@subsection Extended file descriptor opening
+
+
+The function @cfunc{openat2} and the data structure @code{struct open_how} are system extensions
+implemented by the Linux kernel.
+
+
+@MmuxCStructOpaqueTypedef{open_how}
+
+
+@MmuxSetterGetter{open_how, flags,   mmux_uint64_t}
+@MmuxSetterGetter{open_how, mode,    mmux_uint64_t}
+@MmuxSetterGetter{open_how, resolve, mmux_uint64_t}
+@MmuxStructDumper{open_how}
+
+
+To dump the contents of @code{mmux_libc_open_how_t} we can do:
+
+@example
+mmux_libc_file_descriptor_t     fder;
+mmux_libc_open_how_t            open_how;
+
+mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+
+mmux_libc_open_how_flags_set(&open_how, \
+  MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+
+mmux_libc_open_how_mode_set(&open_how, \
+  MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+mmux_libc_open_how_resolve_set(&open_how, \
+  MMUX_LIBC_RESOLVE_BENEATH               \
+  | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
+  | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
+  | MMUX_LIBC_RESOLVE_NO_XDEV);
+
+mmux_libc_stder(&fder);
+if (mmux_libc_open_how_dump(fder, &open_how, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+notice how the Linux kernel demands the data structure to be reset to zero before use; this code
+prints:
+
+@example
+struct open_how = 0x7ffca7af5b80
+struct open_how->flags = 194 (O_ACCMODE | O_CREAT | O_EXCL | O_RDWR)
+struct open_how->mode = 384 (S_IRUSR | S_IRWXU | S_IWUSR)
+struct open_how->resolve = 15 (RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS | RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV)
+@end example
+
+
+@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * @var{fd}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_open_how_t const * const @var{how_p})
+@MmuxCInterface{openat2}.
+
+@example
+mmux_libc_file_system_pathname_t      ptn;
+mmux_libc_file_descriptor_t           dirfd;
+mmux_libc_file_descriptor_t           fd;
+mmux_libc_open_how_t                  open_how;
+
+/* required by the Linux kernel */
+mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+
+mmux_libc_open_how_flags_set(&open_how, \
+  MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+
+mmux_libc_open_how_mode_set(&open_how, \
+  MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+mmux_libc_open_how_resolve_set(&open_how, \
+  MMUX_LIBC_RESOLVE_BENEATH               \
+  | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
+  | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
+  | MMUX_LIBC_RESOLVE_NO_XDEV);
+
+if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
+  /* error */
+@};
+
+mmux_libc_at_fdcwd(&dirfd);
+
+if (mmux_libc_openat2(&fd, dirfd, ptn, &open_how)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
 
 @c page
 @node fds closing
@@ -3497,17 +3613,17 @@ responsibility of the caller to release the buffer with a call to @cfunc{mmux_li
 @section Renaming links
 
 
-@deftypefun mmux_cc_libc_decl bool mmux_libc_rename (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_rename (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{rename}.
 @end deftypefun
 
 
-@deftypefun mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_renameat (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{renameat}.
 @end deftypefun
 
 
-@deftypefn {Linux Function} mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_uint_t flags)
+@deftypefn {Linux Function} bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_uint_t flags)
 @MmuxCInterface{renameat2}.
 @end deftypefn
 

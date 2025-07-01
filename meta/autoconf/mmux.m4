@@ -678,6 +678,10 @@ AC_INCLUDES_DEFAULT([
 #  endif
 #endif
 
+#ifdef HAVE_LINUX_OPENAT2_H
+#  include <linux/openat2.h>
+#endif
+
 #ifdef HAVE_MATH_H
 #  include <math.h>
 #endif
