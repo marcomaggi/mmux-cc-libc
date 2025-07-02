@@ -2721,25 +2721,72 @@ wide.
 
 
 @deftypefun bool mmux_libc_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_asciizcp_t @var{template}, ...)
-@MmuxCInterface{dprintf}.
+@deftypefunx bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
+@deftypefunx bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
+@MmuxCInterface{dprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
+
+To print to a file descriptor:
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+mmux_sint_t             flags = MMUX_LIBC_O_RDONLY;
+mmux_mode_t             mode  = 0;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
+  /* error */
+@};
+
+if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  /* error */
+@}
+
+if (mmux_libc_dprintf(fd, "the number is %d\n", 123)) @{
+  /* error */
+@}
+@end example
+
+To print to @stdout{} and @stderr{}:
+
+@example
+if (mmux_libc_dprintfou("the number is %d\n", 123)) @{
+  /* error */
+@}
+if (mmux_libc_dprintfer("the number is %d\n", 456)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
-Like @cfunc{mmux_libc_dprintf} but prints on @stdout{}.
+@deftypefun bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_asciizcp_t @var{template}, va_list @var{ap})
+@deftypefunx bool mmux_libc_vdprintfou (mmux_asciizcp_t @var{template}, va_list @var{ap})
+@deftypefunx bool mmux_libc_vdprintfer (mmux_asciizcp_t @var{template}, va_list @var{ap})
+@MmuxCInterface{vdprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
+Notice that @file{stdarg.h} is already included by @value{PackageHeaderFile}.
+
+@example
+bool
+my_print_error (mmux_asciizcp_t template, ...)
+@{
+  bool          rv;
+  va_list       ap;
+
+  va_start(ap, template);
+  @{
+    rv = mmux_libc_vdprintfer(template, ap);
+  @}
+  va_end(ap);
+  return rv;
+@}
+@end example
 @end deftypefun
 
-
-@deftypefun bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
-Like @cfunc{mmux_libc_dprintf} but prints on @stderr{}.
-@end deftypefun
-
-@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_dprintf_newline (mmux_libc_file_descriptor_t @var{fd})
 @deftypefunx bool mmux_libc_dprintfou_newline (void)
 @deftypefunx bool mmux_libc_dprintfer_newline (void)
-Print a single newline character, respectively: on @var{fd}, on @stdout{}, on @stderr{}.
+Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -3066,6 +3113,27 @@ if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
 @MmuxCInterface{pwrite}.
 @end deftypefun
 
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_write_buffer (mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefunx bool mmux_libc_write_buffer_to_stdou (mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefunx bool mmux_libc_write_buffer_to_stder (mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+Like @cfunc{mmux_libc_write}, but write a buffer to the file descriptor, respectively: @var{fd},
+@stdout{}, @stderr{}.  If the number of written bytes equals @var{buflen}: return @cfalse{},
+otherwise return @ctrue{}.
+
+These functions exist mostly as tools in debugging code.
+
+@example
+mmux_usize_t    buflen;
+mmux_uint8_t    bufptr[buflen];
+
+if (mmux_libc_write_buffer_to_stdou(bufptr, buflen)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
 @c page
 @node fds seeking
 @section Seeking position in file descriptors
@@ -3371,36 +3439,56 @@ representation of the @var{command}.
 @c ------------------------------------------------------------------------
 
 @defvr {Fcntl Command} MMUX_LIBC_F_DUPFD
-Duplicate a file descriptor; @var{parameter_p} reference a variable of type
+Duplicate a file descriptor; @var{parameter_p} must reference a variable of type
 @objtype{mmux_libc_file_descriptor_t}.
 @end defvr
 
 @c ------------------------------------------------------------------------
 
 @defvr {Fcntl Command} MMUX_LIBC_F_GETFD
-Get file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} reference a variable
+Get file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a variable
 of type @objtype{mmux_sint_t}.
 @end defvr
 
 @c ------------------------------------------------------------------------
 
 @defvr {Fcntl Command} MMUX_LIBC_F_SETFD
-Set file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} reference a variable
-of type @objtype{mmux_sint_t} holding a bitwise OF combination of flags.
+Set file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a variable
+of type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
 @end defvr
 
 @c ------------------------------------------------------------------------
 
 @defvr {Fcntl Command} MMUX_LIBC_F_GETFL
-Get open file descriptor flags, like @samp{O_RDWR}; @var{parameter_p} reference a variable of type
-@objtype{mmux_sint_t}.
+Get open file descriptor flags, like @samp{O_RDWR}; @var{parameter_p} must reference a variable of
+type @objtype{mmux_sint_t}.
+
+To set blocking mode for a file descriptor we do:
+
+@example
+mmux_libc_fd_t  fd;
+mmux_sint_t     parameter;
+
+/* Acquire current file descriptor flags. */
+if (mmux_libc_fcntl(in, MMUX_LIBC_F_GETFL, &parameter)) @{
+  /* error */
+@}
+
+/* Null the non-block flag. */
+parameter &= (~ MMUX_LIBC_O_NONBLOCK);
+
+/* Set the new flags. */
+if (mmux_libc_fcntl(in, MMUX_LIBC_F_SETFL, &parameter)) @{
+  /* error */
+@}
+@end example
 @end defvr
 
 @c ------------------------------------------------------------------------
 
 @defvr {Fcntl Command} MMUX_LIBC_F_SETFL
-Set open file descriptor flags, like @samp{O_APPEND}; @var{parameter_p} reference a variable of type
-@objtype{mmux_sint_t} holding a bitwise OF combination of flags.
+Set open file descriptor flags, like @samp{O_APPEND}; @var{parameter_p} must reference a variable of
+type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
 @end defvr
 
 @c ------------------------------------------------------------------------

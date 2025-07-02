@@ -146,8 +146,6 @@ dump_open_mode (mmux_libc_fd_t fd, mmux_uint64_t value)
 
 /* ------------------------------------------------------------------ */
 
-/* ------------------------------------------------------------------ */
-
 m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[
 #if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
   if (MMUX_LIBC_$1 & value) {
@@ -163,6 +161,7 @@ m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[
 
 static bool
 dump_open_resolve (mmux_libc_fd_t fd, mmux_uint64_t value)
+/* Dump the field "resolve" of "struct open_how", see "openat2(2)" for details. */
 {
   bool		not_first_flags = false;
 
@@ -191,7 +190,7 @@ dump_open_resolve (mmux_libc_fd_t fd, mmux_uint64_t value)
 static const mmux_libc_file_descriptor_t stdin_fd = { .value = 0 };
 static const mmux_libc_file_descriptor_t stdou_fd = { .value = 1 };
 static const mmux_libc_file_descriptor_t stder_fd = { .value = 2 };
-static const mmux_libc_file_descriptor_t at_fdcwd_fd = { .value = mmux_libc_VALUEOF_AT_FDCWD };
+static const mmux_libc_file_descriptor_t at_fdcwd_fd = { .value = MMUX_LIBC_AT_FDCWD };
 
 bool
 mmux_libc_stdin (mmux_libc_file_descriptor_t * result_p)
@@ -268,7 +267,7 @@ mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_fd_t fd)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, char const * template, ...)
+mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, ...)
 {
   va_list	ap;
   mmux_sint_t	rv;
@@ -281,7 +280,7 @@ mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, char const * template, ...)
   return ((0 <= rv)? false : true);
 }
 bool
-mmux_libc_dprintfou (char const * template, ...)
+mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 {
   va_list	ap;
   mmux_sint_t	rv;
@@ -294,7 +293,7 @@ mmux_libc_dprintfou (char const * template, ...)
   return ((0 <= rv)? false : true);
 }
 bool
-mmux_libc_dprintfer (char const * template, ...)
+mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 {
   va_list	ap;
   mmux_sint_t	rv;
@@ -306,6 +305,29 @@ mmux_libc_dprintfer (char const * template, ...)
   va_end(ap);
   return ((0 <= rv)? false : true);
 }
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
+{
+  mmux_sint_t	rv = vdprintf(fd.value, template, ap);
+  return ((0 <= rv)? false : true);
+}
+bool
+mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list ap)
+{
+  mmux_sint_t	rv = vdprintf(stdou_fd.value, template, ap);
+  return ((0 <= rv)? false : true);
+}
+bool
+mmux_libc_vdprintfer (mmux_asciizcp_t template, va_list ap)
+{
+  mmux_sint_t	rv = vdprintf(stder_fd.value, template, ap);
+  return ((0 <= rv)? false : true);
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
 mmux_libc_dprintf_newline (mmux_libc_file_descriptor_t fd)
@@ -478,6 +500,32 @@ mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, m
   } else {
     return true;
   }
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_write_buffer (mmux_libc_fd_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+{
+  mmux_usize_t	nbytes_done;
+  bool		rv;
+
+  rv = mmux_libc_write(&nbytes_done, fd, bufptr, buflen);
+  if (rv || (buflen != nbytes_done)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
+mmux_libc_write_buffer_to_stdou (mmux_pointerc_t bufptr, mmux_usize_t buflen)
+{
+  return mmux_libc_write_buffer(stdou_fd, bufptr, buflen);
+}
+bool
+mmux_libc_write_buffer_to_stder (mmux_pointerc_t bufptr, mmux_usize_t buflen)
+{
+  return mmux_libc_write_buffer(stder_fd, bufptr, buflen);
 }
 
 /* ------------------------------------------------------------------ */

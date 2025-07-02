@@ -86,6 +86,7 @@ extern "C" {
  ** ----------------------------------------------------------------- */
 
 #include <stdbool.h>
+#include <stdarg.h>
 #include <mmux-cc-types.h>
 #include <mmux-cc-libc-config.h>
 #include <mmux-cc-libc-constants.h>
