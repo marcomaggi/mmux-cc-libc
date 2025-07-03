@@ -26,44 +26,66 @@ static mmux_asciizcp_t	PROGNAME = "mmux_libc_select";
 static void
 print_error (mmux_asciizcp_t errmsg_template, ...)
 {
-  if (mmux_libc_dprintfer("%s: error: ", PROGNAME)) {
-    return;
-  } else {
-    bool	rv;
-    va_list	ap;
+  mmux_libc_fd_t	mfd;
 
-    va_start(ap, errmsg_template);
-    {
-      rv = mmux_libc_dprintfer(errmsg_template, ap);
-    }
-    va_end(ap);
-    if (rv) {
+  if (mmux_libc_make_mfd(&mfd)) {
+    return;
+  }
+  {
+    if (mmux_libc_dprintf(mfd, "%s: error: ", PROGNAME)) {
       return;
     } else {
-      mmux_libc_dprintfer_newline();
+      bool	rv;
+      va_list	ap;
+
+      va_start(ap, errmsg_template);
+      {
+	rv = mmux_libc_dprintf(mfd, errmsg_template, ap);
+      }
+      va_end(ap);
+      if (rv) {
+	return;
+      } else {
+	mmux_libc_dprintf_newline(mfd);
+      }
+    }
+    if (mmux_libc_mfd_writeer(mfd)) {
+      return;
     }
   }
+  mmux_libc_close(mfd);
 }
 static void
 print_message (mmux_asciizcp_t template, ...)
 {
-  if (mmux_libc_dprintfer("%s: ", PROGNAME)) {
-    return;
-  } else {
-    bool	rv;
-    va_list	ap;
+  mmux_libc_fd_t	mfd;
 
-    va_start(ap, template);
-    {
-      rv = mmux_libc_dprintfer(template, ap);
-    }
-    va_end(ap);
-    if (rv) {
+  if (mmux_libc_make_mfd(&mfd)) {
+    return;
+  }
+  {
+    if (mmux_libc_dprintf(mfd, "%s: ", PROGNAME)) {
       return;
     } else {
-      mmux_libc_dprintfer_newline();
+      bool	rv;
+      va_list	ap;
+
+      va_start(ap, template);
+      {
+	rv = mmux_libc_dprintf(mfd, template, ap);
+      }
+      va_end(ap);
+      if (rv) {
+	return;
+      } else {
+	mmux_libc_dprintf_newline(mfd);
+      }
+    }
+    if (mmux_libc_mfd_writeer(mfd)) {
+      return;
     }
   }
+  mmux_libc_close(mfd);
 }
 static void
 handle_error (void)
