@@ -3666,7 +3666,8 @@ if (mmux_libc_close(mfd)) @{
 
 @noindent
 we can apply to a memory--mapped file descriptor almost all the functions that act upon ordinary
-file descriptors.
+file descriptors.  We need to remember to appropriately shift the input/output position of the
+underlying device with @cfunc{mmux_libc_lseek}.
 
 
 @deftypefun bool mmux_libc_make_mfd (mmux_libc_file_descriptor_t * @var{mfd_p})
