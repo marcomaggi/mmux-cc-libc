@@ -78,7 +78,7 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h sys/syscall.h])
+                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -92,7 +92,7 @@ AC_CHECK_HEADERS([linux/openat2.h])
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
-                wait waitid syscall])
+                wait waitid syscall memfd_create])
 
 dnl --------------------------------------------------------------------
 
@@ -318,6 +318,8 @@ MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WEXITED WNOHANG WNOWAIT WSTOPPED WCONT
 
 # These are Linux-specific and defined in "sys/wait.h"; for the function "waitid(2)".
 MMUX_CONSTANT_TESTS([P_ALL P_PID P_PIDFD P_PGID])
+
+MMUX_CONSTANT_TESTS([MFD_CLOEXEC MFD_ALLOW_SEALING MFD_HUGETLB])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE])

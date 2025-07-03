@@ -214,6 +214,10 @@ extern "C" {
 #  include <sys/ioctl.h>
 #endif
 
+#ifdef HAVE_SYS_MMAN_H
+#  include <sys/mman.h>
+#endif
+
 #ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h>
 #endif

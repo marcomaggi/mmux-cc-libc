@@ -596,6 +596,28 @@ mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_file_descriptor_t fd, mmux_sin
 
 
 /** --------------------------------------------------------------------
+ ** Memfd buffers.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl bool mmux_libc_memfd_create (mmux_libc_file_descriptor_t * fd_p, mmux_asciizcp_t name, mmux_sint_t flags)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_make_mfd (mmux_libc_file_descriptor_t * fd_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_mfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd);
+
+mmux_cc_libc_decl bool mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t mfd);
+
+mmux_cc_libc_decl bool mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd);
+
+
+/** --------------------------------------------------------------------
  ** Printing types.
  ** ----------------------------------------------------------------- */
 

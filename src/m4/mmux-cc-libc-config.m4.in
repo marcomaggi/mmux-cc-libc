@@ -457,6 +457,10 @@ m4_define([[[mmux_libc_VALUEOF_WSTOPPED]]],			[[[@MMUX_VALUEOF_WSTOPPED@]]])
 m4_define([[[mmux_libc_VALUEOF_WCONTINUED]]],			[[[@MMUX_VALUEOF_WCONTINUED@]]])
 m4_define([[[mmux_libc_VALUEOF_WUNTRACED]]],			[[[@MMUX_VALUEOF_WUNTRACED@]]])
 
+m4_define([[[mmux_libc_VALUEOF_MFD_CLOEXEC]]],			[[[@MMUX_VALUEOF_MFD_CLOEXEC@]]])
+m4_define([[[mmux_libc_VALUEOF_MFD_ALLOW_SEALING]]],		[[[@MMUX_VALUEOF_MFD_ALLOW_SEALING@]]])
+m4_define([[[mmux_libc_VALUEOF_MFD_HUGETLB]]],			[[[@MMUX_VALUEOF_MFD_HUGETLB@]]])
+
 m4_define([[[mmux_libc_VALUEOF__SC_2_CHAR_TERM]]],		[[[@MMUX_VALUEOF__SC_2_CHAR_TERM@]]])
 m4_define([[[mmux_libc_VALUEOF__SC_2_C_BIND]]],			[[[@MMUX_VALUEOF__SC_2_C_BIND@]]])
 m4_define([[[mmux_libc_VALUEOF__SC_2_C_DEV]]],			[[[@MMUX_VALUEOF__SC_2_C_DEV@]]])

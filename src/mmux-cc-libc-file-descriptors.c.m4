@@ -32,7 +32,6 @@
 
 #define DPRINTF_NEWLINE(FD)	if (mmux_libc_dprintf_newline(FD)) { return true; }
 
-
 
 /** --------------------------------------------------------------------
  ** Helpers.
@@ -1233,6 +1232,133 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_COPY_FILE_RANGE]]],[[[
     return true;
   }
 ]]])
+}
+
+
+/** --------------------------------------------------------------------
+ ** Memfd buffers.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_memfd_create (mmux_libc_file_descriptor_t * fd_p, mmux_asciizcp_t name, mmux_sint_t flags)
+{
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMFD_CREATE]]],[[[
+  mmux_sint_t	rv = memfd_create(name, flags);
+
+  if (-1 == rv) {
+    return true;
+  } else {
+    fd_p->value = rv;
+    return false;
+  }
+]]])
+}
+bool
+mmux_libc_make_mfd (mmux_libc_file_descriptor_t * fd_p)
+{
+  return mmux_libc_memfd_create(fd_p, "mmux-cc-libs-memfd-buffer", 0);
+}
+bool
+mmux_libc_mfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
+{
+  mmux_off_t	current_offset = 0, size_offset = 0;
+
+  /* Retrieve the current position. */
+  if (mmux_libc_lseek(fd, &current_offset, MMUX_LIBC_SEEK_CUR)) {
+    return true;
+  } else /* Retrieve the file size. */
+    if (mmux_libc_lseek(fd, &size_offset, MMUX_LIBC_SEEK_END)) {
+      return true;
+    } else
+      /* Reset the original position. */
+      if (mmux_libc_lseek(fd, &current_offset, MMUX_LIBC_SEEK_SET)) {
+	return true;
+      } else if (size_offset >= 0) {
+	*len_p = (mmux_usize_t)size_offset;
+	return false;
+      } else {
+	return true;
+      }
+}
+bool
+mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd)
+{
+  bool		rv			= false;
+  mmux_off_t	original_position	= 0;
+
+  /* Acquire the original position. */
+  if (mmux_libc_lseek(mfd, &original_position, MMUX_LIBC_SEEK_SET)) {
+    return true;
+  }
+  {
+    mmux_off_t	nbytes_length	= 0;
+
+    /* Retrieve the file size. */
+    if (mmux_libc_lseek(mfd, &nbytes_length, MMUX_LIBC_SEEK_END)) {
+      rv = true;
+      goto end_of_function;
+    }
+
+    if (nbytes_length < 0) {
+      rv = true;
+      goto end_of_function;
+    }
+
+    /* Seek to the beginning. */
+    {
+      mmux_off_t	position = 0;
+
+      if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
+	rv = true;
+	goto end_of_function;
+      }
+    }
+
+    /* Read from input, write to output. */
+    {
+      mmux_usize_t	buflen = (mmux_usize_t)nbytes_length;
+      mmux_uint8_t	bufptr[buflen];
+      mmux_usize_t	nbytes_done;
+
+      if (mmux_libc_read(&nbytes_done, mfd, bufptr, buflen)) {
+	rv = true;
+	goto end_of_function;
+      }
+
+      if (nbytes_done != (mmux_usize_t)buflen) {
+	rv = true;
+	goto end_of_function;
+      }
+
+      if (mmux_libc_write(&nbytes_done, ou, bufptr, buflen)) {
+	rv = true;
+	goto end_of_function;
+      }
+
+      if (nbytes_done != (mmux_usize_t)buflen) {
+	rv = true;
+	goto end_of_function;
+      }
+    }
+  }
+
+ end_of_function:
+  /* Restore the original position. */
+  if (mmux_libc_lseek(mfd, &original_position, MMUX_LIBC_SEEK_SET)) {
+    return true;
+  }
+
+  return rv;
+}
+bool
+mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t mfd)
+{
+  return mmux_libc_mfd_write(stdou_fd, mfd);
+}
+bool
+mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd)
+{
+  return mmux_libc_mfd_write(stder_fd, mfd);
 }
 
 

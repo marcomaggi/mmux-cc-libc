@@ -412,6 +412,9 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{S_IXGRP}
 @MmuxDefineConstant{S_IXOTH}
 @MmuxDefineConstant{S_IXUSR}
+@MmuxDefineConstant{MFD_CLOEXEC}
+@MmuxDefineConstant{MFD_ALLOW_SEALING}
+@MmuxDefineConstant{MFD_HUGETLB}
 @MmuxDefineConstant{W_OK}
 @MmuxDefineConstant{X_OK}
 @MmuxDefineConstant{AF_ALG}
@@ -1120,11 +1123,29 @@ if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
 
 @deftypefun bool mmux_libc_strlen (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{ptr})
 @MmuxCInterface{strlen}.
+
+@example
+mmux_asciizcp_t         bufptr = "hello world";
+mmux_usize_t            buflen;
+
+if (mmux_libc_strlen(&buflen, bufptr)) @{
+  /* error, it should never happen */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strnlen (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{ptr}, mmux_usize_t @var{maxlen})
 @MmuxCInterface{strnlen}.
+
+@example
+mmux_asciizcp_t         bufptr = "hello world";
+mmux_usize_t            buflen;
+
+if (mmux_libc_strnlen(&buflen, bufptr, 4096)) @{
+  /* error, it should never happen */
+@}
+@end example
 @end deftypefun
 
 @c page
@@ -3075,7 +3096,7 @@ mmux_usize_t                    buflen = 4096;
 mmux_uint8_t                    bufptr[buflen];
 
 mmux_libc_stdin(&fd);
-if (mmux_libc_read(&nbytes_done, fd, bufptr, bulen)) @{
+if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
   /* error */
 @}
 @end example
