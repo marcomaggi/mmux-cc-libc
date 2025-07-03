@@ -1290,56 +1290,49 @@ mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t
   if (mmux_libc_lseek(mfd, &original_position, MMUX_LIBC_SEEK_SET)) {
     return true;
   }
+
+  /* Seek to the beginning. */
   {
-    mmux_off_t	nbytes_length	= 0;
+    mmux_off_t	position = 0;
 
-    /* Retrieve the file size. */
-    if (mmux_libc_lseek(mfd, &nbytes_length, MMUX_LIBC_SEEK_END)) {
+    if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
       rv = true;
       goto end_of_function;
     }
+  }
 
-    if (nbytes_length < 0) {
-      rv = true;
-      goto end_of_function;
-    }
+  /* Read from input, write to output. */
+  {
+    static mmux_usize_t const	read_buflen = 1024;
+    mmux_octet_t		read_bufptr[read_buflen];
+    mmux_usize_t		nbytes_read;
 
-    /* Seek to the beginning. */
-    {
-      mmux_off_t	position = 0;
-
-      if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
-	rv = true;
-	goto end_of_function;
-      }
-    }
-
-    /* Read from input, write to output. */
-    {
-      mmux_usize_t	buflen = (mmux_usize_t)nbytes_length;
-      mmux_uint8_t	bufptr[buflen];
-      mmux_usize_t	nbytes_done;
-
-      if (mmux_libc_read(&nbytes_done, mfd, bufptr, buflen)) {
+    /* Loop reading while the number of bytes read is positive. */
+    do {
+      if (mmux_libc_read(&nbytes_read, mfd, read_bufptr, read_buflen)) {
 	rv = true;
 	goto end_of_function;
       }
 
-      if (nbytes_done != (mmux_usize_t)buflen) {
-	rv = true;
-	goto end_of_function;
-      }
+      if (nbytes_read > 0) {
+	mmux_octet_t *	write_bufptr	= read_bufptr;
+	mmux_usize_t	write_buflen	= nbytes_read;
+	mmux_usize_t	nbytes_written	= 0;
 
-      if (mmux_libc_write(&nbytes_done, ou, bufptr, buflen)) {
-	rv = true;
-	goto end_of_function;
-      }
+	/* Loop writing until we have written all the bytes from the buffer. */
+	do {
+	  if (mmux_libc_write(&nbytes_written, ou, write_bufptr, write_buflen)) {
+	    rv = true;
+	    goto end_of_function;
+	  }
 
-      if (nbytes_done != (mmux_usize_t)buflen) {
-	rv = true;
-	goto end_of_function;
+	  if (nbytes_written < write_buflen) {
+	    write_bufptr += nbytes_written;
+	    write_buflen -= nbytes_written;
+	  }
+	} while (nbytes_written < write_buflen);
       }
-    }
+    } while (nbytes_read > 0);
   }
 
  end_of_function:

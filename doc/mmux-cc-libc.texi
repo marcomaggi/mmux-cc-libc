@@ -2649,7 +2649,7 @@ wide.
 * fds piping::                  Opening file descriptor pipes.
 * fds selecting::               Selecting file descriptors.
 * fds scatter-gather::          Scatter--gather input and output.
-* fds range-copying::           Copying ranges from file to file.
+* fds copying::                 Copying ranges from file to file.
 * fds flock::                   File locks.
 * fds fun control::             File descriptors functionality ontrol.
 * fds io control::              File descriptors input/output control.
@@ -3402,7 +3402,7 @@ Number of slots in the array.
 @end deftypefun
 
 @c page
-@node fds range-copying
+@node fds copying
 @section Copying ranges from file to file
 
 
@@ -3410,6 +3410,44 @@ Number of slots in the array.
 @MmuxCInterface{copy_file_range}.
 @end deftypefun
 
+
+If we need to copy data between file descriptors, we can adapt the following code template:
+
+@example
+mmux_libc_fd_t                  infd, oufd;
+
+static mmux_usize_t const       read_buflen = 1024;
+mmux_octet_t                    read_bufptr[read_buflen];
+mmux_usize_t                    nbytes_read;
+
+gimme_an_input_fd(&infd);
+gimme_an_ouput_fd(&oufd);
+
+/* Loop reading while the number of bytes read is positive. */
+do @{
+  if (mmux_libc_read(&nbytes_read, infd, read_bufptr, read_buflen)) @{
+    /* error */
+  @}
+
+  if (nbytes_read > 0) @{
+    mmux_octet_t *  write_bufptr    = read_bufptr;
+    mmux_usize_t    write_buflen    = nbytes_read;
+    mmux_usize_t    nbytes_written  = 0;
+
+    /* Loop writing until we have written all the bytes from the buffer. */
+    do @{
+      if (mmux_libc_write(&nbytes_written, oufd, write_bufptr, write_buflen)) @{
+        /* error */
+      @}
+
+      if (nbytes_written < write_buflen) @{
+        write_bufptr += nbytes_written;
+        write_buflen -= nbytes_written;
+      @}
+    @} while (nbytes_written < write_buflen);
+  @}
+@} while (nbytes_read > 0);
+@end example
 @c page
 @node fds flock
 @section File locks
