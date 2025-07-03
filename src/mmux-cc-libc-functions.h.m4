@@ -616,6 +616,8 @@ mmux_cc_libc_decl bool mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t mfd);
 
 mmux_cc_libc_decl bool mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd);
 
+mmux_cc_libc_decl bool mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum);
+
 
 /** --------------------------------------------------------------------
  ** Printing types.

@@ -1354,6 +1354,20 @@ mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd)
   return mmux_libc_mfd_write(stder_fd, mfd);
 }
 
+bool
+mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
+{
+  mmux_asciizcp_t	errmsg;
+
+  if (mmux_libc_strerror(&errmsg, errnum)) {
+    return true;
+  } else if (mmux_libc_dprintf(mfd, errmsg)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
 /** --------------------------------------------------------------------
  ** Printing types.

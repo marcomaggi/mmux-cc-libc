@@ -171,7 +171,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     mmux_libc_FD_SET(read_fr_child_fd, exce_fd_set);
     mmux_libc_FD_SET(writ_to_child_fd, exce_fd_set);
 
-    mmux_libc_timeval_set(timeout, 1, 0);
+    mmux_libc_timeval_set(timeout, 10, 0);
   }
 
   paren_give_child_process_time_to_start();
@@ -182,6 +182,13 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 		       timeout)) {
     print_error("paren: selecting fd events");
     handle_error();
+  }
+
+  if (0 == nfds_ready) {
+    print_error("child: no fds ready");
+    handle_error();
+  } else {
+    mmux_libc_dprintfer("%s: paren: number of ready fds: %d\n", PROGNAME, nfds_ready);
   }
 
   /* Check that no exceptional event happened. */
@@ -409,11 +416,16 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
       mmux_libc_FD_ZERO(exce_fd_set);
 
       mmux_libc_FD_SET(in, read_fd_set);
-      mmux_libc_FD_SET(ou, writ_fd_set);
+      if (0) {
+	/* We do not register  "ou" to be checked for writing: it  would be ready for
+	   writing immediately,  unblocking "select()".  We want  "select()" to block
+	   until a read event is ready. */
+	mmux_libc_FD_SET(ou, writ_fd_set);
+      }
       mmux_libc_FD_SET(in, exce_fd_set);
       mmux_libc_FD_SET(ou, exce_fd_set);
 
-      mmux_libc_timeval_set(timeout, 1, 0);
+      mmux_libc_timeval_set(timeout, 10, 0);
     }
 
     print_message("child: calling select()");
@@ -422,6 +434,13 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 			 timeout)) {
       print_error("child: selecting fd events");
       handle_error();
+    }
+
+    if (0 == nfds_ready) {
+      print_error("child: no fds ready");
+      handle_error();
+    } else {
+      mmux_libc_dprintfer("%s: child: number of ready fds: %d\n", PROGNAME, nfds_ready);
     }
 
     /* Check that no exceptional event happened. */

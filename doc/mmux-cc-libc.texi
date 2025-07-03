@@ -3700,6 +3700,12 @@ Wrappers for @cfunc{mmux_libc_mfd_write} that write the underlying device conten
 @stdout{}, @stderr{}.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_mfd_strerror (mmux_libc_file_descriptor_t @var{mfd}, mmux_sint_t @var{errnum})
+Write to @var{mfd}, at the current position for the underlying device, the error string associated
+to @var{errnum} and retrieved using @cfunc{mmux_libc_strerror}.
+@end deftypefun
+
 @c page
 @node fs
 @chapter File system
