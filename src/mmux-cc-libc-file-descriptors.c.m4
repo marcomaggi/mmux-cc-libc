@@ -1181,31 +1181,70 @@ mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
 		  mmux_libc_fd_set_t * read_fd_set_p, mmux_libc_fd_set_t * write_fd_set_p, mmux_libc_fd_set_t * except_fd_set_p,
 		  mmux_libc_timeval_t * timeout_p)
 {
-  mmux_libc_fd_set_t	default_read_fd_set;
-  mmux_libc_fd_set_t	default_write_fd_set;
-  mmux_libc_fd_set_t	default_except_fd_set;
+  mmux_sint_t		rv = select(maximum_nfds_to_check, read_fd_set_p, write_fd_set_p, except_fd_set_p, timeout_p);
 
-  if (NULL == read_fd_set_p) {
-    FD_ZERO(&default_read_fd_set);
-    read_fd_set_p = &default_read_fd_set;
+  if (-1 < rv) {
+    *nfds_ready = rv;
+    return false;
+  } else {
+    return true;
   }
-  if (NULL == write_fd_set_p) {
-    FD_ZERO(&default_write_fd_set);
-    write_fd_set_p = &default_write_fd_set;
-  }
-  if (NULL == except_fd_set_p) {
-    FD_ZERO(&default_except_fd_set);
-    except_fd_set_p = &default_except_fd_set;
-  }
-  {
-    mmux_sint_t		rv = select(maximum_nfds_to_check, read_fd_set_p, write_fd_set_p, except_fd_set_p, timeout_p);
+}
+bool
+mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+{
+  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_uint_t		nfds_ready;
 
-    if (-1 < rv) {
-      *nfds_ready = rv;
-      return false;
-    } else {
-      return true;
-    }
+  mmux_libc_FD_ZERO(the_fd_set);
+  mmux_libc_FD_SET(fd, the_fd_set);
+
+  if (mmux_libc_select(&nfds_ready, fd.value, the_fd_set, NULL, NULL, timeout_p)) {
+    return true;
+  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
+    *result_p = true;
+    return false;
+  } else {
+    *result_p = false;
+    return false;
+  }
+}
+bool
+mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+{
+  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_uint_t		nfds_ready;
+
+  mmux_libc_FD_ZERO(the_fd_set);
+  mmux_libc_FD_SET(fd, the_fd_set);
+
+  if (mmux_libc_select(&nfds_ready, fd.value, NULL, the_fd_set, NULL, timeout_p)) {
+    return true;
+  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
+    *result_p = true;
+    return false;
+  } else {
+    *result_p = false;
+    return false;
+  }
+}
+bool
+mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+{
+  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_uint_t		nfds_ready;
+
+  mmux_libc_FD_ZERO(the_fd_set);
+  mmux_libc_FD_SET(fd, the_fd_set);
+
+  if (mmux_libc_select(&nfds_ready, fd.value, NULL, NULL, the_fd_set, timeout_p)) {
+    return true;
+  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
+    *result_p = true;
+    return false;
+  } else {
+    *result_p = false;
+    return false;
   }
 }
 

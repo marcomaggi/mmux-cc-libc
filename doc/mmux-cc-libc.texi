@@ -3339,8 +3339,42 @@ if (isset) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t * @var{read_fd_set_p}, mmux_libc_fd_set_t * @var{write_fd_set_p}, mmux_libc_fd_set_t * @var{except_fd_set_p}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t * @var{read_fd_set_p}, mmux_libc_fd_set_t * @var{writ_fd_set_p}, mmux_libc_fd_set_t * @var{exce_fd_set_p}, mmux_libc_timeval_t * @var{timeout_p})
 @MmuxCInterface{select}.
+
+Each of the arguments @var{read_fd_set_p}, @var{writ_fd_set_p}, @var{exce_fd_set_p} can be @cnull{}
+if we are not interested in selecting the corresponding events.
+
+The argument @var{timeout_p} can be @cnull{} if we want to set a timeout of infinite time.
+
+After a successful call: the variable referenced by @var{nfds_ready_p} is set to the number of file
+descriptors that are ready for an action.
+
+The argument @var{maximum_nfds_to_check} must represent the maximum file descriptor value to check
+for events; it is usually just set to the constant @code{MMUX_LIBC_FD_SETSIZE}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_select_fd_for_reading (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefunx bool mmux_libc_select_fd_for_writing (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefunx bool mmux_libc_select_fd_for_exception (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+Like @cfunc{mmux_libc_select}, but select a single event for a single file descriptor; if the file
+descriptor is ready the variable referenced by @var{result_p} is set to @ctrue{}, otherwise it is
+set to @cfalse{}.
+
+@example
+mmux_libc_fd_t  fd;
+bool            is_ready;
+
+gimme_an_fd(&fd);
+
+if (mmux_libc_select_fd_for_reading(&is_ready, fd, NULL)) @{
+  /* error */
+@}
+if (is_ready) @{
+  /* the fd is ready for reading */
+@}
+@end example
 @end deftypefun
 
 @c page
