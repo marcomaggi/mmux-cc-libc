@@ -3689,7 +3689,7 @@ if (mmux_libc_make_mfd(&mfd)) @{
   @}
 
   /* Copy the data to stdout. */
-  if (mmux_libc_mfd_writeou(mfd)) @{
+  if (mmux_libc_mfd_copyou(mfd)) @{
     /* error */
   @}
 @}
@@ -3717,7 +3717,7 @@ Store in the variable referenced by @var{len_p} the number of bytes in the devic
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mfd_write (mmux_libc_file_descriptor_t @var{oufd}, mmux_libc_file_descriptor_t @var{mfd})
+@deftypefun bool mmux_libc_mfd_copy (mmux_libc_file_descriptor_t @var{oufd}, mmux_libc_file_descriptor_t @var{mfd})
 Copy all the data in the device underlying @var{mfd} to the file descriptor @var{oufd}.
 
 This function ignores the current device position, writing all the data from the beginning to the
@@ -3729,10 +3729,22 @@ original, so it is left unchanged.  If an error occurs: the underlying device po
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t @var{mfd})
-@deftypefunx bool mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t @var{mfd})
-Wrappers for @cfunc{mmux_libc_mfd_write} that write the underlying device contents to, respectively:
+@deftypefun bool mmux_libc_mfd_copyou (mmux_libc_file_descriptor_t @var{mfd})
+@deftypefunx bool mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t @var{mfd})
+Wrappers for @cfunc{mmux_libc_mfd_copy} that write the underlying device contents to, respectively:
 @stdout{}, @stderr{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t @var{mfd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+Write @var{buflen} bytes from the buffer @var{bufptr} into the device underlying @var{mfd}, at the
+current position.  This is a simplified wrapper for @cfunc{mmux_libc_write}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
+Write the @asciiz{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
+current position.  This is a simplified wrapper for @cfunc{mmux_libc_write}.
 @end deftypefun
 
 

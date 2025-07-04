@@ -67,7 +67,7 @@ test_small_string (void)
     handle_error();
   }
 
-  if (mmux_libc_dprintf(fd, asciiz_string)) {
+  if (mmux_libc_mfd_write_asciiz(fd, asciiz_string)) {
     print_error("printing to mfd");
     handle_error();
   }
@@ -133,7 +133,7 @@ test_small_string (void)
 
   /* Dumping the string to stdout. */
   {
-    if (mmux_libc_mfd_writeou(fd)) {
+    if (mmux_libc_mfd_copyou(fd)) {
       print_error("dumping to stdout");
       handle_error();
     }
@@ -239,7 +239,7 @@ test_big_string (void)
 
   /* Dumping the string to stdout. */
   if (0) {
-    if (mmux_libc_mfd_writeou(fd)) {
+    if (mmux_libc_mfd_copyou(fd)) {
       print_error("dumping to stdout");
       handle_error();
     }

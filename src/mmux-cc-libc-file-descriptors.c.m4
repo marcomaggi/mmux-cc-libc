@@ -1320,7 +1320,7 @@ mmux_libc_mfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
       }
 }
 bool
-mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd)
+mmux_libc_mfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd)
 {
   bool		rv			= false;
   mmux_off_t	original_position	= 0;
@@ -1383,16 +1383,41 @@ mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t
   return rv;
 }
 bool
-mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t mfd)
+mmux_libc_mfd_copyou (mmux_libc_file_descriptor_t mfd)
 {
-  return mmux_libc_mfd_write(stdou_fd, mfd);
+  return mmux_libc_mfd_copy(stdou_fd, mfd);
 }
 bool
-mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd)
+mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t mfd)
 {
-  return mmux_libc_mfd_write(stder_fd, mfd);
+  return mmux_libc_mfd_copy(stder_fd, mfd);
 }
+bool
+mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+{
+  mmux_usize_t	nbytes_done;
 
+  if (mmux_libc_write(&nbytes_done, mfd, bufptr, buflen)) {
+    return true;
+  } else if (buflen != nbytes_done) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
+mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t bufptr)
+{
+  mmux_usize_t	buflen;
+
+  if (mmux_libc_strlen(&buflen, bufptr)) {
+    return true;
+  } else if (mmux_libc_mfd_write_buffer(mfd, bufptr, buflen)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 bool
 mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
 {
@@ -1400,7 +1425,7 @@ mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
 
   if (mmux_libc_strerror(&errmsg, errnum)) {
     return true;
-  } else if (mmux_libc_dprintf(mfd, errmsg)) {
+  } else if (mmux_libc_mfd_write_asciiz(mfd, errmsg)) {
     return true;
   } else {
     return false;

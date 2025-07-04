@@ -444,7 +444,7 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
     struct_name = "struct in_addr";
   }
 
-  DPRINTF(fd, "%s * = %p\n", struct_name, in_addr_p);
+  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)in_addr_p);
 
   {
     mmux_uint32_t	raw_number;
@@ -495,7 +495,7 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
     struct_name = "struct in6_addr";
   }
 
-  DPRINTF(fd, "%s * = %p\n", struct_name, insix_addr_p);
+  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)insix_addr_p);
 
   {
 #undef  IS_THIS_ENOUGH_QUESTION_MARK
@@ -1781,8 +1781,8 @@ mmux_libc_linger_dump (mmux_libc_file_descriptor_t fd, mmux_libc_linger_t const 
   if (NULL == struct_name) {
     struct_name = "struct linger";
   }
-  DPRINTF(fd, "%s.l_onoff  = \"%s\"\n", struct_name, linger_p->l_onoff);
-  DPRINTF(fd, "%s.l_linger = \"%s\"\n", struct_name, linger_p->l_linger);
+  DPRINTF(fd, "%s.l_onoff  = \"%d\"\n", struct_name, linger_p->l_onoff);
+  DPRINTF(fd, "%s.l_linger = \"%d\"\n", struct_name, linger_p->l_linger);
   return false;
 }
 bool

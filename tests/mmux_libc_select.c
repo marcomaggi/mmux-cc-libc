@@ -23,8 +23,13 @@
 
 static mmux_asciizcp_t	PROGNAME = "mmux_libc_select";
 
-static void
-print_error (mmux_asciizcp_t errmsg_template, ...)
+__attribute__((__nonnull__(1))) static void
+print_error (mmux_asciizcp_t errmsg)
+{
+  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
+}
+__attribute__((__nonnull__(1),__format__(__printf__,1,2))) static void
+printf_error (mmux_asciizcp_t errmsg_template, ...)
 {
   mmux_libc_fd_t	mfd;
 
@@ -40,7 +45,7 @@ print_error (mmux_asciizcp_t errmsg_template, ...)
 
       va_start(ap, errmsg_template);
       {
-	rv = mmux_libc_dprintf(mfd, errmsg_template, ap);
+	rv = mmux_libc_vdprintf(mfd, errmsg_template, ap);
       }
       va_end(ap);
       if (rv) {
@@ -49,13 +54,13 @@ print_error (mmux_asciizcp_t errmsg_template, ...)
 	mmux_libc_dprintf_newline(mfd);
       }
     }
-    if (mmux_libc_mfd_writeer(mfd)) {
+    if (mmux_libc_mfd_copyer(mfd)) {
       return;
     }
   }
   mmux_libc_close(mfd);
 }
-static void
+__attribute__((__nonnull__(1),__format__(__printf__,1,2))) static void
 print_message (mmux_asciizcp_t template, ...)
 {
   mmux_libc_fd_t	mfd;
@@ -72,7 +77,7 @@ print_message (mmux_asciizcp_t template, ...)
 
       va_start(ap, template);
       {
-	rv = mmux_libc_dprintf(mfd, template, ap);
+	rv = mmux_libc_vdprintf(mfd, template, ap);
       }
       va_end(ap);
       if (rv) {
@@ -81,7 +86,7 @@ print_message (mmux_asciizcp_t template, ...)
 	mmux_libc_dprintf_newline(mfd);
       }
     }
-    if (mmux_libc_mfd_writeer(mfd)) {
+    if (mmux_libc_mfd_copyer(mfd)) {
       return;
     }
   }
@@ -111,7 +116,7 @@ wait_for_some_time (void)
 
   mmux_libc_timespec_set(&requested_time, 0, 5000000);
   if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
-    print_error("nanosleep");
+    printf_error("nanosleep");
     handle_error();
   }
 }
@@ -144,7 +149,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     /* Acquire current file descriptor flags. */
     if (mmux_libc_fcntl(read_fr_child_fd, MMUX_LIBC_F_GETFL, &parameter)) {
-      print_error("paren: setting blocking mode for input fd: acquiring current flags");
+      printf_error("paren: setting blocking mode for input fd: acquiring current flags");
       handle_error();
     }
 
@@ -153,7 +158,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     /* Set the new flags. */
     if (mmux_libc_fcntl(read_fr_child_fd, MMUX_LIBC_F_SETFL, &parameter)) {
-      print_error("paren: setting blocking mode for input fd: setting flags");
+      printf_error("paren: setting blocking mode for input fd: setting flags");
       handle_error();
     }
   }
@@ -180,12 +185,12 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
   if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
 		       read_fd_set, writ_fd_set, exce_fd_set,
 		       timeout)) {
-    print_error("paren: selecting fd events");
+    printf_error("paren: selecting fd events");
     handle_error();
   }
 
   if (0 == nfds_ready) {
-    print_error("child: no fds ready");
+    printf_error("child: no fds ready");
     handle_error();
   } else {
     mmux_libc_dprintfer("%s: paren: number of ready fds: %d\n", PROGNAME, nfds_ready);
@@ -197,12 +202,12 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     mmux_libc_FD_ISSET(&isset, read_fr_child_fd, exce_fd_set);
     if (isset) {
-      print_error("paren: unexpected exceptional event on read_fr_child_fd");
+      printf_error("paren: unexpected exceptional event on read_fr_child_fd");
       handle_error();
     }
     mmux_libc_FD_ISSET(&isset, writ_to_child_fd, exce_fd_set);
     if (isset) {
-      print_error("paren: unexpected exceptional event on writ_to_child_fd");
+      printf_error("paren: unexpected exceptional event on writ_to_child_fd");
       handle_error();
     }
   }
@@ -219,11 +224,11 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     mmux_libc_FD_ISSET(&isset, read_fr_child_fd, read_fd_set);
     if (! isset) {
-      print_error("paren: expected read event on read_fr_child_fd");
+      printf_error("paren: expected read event on read_fr_child_fd");
       mmux_libc_errno_set(1);
       handle_error();
     } else if (mmux_libc_read(&nbytes_done, read_fr_child_fd, bufptr, buflen)) {
-      print_error("paren: reading from read_fr_child_fd");
+      printf_error("paren: reading from read_fr_child_fd");
       handle_error();
     } else {
       mmux_libc_dprintfer("%s: paren: received greetings from child: \"", PROGNAME);
@@ -241,7 +246,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
 	mmux_libc_strncmp(&result, expected_greetings, (mmux_asciizcp_t)bufptr, expected_greetings_len);
 	if (0 != result) {
-	  print_error("paren: wrong greetings string from child");
+	  printf_error("paren: wrong greetings string from child");
 	  handle_error();
 	}
       }
@@ -250,7 +255,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
   print_message("paren: sending greetings to child");
   if (mmux_libc_dprintf(writ_to_child_fd, "hello child\n")) {
-    print_error("paren: greetings to child");
+    printf_error("paren: greetings to child");
     handle_error();
   }
 
@@ -259,12 +264,12 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
   print_message("paren: closing file descriptors");
   {
     if (mmux_libc_close(read_fr_child_fd)) {
-      print_error("paren: closing read_fr_child_fd");
+      printf_error("paren: closing read_fr_child_fd");
       handle_error();
     }
 
     if (mmux_libc_close(writ_to_child_fd)) {
-      print_error("paren: closing writ_to_child_fd");
+      printf_error("paren: closing writ_to_child_fd");
       handle_error();
     }
   }
@@ -294,7 +299,7 @@ paren_wait_for_child_process_completion (mmux_libc_pid_t child_pid)
 
   if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
 				&completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) {
-    print_error("paren: waiting");
+    printf_error("paren: waiting");
     handle_error();
   } else {
     if (completed_process_status_available) {
@@ -302,15 +307,15 @@ paren_wait_for_child_process_completion (mmux_libc_pid_t child_pid)
 	if (MMUX_LIBC_EXIT_SUCCESS == mmux_libc_WEXITSTATUS(completed_process_status)) {
 	  mmux_libc_exit_success();
 	} else {
-	  print_error("paren: child process exited unsuccessfully");
+	  printf_error("paren: child process exited unsuccessfully");
 	  handle_error();
 	}
       } else {
-	print_error("paren: child process not exited");
+	printf_error("paren: child process not exited");
 	handle_error();
       }
     } else {
-      print_error("paren: no complete child process status");
+      printf_error("paren: no complete child process status");
       handle_error();
     }
   }
@@ -370,7 +375,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
     /* Acquire current file descriptor flags. */
     if (mmux_libc_fcntl(in, MMUX_LIBC_F_GETFL, &parameter)) {
-      print_error("child: setting blocking mode for input fd: acquiring current flags");
+      printf_error("child: setting blocking mode for input fd: acquiring current flags");
       handle_error();
     }
 
@@ -379,7 +384,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
     /* Set the new flags. */
     if (mmux_libc_fcntl(in, MMUX_LIBC_F_SETFL, &parameter)) {
-      print_error("child: setting blocking mode for input fd: setting flags");
+      printf_error("child: setting blocking mode for input fd: setting flags");
       handle_error();
     }
   }
@@ -392,7 +397,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
   {
     print_message("child: sending greetings to parent: \"hello parent\n\"");
     if (mmux_libc_dprintfou("hello parent\n")) {
-      print_error("child: sending greetings to parent");
+      printf_error("child: sending greetings to parent");
       handle_error();
     }
   }
@@ -432,12 +437,12 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
 			 read_fd_set, writ_fd_set, exce_fd_set,
 			 timeout)) {
-      print_error("child: selecting fd events");
+      printf_error("child: selecting fd events");
       handle_error();
     }
 
     if (0 == nfds_ready) {
-      print_error("child: no fds ready");
+      printf_error("child: no fds ready");
       handle_error();
     } else {
       mmux_libc_dprintfer("%s: child: number of ready fds: %d\n", PROGNAME, nfds_ready);
@@ -449,12 +454,12 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
       mmux_libc_FD_ISSET(&isset, in, exce_fd_set);
       if (isset) {
-	print_error("child: unexpected exceptional event on read_fr_paren_fd");
+	printf_error("child: unexpected exceptional event on read_fr_paren_fd");
 	handle_error();
       }
       mmux_libc_FD_ISSET(&isset, ou, exce_fd_set);
       if (isset) {
-	print_error("child: unexpected exceptional event on writ_to_paren_fd");
+	printf_error("child: unexpected exceptional event on writ_to_paren_fd");
 	handle_error();
       }
     }
@@ -463,7 +468,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     print_message("child: checking for read fd event");
     mmux_libc_FD_ISSET(&isset, in, read_fd_set);
     if (! isset) {
-      print_error("child: expected read event on read_fr_paren_fd");
+      printf_error("child: expected read event on read_fr_paren_fd");
       mmux_libc_errno_set(1);
       handle_error();
     } else {
@@ -476,7 +481,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
       print_message("child: reading from parent");
 
       if (mmux_libc_read(&nbytes_done, in, bufptr, buflen)) {
-	print_error("child: reading from read_fr_paren_fd");
+	printf_error("child: reading from read_fr_paren_fd");
 	handle_error();
       } else {
 	mmux_libc_dprintfer("%s: child: received greetings from paren: \"", PROGNAME);
@@ -494,7 +499,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
 	  mmux_libc_strncmp(&result, expected_greetings, (mmux_asciizcp_t)bufptr, expected_greetings_len);
 	  if (0 != result) {
-	    print_error("child: wrong greetings string from child");
+	    printf_error("child: wrong greetings string from child");
 	    handle_error();
 	  }
 	}
@@ -537,7 +542,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     } else if (mmux_libc_pipe(paren_fr_child_fds)) {
       handle_error();
     } else if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) {
-      print_error("forking");
+      printf_error("forking");
       handle_error();
     } else if (this_is_the_paren_process) {
       paren_play(paren_fr_child_fds[0], paren_to_child_fds[1], child_pid);

@@ -407,18 +407,22 @@ mmux_cc_libc_decl bool mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, ...)
-  __attribute__((__nonnull__(2)));
+  __attribute__((__nonnull__(2),__format__(__printf__,2,3)));
+
 mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
-  __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1),__format__(__printf__,1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
-  __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1),__format__(__printf__,1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
-  __attribute__((__nonnull__(2)));
+  __attribute__((__nonnull__(2),__format__(__printf__,2,0)));
+
 mmux_cc_libc_decl bool mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list ap)
-  __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1),__format__(__printf__,1,0)));
+
 mmux_cc_libc_decl bool mmux_libc_vdprintfer (mmux_asciizcp_t template, va_list ap)
-  __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1),__format__(__printf__,1,0)));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_newline   (mmux_libc_file_descriptor_t fd);
 mmux_cc_libc_decl bool mmux_libc_dprintfou_newline (void);
@@ -619,11 +623,17 @@ mmux_cc_libc_decl bool mmux_libc_make_mfd (mmux_libc_file_descriptor_t * fd_p)
 mmux_cc_libc_decl bool mmux_libc_mfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_write (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+  __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_writeou (mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t bufptr)
+  __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_writeer (mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_mfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd);
+
+mmux_cc_libc_decl bool mmux_libc_mfd_copyou (mmux_libc_file_descriptor_t mfd);
+
+mmux_cc_libc_decl bool mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t mfd);
 
 mmux_cc_libc_decl bool mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum);
 
