@@ -1173,7 +1173,7 @@ mmux_libc_FD_CLR (mmux_libc_file_descriptor_t fd, mmux_libc_fd_set_t * fd_set_p)
 bool
 mmux_libc_FD_ISSET (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_fd_set_t const * fd_set_p)
 {
-  *result_p = FD_ISSET(fd.value, fd_set_p);
+  *result_p = (FD_ISSET(fd.value, fd_set_p))? true : false;
   return false;
 }
 bool
@@ -1194,18 +1194,18 @@ bool
 mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
 {
   mmux_libc_fd_set_t	the_fd_set[1];
-  mmux_uint_t		nfds_ready;
+  mmux_uint_t		nfds_ready = 0;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, fd.value, the_fd_set, NULL, NULL, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, 1+fd.value, the_fd_set, NULL, NULL, timeout_p)) {
     return true;
-  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
-    *result_p = true;
+  } else if (0 == nfds_ready) {
+    *result_p = false;
     return false;
   } else {
-    *result_p = false;
+    mmux_libc_FD_ISSET(result_p, fd, the_fd_set);
     return false;
   }
 }
@@ -1218,7 +1218,7 @@ mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_file_descriptor_t fd
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, fd.value, NULL, the_fd_set, NULL, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, 1+fd.value, NULL, the_fd_set, NULL, timeout_p)) {
     return true;
   } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
     *result_p = true;
@@ -1237,7 +1237,7 @@ mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_file_descriptor_t 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, fd.value, NULL, NULL, the_fd_set, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, 1+fd.value, NULL, NULL, the_fd_set, timeout_p)) {
     return true;
   } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
     *result_p = true;

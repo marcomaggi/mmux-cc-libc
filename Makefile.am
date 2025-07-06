@@ -198,6 +198,7 @@ check_PROGRAMS	= \
 	tests/mmux_libc_wait				\
 	\
 	tests/mmux_libc_select				\
+	tests/mmux_libc_select_fd			\
 	\
 	tests/mmux_libc_open_write_read_close		\
 	tests/mmux_libc_open_pwrite_pread_close		\
@@ -241,6 +242,9 @@ tests_mmux_libc_wait_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_mmux_libc_select_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_mmux_libc_select_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_mmux_libc_select_fd_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_mmux_libc_select_fd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file descriptors
