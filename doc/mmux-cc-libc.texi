@@ -3350,8 +3350,10 @@ The argument @var{timeout_p} can be @cnull{} if we want to set a timeout of infi
 After a successful call: the variable referenced by @var{nfds_ready_p} is set to the number of file
 descriptors that are ready for an action.
 
-The argument @var{maximum_nfds_to_check} must represent the maximum file descriptor value to check
-for events; it is usually just set to the constant @code{MMUX_LIBC_FD_SETSIZE}.
+The argument @var{maximum_nfds_to_check} must represent the maximum number of file descriptors to
+check for events: if we want to check up to file descriptor @samp{10}, we have to set
+@var{maximum_nfds_to_check} to @samp{11}; it is usually just set to the constant
+@code{MMUX_LIBC_FD_SETSIZE}.
 @end deftypefun
 
 

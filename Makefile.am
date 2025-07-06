@@ -190,21 +190,21 @@ src/%.$(OBJEXT): \
 check_PROGRAMS	= \
 	tests/version					\
 	\
-	tests/mmux_libc_fork				\
-	tests/mmux_libc_wait_any_process		\
-	tests/mmux_libc_wait_my_process_group		\
-	tests/mmux_libc_wait_process_id			\
-	tests/mmux_libc_wait_group_id			\
-	tests/mmux_libc_wait				\
+	tests/test-fork					\
+	tests/test-wait-any-process			\
+	tests/test-wait-my-process-group		\
+	tests/test-wait-process-id			\
+	tests/test-wait-group-id			\
+	tests/test-wait					\
 	\
-	tests/mmux_libc_select				\
-	tests/mmux_libc_select_fd			\
+	tests/test-select				\
+	tests/test-select-fd				\
 	\
-	tests/mmux_libc_open_write_read_close		\
-	tests/mmux_libc_open_pwrite_pread_close		\
-	tests/mmux_libc_openat_write_read_close		\
-	tests/mmux_libc_openat2_write_read_close	\
-	tests/mmux_libc_mfd
+	tests/test-open-write-read-close		\
+	tests/test-open-pwrite-pread-close		\
+	tests/test-openat-write-read-close		\
+	tests/test-openat2-write-read-close		\
+	tests/test-mfd
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -219,50 +219,50 @@ tests_version_LDADD		= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 ## processes
 
-tests_mmux_libc_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_fork_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_wait_any_process_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_any_process_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_wait_my_process_group_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_my_process_group_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_wait_process_id_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_process_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_group_id_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_wait_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## waiting for input/output
 
-tests_mmux_libc_select_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_select_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_select_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_select_fd_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_select_fd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_select_fd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_select_fd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file descriptors
 
-tests_mmux_libc_open_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_open_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_open_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_open_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_open_pwrite_pread_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_open_pwrite_pread_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_open_pwrite_pread_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_open_pwrite_pread_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_openat_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_openat_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_openat_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_openat_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_openat2_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_openat2_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_openat2_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_openat2_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_mmux_libc_mfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-tests_mmux_libc_mfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_mfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_mfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"
