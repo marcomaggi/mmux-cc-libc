@@ -138,28 +138,28 @@ void
 paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mmux_libc_pid_t child_pid)
 /* We expect the child to greet the parent first, then the parent replies. */
 {
-  mmux_libc_timeval_t     timeout[1];
-  bool                    is_ready;
-
   paren_give_child_process_time_to_start();
 
   /* Read from child. */
   {
+    mmux_libc_timeval_t		timeout[1];
+    bool			read_fr_child_fd_is_ready;
+
     print_message("paren: calling select_fd_for_reading()");
     mmux_libc_timeval_set(timeout, 1, 0);
-    if (mmux_libc_select_fd_for_reading(&is_ready, read_fr_child_fd, timeout)) {
-      printf_error("paren: selecting fd events");
+    if (mmux_libc_select_fd_for_reading(&read_fr_child_fd_is_ready, read_fr_child_fd, timeout)) {
+      print_error("paren: selecting fd events");
       handle_error();
     }
 
-    if (! is_ready) {
+    if (! read_fr_child_fd_is_ready) {
       printf_error("paren: expected read event on read_fr_child_fd");
       mmux_libc_errno_set(1);
       handle_error();
     } else {
-      mmux_usize_t	nbytes_done;
-      mmux_usize_t	buflen = 4096;
-      mmux_uint8_t	bufptr[buflen];
+      mmux_usize_t		nbytes_done;
+      mmux_usize_t const	buflen = 4096;
+      mmux_char_t		bufptr[buflen];
 
       mmux_libc_memzero(bufptr, buflen);
 
@@ -174,7 +174,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 	mmux_libc_dprintfer("\"\n");
       }
 
-      /* Validate thd greetings string received from child. */
+      /* Validate the greetings string received from child. */
       {
 	mmux_sint_t	result;
 	mmux_asciizcp_t	expected_greetings = "hello parent\n";
@@ -182,7 +182,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
 	mmux_libc_strlen(&expected_greetings_len, expected_greetings);
 
-	mmux_libc_strncmp(&result, expected_greetings, (mmux_asciizcp_t)bufptr, expected_greetings_len);
+	mmux_libc_strncmp(&result, expected_greetings, bufptr, expected_greetings_len);
 	if (0 != result) {
 	  printf_error("paren: wrong greetings string from child");
 	  handle_error();
@@ -193,14 +193,17 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
   /* Check for no exceptional condition, just to show off. */
   {
+    mmux_libc_timeval_t		timeout[1];
+    bool			read_fr_child_fd_is_ready;
+
     print_message("paren: calling select_fd_for_exception()");
     mmux_libc_timeval_set(timeout, 1, 0);
-    if (mmux_libc_select_fd_for_exception(&is_ready, read_fr_child_fd, timeout)) {
+    if (mmux_libc_select_fd_for_exception(&read_fr_child_fd_is_ready, read_fr_child_fd, timeout)) {
       printf_error("paren: selecting fd events");
       handle_error();
     }
 
-    if (is_ready) {
+    if (read_fr_child_fd_is_ready) {
       printf_error("paren: expected no exception event on read_fr_child_fd");
       mmux_libc_errno_set(1);
       handle_error();
@@ -209,14 +212,17 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
   /* Write to child. */
   {
+    mmux_libc_timeval_t		timeout[1];
+    bool			writ_to_child_fd_is_ready;
+
     print_message("paren: calling select_fd_for_writing()");
     mmux_libc_timeval_set(timeout, 1, 0);
-    if (mmux_libc_select_fd_for_writing(&is_ready, writ_to_child_fd, timeout)) {
+    if (mmux_libc_select_fd_for_writing(&writ_to_child_fd_is_ready, writ_to_child_fd, timeout)) {
       printf_error("paren: selecting fd events");
       handle_error();
     }
 
-    if (! is_ready) {
+    if (! writ_to_child_fd_is_ready) {
       printf_error("paren: expected write event on writ_to_child_fd");
       mmux_libc_errno_set(1);
       handle_error();
@@ -376,6 +382,22 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
   /* Send greetings to parent. */
   {
+    bool			ou_fd_is_ready;
+    mmux_libc_timeval_t		timeout[1];
+
+    print_message("child: calling select_fd_for_writing()");
+    mmux_libc_timeval_set(timeout, 1, 0);
+    if (mmux_libc_select_fd_for_writing(&ou_fd_is_ready, ou, timeout)) {
+      printf_error("child: selecting fd events");
+      handle_error();
+    }
+
+    if (! ou_fd_is_ready) {
+      printf_error("child: expected write event on ou");
+      mmux_libc_errno_set(1);
+      handle_error();
+    }
+
     print_message("child: sending greetings to parent: \"hello parent\n\"");
     if (mmux_libc_dprintfou("hello parent\n")) {
       printf_error("child: sending greetings to parent");
@@ -387,72 +409,23 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
   /* Read parent's reply. */
   {
-    mmux_libc_fd_set_t      read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
-    mmux_uint_t             nfds_ready;
-    mmux_uint_t             maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-    mmux_libc_timeval_t     timeout[1];
-    bool                    isset;
+    bool			in_fd_is_ready;
+    mmux_libc_timeval_t		timeout[1];
 
-    /* Setup the arguments of "mmux_libc_select()". */
-    {
-      print_message("child: setting up fd sets");
-
-      mmux_libc_FD_ZERO(read_fd_set);
-      mmux_libc_FD_ZERO(writ_fd_set);
-      mmux_libc_FD_ZERO(exce_fd_set);
-
-      mmux_libc_FD_SET(in, read_fd_set);
-      if (0) {
-	/* We do not register  "ou" to be checked for writing: it  would be ready for
-	   writing immediately,  unblocking "select()".  We want  "select()" to block
-	   until a read event is ready. */
-	mmux_libc_FD_SET(ou, writ_fd_set);
-      }
-      mmux_libc_FD_SET(in, exce_fd_set);
-      mmux_libc_FD_SET(ou, exce_fd_set);
-
-      mmux_libc_timeval_set(timeout, 10, 0);
-    }
-
-    print_message("child: calling select()");
-    if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
-			 read_fd_set, writ_fd_set, exce_fd_set,
-			 timeout)) {
+    print_message("child: calling select_fd_for_reading()");
+    mmux_libc_timeval_set(timeout, 3, 0);
+    if (mmux_libc_select_fd_for_reading(&in_fd_is_ready, in, timeout)) {
       printf_error("child: selecting fd events");
       handle_error();
     }
 
-    if (0 == nfds_ready) {
-      printf_error("child: no fds ready");
-      handle_error();
-    } else {
-      mmux_libc_dprintfer("%s: child: number of ready fds: %d\n", PROGNAME, nfds_ready);
-    }
-
-    /* Check that no exceptional event happened. */
-    {
-      print_message("child: checking for no exceptional fd events");
-
-      mmux_libc_FD_ISSET(&isset, in, exce_fd_set);
-      if (isset) {
-	printf_error("child: unexpected exceptional event on read_fr_paren_fd");
-	handle_error();
-      }
-      mmux_libc_FD_ISSET(&isset, ou, exce_fd_set);
-      if (isset) {
-	printf_error("child: unexpected exceptional event on writ_to_paren_fd");
-	handle_error();
-      }
-    }
-
-    /* Check for a read event on the "read_fr_paren_fd". */
-    print_message("child: checking for read fd event");
-    mmux_libc_FD_ISSET(&isset, in, read_fd_set);
-    if (! isset) {
-      printf_error("child: expected read event on read_fr_paren_fd");
+    if (! in_fd_is_ready) {
+      printf_error("child: expected read event on in");
       mmux_libc_errno_set(1);
       handle_error();
-    } else {
+    }
+
+    {
       mmux_usize_t	nbytes_done;
       mmux_usize_t	buflen = 4096;
       mmux_uint8_t	bufptr[buflen];
