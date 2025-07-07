@@ -188,7 +188,7 @@ src/%.$(OBJEXT): \
 #### TESTS
 
 check_PROGRAMS	= \
-	tests/version					\
+	tests/test-version				\
 	\
 	tests/test-fork					\
 	tests/test-wait-any-process			\
@@ -213,8 +213,8 @@ TESTS				= $(check_PROGRAMS)
 
 ## ------------------------------------------------------------------------
 
-tests_version_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_version_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_version_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_version_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

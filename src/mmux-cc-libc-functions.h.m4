@@ -857,21 +857,32 @@ mmux_cc_libc_decl bool mmux_libc_wait (bool * completed_process_status_available
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_WIFEXITED (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WIFEXITED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WEXITSTATUS (mmux_sint_t * result_p, mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl mmux_libc_interprocess_signal_t mmux_libc_WTERMSIG (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * result_p,
+					   mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WCOREDUMP (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WCOREDUMP (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WIFSTOPPED (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WIFSTOPPED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl mmux_libc_interprocess_signal_t mmux_libc_WSTOPSIG (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * result_p,
+					   mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (mmux_libc_completed_process_status_t completed_process_status);
+mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (bool * result_p,
+					       mmux_libc_completed_process_status_t completed_process_status)
+  __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 

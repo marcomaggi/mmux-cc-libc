@@ -2235,43 +2235,51 @@ wide.
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_WIFEXITED (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WIFEXITED,waitpid}.
+@deftypefun bool mmux_libc_WIFEXITED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WIFEXITED,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.
+@deftypefun mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WIFSIGNALED,waitpid}.
+@deftypefun bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WIFSIGNALED,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun mmux_libc_interprocess_signal_t mmux_libc_WTERMSIG (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WTERMSIG,waitpid}.
+@deftypefun bool mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WTERMSIG,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WCOREDUMP (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WCOREDUMP,waitpid}.
+@deftypefun bool mmux_libc_WCOREDUMP (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WCOREDUMP,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFSTOPPED (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WIFSTOPPED,waitpid}.
+@deftypefun bool mmux_libc_WIFSTOPPED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WIFSTOPPED,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun mmux_libc_interprocess_signal_t mmux_libc_WSTOPSIG (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WSTOPSIG,waitpid}.
+@deftypefun bool mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WSTOPSIG,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFCONTINUED (mmux_libc_completed_process_status_t completed_process_status)
-@MmuxCMacroInterfaceTwo{WIFCONTINUED,waitpid}.
+@deftypefun bool mmux_libc_WIFCONTINUED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WIFCONTINUED,waitpid}.  Set the variable referenced by @var{result_p} to the
+value computed by the C preprocessor macro.
 @end deftypefun
 
 @c page

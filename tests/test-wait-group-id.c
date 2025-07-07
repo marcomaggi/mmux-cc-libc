@@ -14,7 +14,7 @@
 
 #include <mmux-cc-libc.h>
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_wait_group_id";
+static mmux_asciizcp_t	PROGNAME = "test-wait-group-id";
 
 static void
 print_error (mmux_asciizcp_t errmsg)

@@ -19,9 +19,12 @@
 
 #include <mmux-cc-libc.h>
 
-#include <sys/mman.h>
+static mmux_asciizcp_t	PROGNAME = "test-select-fd";
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_select";
+
+/** --------------------------------------------------------------------
+ ** Helpers.
+ ** ----------------------------------------------------------------- */
 
 __attribute__((__nonnull__(1))) static void
 print_error (mmux_asciizcp_t errmsg)
@@ -273,8 +276,16 @@ paren_wait_for_child_process_completion (mmux_libc_pid_t child_pid)
     handle_error();
   } else {
     if (completed_process_status_available) {
-      if (mmux_libc_WIFEXITED(completed_process_status)) {
-	if (MMUX_LIBC_EXIT_SUCCESS == mmux_libc_WEXITSTATUS(completed_process_status)) {
+      bool	has_exited;
+
+      if (mmux_libc_WIFEXITED(&has_exited, completed_process_status)) {
+	handle_error();
+      } else if (has_exited) {
+	mmux_sint_t	exit_status;
+
+	if (mmux_libc_WEXITSTATUS(&exit_status, completed_process_status)) {
+	  handle_error();
+	} else if (MMUX_LIBC_EXIT_SUCCESS == exit_status) {
 	  mmux_libc_exit_success();
 	} else {
 	  printf_error("paren: child process exited unsuccessfully");

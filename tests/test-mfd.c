@@ -19,7 +19,7 @@
 
 #include <mmux-cc-libc.h>
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_mfd";
+static mmux_asciizcp_t	PROGNAME = "test-mfd";
 
 
 /** --------------------------------------------------------------------

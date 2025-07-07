@@ -382,28 +382,35 @@ mmux_libc_waitid (bool * completed_process_status_available_p,
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_WIFEXITED (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+mmux_libc_WIFEXITED (bool * result_p MMUX_CC_LIBC_UNUSED,
+		     mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFEXITED]]],[[[
-  return (WIFEXITED(completed_process_status.value))? true : false;
-]]])
-}
-mmux_sint_t
-mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
-{
-MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WEXITSTATUS]]],[[[
-  return WEXITSTATUS(completed_process_status.value);
+  *result_p = (WIFEXITED(completed_process_status.value))? true : false;
+  return false;
 ]]])
 }
 bool
-mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+mmux_libc_WEXITSTATUS (mmux_sint_t * result_p MMUX_CC_LIBC_UNUSED,
+		       mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
-MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFSIGNALED]]],[[[
-  return (WIFSIGNALED(completed_process_status.value))? true : false;
+MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WEXITSTATUS]]],[[[
+  *result_p = WEXITSTATUS(completed_process_status.value);
+  return false;
 ]]])
 }
-mmux_libc_interprocess_signal_t
-mmux_libc_WTERMSIG (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+bool
+mmux_libc_WIFSIGNALED (bool * result_p MMUX_CC_LIBC_UNUSED,
+		       mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+{
+MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFSIGNALED]]],[[[
+  *result_p = (WIFSIGNALED(completed_process_status.value))? true : false;
+  return false;
+]]])
+}
+bool
+mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUSED,
+		    mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WTERMSIG]]],[[[
   mmux_libc_interprocess_signal_t	ipxsig;
@@ -411,25 +418,31 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WTERMSIG]]],[[[
   /* We do  not check this return  value because the  argument is a value  that comes
      from the libc; we assume it is correct. */
   mmux_libc_make_interprocess_signal(&ipxsig, WTERMSIG(completed_process_status.value));
-  return ipxsig;
+  *result_p = ipxsig;
+  return false;
 ]]])
 }
 bool
-mmux_libc_WCOREDUMP (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+mmux_libc_WCOREDUMP (bool * result_p MMUX_CC_LIBC_UNUSED,
+		     mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WCOREDUMP]]],[[[
-  return (WCOREDUMP(completed_process_status.value))? true : false;
+  *result_p = (WCOREDUMP(completed_process_status.value))? true : false;
+  return false;
 ]]])
 }
 bool
-mmux_libc_WIFSTOPPED (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+mmux_libc_WIFSTOPPED (bool * result_p MMUX_CC_LIBC_UNUSED,
+		      mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFSTOPPED]]],[[[
-  return (WIFSTOPPED(completed_process_status.value))? true : false;
+  *result_p = (WIFSTOPPED(completed_process_status.value))? true : false;
+  return false;
 ]]])
 }
-mmux_libc_interprocess_signal_t
-mmux_libc_WSTOPSIG (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+bool
+mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUSED,
+		    mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WSTOPSIG]]],[[[
   mmux_libc_interprocess_signal_t	ipxsig;
@@ -437,14 +450,17 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WSTOPSIG]]],[[[
   /* We do  not check this return  value because the  argument is a value  that comes
      from the libc; we assume it is correct. */
   mmux_libc_make_interprocess_signal(&ipxsig, WSTOPSIG(completed_process_status.value));
-  return ipxsig;
+  *result_p = ipxsig;
+  return false;
 ]]])
 }
 bool
-mmux_libc_WIFCONTINUED (mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+mmux_libc_WIFCONTINUED (bool * result_p MMUX_CC_LIBC_UNUSED,
+			mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFCONTINUED]]],[[[
-  return (WIFCONTINUED(completed_process_status.value))? true : false;
+  *result_p = (WIFCONTINUED(completed_process_status.value))? true : false;
+  return false;
 ]]])
 }
 

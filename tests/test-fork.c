@@ -14,7 +14,7 @@
 
 #include <mmux-cc-libc.h>
 
-static mmux_asciizcp_t	PROGNAME = "mmux_libc_fork";
+static mmux_asciizcp_t	PROGNAME = "test-fork";
 
 static void
 print_error (mmux_asciizcp_t errmsg)
