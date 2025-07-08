@@ -544,13 +544,27 @@ mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec,	iov_base,	mmux_pointer_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec,	iov_len,	mmux_usize_t)
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_pointer,	mmux_pointer_t)
+mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * iovec_p,
+					     mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(2)));
+
+/* ------------------------------------------------------------------ */
+
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_pointer,	mmux_libc_iovec_t *)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_length,	mmux_usize_t)
 
-mmux_cc_libc_decl bool mmux_libc_readv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array)
+mmux_cc_libc_decl bool mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t const * iova_p,
+						   mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(2)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_readv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
+					mmux_libc_iovec_array_t iovec_array)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_writev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array)
+mmux_cc_libc_decl bool mmux_libc_writev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
+					 mmux_libc_iovec_array_t iovec_array)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_preadv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
@@ -566,8 +580,6 @@ mmux_cc_libc_decl bool mmux_libc_preadv2 (mmux_usize_t * nbytes_read_p, mmux_lib
 mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
 					   mmux_libc_iovec_array_t iovec_array, mmux_off_t offset, mmux_sint_t flags)
   __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * iovec_p, mmux_asciizcp_t struct_name);
 
 
 /** --------------------------------------------------------------------

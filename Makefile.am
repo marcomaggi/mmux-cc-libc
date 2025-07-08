@@ -205,7 +205,8 @@ check_PROGRAMS	= \
 	tests/test-openat-write-read-close		\
 	tests/test-openat2-write-read-close		\
 	tests/test-mfd					\
-	tests/test-struct-iovec
+	tests/test-struct-iovec				\
+	tests/test-struct-iovec-array
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -267,6 +268,9 @@ tests_test_mfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_struct_iovec_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_struct_iovec_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_struct_iovec_array_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_struct_iovec_array_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

@@ -634,7 +634,7 @@ mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
 
 DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_base,	mmux_pointer_t)
 DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_len,	mmux_usize_t)
-DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_pointer,	mmux_pointer_t)
+DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_pointer,	mmux_libc_iovec_t *)
 DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_length,	mmux_usize_t)
 
 bool
@@ -652,6 +652,26 @@ mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * 
 
     mmux_usize_sprint(str, len, iovec_p->iov_len);
     DPRINTF(fd, "%s->iov_len = %s\n", struct_name, str);
+  }
+
+  return false;
+}
+
+bool
+mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t const * iova_p, mmux_asciizcp_t struct_name)
+{
+  if (NULL == struct_name) {
+    struct_name = "mmux_libc_iovec_array_t";
+  }
+
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iova_p);
+  DPRINTF(fd, "%s->iova_pointer = %p\n", struct_name, (mmux_pointer_t)iova_p->iova_pointer);
+  {
+    int		len = mmux_usize_sprint_size(iova_p->iova_length);
+    char	str[len];
+
+    mmux_usize_sprint(str, len, iova_p->iova_length);
+    DPRINTF(fd, "%s->iova_length = %s\n", struct_name, str);
   }
 
   return false;
