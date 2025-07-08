@@ -3392,6 +3392,16 @@ if (is_ready) @{
 @section Scatter--gather input and output
 
 
+@menu
+* fds scatter-gather struct::   The input/output vector data structure.
+* fds scatter-gather api::      The input/output vector programming interface.
+@end menu
+
+@c page
+@node fds scatter-gather struct
+@subsection The input/output vector data structure
+
+
 @MmuxCStructOpaqueTypedef{iovec}
 
 
@@ -3400,10 +3410,10 @@ Data structure type representing an array of @objtype{mmux_libc_iovec_t} data st
 the following fields:
 
 @table @code
-@item iova_base
+@item mmux_libc_iovec_t * iova_base
 Pointer to the array.
 
-@item iova_len
+@item mmux_usize_t iova_len
 Number of slots in the array.
 @end table
 @end deftp
@@ -3416,34 +3426,38 @@ Number of slots in the array.
 @MmuxSetterGetter{iovec_array, iova_len,  mmux_usize_t}
 @MmuxStructDumper{iovec_array}
 
+@c page
+@node fds scatter-gather api
+@subsection The input/output vector programming interface
+
 
 @deftypefun bool mmux_libc_readv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array})
-@MmuxStructDumper{readv}.
+@MmuxCInterface{readv}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_writev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array})
-@MmuxStructDumper{writev}.
+@MmuxCInterface{writev}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_preadv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset})
-@MmuxStructDumper{preadv}.
+@MmuxCInterface{preadv}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_pwritev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset})
-@MmuxStructDumper{pwritev}.
+@MmuxCInterface{pwritev}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_preadv2 (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
-@MmuxStructDumper{preadv2}.
+@MmuxCInterface{preadv2}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
-@MmuxStructDumper{pwritev2}.
+@MmuxCInterface{pwritev2}.
 @end deftypefun
 
 @c page
