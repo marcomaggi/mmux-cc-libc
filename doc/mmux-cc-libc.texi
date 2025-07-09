@@ -3400,7 +3400,8 @@ if (is_ready) @{
 @menu
 * fds scatter-gather buffer::   The input/output buffer data structure.
 * fds scatter-gather array::    The input/output array data structure.
-* fds scatter-gather api::      The input/output vector programming interface.
+* fds scatter-gather reading::  Reading with the input/output vector programming interface.
+* fds scatter-gather writing::  Writing with the input/output vector programming interface.
 @end menu
 
 @c page
@@ -3525,22 +3526,55 @@ Number of items in the array referenced by @code{iova_base}.
 @MmuxStructDumperTwo{iovec_array, mmux_libc_iovec_array_t}
 
 @c page
-@node fds scatter-gather api
-@subsection The input/output vector programming interface
-
+@node fds scatter-gather reading
+@subsection Reading with the input/output vector programming interface
 
 @deftypefun bool mmux_libc_readv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array})
 @MmuxCInterface{readv}.
-@end deftypefun
 
+@example
+mmux_usize_t const          bufnum = 4;
+mmux_usize_t const          buflen = 8;
+mmux_octet_t                bufptr[bufnum][buflen];
+mmux_libc_iovec_t           iov[bufnum];
+mmux_libc_iovec_array_t     iova;
 
-@deftypefun bool mmux_libc_writev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array})
-@MmuxCInterface{writev}.
+for (mmux_uint_t i=0; i<bufnum; ++i) @{
+  mmux_libc_iov_len_set  (&(iov[i]), buflen);
+  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+@}
+
+mmux_libc_iova_len_set  (&iova, bufnum);
+mmux_libc_iova_base_set (&iova, iov);
+
+/* Perform the reading. */
+@{
+  mmux_usize_t      nbytes_done;
+
+  if (mmux_libc_readv(&nbytes_done, mfd, iova)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_preadv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset})
 @MmuxCInterface{preadv}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
+@MmuxCInterface{pwritev2}.
+@end deftypefun
+
+@c page
+@node fds scatter-gather writing
+@subsection Writing with the input/output vector programming interface
+
+
+@deftypefun bool mmux_libc_writev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array})
+@MmuxCInterface{writev}.
 @end deftypefun
 
 
@@ -3553,10 +3587,6 @@ Number of items in the array referenced by @code{iova_base}.
 @MmuxCInterface{preadv2}.
 @end deftypefun
 
-
-@deftypefun bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t @var{iovec_array}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
-@MmuxCInterface{pwritev2}.
-@end deftypefun
 
 @c page
 @node fds copying

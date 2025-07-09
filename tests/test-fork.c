@@ -5,7 +5,7 @@
 
   Abstract
 
-	Test file for version functions.
+	Test file for functions.
 
   Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
 
