@@ -21,7 +21,7 @@
 #include <mmux-cc-libc.h>
 #include <assert.h>
 
-static mmux_asciizcp_t	PROGNAME = "test-readv-writev";
+static mmux_asciizcp_t	PROGNAME = "test-preadv-pwritev";
 
 
 /** --------------------------------------------------------------------
@@ -91,8 +91,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     /* Perform the writing. */
     {
       mmux_usize_t	nbytes_done;
+      mmux_off_t	offset = 0;
 
-      if (mmux_libc_writev(&nbytes_done, mfd, &iova)) {
+      if (mmux_libc_pwritev(&nbytes_done, mfd, &iova, offset)) {
 	print_error("writev");
 	handle_error();
       }
@@ -130,8 +131,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     /* Perform the reading. */
     {
       mmux_usize_t	nbytes_done;
+      mmux_off_t	offset = 0;
 
-      if (mmux_libc_readv(&nbytes_done, mfd, &iova)) {
+      if (mmux_libc_preadv(&nbytes_done, mfd, &iova, offset)) {
 	print_error("readv");
 	handle_error();
       }

@@ -560,25 +560,25 @@ mmux_cc_libc_decl bool mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t f
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_readv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
-					mmux_libc_iovec_array_t iovec_array)
+					mmux_libc_iovec_array_t * iova_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_writev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
-					 mmux_libc_iovec_array_t iovec_array)
+					 mmux_libc_iovec_array_t * iova_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_preadv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
-					 mmux_libc_iovec_array_t iovec_array, mmux_off_t offset)
+					 mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
   __attribute__((__nonnull__(1)));
 mmux_cc_libc_decl bool mmux_libc_pwritev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
-					  mmux_libc_iovec_array_t iovec_array, mmux_off_t offset)
+					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_preadv2 (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
-					  mmux_libc_iovec_array_t iovec_array, mmux_off_t offset, mmux_sint_t flags)
+					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
   __attribute__((__nonnull__(1)));
 mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
-					   mmux_libc_iovec_array_t iovec_array, mmux_off_t offset, mmux_sint_t flags)
+					   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
   __attribute__((__nonnull__(1)));
 
 
