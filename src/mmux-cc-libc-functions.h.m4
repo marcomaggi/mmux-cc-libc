@@ -550,8 +550,8 @@ mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmu
 
 /* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_pointer,	mmux_libc_iovec_t *)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_length,	mmux_usize_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_base,	mmux_libc_iovec_t *)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_len,	mmux_usize_t)
 
 mmux_cc_libc_decl bool mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t const * iova_p,
 						   mmux_asciizcp_t struct_name)
@@ -648,6 +648,8 @@ mmux_cc_libc_decl bool mmux_libc_mfd_copyou (mmux_libc_file_descriptor_t mfd);
 mmux_cc_libc_decl bool mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t mfd);
 
 mmux_cc_libc_decl bool mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum);
+
+mmux_cc_libc_decl bool mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen);
 
 
 /** --------------------------------------------------------------------

@@ -57,32 +57,35 @@ handle_error (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  mmux_usize_t const	bufnum = 16;
   mmux_usize_t const	buflen = 4096;
-  mmux_octet_t		bufptr[buflen];
-  mmux_libc_iovec_t	iov[1];
+  mmux_octet_t		bufptr[bufnum][buflen];
+  mmux_libc_iovec_t	iov[bufnum];
 
-  mmux_libc_iov_base_set (iov, bufptr);
-  mmux_libc_iov_len_set  (iov, buflen);
+  for (mmux_uint_t i=0; i<bufnum; ++i) {
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  }
 
   {
     mmux_usize_t	the_buflen;
     mmux_octet_t *	the_bufptr;
 
-    mmux_libc_iov_len_ref  (&the_buflen, iov);
-    mmux_libc_iov_base_ref ((mmux_pointer_t)&the_bufptr, iov);
+    mmux_libc_iov_len_ref  (&the_buflen, &(iov[0]));
+    mmux_libc_iov_base_ref ((mmux_pointer_t)&the_bufptr, &(iov[0]));
 
     assert(the_buflen == buflen);
-    assert(the_bufptr == bufptr);
+    assert((mmux_pointer_t)the_bufptr == (mmux_pointer_t)&(bufptr[0]));
   }
 
   {
     mmux_libc_fd_t	fd;
 
     mmux_libc_stdou(&fd);
-    if (mmux_libc_iovec_dump(fd, iov, NULL)) {
+    if (mmux_libc_iovec_dump(fd, &(iov[0]), NULL)) {
       handle_error();
     }
-    if (mmux_libc_iovec_dump(fd, iov, "mystruct")) {
+    if (mmux_libc_iovec_dump(fd, &(iov[0]), "mystruct")) {
       handle_error();
     }
   }

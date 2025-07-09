@@ -634,8 +634,8 @@ mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
 
 DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_base,	mmux_pointer_t)
 DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_len,	mmux_usize_t)
-DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_pointer,	mmux_libc_iovec_t *)
-DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_length,	mmux_usize_t)
+DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_base,	mmux_libc_iovec_t *)
+DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_len,	mmux_usize_t)
 
 bool
 mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * const iovec_p, char const * struct_name)
@@ -647,8 +647,8 @@ mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * 
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iovec_p);
   DPRINTF(fd, "%s->iov_base = %p\n", struct_name, iovec_p->iov_base);
   {
-    int		len = mmux_usize_sprint_size(iovec_p->iov_len);
-    char	str[len];
+    mmux_sint_t		len = mmux_usize_sprint_size(iovec_p->iov_len);
+    mmux_char_t		str[len];
 
     mmux_usize_sprint(str, len, iovec_p->iov_len);
     DPRINTF(fd, "%s->iov_len = %s\n", struct_name, str);
@@ -665,13 +665,45 @@ mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_arra
   }
 
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iova_p);
-  DPRINTF(fd, "%s->iova_pointer = %p\n", struct_name, (mmux_pointer_t)iova_p->iova_pointer);
+  DPRINTF(fd, "%s->iova_base = %p\n", struct_name, (mmux_pointer_t)iova_p->iova_base);
   {
-    int		len = mmux_usize_sprint_size(iova_p->iova_length);
-    char	str[len];
+    mmux_sint_t		len = mmux_usize_sprint_size(iova_p->iova_len);
+    mmux_char_t		str[len];
 
-    mmux_usize_sprint(str, len, iova_p->iova_length);
-    DPRINTF(fd, "%s->iova_length = %s\n", struct_name, str);
+    mmux_usize_sprint(str, len, iova_p->iova_len);
+    DPRINTF(fd, "%s->iova_len = %s\n", struct_name, str);
+  }
+
+  for (mmux_usize_t i=0; i<iova_p->iova_len; ++i) {
+    mmux_libc_fd_t	mfd;
+
+    if (mmux_libc_make_mfd(&mfd)) {
+      return true;
+    };
+    {
+      mmux_libc_dprintf(mfd, "%s->iova_base[%lu]", struct_name, i);
+      {
+	mmux_usize_t	buflen;
+
+	if (mmux_libc_mfd_length(&buflen, mfd)) {
+	  return true;
+	}
+	{
+	  mmux_char_t	bufptr[1+buflen];
+
+	  bufptr[buflen] = '\0';
+	  if (mmux_libc_mfd_read_buffer(mfd, bufptr, buflen)) {
+	    return true;
+	  }
+	  if (mmux_libc_iovec_dump(fd, &(iova_p->iova_base[i]), bufptr)) {
+	    return true;
+	  }
+	}
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      return true;
+    }
   }
 
   return false;
@@ -682,7 +714,7 @@ mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_arra
 bool
 mmux_libc_readv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array)
 {
-  mmux_ssize_t	rv = readv(fd.value, iovec_array.iova_pointer, iovec_array.iova_length);
+  mmux_ssize_t	rv = readv(fd.value, iovec_array.iova_base, iovec_array.iova_len);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -694,7 +726,7 @@ mmux_libc_readv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descripto
 bool
 mmux_libc_writev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array)
 {
-  mmux_ssize_t	rv = writev(fd.value, iovec_array.iova_pointer, iovec_array.iova_length);
+  mmux_ssize_t	rv = writev(fd.value, iovec_array.iova_base, iovec_array.iova_len);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -710,7 +742,7 @@ bool
 mmux_libc_preadv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array,
 		  mmux_off_t offset)
 {
-  mmux_ssize_t	rv = preadv(fd.value, iovec_array.iova_pointer, iovec_array.iova_length, offset);
+  mmux_ssize_t	rv = preadv(fd.value, iovec_array.iova_base, iovec_array.iova_len, offset);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -723,7 +755,7 @@ bool
 mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array,
 		   mmux_off_t offset)
 {
-  mmux_ssize_t	rv = pwritev(fd.value, iovec_array.iova_pointer, iovec_array.iova_length, offset);
+  mmux_ssize_t	rv = pwritev(fd.value, iovec_array.iova_base, iovec_array.iova_len, offset);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -739,7 +771,7 @@ bool
 mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array,
 		   mmux_off_t offset, mmux_sint_t flags)
 {
-  mmux_ssize_t	rv = preadv2(fd.value, iovec_array.iova_pointer, iovec_array.iova_length, offset, flags);
+  mmux_ssize_t	rv = preadv2(fd.value, iovec_array.iova_base, iovec_array.iova_len, offset, flags);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -752,7 +784,7 @@ bool
 mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t iovec_array,
 		    mmux_off_t offset, mmux_sint_t flags)
 {
-  mmux_ssize_t	rv = pwritev2(fd.value, iovec_array.iova_pointer, iovec_array.iova_length, offset, flags);
+  mmux_ssize_t	rv = pwritev2(fd.value, iovec_array.iova_base, iovec_array.iova_len, offset, flags);
 
   if (-1 != rv) {
     *number_of_bytes_read_p = rv;
@@ -1450,6 +1482,26 @@ mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
   } else {
     return false;
   }
+}
+
+bool
+mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen)
+{
+  mmux_usize_t	nbytes_done;
+  mmux_off_t	position = 0;
+
+  /* Seek to the beginning. */
+  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
+    return true;
+  }
+  if (mmux_libc_read(&nbytes_done, mfd, bufptr, maximum_buflen)) {
+    return true;
+  }
+  /* Restore the original position. */
+  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
+    return true;
+  }
+  return false;
 }
 
 

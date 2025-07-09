@@ -126,8 +126,8 @@ typedef struct mmux_libc_utimbuf_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_UTIMBU
 typedef struct mmux_libc_open_how_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW]; } mmux_libc_open_how_t;
 
 typedef struct mmux_libc_iovec_array_t {
-  mmux_libc_iovec_t *	iova_pointer;
-  mmux_usize_t		iova_length;
+  mmux_libc_iovec_t *	iova_base;
+  mmux_usize_t		iova_len;
 } mmux_libc_iovec_array_t;
 
 typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t;

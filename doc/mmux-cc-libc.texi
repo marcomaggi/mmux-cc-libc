@@ -121,12 +121,17 @@ Setter and getter for the field @code{\FIELDNAME\} of @objtype{mmux_libc_\STRUCT
 
 @end macro
 
+
 @macro MmuxStructDumper{STRUCTNAME}
+@MmuxStructDumperTwo{\STRUCTNAME\,struct \STRUCTNAME\}
+@end macro
+
+
+@macro MmuxStructDumperTwo{STRUCTNAME,STRUCTTYPE}
 @deftypefun bool mmux_libc_\STRUCTNAME\_dump (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_\STRUCTNAME\_t const * @var{struct_p}, mmux_asciizcp_t @var{struct_name})
 Write to @var{fd} a description of the fields of the @MmuxCStruct{\STRUCTNAME\} referenced by
 @var{struct_p}.  @var{struct_name} must be a pointer to an @asciiz{} string representing the name of
-the data structure used in the description; when @cnull{}: it defaults to @samp{struct
-\STRUCTNAME\}.
+the data structure used in the description; when @cnull{}: it defaults to @samp{\STRUCTTYPE\}.
 @end deftypefun
 
 @end macro
@@ -3393,16 +3398,112 @@ if (is_ready) @{
 
 
 @menu
-* fds scatter-gather struct::   The input/output vector data structure.
+* fds scatter-gather buffer::   The input/output buffer data structure.
+* fds scatter-gather array::    The input/output array data structure.
 * fds scatter-gather api::      The input/output vector programming interface.
 @end menu
 
 @c page
-@node fds scatter-gather struct
-@subsection The input/output vector data structure
+@node fds scatter-gather buffer
+@subsection The input/output buffer data structure
+
+
+Data to be read from or written to a file descriptor using the scatter--gather facilities must be
+stored in multiple buffers; a single buffer of data is represented by the data structure
+@objtype{mmux_libc_iovec_t}.  To instantiate and inspect such data structure we do:
+
+@example
+mmux_usize_t const      bufnum = 16;
+mmux_usize_t const      buflen = 4096;
+mmux_octet_t            bufptr[bufnum][buflen];
+mmux_libc_iovec_t       iov[bufnum];
+
+for (mmux_uint_t i=0; i<bufnum; ++i) @{
+  mmux_libc_iov_len_set  (&(iov[i]), buflen);
+  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+@}
+
+@{
+  mmux_libc_fd_t      fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_iovec_dump(fd, &(iov[0]), NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+this code dumps to @stdout{} a string representation of a single @objtype{mmux_libc_iovec_t}:
+
+@example
+struct iovec = 0x7ffe8c4309d0
+struct iovec->iov_base = 0x7ffe8c4209c0
+struct iovec->iov_len = 4096
+@end example
 
 
 @MmuxCStructOpaqueTypedef{iovec}
+
+
+@MmuxSetterGetter{iovec, iov_base, mmux_pointer_t}
+@MmuxSetterGetter{iovec, iov_len,  mmux_usize_t}
+@MmuxStructDumper{iovec}
+
+@c page
+@node fds scatter-gather array
+@subsection The input/output array data structure
+
+
+Data to be read from or written to a file descriptor using the scatter--gather facilities must be
+stored in multiple buffers; an array of these buffers is represented by the data structure
+@objtype{mmux_libc_iovec_array_t}.  To instantiate and inspect such data structure we do:
+
+@example
+mmux_usize_t const      bufnum = 16;
+mmux_usize_t const      buflen = 4096;
+mmux_octet_t            bufptr[bufnum][buflen];
+mmux_libc_iovec_t       iov[bufnum];
+mmux_libc_iovec_array_t iova;
+
+for (mmux_uint_t i=0; i<bufnum; ++i) @{
+  mmux_libc_iov_len_set  (&(iov[i]), buflen);
+  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+@}
+
+mmux_libc_iova_len_set  (&iova, bufnum);
+mmux_libc_iova_base_set (&iova, iov);
+
+@{
+  mmux_libc_fd_t      fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_iovec_array_dump(fd, &iova, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+this code dumps to @stdout{} a string representation of a single @objtype{mmux_libc_iovec_array_t}:
+
+@example
+mmux_libc_iovec_array_t = 0x7ffcd9306550
+mmux_libc_iovec_array_t->iova_base = 0x7ffcd9306560
+mmux_libc_iovec_array_t->iova_len = 4
+mmux_libc_iovec_array_t->iova_base[0] = 0x7ffcd9306560
+mmux_libc_iovec_array_t->iova_base[0]->iov_base = 0x7ffcd9302540
+mmux_libc_iovec_array_t->iova_base[0]->iov_len = 4096
+mmux_libc_iovec_array_t->iova_base[1] = 0x7ffcd9306570
+mmux_libc_iovec_array_t->iova_base[1]->iov_base = 0x7ffcd9303540
+mmux_libc_iovec_array_t->iova_base[1]->iov_len = 4096
+mmux_libc_iovec_array_t->iova_base[2] = 0x7ffcd9306580
+mmux_libc_iovec_array_t->iova_base[2]->iov_base = 0x7ffcd9304540
+mmux_libc_iovec_array_t->iova_base[2]->iov_len = 4096
+mmux_libc_iovec_array_t->iova_base[3] = 0x7ffcd9306590
+mmux_libc_iovec_array_t->iova_base[3]->iov_base = 0x7ffcd9305540
+mmux_libc_iovec_array_t->iova_base[3]->iov_len = 4096
+@end example
 
 
 @deftp {Opaque Struct Typedef} mmux_libc_iovec_array_t
@@ -3411,20 +3512,17 @@ the following fields:
 
 @table @code
 @item mmux_libc_iovec_t * iova_base
-Pointer to the array.
+Pointer to an array of @objtype{mmux_libc_iovec_t} data structures.
 
 @item mmux_usize_t iova_len
-Number of slots in the array.
+Number of items in the array referenced by @code{iova_base}.
 @end table
 @end deftp
 
-@MmuxSetterGetter{iovec, iov_base, mmux_pointer_t}
-@MmuxSetterGetter{iovec, iov_len,  mmux_usize_t}
-@MmuxStructDumper{iovec}
 
-@MmuxSetterGetter{iovec_array, iova_base, mmux_pointer_t}
+@MmuxSetterGetter{iovec_array, iova_base, mmux_libc_iovec_t *}
 @MmuxSetterGetter{iovec_array, iova_len,  mmux_usize_t}
-@MmuxStructDumper{iovec_array}
+@MmuxStructDumperTwo{iovec_array, mmux_libc_iovec_array_t}
 
 @c page
 @node fds scatter-gather api
@@ -3698,6 +3796,28 @@ a variable of type @objtype{mmux_sint_t}.
 @section Memory--mapped file descriptors
 
 
+@cindex Memory--mapped file descriptors
+@cindex Memfds
+
+
+Memory--mapped file descriptors (memfds for short) are constructed by @cfunc{memfd_create},
+@MmuxCFuncpage{memfd_create}.  The device underlying a memfd exists only in memory, but we can apply
+to it almost all the functions acting upon file descriptors.
+
+@menu
+* fds memfd intro::             Introduction to memfds and usage examples.
+* fds memfd makers::            Constructing memfds.
+* fds memfd inspect::           Inspecting memfds.
+* fds memfd reading::           Special reading operations upon memfds.
+* fds memfd writing::           Special writing operations upon memfds.
+* fds memfd copying::           Special copying operations upon memfds.
+@end menu
+
+@c page
+@node fds memfd intro
+@subsection Introduction to memfds and usage examples
+
+
 To use a memory--mapped file descriptor, we do:
 
 @example
@@ -3712,6 +3832,15 @@ if (mmux_libc_make_mfd(&mfd)) @{
     /* error */
   @}
 
+  @{
+    mmux_double_t       rep = 1.2;
+    mmux_double_t       imp = 3.4;
+    mmux_complexd_t     Z;
+
+    Z = mmux_complexd_make_rectangular(rep, imp);
+    mmux_complexd_dprintf(mfd, Z);
+  @}
+
   /* Copy the data to stdout. */
   if (mmux_libc_mfd_copyou(mfd)) @{
     /* error */
@@ -3723,16 +3852,96 @@ if (mmux_libc_close(mfd)) @{
 @end example
 
 @noindent
-we can apply to a memory--mapped file descriptor almost all the functions that act upon ordinary
-file descriptors.  We need to remember to appropriately shift the input/output position of the
-underlying device with @cfunc{mmux_libc_lseek}.
+we can apply to a memfd almost all the functions that act upon ordinary file descriptors.
+
+We need to remember to appropriately shift the input/output position of the underlying device with
+@cfunc{mmux_libc_lseek}.  If we need to shift the position, do something, and then restore the
+position to its original value, we do:
+
+@example
+mmux_libc_fd_t  mfd = ...;
+mmux_off_t      position = 0; /* new position with respect to MMUX_LIBC_SEEK_SET */
+
+/* Save the current position then seek to the beginning. */
+if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
+  /* error */
+@}
+
+/* do something with mfd */
+
+/* Restore the original position. */
+if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
+  /* error */
+@}
+@end example
+
+@c page
+@node fds memfd makers
+@subsection Constructing memfds
+
+
+The core constructor for a memfd is @cfunc{mmux_libc_make_mfd}; we should always pair a call to it
+with a call to @cfunc{mmux_libc_close}, which acts as destructor:
+
+@example
+mmux_libc_fd_t  mfd;
+
+if (mmux_libc_make_mfd(&mfd)) @{
+  /* error */
+@}
+
+@{
+  /* do something with "mfd" */
+@}
+
+if (mmux_libc_close(mfd)) @{
+  /* error */
+@}
+@end example
 
 
 @deftypefun bool mmux_libc_make_mfd (mmux_libc_file_descriptor_t * @var{mfd_p})
 Create a new file descriptor whose underlying device is mapped into ordinary memory; store the
-resulting file descriptor in the variable referenced by @var{mfd_p}.  This function makes use of
-@cfunc{mmux_libc_memfd_create}.
+resulting file descriptor in the variable referenced by @var{mfd_p}.
 @end deftypefun
+
+@c page
+@node fds memfd inspect
+@subsection Inspecting memfds
+
+
+To acquire the number of bytes in the device underlying a memfd, we do:
+
+@example
+mmux_libc_fd_t  mfd;
+mmux_usize_t    buflen;
+
+if (mmux_libc_mfd_length(&buflen, mfd)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+this operation should not fail.
+
+If the data in the device is to be interpreted as an @mmuxascii{} string, we can allocate a buffer
+to contain it as @asciiz{} string as follows:
+
+@example
+mmux_libc_fd_t  mfd;
+mmux_usize_t    buflen;
+
+if (mmux_libc_mfd_length(&buflen, mfd)) @{
+  /* error */
+@}
+
+@{
+  mmux_char_t   bufptr[1+buflen];
+
+  bufptr[buflen] = '\0';
+  ...
+@}
+@end example
 
 
 @deftypefun bool mmux_libc_mfd_length (mmux_usize_t * @var{len_p}, mmux_libc_file_descriptor_t @var{mfd})
@@ -3740,16 +3949,121 @@ Store in the variable referenced by @var{len_p} the number of bytes in the devic
 @var{mfd}.
 @end deftypefun
 
+@c page
+@node fds memfd reading
+@subsection Special reading operations upon memfds
+
+
+Applying the basic reading operation using @cfunc{mmux_libc_read} to a memfd, looks like this:
+
+@example
+mmux_usize_t    buflen = 4094;
+mmux_octet_t *  bufptr[buflen];
+
+mmux_libc_fd_t  mfd;
+mmux_usize_t    nbytes_done;
+
+gimme_a_memfd(&mfd);
+
+if (mmux_libc_read(&nbytes_done, mfd, bufptr, buflen)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+this is quite verbose, and the read operation should not fail.  So the following functions are
+implemented.
+
+If the data in the device underlying the memfd is to be considered as an @mmuxascii{} string, we can
+copy it into an external buffer as follows:
+
+@example
+mmux_usize_t    buflen;
+
+if (mmux_libc_mfd_length(&buflen, mfd)) @{
+  /* error */
+@} else @{
+  mmux_char_t   bufptr[1+buflen];
+
+  bufptr[buflen] = '\0';
+  if (mmux_libc_mfd_read_buffer(mfd, bufptr, buflen)) @{
+    /* error */
+  @}
+  ...
+@}
+@end example
+
+@noindent
+we take advantage of the fact that we know the data size.
+
+
+@deftypefun bool mmux_libc_mfd_read_buffer (mmux_libc_fd_t @var{mfd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{maximum_buflen})
+Wrapper for @cfunc{mmux_libc_read}.  Copy up to @var{maximum_buflen} bytes from the device
+underlying @var{mfd} to the buffer @var{bufptr}.
+@end deftypefun
+
+@c page
+@node fds memfd writing
+@subsection Special writing operations upon memfds
+
+
+Applying the basic writing operation using @cfunc{mmux_libc_write} to a memfd, looks like this:
+
+@example
+mmux_usize_t    buflen = 4094;
+mmux_octet_t *  bufptr[buflen];
+
+mmux_libc_fd_t  mfd;
+mmux_usize_t    nbytes_done;
+
+fill_buffer(bufptr, buflen);
+gimme_a_memfd(&mfd);
+
+if (mmux_libc_write(&nbytes_done, mfd, bufptr, buflen)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+this is quite verbose, but we need to remember that the write operation could fail if there is not
+enough memory available to enlarge the underlying device.  Anyway, the following functions are
+implemented.
+
+
+@deftypefun bool mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t @var{mfd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+Write @var{buflen} bytes from the buffer @var{bufptr} into the device underlying @var{mfd}, at the
+current position.  The return value is @ctrue{} if less than @var{buflen} bytes are written to
+@var{mfd}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
+Write the @asciiz{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
+current position.  The return value is @ctrue{} if less than the whole string is written to
+@var{mfd}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_mfd_strerror (mmux_libc_file_descriptor_t @var{mfd}, mmux_sint_t @var{errnum})
+Write to @var{mfd}, at the current position for the underlying device, the error string associated
+to @var{errnum} and retrieved using @cfunc{mmux_libc_strerror}.  The return value is @ctrue{} if
+less than the whole error message is written to @var{mfd}.
+@end deftypefun
+
+@c page
+@node fds memfd copying
+@subsection Special copying operations upon memfds
+
 
 @deftypefun bool mmux_libc_mfd_copy (mmux_libc_file_descriptor_t @var{oufd}, mmux_libc_file_descriptor_t @var{mfd})
 Copy all the data in the device underlying @var{mfd} to the file descriptor @var{oufd}.
 
 This function ignores the current device position, writing all the data from the beginning to the
 end of the underlying device.  When successful: the current device position is restored to the
-original, so it is left unchanged.  If an error occurs: the underlying device position is undefined.
+original value, so it is left unchanged.  If an error occurs: the underlying device position is
+undefined.
 
-@strong{NOTE} It appears the memory--mapped file descriptors cannot be used with
-@cfunc{mmux_libc_copy_file_range}.
+@strong{NOTE} It appears the memfds cannot be used with @cfunc{mmux_libc_copy_file_range}.
 @end deftypefun
 
 
@@ -3757,24 +4071,6 @@ original, so it is left unchanged.  If an error occurs: the underlying device po
 @deftypefunx bool mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t @var{mfd})
 Wrappers for @cfunc{mmux_libc_mfd_copy} that write the underlying device contents to, respectively:
 @stdout{}, @stderr{}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t @var{mfd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
-Write @var{buflen} bytes from the buffer @var{bufptr} into the device underlying @var{mfd}, at the
-current position.  This is a simplified wrapper for @cfunc{mmux_libc_write}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
-Write the @asciiz{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
-current position.  This is a simplified wrapper for @cfunc{mmux_libc_write}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_mfd_strerror (mmux_libc_file_descriptor_t @var{mfd}, mmux_sint_t @var{errnum})
-Write to @var{mfd}, at the current position for the underlying device, the error string associated
-to @var{errnum} and retrieved using @cfunc{mmux_libc_strerror}.
 @end deftypefun
 
 @c page

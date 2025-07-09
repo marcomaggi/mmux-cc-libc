@@ -320,8 +320,8 @@ typedef struct stat		mmux_libc_stat_t;
 typedef struct utimbuf		mmux_libc_utimbuf_t;
 
 typedef struct mmux_libc_iovec_array_t {
-  mmux_libc_iovec_t *	iova_pointer;
-  mmux_usize_t		iova_length;
+  mmux_libc_iovec_t *	iova_base;
+  mmux_usize_t		iova_len;
 } mmux_libc_iovec_array_t;
 
 typedef struct in_addr				mmux_libc_in_addr_t;

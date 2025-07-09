@@ -57,22 +57,30 @@ handle_error (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
-  mmux_usize_t const		array_length = 16;
-  mmux_libc_iovec_t		array_pointer[array_length];
+  mmux_usize_t const		bufnum = 4;
+  mmux_usize_t const		buflen = 4096;
+  mmux_octet_t			bufptr[bufnum][buflen];
+  mmux_libc_iovec_t		iov[bufnum];
+
   mmux_libc_iovec_array_t	iova;
 
-  mmux_libc_iova_pointer_set (&iova, array_pointer);
-  mmux_libc_iova_length_set  (&iova, array_length);
+  for (mmux_uint_t i=0; i<bufnum; ++i) {
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  }
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 
   {
     mmux_usize_t	the_array_length;
     mmux_libc_iovec_t *	the_array_pointer;
 
-    mmux_libc_iova_length_ref  (&the_array_length,  &iova);
-    mmux_libc_iova_pointer_ref (&the_array_pointer, &iova);
+    mmux_libc_iova_len_ref  (&the_array_length,  &iova);
+    mmux_libc_iova_base_ref (&the_array_pointer, &iova);
 
-    assert(the_array_length  == array_length);
-    assert(the_array_pointer == array_pointer);
+    assert(the_array_length  == bufnum);
+    assert(the_array_pointer == iov);
   }
 
   {
