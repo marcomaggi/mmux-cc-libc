@@ -187,6 +187,8 @@ src/%.$(OBJEXT): \
 
 #### TESTS
 
+EXTRA_DIST	+= tests/test-common.h
+
 check_PROGRAMS	= \
 	tests/test-version				\
 	\

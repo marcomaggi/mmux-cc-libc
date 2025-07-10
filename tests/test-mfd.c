@@ -18,35 +18,7 @@
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc.h>
-
-static mmux_asciizcp_t	PROGNAME = "test-mfd";
-
-
-/** --------------------------------------------------------------------
- ** Helpers.
- ** ----------------------------------------------------------------- */
-
-static void
-print_error (mmux_asciizcp_t errmsg)
-{
-  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
-}
-static void
-handle_error (void)
-{
-  mmux_sint_t		errnum;
-  mmux_asciizcp_t	errmsg;
-
-  mmux_libc_errno_consume(&errnum);
-  if (errnum) {
-    if (mmux_libc_strerror(&errmsg, errnum)) {
-      mmux_libc_exit_failure();
-    } else {
-      print_error(errmsg);
-    }
-  }
-  mmux_libc_exit_failure();
-}
+#include <test-common.h>
 
 
 /** --------------------------------------------------------------------
@@ -56,6 +28,12 @@ handle_error (void)
 static void
 test_small_string (void)
 {
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME			= "test-mfd";
+  }
+
   mmux_asciizcp_t	asciiz_string = "ciao mamma";
   mmux_usize_t		asciiz_string_len;
   mmux_libc_fd_t	fd;

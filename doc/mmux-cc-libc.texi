@@ -4138,8 +4138,8 @@ if (mmux_libc_read(&nbytes_done, mfd, bufptr, buflen)) @{
 @end example
 
 @noindent
-this is quite verbose, and the read operation should not fail.  So the following functions are
-implemented.
+this is quite verbose, and the read operation should not fail if the destination buffer is wide
+enough.  So the following functions are implemented.
 
 If the data in the device underlying the memfd is to be considered as an @mmuxascii{} string, we can
 copy it into an external buffer as follows:
@@ -4166,7 +4166,7 @@ we take advantage of the fact that we know the data size.
 
 @deftypefun bool mmux_libc_mfd_read_buffer (mmux_libc_fd_t @var{mfd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{maximum_buflen})
 Wrapper for @cfunc{mmux_libc_read}.  Copy up to @var{maximum_buflen} bytes from the device
-underlying @var{mfd} to the buffer @var{bufptr}.
+underlying @var{mfd} to the buffer referenced by @var{bufptr}.
 @end deftypefun
 
 @c page

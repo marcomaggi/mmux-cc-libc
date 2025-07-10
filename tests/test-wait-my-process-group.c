@@ -12,19 +12,28 @@
   See the COPYING file.
 */
 
+
+/** --------------------------------------------------------------------
+ ** Headers.
+ ** ----------------------------------------------------------------- */
+
 #include <mmux-cc-libc.h>
+#include <test-common.h>
 
-static mmux_asciizcp_t	PROGNAME = "test-wait-my-process-group";
-
-static void
-print_error (mmux_asciizcp_t errmsg)
-{
-  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
-}
+
+/** --------------------------------------------------------------------
+ ** Let's go.
+ ** ----------------------------------------------------------------- */
 
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME = "test-wait-my-process-group";
+  }
+
   bool                    this_is_the_parent_process;
   mmux_libc_pid_t         child_pid;
 

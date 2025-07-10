@@ -18,54 +18,9 @@
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc.h>
-
-static mmux_asciizcp_t	PROGNAME = "test-openat2-write-read-close";
+#include <test-common.h>
 
 static mmux_asciizcp_t	pathname_asciiz = "./test-openat2-write-read-close.file.ext";
-
-
-/** --------------------------------------------------------------------
- ** Helpers.
- ** ----------------------------------------------------------------- */
-
-static void
-cleanfiles (void)
-{
-  mmux_libc_ptn_t	ptn;
-
-  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
-    return;
-  };
-
-  if (mmux_libc_unlink(ptn)) {
-    return;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-
-static void
-print_error (mmux_asciizcp_t errmsg)
-{
-  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
-}
-static void
-handle_error (void)
-{
-  mmux_sint_t		errnum;
-  mmux_asciizcp_t	errmsg;
-
-  mmux_libc_errno_consume(&errnum);
-  if (errnum) {
-    if (mmux_libc_strerror(&errmsg, errnum)) {
-      mmux_libc_exit_failure();
-    } else {
-      print_error(errmsg);
-    }
-  }
-  cleanfiles();
-  mmux_libc_exit_failure();
-}
 
 
 /** --------------------------------------------------------------------
@@ -75,6 +30,14 @@ handle_error (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME = "test-openat2-write-read-close";
+    cleanfiles_register(pathname_asciiz);
+    cleanfiles();
+  }
+
   mmux_libc_file_descriptor_t		fder;
   mmux_libc_file_system_pathname_t	ptn;
   mmux_libc_file_descriptor_t		dirfd;

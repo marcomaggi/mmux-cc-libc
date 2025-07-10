@@ -1487,6 +1487,16 @@ mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
 bool
 mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen)
 {
+#if (1)
+  mmux_off_t	offset = 0;
+  mmux_usize_t	nbytes_done;
+
+  if (mmux_libc_pread(&nbytes_done, mfd, bufptr, maximum_buflen, offset)) {
+    return true;
+  } else {
+    return false;
+  }
+#else
   mmux_usize_t	nbytes_done;
   mmux_off_t	position = 0;
 
@@ -1502,6 +1512,7 @@ mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize
     return true;
   }
   return false;
+#endif
 }
 
 

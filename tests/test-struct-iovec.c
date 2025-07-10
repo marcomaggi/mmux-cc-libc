@@ -18,36 +18,7 @@
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc.h>
-#include <assert.h>
-
-static mmux_asciizcp_t	PROGNAME = "test-struct-iovec";
-
-
-/** --------------------------------------------------------------------
- ** Helpers.
- ** ----------------------------------------------------------------- */
-
-static void
-print_error (mmux_asciizcp_t errmsg)
-{
-  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
-}
-static void
-handle_error (void)
-{
-  mmux_sint_t		errnum;
-  mmux_asciizcp_t	errmsg;
-
-  mmux_libc_errno_consume(&errnum);
-  if (errnum) {
-    if (mmux_libc_strerror(&errmsg, errnum)) {
-      mmux_libc_exit_failure();
-    } else {
-      print_error(errmsg);
-    }
-  }
-  mmux_libc_exit_failure();
-}
+#include <test-common.h>
 
 
 /** --------------------------------------------------------------------
@@ -57,6 +28,12 @@ handle_error (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME = "test-struct-iovec";
+  }
+
   mmux_usize_t const	bufnum = 16;
   mmux_usize_t const	buflen = 4096;
   mmux_octet_t		bufptr[bufnum][buflen];
