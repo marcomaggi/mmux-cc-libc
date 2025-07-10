@@ -36,7 +36,7 @@ static mmux_uint_t		CLEANFILES_PATHNAMES_COUNT = 0;
 
 void print_error (mmux_asciizcp_t errmsg);
 void printf_error (mmux_asciizcp_t errmsg_template, ...);
-void print_message (mmux_asciizcp_t template, ...);
+void printf_message (mmux_asciizcp_t template, ...);
 void handle_error (void);
 
 void wait_for_some_time (void);
@@ -87,7 +87,7 @@ printf_error (mmux_asciizcp_t errmsg_template, ...)
   mmux_libc_close(mfd);
 }
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
-print_message (mmux_asciizcp_t template, ...)
+printf_message (mmux_asciizcp_t template, ...)
 {
   mmux_libc_fd_t	mfd;
 

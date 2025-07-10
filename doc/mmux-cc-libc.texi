@@ -3735,7 +3735,80 @@ fill_buffers(iova);
 @end deftypefun
 
 
-If we need to copy data between file descriptors, we can adapt the following code template:
+Here is an example to understand the mechanics of the function call:
+
+@example
+mmux_libc_file_descriptor_t     src_fd;
+mmux_libc_file_descriptor_t     dst_fd;
+
+/* Open the source and destination files. */
+@{
+  mmux_libc_file_system_pathname_t    src_ptn;
+  mmux_libc_file_system_pathname_t    dst_ptn;
+  mmux_sint_t  flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
+  mmux_mode_t  mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+  if (mmux_libc_make_file_system_pathname(&src_ptn, "source.ext")) @{
+    /* error */
+  @}
+  if (mmux_libc_open(&src_fd, src_ptn, flags, mode)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_make_file_system_pathname(&dst_ptn, "destination.ext")) @{
+    /* error */
+  @}
+
+  if (mmux_libc_open(&dst_fd, dst_ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Write data to the source file. */
+@{
+  mmux_usize_t        nbytes_done;
+  //                            01234567890123456789012345678901234567890
+  //                            0         1         2         3         4
+  mmux_asciizcp_t     bufptr = "0123456789abcdefghilmnopqrstuvz0123456789";
+  mmux_usize_t        buflen;
+
+  mmux_libc_strlen(&buflen, bufptr);
+
+  if (mmux_libc_write(&nbytes_done, src_fd, bufptr, buflen)) @{
+    /* error */
+  @}
+  if (nbytes_done != buflen) @{
+    /* it is an error for our purposes */
+  @}
+@}
+
+/* Copy the alpha range of data "abcdefghilmnopqrstuvz" from the source
+   file to the destination file. */
+@{
+  mmux_usize_t        nbytes_done;
+  mmux_sint64_t       src_position = 10;
+  mmux_sint64_t       dst_position = 0;
+  mmux_usize_t        number_of_bytes_to_copy = 21;
+  mmux_sint_t         flags = 0;
+
+  if (mmux_libc_copy_file_range(&nbytes_done,
+                                src_fd, &src_position,
+                                dst_fd, &dst_position,
+                                number_of_bytes_to_copy, flags)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_close(src_fd)) @{
+  /* error */
+@}
+if (mmux_libc_close(dst_fd)) @{
+  /* error */
+@}
+@end example
+
+If we need to copy data between file descriptors, and we cannot use
+@cfunc{mmux_libc_copy_file_range}, we can adapt the following code template:
 
 @example
 mmux_libc_fd_t                  infd, oufd;
@@ -3772,6 +3845,7 @@ do @{
   @}
 @} while (nbytes_read > 0);
 @end example
+
 @c page
 @node fds flock
 @section File locks
