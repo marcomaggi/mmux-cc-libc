@@ -4042,6 +4042,10 @@ if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
 @}
 @end example
 
+@noindent
+also we can use @cfunc{mmux_libc_pread} and @cfunc{mmux_libc_pwrite} to read from and write to a
+position from the beginning of the underlying device.
+
 @c page
 @node fds memfd makers
 @subsection Constructing memfds
