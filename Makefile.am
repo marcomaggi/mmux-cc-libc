@@ -212,7 +212,8 @@ check_PROGRAMS	= \
 	tests/test-readv-writev				\
 	tests/test-preadv-pwritev			\
 	tests/test-preadv2-pwritev2			\
-	tests/test-copy-file-range
+	tests/test-copy-file-range			\
+	tests/test-struct-flock
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -289,6 +290,9 @@ tests_test_preadv2_pwritev2_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_copy_file_range_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_copy_file_range_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_struct_flock_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_struct_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

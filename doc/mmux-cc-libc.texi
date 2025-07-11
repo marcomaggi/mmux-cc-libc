@@ -2664,7 +2664,7 @@ wide.
 * fds scatter-gather::          Scatter--gather input and output.
 * fds copying::                 Copying ranges from file to file.
 * fds flock::                   File locks.
-* fds fun control::             File descriptors functionality ontrol.
+* fds fun control::             File descriptors functionality control.
 * fds io control::              File descriptors input/output control.
 * fds memfd::                   Memory-mapped file descriptors.
 @end menu
@@ -3851,6 +3851,44 @@ do @{
 @section File locks
 
 
+Data structures of type @objtype{mmux_libc_flock_t} are used to describe a file lock in some calls
+to @cfunc{mmux_libc_fcntl}.  To declare and inspect such data structures we do:
+
+@example
+mmux_libc_flock_t     flo;
+mmux_libc_pid_t       pid;
+
+mmux_libc_make_pid(&pid, 0); /* should not fail */
+
+mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_RDLCK);
+mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
+mmux_libc_l_start_set  (&flo, 11);
+mmux_libc_l_len_set    (&flo, 33);
+mmux_libc_l_pid_set    (&flo, pid);
+
+@{
+  mmux_libc_fd_t      fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_flock_dump(fd, &flo, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+which will print:
+
+@example
+struct flock = "0x7ffcf5d55170"
+struct flock.l_type = "0" (F_RDLCK)
+struct flock.l_whence = "0" (SEEK_SET)
+struct flock.l_start = "11"
+struct flock.l_len = "33"
+struct flock.l_pid = "0"
+@end example
+
+
 @MmuxCStructOpaqueTypedef{flock}
 @MmuxSetterGetter{flock, l_type,   mmux_sshort_t}
 @MmuxSetterGetter{flock, l_whence, mmux_sshort_t}
@@ -3867,7 +3905,7 @@ representing the name of the value.
 
 @c page
 @node fds fun control
-@section File descriptors functionality ontrol
+@section File descriptors functionality control
 
 
 @deftypefun bool mmux_libc_fcntl (mmux_libc_file_descriptor_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
