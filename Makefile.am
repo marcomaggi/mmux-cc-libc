@@ -302,14 +302,17 @@ tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 #### interface to "make installcheck"
 
 installcheck-local: $(TESTS)
-	@RV=0							;\
-	for FILE in $(TESTS)					;\
-	do echo "running: '$(builddir)/$$FILE'"			;\
-	    if ! "$(builddir)/$$FILE"				;\
-	    then RV=$$?; break					;\
-	    fi							;\
-	done							;\
-	if test "$$RV" = 77; then exit 0; else exit $$RV; fi	;
+	@RV=0										      ;\
+	for FILE in $(TESTS)								      ;\
+	do echo "make installcheck: running: '$(builddir)/$$FILE'"			      ;\
+	    if "$(builddir)/$$FILE"							      ;\
+	    then :									      ;\
+	    else RV=$$?									      ;\
+		echo "make installcheck: test file '$(builddir)/$$FILE' exit status: $$RV"    ;\
+	        if test "$$RV" != 77; then break; fi					      ;\
+	    fi										      ;\
+	done										      ;\
+	if test "$$RV" = 77; then exit 0; else exit $$RV; fi				      ;
 
 
 #### common rules
