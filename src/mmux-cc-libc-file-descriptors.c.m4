@@ -414,7 +414,7 @@ mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t co
     mmux_libc_open_how_flags_ref(&value, open_how_p);
 
     DPRINTF(fd, "%s->flags = ", struct_name);
-    if (mmux_uint64_dprintf(fd, value)) {
+    if (mmux_libc_dprintf_uint64(fd, value)) {
       return true;
     }
     if (dump_open_flags(fd, value)) {
@@ -430,7 +430,7 @@ mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t co
     mmux_libc_open_how_mode_ref(&value, open_how_p);
 
     DPRINTF(fd, "%s->mode = ", struct_name);
-    if (mmux_uint64_dprintf(fd, value)) {
+    if (mmux_libc_dprintf_uint64(fd, value)) {
       return true;
     }
     if (dump_open_mode(fd, value)) {
@@ -446,7 +446,7 @@ mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t co
     mmux_libc_open_how_resolve_ref(&value, open_how_p);
 
     DPRINTF(fd, "%s->resolve = ", struct_name);
-    if (mmux_uint64_dprintf(fd, value)) {
+    if (mmux_libc_dprintf_uint64(fd, value)) {
       return true;
     }
     if (dump_open_resolve(fd, value)) {
@@ -1522,7 +1522,7 @@ mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize
 
 m4_define([[[DEFINE_PRINTER]]],[[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[
 bool
-mmux_$1_dprintf (mmux_libc_file_descriptor_t fd, mmux_$1_t value)
+mmux_libc_dprintf_$1 (mmux_libc_file_descriptor_t fd, mmux_$1_t value)
 {
   int		rv, required_nbytes;
 
@@ -1618,22 +1618,22 @@ DEFINE_PRINTER([[[rlim]]])
 bool
 mmux_libc_fd_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 bool
 mmux_libc_pid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 bool
 mmux_libc_uid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 bool
 mmux_libc_gid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 bool
 mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value)
@@ -1643,12 +1643,12 @@ mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pat
 bool
 mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_completed_process_status_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 bool
 mmux_libc_interprocess_signal_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_interprocess_signal_t value)
 {
-  return mmux_sint_dprintf(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, value.value);
 }
 
 /* end of file */

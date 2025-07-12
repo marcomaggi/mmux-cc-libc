@@ -44,8 +44,8 @@
 @set PackageCflagsVar                   @env{MMUX_CC_LIBC_CFLAGS}
 @c This is the stem of the library in "libmmux-cc-libc.so".
 @set PackageLibstem                     mmux-cc-libc
-@set PackageApiPrefixLower              mmux_
-@set PackageApiPrefixUpper              MMUX_
+@set PackageApiPrefixLower              mmux_libc_
+@set PackageApiPrefixUpper              MMUX_LIBC_
 
 @set PackageHeader                      mmux-cc-libc.h
 @set PackageHeaderFile                  @file{@value{PackageHeader}}
@@ -2841,7 +2841,7 @@ Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{
 @c ------------------------------------------------------------------------
 
 @macro MmuxDefineTypePrinterFunc{STEM}
-@deftypefun bool mmux_\STEM\_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_\STEM\_t @var{value})
+@deftypefun bool mmux_libc_dprintf_\STEM\ (mmux_libc_file_descriptor_t @var{fd}, mmux_\STEM\_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 

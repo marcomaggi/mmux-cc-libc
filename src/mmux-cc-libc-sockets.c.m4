@@ -451,7 +451,7 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
 
     mmux_libc_s_addr_ref(&raw_number, in_addr_p);
     DPRINTF(fd, "%s.s_addr = ", struct_name);
-    if (mmux_uint32_dprintf(fd, raw_number)) {
+    if (mmux_libc_dprintf_uint32(fd, raw_number)) {
       return true;
     };
 

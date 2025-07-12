@@ -657,7 +657,7 @@ mmux_cc_libc_decl bool mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_point
  ** ----------------------------------------------------------------- */
 
 m4_define([[[DEFINE_PRINTER_PROTO]]],
-  [[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[mmux_cc_libc_decl bool mmux_$1_dprintf (mmux_libc_file_descriptor_t fd, mmux_$1_t value);]]])]]])
+  [[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[mmux_cc_libc_decl bool mmux_libc_dprintf_$1 (mmux_libc_file_descriptor_t fd, mmux_$1_t value);]]])]]])
 
 DEFINE_PRINTER_PROTO([[[pointer]]])
 
