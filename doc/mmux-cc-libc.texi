@@ -2920,32 +2920,37 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{socklen}
 @MmuxDefineTypePrinterFunc{rlim}
 
-@deftypefun bool mmux_libc_fd_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_descriptor_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_descriptor_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pid_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_pid_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_pid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_uid_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_gid_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_gid_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_gid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_completed_process_status_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_completed_process_status_t @var{value})
+Print to @var{fd} the string representation of @var{value}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 

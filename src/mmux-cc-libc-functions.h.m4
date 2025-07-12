@@ -732,21 +732,21 @@ DEFINE_PRINTER_PROTO([[[time]]])
 DEFINE_PRINTER_PROTO([[[socklen]]])
 DEFINE_PRINTER_PROTO([[[rlim]]])
 
-mmux_cc_libc_decl bool mmux_libc_fd_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value);
 
-mmux_cc_libc_decl bool mmux_libc_pid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value);
 
-mmux_cc_libc_decl bool mmux_libc_uid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value);
 
-mmux_cc_libc_decl bool mmux_libc_gid_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value);
 
-mmux_cc_libc_decl bool mmux_libc_ptn_dprintf (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value);
 
-mmux_cc_libc_decl bool mmux_libc_completed_process_status_dprintf (mmux_libc_file_descriptor_t fd,
-								   mmux_libc_completed_process_status_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t fd,
+									mmux_libc_completed_process_status_t value);
 
-mmux_cc_libc_decl bool mmux_libc_interprocess_signal_dprintf (mmux_libc_file_descriptor_t fd,
-							mmux_libc_interprocess_signal_t value);
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t fd,
+								   mmux_libc_interprocess_signal_t value);
 
 
 /** --------------------------------------------------------------------
