@@ -974,6 +974,80 @@ Otherwise we may want to call @cfunc{mmux_libc_dprintf_strerror}; @ref{mmux_libc
 for details.
 @end deftypefun
 
+
+@deftypefn {@gnu{} Function} bool mmux_libc_strerror_r (mmux_asciizcpp_t @var{result_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{errnum})
+@MmuxCInterface{strerror_r}.  This is the @gnu{} variant of this function.
+
+We must use the arguments @var{bufptr} and @var{buflen} to provide a buffer in which the string
+could be written: it is up to @cfunc{strerror_r} to use it or not.  If the call is successful: we
+just use the pointer stored in the variable referenced by @var{result_p}.  A @var{buflen} of
+@samp{1024} should be enough to hold any string.
+
+@example
+mmux_asciizcp_t         result;
+mmux_usize_t            buflen = 1024;
+mmux_char_t             bufptr[buflen];
+
+if (mmux_libc_strerror_r(&result, bufptr, buflen, MMUX_LIBC_EINVAL)) @{
+  /* error */
+@}
+
+if (mmux_libc_dprintfer("strerror_r result: %s\n", result)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+@MmuxCInterface{strerrorname_np}.  This is the @gnu{} variant of this function.
+
+The following code example should print @samp{EINVAL}:
+
+@example
+mmux_asciizcp_t result;
+
+if (mmux_libc_strerrorname_np(&result, MMUX_LIBC_EINVAL)) @{
+  /* error */
+@}
+
+if (mmux_libc_dprintfer("strerrorname_np result: %s", result)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+@MmuxCInterface{strerrordesc_np}.  This is the @gnu{} variant of this function.
+
+The following code example should print @samp{Invalid argument}:
+
+@example
+mmux_asciizcp_t result;
+
+if (mmux_libc_strerrordesc_np(&result, MMUX_LIBC_EINVAL)) @{
+  /* error */
+@}
+
+if (mmux_libc_dprintfer("strerrordesc_np result: %s", result)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_program_invocation_name (mmux_asciizcpp_t @var{result_p})
+Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Library global variable
+@code{program_invocation_name}.  @glibcref{Error Messages, Error Messages}.
+@end deftypefn
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_program_invocation_short_name (mmux_asciizcpp_t @var{result_p})
+Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Library global variable
+@code{program_invocation_short_name}.  @glibcref{Error Messages, Error Messages}.
+@end deftypefn
+
 @c page
 @node memory
 @chapter Memory management

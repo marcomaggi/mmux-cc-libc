@@ -64,6 +64,23 @@ mmux_cc_libc_decl bool mmux_libc_errno_consume (mmux_sint_t * result_errnum_p)
 mmux_cc_libc_decl bool mmux_libc_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_strerror_r (mmux_asciizcpp_t result_p,
+					     mmux_asciizp_t bufptr, mmux_usize_t buflen,
+					     mmux_sint_t errnum)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_program_invocation_name (mmux_asciizcpp_t result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_program_invocation_short_name (mmux_asciizcpp_t result_p)
+  __attribute__((__nonnull__(1)));
+
 
 /** --------------------------------------------------------------------
  ** Strings.

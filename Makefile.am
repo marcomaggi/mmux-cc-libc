@@ -191,6 +191,7 @@ EXTRA_DIST	+= tests/test-common.h
 
 check_PROGRAMS	= \
 	tests/test-version				\
+	tests/test-strerror				\
 	\
 	tests/test-fork					\
 	tests/test-wait					\
@@ -225,6 +226,9 @@ TESTS				= $(check_PROGRAMS)
 
 tests_test_version_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_version_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_strerror_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_strerror_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

@@ -648,6 +648,10 @@ AC_INCLUDES_DEFAULT([
 #  include <errno.h>
 #endif
 
+#ifdef HAVE_ERROR_H
+#  include <error.h>
+#endif
+
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
 #endif
