@@ -305,6 +305,20 @@ mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   return ((0 <= rv)? false : true);
 }
 
+bool
+mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum)
+{
+  mmux_asciizcp_t	errmsg;
+
+  if (mmux_libc_strerror(&errmsg, errnum)) {
+    return true;
+  } else if (mmux_libc_dprintf(fd, "%s", errmsg)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /* ------------------------------------------------------------------ */
 
 bool

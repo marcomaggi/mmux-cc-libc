@@ -415,6 +415,8 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(1),__format__(__printf__,1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum);
+
 mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
   __attribute__((__nonnull__(2),__format__(__printf__,2,0)));
 

@@ -243,7 +243,8 @@ Indexes
 
 
 This document describes version @value{MmuxPkgSemanticVersion} of @value{PACKAGE}, a C11 language
-library meant to be used in foreign functions interfaces for higher--level languages.
+library implementing a wrapper to the @gnu{} C Library that makes it easier to interface it to
+high--level platforms.
 
 @cindex @value{PackageHeaderFile}, header file
 @cindex Header file @value{PackageHeaderFile}
@@ -266,6 +267,12 @@ C language header files are installed under @code{$includedir}, for example:
 /usr/local/include/@value{PackageHeaderFile}
 @end example
 
+Before using the library, we must initialise it by calling the appropriate function:
+
+@example
+mmux_cc_libc_init();
+@end example
+
 @menu
 * overview stems::              Specifying C language types with their stem.
 * overview errors::             Error handling.
@@ -286,12 +293,19 @@ C language header files are installed under @code{$includedir}, for example:
 @section Error handling
 
 
-Unless otherwise specified, the functions that can fail return a @objtype{bool} value: @cfalse{}
-when successful; @ctrue{} when an error occurs.
+All the functions return a @objtype{bool} value: @cfalse{} when successful; @ctrue{} when an error
+occurs.  The usual function call should look like this:
 
-If a function may not be implemented by the system or the C library: the corresponding
-@value{PACKAGE} function is always implemented; its return value is a @objtype{bool} and it is
-always @cfalse{}; it sets @code{errno} to @samp{MMUX_LIBC_ENOSYS}.
+@example
+if (mmux_libc_do_something()) @{
+  /* error */
+@}
+@end example
+
+If a function implemented by the @gnu{} C Library is interfaced by @value{PACKAGE} but it is not
+available under a specific platform: the corresponding @value{PACKAGE} function is always
+implemented; its return value is a @objtype{bool} and it is always @ctrue{}; it sets @code{errno} to
+@samp{MMUX_LIBC_ENOSYS}.
 
 @c page
 @node overview results
@@ -322,15 +336,20 @@ if (mmux_libc_sysconf(&result, MMUX_LIBC__SC_PAGESIZE)) @{
 @chapter Constants
 
 
+@value{PACKAGE} attempts to offer all the constants implemented by the @gnu{} C Library; the name of
+the @value{PACKAGE} constant is the original name prefixed with
+@code{@value{PackageApiPrefixUpper}}.
+
+
 @macro MmuxDefineConstant{NAME}
-@defvr {Constant} MMUX_LIBC_\NAME\
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
 @defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
-The symbol @samp{MMUX_LIBC_\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
 either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
 features of the underlying platform.
 
 The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
-@samp{MMUX_LIBC_\NAME\} is available.
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
 @end macro
@@ -587,12 +606,12 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{EXIT_SUCCESS}
 @MmuxDefineConstant{EXIT_FAILURE}
 
-@defvr Constant MMUX_LIBC_MSG_ZERO
+@defvr Constant @value{PackageApiPrefixUpper}MSG_ZERO
 @defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_MSG_ZERO
-The symbol @code{MMUX_LIBC_MSG_ZERO} evaluates to zero; it is meant to be used as @var{flags}
-argument for @cfunc{mmux_libc_send}, and similar functions, when no other @code{MMUX_LIBC_MSG_*}
-flag is needed; it gives the reader of the code a remainder of which flags are available for the
-operation.
+The symbol @code{@value{PackageApiPrefixUpper}MSG_ZERO} evaluates to zero; it is meant to be used as
+@var{flags} argument for @cfunc{mmux_libc_send}, and similar functions, when no other
+@code{@value{PackageApiPrefixUpper}MSG_*} flag is needed; it gives the reader of the code a
+remainder of which flags are available for the operation.
 
 The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
 @end defvr
@@ -947,6 +966,12 @@ if (mmux_libc_errno_consume(&errnum)) @{
 
 @deftypefun bool mmux_libc_strerror (mmux_asciizcp_t * @var{result_error_message_p}, mmux_sint_t @var{errnum})
 @MmuxCInterface{strerror}.  The return value is always @cfalse{}.
+
+Often we want to compose strings using a memory--mapped file descriptor, so we call
+@cfunc{mmux_libc_mfd_strerror} instead of this function, @ref{mmux_libc_mfd_strerror} for details.
+
+Otherwise we may want to call @cfunc{mmux_libc_dprintf_strerror}; @ref{mmux_libc_dprintf_strerror}
+for details.
 @end deftypefun
 
 @c page
@@ -2838,6 +2863,13 @@ my_print_error (mmux_asciizcp_t template, ...)
 Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{}.
 @end deftypefun
 
+
+@anchor{mmux_libc_dprintf_strerror}
+@deftypefun bool mmux_libc_dprintf_strerror (mmux_libc_fd_t @var{fd}, mmux_sint_t @var{errnum})
+Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @asciiz{} string resulting from a
+call to @cfunc{mmux_libc_strerror}.
+@end deftypefun
+
 @c ------------------------------------------------------------------------
 
 @macro MmuxDefineTypePrinterFunc{STEM}
@@ -4346,6 +4378,7 @@ current position.  The return value is @ctrue{} if less than the whole string is
 @end deftypefun
 
 
+@anchor{mmux_libc_mfd_strerror}
 @deftypefun bool mmux_libc_mfd_strerror (mmux_libc_file_descriptor_t @var{mfd}, mmux_sint_t @var{errnum})
 Write to @var{mfd}, at the current position for the underlying device, the error string associated
 to @var{errnum} and retrieved using @cfunc{mmux_libc_strerror}.  The return value is @ctrue{} if
