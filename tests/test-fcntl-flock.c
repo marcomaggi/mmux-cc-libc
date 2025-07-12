@@ -1,0 +1,217 @@
+/*
+  Part of: MMUX CC Libc
+  Contents: test for functions
+  Date: Jul 11, 2025
+
+  Abstract
+
+	Test file for functions.
+
+  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+
+  See the COPYING file.
+*/
+
+
+/** --------------------------------------------------------------------
+ ** Headers.
+ ** ----------------------------------------------------------------- */
+
+#include <mmux-cc-libc.h>
+#include <test-common.h>
+
+static mmux_asciizcp_t		pathname_asciiz = "./test-copy-file-range.file.ext";
+
+
+/** --------------------------------------------------------------------
+ ** Helpers.
+ ** ----------------------------------------------------------------- */
+
+static bool
+test_create_data_file (mmux_libc_ptn_t ptn)
+{
+  mmux_sint_t const	flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
+  mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_fd_t	fd;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) {
+    handle_error();
+  }
+
+  /* Write data to the source file. */
+  {
+    mmux_usize_t	nbytes_done;
+    //                            01234567890123456789012345678901234567890
+    //                            0         1         2         3         4
+    mmux_asciizcp_t	bufptr = "0123456789abcdefghilmnopqrstuvz0123456789";
+    mmux_usize_t	buflen;
+
+    mmux_libc_strlen(&buflen, bufptr);
+
+    if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
+      handle_error();
+    }
+    if (nbytes_done != buflen) {
+      handle_error();
+    }
+  }
+
+  if (mmux_libc_close(fd)) {
+    handle_error();
+  }
+
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Let's go.
+ ** ----------------------------------------------------------------- */
+
+int
+main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
+{
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME = "test-fcntl-flock";
+    cleanfiles_register(pathname_asciiz);
+    cleanfiles();
+  }
+
+  mmux_libc_ptn_t	ptn;
+  mmux_libc_fd_t	fd;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    handle_error();
+  }
+
+  /* Create the data file. */
+  if (test_create_data_file(ptn)) {
+    handle_error();
+  }
+
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      print_error("forking");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      /* Open the data file. */
+      {
+	mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
+	mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+	if (mmux_libc_open(&fd, ptn, flags, mode)) {
+	  print_error("opening data file");
+	  handle_error();
+	}
+      }
+
+      /* Lock the alpha portion of the file. */
+      {
+	mmux_libc_flock_t	flo;
+	mmux_libc_pid_t		pid;
+
+	if (mmux_libc_make_pid_zero(&pid)) {
+	  handle_error();
+	}
+
+	mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
+	mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
+	mmux_libc_l_start_set  (&flo, 11);
+	mmux_libc_l_len_set    (&flo, 21);
+	mmux_libc_l_pid_set    (&flo, pid);
+
+	if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
+	  print_error("setting lock with fcntl()");
+	  handle_error();
+	}
+
+	if (1) {
+	  mmux_libc_fd_t	ou;
+
+	  mmux_libc_stdou(&ou);
+	  if (mmux_libc_flock_dump(ou, &flo, "paren struct flock")) {
+	    handle_error();
+	  }
+	}
+      }
+
+      if (mmux_libc_close(fd)) {
+	handle_error();
+      }
+
+      /* Wait for child process completion. */
+      {
+	bool					completed_process_status_available;
+	mmux_libc_pid_t				completed_process_pid;
+	mmux_libc_completed_process_status_t	completed_process_status;
+	mmux_sint_t				process_wait_flags = 0;
+
+	if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
+				      &completed_process_status, child_pid, process_wait_flags)) {
+	  print_error("waiting for process completion");
+	  handle_error();
+	} else if (completed_process_status_available) {
+	  printf_message("child process completion status: %d\n", completed_process_status.value);
+	  mmux_libc_exit_success();
+	} else {
+	  print_error("no complete child process status\n");
+	  mmux_libc_exit_failure();
+	}
+      }
+    } else {
+
+      /* Open the data file. */
+      {
+	mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
+	mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+	if (mmux_libc_open(&fd, ptn, flags, mode)) {
+	  print_error("opening data file");
+	  handle_error();
+	}
+      }
+
+      /* Lock the alpha portion of the file. */
+      {
+	mmux_libc_flock_t	flo;
+	mmux_libc_pid_t		pid;
+
+	if (mmux_libc_make_pid_zero(&pid)) {
+	  handle_error();
+	}
+
+	mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
+	mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
+	mmux_libc_l_start_set  (&flo, 11);
+	mmux_libc_l_len_set    (&flo, 21);
+	mmux_libc_l_pid_set    (&flo, pid);
+
+	if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
+	  print_error("setting lock with fcntl()");
+	  handle_error();
+	}
+
+	if (1) {
+	  mmux_libc_fd_t	ou;
+
+	  mmux_libc_stdou(&ou);
+	  if (mmux_libc_flock_dump(ou, &flo, "child struct flock")) {
+	    handle_error();
+	  }
+	}
+      }
+
+      if (mmux_libc_close(fd)) {
+	handle_error();
+      }
+      mmux_libc_exit_success();
+    }
+  }
+}
+
+/* end of file */

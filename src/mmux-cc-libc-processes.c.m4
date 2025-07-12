@@ -44,6 +44,18 @@ mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_pid_t pid_num)
   }
 }
 bool
+mmux_libc_make_pid_zero (mmux_libc_pid_t * result_p)
+{
+  result_p->value = 0;
+  return false;
+}
+bool
+mmux_libc_make_pid_minus_one (mmux_libc_pid_t * result_p)
+{
+  result_p->value = -1;
+  return false;
+}
+bool
 mmux_libc_pid_equal (mmux_libc_pid_t one, mmux_libc_pid_t two)
 {
   if (one.value == two.value) {

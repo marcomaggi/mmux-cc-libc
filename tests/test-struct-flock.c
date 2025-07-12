@@ -37,7 +37,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   mmux_libc_flock_t	flo;
   mmux_libc_pid_t	pid;
 
-  if (mmux_libc_make_pid(&pid, 0)) {
+  if (mmux_libc_make_pid_zero(&pid)) {
     handle_error();
   }
 

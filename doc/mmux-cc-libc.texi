@@ -2132,6 +2132,20 @@ Build a new value of type @objtype{mmux_libc_pid_t}.
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_make_pid_zero (mmux_libc_pid_t * @var{result_p})
+Build a new value of type @objtype{mmux_libc_pid_t} whose process identifier equals zero.  This is
+useful for neutral initialisation of some data structures like @objtype{mmux_libc_flock_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_pid_minus_one (mmux_libc_pid_t * @var{result_p})
+Build a new value of type @objtype{mmux_libc_pid_t} whose process identifier equals @samp{-1}.  This
+is useful for special initialisation of some data structures like @objtype{mmux_libc_flock_t}, in
+which a process identifier equal to @samp{-1} is used for file description locks, @glibcref{Open
+File Description Locks, Open File Description Locks}.
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_pid_equal (mmux_libc_pid_t @vari{pid}, mmux_libc_pid_t @varii{pid})
 Return true if @vari{pid} and  @varii{pid} are equal.
 @end deftypefun
@@ -3858,7 +3872,7 @@ to @cfunc{mmux_libc_fcntl}.  To declare and inspect such data structures we do:
 mmux_libc_flock_t     flo;
 mmux_libc_pid_t       pid;
 
-mmux_libc_make_pid(&pid, 0); /* should not fail */
+mmux_libc_make_pid_zero(&pid); /* should not fail */
 
 mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_RDLCK);
 mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);

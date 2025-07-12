@@ -791,6 +791,12 @@ mmux_cc_libc_decl bool mmux_libc_prlimit (mmux_libc_pid_t pid, mmux_sint_t resou
 mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_pid_t pid_num)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_make_pid_zero (mmux_libc_pid_t * result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_pid_minus_one (mmux_libc_pid_t * result_p)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_pid_equal (mmux_libc_pid_t one, mmux_libc_pid_t two);
 
 mmux_cc_libc_decl bool mmux_libc_pid_parse (mmux_libc_pid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)

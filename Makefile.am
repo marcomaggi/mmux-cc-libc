@@ -193,27 +193,28 @@ check_PROGRAMS	= \
 	tests/test-version				\
 	\
 	tests/test-fork					\
+	tests/test-wait					\
 	tests/test-wait-any-process			\
+	tests/test-wait-group-id			\
 	tests/test-wait-my-process-group		\
 	tests/test-wait-process-id			\
-	tests/test-wait-group-id			\
-	tests/test-wait					\
 	\
 	tests/test-select				\
 	tests/test-select-fd				\
 	\
-	tests/test-open-write-read-close		\
+	tests/test-copy-file-range			\
+	tests/test-fcntl-flock				\
+	tests/test-mfd					\
 	tests/test-open-pwrite-pread-close		\
+	tests/test-open-write-read-close		\
 	tests/test-openat-write-read-close		\
 	tests/test-openat2-write-read-close		\
-	tests/test-mfd					\
-	tests/test-struct-iovec				\
-	tests/test-struct-iovec-array			\
-	tests/test-readv-writev				\
 	tests/test-preadv-pwritev			\
 	tests/test-preadv2-pwritev2			\
-	tests/test-copy-file-range			\
-	tests/test-struct-flock
+	tests/test-readv-writev				\
+	tests/test-struct-flock				\
+	tests/test-struct-iovec				\
+	tests/test-struct-iovec-array
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -293,6 +294,9 @@ tests_test_copy_file_range_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_struct_flock_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_struct_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"
