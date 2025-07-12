@@ -36,6 +36,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-openat-write-read-close";
     cleanfiles_register(pathname_asciiz);
     cleanfiles();
+    mmux_libc_atexit(cleanfiles);
   }
 
   mmux_libc_file_system_pathname_t	ptn;

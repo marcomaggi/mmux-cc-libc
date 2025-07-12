@@ -38,6 +38,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     cleanfiles_register(src_pathname_asciiz);
     cleanfiles_register(dst_pathname_asciiz);
     cleanfiles();
+    mmux_libc_atexit(cleanfiles);
   }
 
   mmux_libc_file_descriptor_t		src_fd,  dst_fd;

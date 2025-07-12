@@ -20,7 +20,7 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		pathname_asciiz = "./test-copy-file-range.file.ext";
+static mmux_asciizcp_t		pathname_asciiz = "./test-fcntl-flock.ext";
 
 
 /** --------------------------------------------------------------------
@@ -77,6 +77,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-fcntl-flock";
     cleanfiles_register(pathname_asciiz);
     cleanfiles();
+    mmux_libc_atexit(cleanfiles);
   }
 
   mmux_libc_ptn_t	ptn;
