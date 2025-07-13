@@ -215,7 +215,9 @@ check_PROGRAMS	= \
 	tests/test-readv-writev				\
 	tests/test-struct-flock				\
 	tests/test-struct-iovec				\
-	tests/test-struct-iovec-array
+	tests/test-struct-iovec-array			\
+	\
+	tests/test-interprocess-signals-kill-pause
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -301,6 +303,11 @@ tests_test_struct_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+
+tests_test_interprocess_signals_kill_pause_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_kill_pause_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

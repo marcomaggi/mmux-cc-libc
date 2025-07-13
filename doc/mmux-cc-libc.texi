@@ -3004,7 +3004,7 @@ my_handler (mmux_sint_t signum)
   mmux_libc_sighandler_t *              the_old_handler;
 
   mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-  if (mmux_libc_signal(&the_old_hadler, ipxsignal, my_handler)) @{
+  if (mmux_libc_signal(&the_old_handler, ipxsignal, my_handler)) @{
     /* error */
   @}
 @}
