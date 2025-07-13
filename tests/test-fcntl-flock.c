@@ -77,18 +77,18 @@ test_create_data_file (void)
 __attribute__((__noreturn__)) static void
 play_parent (mmux_libc_pid_t child_pid)
 {
-  mmux_libc_ptn_t	ptn;
   mmux_libc_fd_t	fd;
   bool			the_child_acquired_the_lock;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
-    handle_error();
-  }
-
   /* Open the data file. */
   {
+    mmux_libc_ptn_t	ptn;
     mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
     mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+    if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+      handle_error();
+    }
 
     printf_message("paren process: open data file: \"%s\"", pathname_asciiz);
     if (mmux_libc_open(&fd, ptn, flags, mode)) {
