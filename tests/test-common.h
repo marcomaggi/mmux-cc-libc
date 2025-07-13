@@ -118,7 +118,7 @@ printf_message (mmux_asciizcp_t template, ...)
   }
   mmux_libc_close(mfd);
 }
-void
+__attribute__((__noreturn__)) void
 handle_error (void)
 {
   mmux_sint_t		errnum;

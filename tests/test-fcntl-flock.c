@@ -28,8 +28,14 @@ static mmux_asciizcp_t		pathname_asciiz = "./test-fcntl-flock.ext";
  ** ----------------------------------------------------------------- */
 
 static bool
-test_create_data_file (mmux_libc_ptn_t ptn)
+test_create_data_file (void)
 {
+  mmux_libc_ptn_t	ptn;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    handle_error();
+  }
+
   mmux_sint_t const	flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
   mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
   mmux_libc_fd_t	fd;
@@ -65,6 +71,200 @@ test_create_data_file (mmux_libc_ptn_t ptn)
 
 
 /** --------------------------------------------------------------------
+ ** Parent process.
+ ** ----------------------------------------------------------------- */
+
+__attribute__((__noreturn__)) static void
+play_parent (mmux_libc_pid_t child_pid)
+{
+  mmux_libc_ptn_t	ptn;
+  mmux_libc_fd_t	fd;
+  bool			the_child_acquired_the_lock;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    handle_error();
+  }
+
+  /* Open the data file. */
+  {
+    mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
+    mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+    printf_message("paren process: open data file: \"%s\"", pathname_asciiz);
+    if (mmux_libc_open(&fd, ptn, flags, mode)) {
+      print_error("opening data file");
+      handle_error();
+    }
+  }
+
+  printf_message("paren process: give child some time to acquire the lock");
+  wait_for_some_time();
+
+  /* Check that the alpha portion of the file is locked. */
+  {
+    mmux_libc_flock_t	flo;
+    mmux_libc_pid_t	pid;
+
+    if (mmux_libc_make_pid_zero(&pid)) {
+      handle_error();
+    }
+
+    mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
+    mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
+    mmux_libc_l_start_set  (&flo, 11);
+    mmux_libc_l_len_set    (&flo, 21);
+    mmux_libc_l_pid_set    (&flo, pid);
+
+    printf_message("paren process: check that the alpha portion of the file is locked");
+    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_GETLK, &flo)) {
+      print_error("setting lock with fcntl()");
+      handle_error();
+    }
+
+    if (1) {
+      mmux_libc_fd_t	er;
+
+      mmux_libc_stder(&er);
+      if (mmux_libc_flock_dump(er, &flo, "paren struct flock")) {
+	handle_error();
+      }
+    }
+
+    {
+      mmux_libc_pid_t	the_pid;
+
+      mmux_libc_l_pid_ref(&the_pid, &flo);
+      if (mmux_libc_pid_equal(the_pid, child_pid)) {
+	printf_message("paren process: the child acquired the lock");
+	the_child_acquired_the_lock = true;
+      } else {
+	printf_message("paren process: something acquired the lock");
+	the_child_acquired_the_lock = false;
+      }
+    }
+  }
+
+  printf_message("paren process: close the file");
+  if (mmux_libc_close(fd)) {
+    handle_error();
+  }
+
+  /* Send a signal to the child process, so it will exit. */
+  {
+    mmux_libc_interprocess_signal_t         ipxsignal;
+
+    mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+    printf_message("paren process: delivering SIGUSR1 to child process");
+    if (mmux_libc_kill(child_pid, ipxsignal)) {
+      handle_error();
+    }
+  }
+
+  /* Wait for child process completion. */
+  {
+    bool					completed_process_status_available;
+    mmux_libc_pid_t				completed_process_pid;
+    mmux_libc_completed_process_status_t	completed_process_status;
+    mmux_sint_t					process_wait_flags = 0;
+
+    printf_message("paren process: waiting for child process completion");
+    if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
+				  &completed_process_status, child_pid, process_wait_flags)) {
+      print_error("paren process: waiting for process completion");
+      handle_error();
+    } else if (completed_process_status_available) {
+      printf_message("child process completion status: %d\n", completed_process_status.value);
+      if (the_child_acquired_the_lock) {
+	mmux_libc_exit_success();
+      } else {
+	mmux_libc_exit_failure();
+      }
+    } else {
+      print_error("no complete child process status\n");
+      mmux_libc_exit_failure();
+    }
+  }
+}
+
+
+/** --------------------------------------------------------------------
+ ** Child process.
+ ** ----------------------------------------------------------------- */
+
+__attribute__((__noreturn__)) static void
+play_child (void)
+{
+  mmux_libc_ptn_t	ptn;
+  mmux_libc_fd_t	fd;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    handle_error();
+  }
+
+  /* Open the data file. */
+  {
+    mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
+    mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+    printf_message("child process: open data file: \"%s\"", pathname_asciiz);
+    if (mmux_libc_open(&fd, ptn, flags, mode)) {
+      print_error("opening data file");
+      handle_error();
+    }
+  }
+
+  /* Lock the alpha portion of the file. */
+  {
+    mmux_libc_flock_t	flo;
+    mmux_libc_pid_t	pid;
+
+    if (mmux_libc_make_pid_zero(&pid)) {
+      handle_error();
+    }
+
+    mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
+    mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
+    mmux_libc_l_start_set  (&flo, 11);
+    mmux_libc_l_len_set    (&flo, 21);
+    mmux_libc_l_pid_set    (&flo, pid);
+
+    printf_message("child process: acquire the lock");
+    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
+      print_error("setting lock with fcntl()");
+      handle_error();
+    }
+
+    if (1) {
+      mmux_libc_fd_t	er;
+
+      mmux_libc_stder(&er);
+      if (mmux_libc_flock_dump(er, &flo, "child struct flock")) {
+	handle_error();
+      }
+    }
+  }
+
+  /* Pause until the parent sends the child a signal. */
+  {
+    if (mmux_libc_interprocess_signals_bub_init()) {
+      handle_error();
+    }
+    printf_message("child process: pause until the paren sends a signal");
+    wait_for_some_time();
+    //mmux_libc_pause();
+  }
+
+  printf_message("child process: close the file");
+  if (mmux_libc_close(fd)) {
+    handle_error();
+  }
+
+  printf_message("child process: exit");
+  mmux_libc_exit_success();
+}
+
+
+/** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
 
@@ -80,18 +280,17 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_fd_t	fd;
-
-  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
-    handle_error();
-  }
 
   /* Create the data file. */
-  if (test_create_data_file(ptn)) {
-    handle_error();
+  {
+    printf_message("main  process: create the data file");
+    if (test_create_data_file()) {
+      handle_error();
+    }
   }
 
+  /* Run a child  process.  The child process acquires the  lock.  The parent process
+     detects the lock.  The child exits.  The parent exits. */
   {
     bool		this_is_the_parent_process;
     mmux_libc_pid_t	child_pid;
@@ -100,117 +299,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       print_error("forking");
       handle_error();
     } else if (this_is_the_parent_process) {
-      /* Open the data file. */
-      {
-	mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
-	mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
-
-	if (mmux_libc_open(&fd, ptn, flags, mode)) {
-	  print_error("opening data file");
-	  handle_error();
-	}
-      }
-
-      /* Lock the alpha portion of the file. */
-      {
-	mmux_libc_flock_t	flo;
-	mmux_libc_pid_t		pid;
-
-	if (mmux_libc_make_pid_zero(&pid)) {
-	  handle_error();
-	}
-
-	mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
-	mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-	mmux_libc_l_start_set  (&flo, 11);
-	mmux_libc_l_len_set    (&flo, 21);
-	mmux_libc_l_pid_set    (&flo, pid);
-
-	if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
-	  print_error("setting lock with fcntl()");
-	  handle_error();
-	}
-
-	if (1) {
-	  mmux_libc_fd_t	ou;
-
-	  mmux_libc_stdou(&ou);
-	  if (mmux_libc_flock_dump(ou, &flo, "paren struct flock")) {
-	    handle_error();
-	  }
-	}
-      }
-
-      if (mmux_libc_close(fd)) {
-	handle_error();
-      }
-
-      /* Wait for child process completion. */
-      {
-	bool					completed_process_status_available;
-	mmux_libc_pid_t				completed_process_pid;
-	mmux_libc_completed_process_status_t	completed_process_status;
-	mmux_sint_t				process_wait_flags = 0;
-
-	if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
-				      &completed_process_status, child_pid, process_wait_flags)) {
-	  print_error("waiting for process completion");
-	  handle_error();
-	} else if (completed_process_status_available) {
-	  printf_message("child process completion status: %d\n", completed_process_status.value);
-	  mmux_libc_exit_success();
-	} else {
-	  print_error("no complete child process status\n");
-	  mmux_libc_exit_failure();
-	}
-      }
+      play_parent(child_pid);
     } else {
-
-      /* Open the data file. */
-      {
-	mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
-	mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
-
-	if (mmux_libc_open(&fd, ptn, flags, mode)) {
-	  print_error("opening data file");
-	  handle_error();
-	}
-      }
-
-      /* Lock the alpha portion of the file. */
-      {
-	mmux_libc_flock_t	flo;
-	mmux_libc_pid_t		pid;
-
-	if (mmux_libc_make_pid_zero(&pid)) {
-	  handle_error();
-	}
-
-	mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
-	mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-	mmux_libc_l_start_set  (&flo, 11);
-	mmux_libc_l_len_set    (&flo, 21);
-	mmux_libc_l_pid_set    (&flo, pid);
-
-	if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
-	  print_error("setting lock with fcntl()");
-	  handle_error();
-	}
-
-	if (1) {
-	  mmux_libc_fd_t	ou;
-
-	  mmux_libc_stdou(&ou);
-	  if (mmux_libc_flock_dump(ou, &flo, "child struct flock")) {
-	    handle_error();
-	  }
-	}
-      }
-
-      if (mmux_libc_close(fd)) {
-	handle_error();
-      }
-      mmux_libc_exit_success();
+      play_child();
     }
   }
 }
