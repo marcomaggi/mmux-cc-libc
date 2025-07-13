@@ -40,12 +40,12 @@ test_small_string (void)
 
   mmux_libc_strlen(&asciiz_string_len, asciiz_string);
 
-  if (mmux_libc_make_mfd(&fd)) {
+  if (mmux_libc_make_memfd(&fd)) {
     print_error("creating mfd");
     handle_error();
   }
 
-  if (mmux_libc_mfd_write_asciiz(fd, asciiz_string)) {
+  if (mmux_libc_memfd_write_asciiz(fd, asciiz_string)) {
     print_error("printing to mfd");
     handle_error();
   }
@@ -53,7 +53,7 @@ test_small_string (void)
   {
     mmux_usize_t	nbytes_length;
 
-    if (mmux_libc_mfd_length(&nbytes_length, fd)) {
+    if (mmux_libc_memfd_length(&nbytes_length, fd)) {
       print_error("computing the length of mfd");
       handle_error();
     } else if (asciiz_string_len != nbytes_length) {
@@ -111,7 +111,7 @@ test_small_string (void)
 
   /* Dumping the string to stdout. */
   {
-    if (mmux_libc_mfd_copyou(fd)) {
+    if (mmux_libc_memfd_copyou(fd)) {
       print_error("dumping to stdout");
       handle_error();
     }
@@ -138,7 +138,7 @@ test_big_string (void)
   mmux_usize_t		asciiz_string_len = 0;
   mmux_libc_fd_t	fd;
 
-  if (mmux_libc_make_mfd(&fd)) {
+  if (mmux_libc_make_memfd(&fd)) {
     print_error("creating mfd");
     handle_error();
   }
@@ -157,7 +157,7 @@ test_big_string (void)
   {
     mmux_usize_t	nbytes_length;
 
-    if (mmux_libc_mfd_length(&nbytes_length, fd)) {
+    if (mmux_libc_memfd_length(&nbytes_length, fd)) {
       print_error("computing the length of mfd");
       handle_error();
     } else if (asciiz_string_len != nbytes_length) {
@@ -217,7 +217,7 @@ test_big_string (void)
 
   /* Dumping the string to stdout. */
   if (0) {
-    if (mmux_libc_mfd_copyou(fd)) {
+    if (mmux_libc_memfd_copyou(fd)) {
       print_error("dumping to stdout");
       handle_error();
     }

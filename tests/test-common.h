@@ -59,7 +59,7 @@ printf_error (mmux_asciizcp_t errmsg_template, ...)
 {
   mmux_libc_fd_t	mfd;
 
-  if (mmux_libc_make_mfd(&mfd)) {
+  if (mmux_libc_make_memfd(&mfd)) {
     return;
   }
   {
@@ -80,7 +80,7 @@ printf_error (mmux_asciizcp_t errmsg_template, ...)
 	mmux_libc_dprintf_newline(mfd);
       }
     }
-    if (mmux_libc_mfd_copyer(mfd)) {
+    if (mmux_libc_memfd_copyer(mfd)) {
       return;
     }
   }
@@ -91,7 +91,7 @@ printf_message (mmux_asciizcp_t template, ...)
 {
   mmux_libc_fd_t	mfd;
 
-  if (mmux_libc_make_mfd(&mfd)) {
+  if (mmux_libc_make_memfd(&mfd)) {
     return;
   }
   {
@@ -112,7 +112,7 @@ printf_message (mmux_asciizcp_t template, ...)
 	mmux_libc_dprintf_newline(mfd);
       }
     }
-    if (mmux_libc_mfd_copyer(mfd)) {
+    if (mmux_libc_memfd_copyer(mfd)) {
       return;
     }
   }

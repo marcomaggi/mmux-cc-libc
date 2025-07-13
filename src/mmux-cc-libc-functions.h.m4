@@ -648,27 +648,27 @@ mmux_cc_libc_decl bool mmux_libc_memfd_create (mmux_libc_file_descriptor_t * fd_
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_mfd (mmux_libc_file_descriptor_t * fd_p)
+mmux_cc_libc_decl bool mmux_libc_make_memfd (mmux_libc_file_descriptor_t * fd_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_memfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+mmux_cc_libc_decl bool mmux_libc_memfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t bufptr)
+mmux_cc_libc_decl bool mmux_libc_memfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t bufptr)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_mfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd);
 
-mmux_cc_libc_decl bool mmux_libc_mfd_copyou (mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_memfd_copyou (mmux_libc_file_descriptor_t mfd);
 
-mmux_cc_libc_decl bool mmux_libc_mfd_copyer (mmux_libc_file_descriptor_t mfd);
+mmux_cc_libc_decl bool mmux_libc_memfd_copyer (mmux_libc_file_descriptor_t mfd);
 
-mmux_cc_libc_decl bool mmux_libc_mfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum);
+mmux_cc_libc_decl bool mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum);
 
-mmux_cc_libc_decl bool mmux_libc_mfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen);
+mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen);
 
 
 /** --------------------------------------------------------------------
