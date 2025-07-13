@@ -173,14 +173,28 @@ play_parent (mmux_libc_pid_t child_pid)
       print_error("paren process: waiting for process completion");
       handle_error();
     } else if (completed_process_status_available) {
-      printf_message("child process completion status: %d\n", completed_process_status.value);
-      if (the_child_acquired_the_lock) {
-	mmux_libc_exit_success();
+      bool	child_process_has_exited;
+
+      printf_message("paren process: child process completion status: %d", completed_process_status.value);
+
+      mmux_libc_WIFEXITED(&child_process_has_exited, completed_process_status);
+      if (child_process_has_exited) {
+	mmux_sint_t	child_process_exit_status;
+
+	mmux_libc_WEXITSTATUS(&child_process_exit_status, completed_process_status);
+	printf_message("paren process: child process has exited with status: %d", child_process_exit_status);
+
+	if (the_child_acquired_the_lock) {
+	  mmux_libc_exit_success();
+	} else {
+	  mmux_libc_exit_failure();
+	}
       } else {
+	printf_message("paren process: child process has not exited, it was terminated in some other way");
 	mmux_libc_exit_failure();
       }
     } else {
-      print_error("no complete child process status\n");
+      print_error("no complete child process status");
       mmux_libc_exit_failure();
     }
   }
@@ -190,6 +204,12 @@ play_parent (mmux_libc_pid_t child_pid)
 /** --------------------------------------------------------------------
  ** Child process.
  ** ----------------------------------------------------------------- */
+
+static void
+child_process_signal_handler (mmux_sint_t signum MMUX_CC_LIBC_UNUSED)
+{
+  return;
+}
 
 __attribute__((__noreturn__)) static void
 play_child (void)
@@ -244,14 +264,23 @@ play_child (void)
     }
   }
 
-  /* Pause until the parent sends the child a signal. */
+  /* Register the handler for SIGUSR1. */
   {
-    if (mmux_libc_interprocess_signals_bub_init()) {
+    mmux_libc_interprocess_signal_t       ipxsignal;
+    mmux_libc_sighandler_t *              the_old_handler;
+
+    mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+    printf_message("child process: registering the handler for SIGUSR1");
+    if (mmux_libc_signal(&the_old_handler, ipxsignal, child_process_signal_handler)) {
       handle_error();
     }
+  }
+
+  /* Pause until the parent sends the child a signal. */
+  {
     printf_message("child process: pause until the paren sends a signal");
-    wait_for_some_time();
-    //mmux_libc_pause();
+    mmux_libc_pause();
+    printf_message("child process: waking up because signal received");
   }
 
   printf_message("child process: close the file");
