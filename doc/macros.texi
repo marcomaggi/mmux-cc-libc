@@ -288,9 +288,17 @@
 @command{bash}
 @end macro
 
+@ifhtml
 @macro bub{}
 @acronym{bub}
 @end macro
+@end ifhtml
+
+@ifnothtml
+@macro bub{}
+@acronym{BUB}
+@end macro
+@end ifnothtml
 
 @macro ffmpeg{}
 @acronym{FFMPEG}

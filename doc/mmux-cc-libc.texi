@@ -867,6 +867,43 @@ The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to 
 @MmuxDefineConstant{RLIMIT_STACK}
 @MmuxDefineConstant{RLIM_INFINITY}
 
+@MmuxDefineConstant{NSIG}
+@MmuxDefineConstant{SIGFPE}
+@MmuxDefineConstant{SIGILL}
+@MmuxDefineConstant{SIGSEGV}
+@MmuxDefineConstant{SIGBUS}
+@MmuxDefineConstant{SIGABRT}
+@MmuxDefineConstant{SIGIOT}
+@MmuxDefineConstant{SIGTRAP}
+@MmuxDefineConstant{SIGEMT}
+@MmuxDefineConstant{SIGSYS}
+@MmuxDefineConstant{SIGTERM}
+@MmuxDefineConstant{SIGINT}
+@MmuxDefineConstant{SIGQUIT}
+@MmuxDefineConstant{SIGKILL}
+@MmuxDefineConstant{SIGHUP}
+@MmuxDefineConstant{SIGALRM}
+@MmuxDefineConstant{SIGVRALRM}
+@MmuxDefineConstant{SIGPROF}
+@MmuxDefineConstant{SIGIO}
+@MmuxDefineConstant{SIGURG}
+@MmuxDefineConstant{SIGPOLL}
+@MmuxDefineConstant{SIGCHLD}
+@MmuxDefineConstant{SIGCLD}
+@MmuxDefineConstant{SIGCONT}
+@MmuxDefineConstant{SIGSTOP}
+@MmuxDefineConstant{SIGTSTP}
+@MmuxDefineConstant{SIGTTIN}
+@MmuxDefineConstant{SIGTTOU}
+@MmuxDefineConstant{SIGPIPE}
+@MmuxDefineConstant{SIGLOST}
+@MmuxDefineConstant{SIGXCPU}
+@MmuxDefineConstant{SIGXSFZ}
+@MmuxDefineConstant{SIGUSR1}
+@MmuxDefineConstant{SIGUSR2}
+@MmuxDefineConstant{SIGWINCH}
+@MmuxDefineConstant{SIGINFO}
+
 @c page
 @node version
 @chapter Version functions
@@ -2687,6 +2724,9 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 
 @menu
 * signals signals::             Representing interprocess signals.
+* signals delivering::          Delivering interprocess signals.
+* signals bub::                 Block/unblock interprocess signals handling.
+* signals handling::            Other interprocess signals delivering methods.
 @end menu
 
 @c page
@@ -2706,7 +2746,7 @@ Build a new value of type @objtype{mmux_libc_interprocess_signal_t}.
 mmux_libc_interprocess_signal_t ipxsig;
 
 if (mmux_libc_make_interprocess_signal(&ipxsig, MMUX_LIBC_SIGUSR1) @{
-  ... /* this error happens only if @var{signal_NUMBER} is negative */
+  ... /* this error happens only if @var{signal_number} is negative */
 @}
 @end example
 @end deftypefun
@@ -2723,7 +2763,7 @@ To convert a file descriptor to string we can do:
 mmux_libc_interprocess_signal_t         ipxsig;
 mmux_usize_t                            required_nchars;
 
-mmux_libc_make_signal_number(&the_signal_number, MMUX_LIBC_SIGUSR1);
+mmux_libc_make_interprocess_signal(&the_signal_number, MMUX_LIBC_SIGUSR1);
 
 if (mmux_libc_interprocess_signal_sprint_size(&required_nchars, ipxsig) @{
   /* error */
@@ -2756,6 +2796,224 @@ referenced by @var{required_nchars_p}.
 Convert @var{ipxsig} to its @asciiz{} string representation and store the result, @strong{including}
 the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
 wide.
+@end deftypefun
+
+@c page
+@node signals delivering
+@subsection Delivering interprocess signals
+
+
+@deftypefun bool mmux_libc_raise (mmux_libc_interprocess_signal_t @var{ipxsignal})
+@MmuxCInterface{raise}.
+
+To deliver a signal to the calling process we do:
+
+@example
+mmux_libc_interprocess_signal_t         ipxsignal;
+
+mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+if (mmux_libc_raise(ipxsignal)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_kill (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t @var{ipxsignal})
+@MmuxCInterface{kill}.
+
+To deliver the signal @samp{SIGUSR1} to a child process we do:
+
+@example
+bool                    this_is_the_parent_process;
+mmux_libc_pid_t         child_pid;
+
+if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
+  /* error */
+@} else if (this_is_the_parent_process) @{
+  mmux_libc_interprocess_signal_t         ipxsignal;
+
+  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+  if (mmux_libc_kill(child_pid, ipxsignal)) @{
+    /* error */
+  @}
+@} else @{
+  ... /* do something in the child process */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_kill_all_processes_in_same_group (mmux_libc_interprocess_signal_t @var{ipxsignal})
+Call the C library function @cfunc{signal} setting the first argument to @samp{0}: it delivers the
+signal to all the processes in the same group as the delivering process.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_kill_group (mmux_libc_gid_t @var{gid}, mmux_libc_interprocess_signal_t @var{ipxsignal})
+Deliver the signal to all the processes in the group @var{gid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_kill_all_processes (mmux_libc_interprocess_signal_t @var{ipxsignal})
+Call the C library function @cfunc{signal} setting the first argument to @samp{-1}: it delivers the
+signal to ``all'' processes, see the documentation for details.  @glibcref{Signaling Another
+Process, Signaling Another Process}.
+@end deftypefun
+
+
+@deftypefn {Linux Function} bool mmux_libc_tgkill (mmux_libc_pid_t @var{pid}, mmux_libc_pid_t @var{tid}, mmux_libc_interprocess_signal_t @var{ipxsignal})
+@MmuxCInterface{tgkill}.  Deliver the signal to thread @var{tid} belonging to the process @var{pid}.
+@end deftypefn
+
+@c page
+@node signals bub
+@subsection Block/unblock interprocess signals handling
+
+
+@cindex @bub{} interprocess signals @api{}
+@cindex @bub{} signals @api{}
+@cindex Block/unblock interprocess signals @api{}
+@cindex Interprocess signals, block/unblock @api{}
+@cindex Signals, block/unblock @api{}
+
+
+The block/unblock (@bub{}) @api{} is a simplified interface to detect the arrival of interprocess
+signals; if it does not suit the application's model, we should just ignore it.  It is impossible to
+use the @bub{} @api{} along with other interprocess signal @api{}s.  Here is a meaningless usage
+example:
+
+@example
+if (mmux_libc_interprocess_signals_bub_init()) @{
+  /* error */
+@}
+
+/* Deliver a signal to the calling process. */
+@{
+  mmux_libc_interprocess_signal_t       ipxsignal;
+
+  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+  if (mmux_libc_raise(ipxsignal)) @{
+    /* error */
+  @}
+@}
+
+/* Unblock all the signals, then block them again. */
+if (mmux_libc_interprocess_signals_bub_acquire()) @{
+  /* error */
+@}
+
+/* Check if the signal was delivered. */
+@{
+  mmux_libc_interprocess_signal_t       ipxsignal;
+  bool                                  delivered;
+
+  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+  if (mmux_libc_interprocess_signals_bub_delivered(&result, ipxsignal)) @{
+    /* error */
+  @}
+  if (delivered) @{
+    /* react to the signal */
+  @}
+@}
+
+if (mmux_libc_interprocess_signals_bub_final()) @{
+  /* error */
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_interprocess_signals_bub_init (void)
+Block all the signals and initialise the @bub{} interface.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_bub_final (void)
+Set all the signal handlers to @code{SIG_IGN}, then unblock all the signals and finalise the @bub{}
+interface.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_bub_acquire (void)
+Unblock all the signals, then block them again.  This should allow all the pending signals to be
+delivered to the process.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_bub_delivered (bool * @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal})
+When successful: store @ctrue{} in the variable referenced by @var{result_p} if the signal
+@var{ipxsignal} has been delivered at least once @strong{before} the last call to
+@cfunc{mmux_libc_interprocess_signal_bub_acquire}.
+
+Calling this function with @var{ipxsignal} clears the internal flag for this signal, so calling it
+again without acquiring new signals always stores @false{} in the variable referenced by
+@var{result_p}.
+@end deftypefun
+
+@c page
+@node signals handling
+@subsection Other interprocess signals delivering methods
+
+
+@deftypefn {Function Type} bool mmux_libc_sighandler_t (mmux_sint_t @var{signum})
+Type of functions to be used as interprocess signal handlers.
+@end deftypefn
+
+
+@deftypefun bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_t ** @var{result_p})
+@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_t ** @var{result_p})
+@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** @var{result_p})
+Store in the variable referenced by @var{result_p} the corresponding signal handling action.
+
+The value @samp{SIG_ERR} is a special value used by @cfunc{signal} to return error, but it is
+provided in this @api{} for completeness.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_signal (mmux_libc_sighandler_t ** @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal}, mmux_libc_sighandler_t @var{action})
+@MmuxCInterface{signal}.  When successful: store in the variable referenced by @var{result_p} the
+action that was previously set for @var{ipxsignal}.
+
+To set the default action for @samp{SIGUSR1} we do:
+
+@example
+@{
+  mmux_libc_interprocess_signal_t       ipxsignal;
+  mmux_libc_sighandler_t *              the_old_handler;
+  mmux_libc_sighandler_t *              the_new_handler;
+
+  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+  mmux_libc_retrieve_signal_handler_SIG_DFL(&the_new_handler);
+  if (mmux_libc_signal(&the_old_hadler, ipxsignal, the_new_handler)) @{
+    /* error */
+  @}
+@}
+@end example
+
+To set a custom action for @samp{SIGUSR1} we do:
+
+@example
+static void
+my_handler (mmux_sint_t signum)
+@{
+  ...
+@}
+
+@{
+  mmux_libc_interprocess_signal_t       ipxsignal;
+  mmux_libc_sighandler_t *              the_old_handler;
+
+  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
+  if (mmux_libc_signal(&the_old_hadler, ipxsignal, my_handler)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_pause (void)
+@MmuxCInterface{pause}.  It is usually not useful to check the return value of @cfunc{pause}.
 @end deftypefun
 
 @c page

@@ -78,7 +78,7 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h])
+                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -94,6 +94,8 @@ AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp s
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
                 wait waitid syscall memfd_create strerrorname_np strerrordesc_np
                 strerror_r strerror_l])
+
+AC_CHECK_FUNCS([sigaltstack sigemptyset sigaddset sigfillset sigprocmask sigaction tgkill])
 
 dnl --------------------------------------------------------------------
 
@@ -321,6 +323,23 @@ MMUX_CONSTANT_TESTS([WAIT_ANY WAIT_MYPGRP WEXITED WNOHANG WNOWAIT WSTOPPED WCONT
 MMUX_CONSTANT_TESTS([P_ALL P_PID P_PIDFD P_PGID])
 
 MMUX_CONSTANT_TESTS([MFD_CLOEXEC MFD_ALLOW_SEALING MFD_HUGETLB])
+
+## interprocess signals
+MMUX_CONSTANT_TESTS([NSIG SA_NOCLDSTOP SA_ONSTACK SA_RESTART])
+# program error
+MMUX_CONSTANT_TESTS([SIGFPE SIGILL SIGSEGV SIGBUS SIGABRT SIGIOT SIGTRAP SIGEMT SIGSYS])
+# termination
+MMUX_CONSTANT_TESTS([SIGTERM SIGINT SIGQUIT SIGKILL SIGHUP])
+# alarm
+MMUX_CONSTANT_TESTS([SIGALRM SIGVRALRM SIGPROF])
+# asynchronous I/O
+MMUX_CONSTANT_TESTS([SIGIO SIGURG SIGPOLL])
+# job control
+MMUX_CONSTANT_TESTS([SIGCHLD SIGCLD SIGCONT SIGSTOP SIGTSTP SIGTTIN SIGTTOU])
+# operation error
+MMUX_CONSTANT_TESTS([SIGPIPE SIGLOST SIGXCPU SIGXSFZ])
+# misc
+MMUX_CONSTANT_TESTS([SIGUSR1 SIGUSR2 SIGWINCH SIGINFO])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE])

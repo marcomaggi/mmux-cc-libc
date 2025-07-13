@@ -959,6 +959,47 @@ mmux_cc_libc_decl bool mmux_libc_interprocess_signal_sprint (char * ptr, mmux_us
 mmux_cc_libc_decl bool mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_interprocess_signal_t signum)
   __attribute__((__nonnull__(1)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal);
+
+mmux_cc_libc_decl bool mmux_libc_kill (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t ipxsignal);
+
+mmux_cc_libc_decl bool mmux_libc_kill_all_processes_in_same_group (mmux_libc_interprocess_signal_t ipxsignal);
+
+mmux_cc_libc_decl bool mmux_libc_kill_group (mmux_libc_gid_t gid, mmux_libc_interprocess_signal_t ipxsignal);
+
+mmux_cc_libc_decl bool mmux_libc_kill_all_processes (mmux_libc_interprocess_signal_t ipxsignal);
+
+mmux_cc_libc_decl bool mmux_libc_tgkill (mmux_libc_pid_t pid, mmux_libc_pid_t tid, mmux_libc_interprocess_signal_t ipxsignal);
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_bub_init (void);
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_bub_final (void);
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_bub_acquire (void);
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_bub_delivered (bool * result_p, mmux_libc_interprocess_signal_t ipxsignal)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_t ** result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_t ** result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p, mmux_libc_interprocess_signal_t ipxsignal,
+					 mmux_libc_sighandler_t action);
+
+mmux_cc_libc_decl bool mmux_libc_pause (void);
+
 
 /** --------------------------------------------------------------------
  ** Persona.

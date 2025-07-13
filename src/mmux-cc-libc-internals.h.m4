@@ -206,6 +206,10 @@ extern "C" {
 #  include <stdarg.h>
 #endif
 
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
+
 #ifdef HAVE_STDBOOL_H
 #  include <stdbool.h>
 #endif
@@ -277,7 +281,7 @@ extern "C" {
 
 
 /** --------------------------------------------------------------------
- ** type definitions.
+ ** Type definitions.
  ** ----------------------------------------------------------------- */
 
 typedef mmux_ushort_t			mmux_host_byteorder_ushort_t;
@@ -352,6 +356,13 @@ typedef mmux_libc_servent_t *			mmux_libc_servent_ptr_t;
 typedef mmux_libc_protoent_t *			mmux_libc_protoent_ptr_t;
 typedef mmux_libc_netent_t *			mmux_libc_netent_ptr_t;
 typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
+
+
+/** --------------------------------------------------------------------
+ ** Function type definitions.
+ ** ----------------------------------------------------------------- */
+
+typedef void mmux_libc_sighandler_t (mmux_sint_t signum);
 
 
 /** --------------------------------------------------------------------
