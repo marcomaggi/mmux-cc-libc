@@ -164,8 +164,17 @@ test_delivery_and_termination (void)
 	handle_error();
       } else {
 	if (completed_process_status_available) {
-	  printf_message("paren process: child process completion status: %d\n", completed_process_status.value);
-	  return false;
+	  bool	signaled;
+
+	  printf_message("paren process: child process completion status: %d", completed_process_status.value);
+	  mmux_libc_WIFSIGNALED(&signaled, completed_process_status);
+	  if (signaled) {
+	    printf_message("paren process: child process terminated by signal");
+	    return false;
+	  } else {
+	    printf_message("paren process: child process terminated for some reason");
+	    return true;
+	  }
 	} else {
 	  printf_message("paren process: no complete child process status\n");
 	  return true;

@@ -2396,13 +2396,13 @@ value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun mmux_sint_t mmux_libc_WEXITSTATUS (mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WEXITSTATUS (mmux_sint_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFSIGNALED (mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WIFSIGNALED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFSIGNALED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
