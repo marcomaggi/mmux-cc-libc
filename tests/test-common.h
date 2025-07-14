@@ -43,6 +43,7 @@ void wait_for_some_time (void);
 
 void cleanfiles (void);
 void cleanfiles_register (mmux_asciizcp_t pathname_asciiz);
+bool test_create_data_file (mmux_asciizcp_t pathname_ascii);
 
 
 /** --------------------------------------------------------------------
@@ -180,6 +181,48 @@ cleanfiles (void)
       return;
     }
   }
+}
+
+bool
+test_create_data_file (mmux_asciizcp_t pathname_asciiz)
+{
+  mmux_libc_ptn_t	ptn;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    handle_error();
+  }
+
+  mmux_sint_t const	flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
+  mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_fd_t	fd;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) {
+    handle_error();
+  }
+
+  /* Write data to the source file. */
+  {
+    mmux_usize_t	nbytes_done;
+    //                            01234567890123456789012345678901234567890
+    //                            0         1         2         3         4
+    mmux_asciizcp_t	bufptr = "0123456789abcdefghilmnopqrstuvz0123456789";
+    mmux_usize_t	buflen;
+
+    mmux_libc_strlen(&buflen, bufptr);
+
+    if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
+      handle_error();
+    }
+    if (nbytes_done != buflen) {
+      handle_error();
+    }
+  }
+
+  if (mmux_libc_close(fd)) {
+    handle_error();
+  }
+
+  return false;
 }
 
 /* end of file */

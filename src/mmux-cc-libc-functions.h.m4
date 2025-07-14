@@ -1320,6 +1320,14 @@ mmux_cc_libc_decl bool mmux_libc_S_ISSOCK (bool * result_p, mmux_mode_t mode)
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, actime,  mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, modtime, mmux_time_t)
 

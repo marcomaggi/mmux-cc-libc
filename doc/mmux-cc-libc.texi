@@ -4816,6 +4816,12 @@ if (mmux_libc_file_system_pathname_free(ptn)) @{
 Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_libc_free}.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_file_system_pathname_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} is the two given pathnames are equal
+when compared as @asciiz{} strings.
+@end deftypefun
+
 @c page
 @node fs links
 @section Hard and symbolic links
@@ -4823,11 +4829,34 @@ Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_li
 
 @deftypefun bool mmux_libc_link (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{link}.
+
+@example
+mmux_libc_ptn_t         old_ptn, new_ptn;
+
+mmux_libc_make_file_system_pathname(&old_ptn, "/path/to/old-file.ext");
+mmux_libc_make_file_system_pathname(&new_ptn, "/path/to/new-file.ext");
+if (mmux_libc_link(old_ptn, new_ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_linkat (mmux_libc_file_descriptor_t @var{oldfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_sint_t @var{flags})
 @MmuxCInterface{linkat}
+
+@example
+mmux_libc_ptn_t         old_ptn, new_ptn;
+mmux_libc_fd_t          fd;
+mmux_sint_t             flags = MMUX_LIBC_AT_SYMLINK_FOLLOW;
+
+mmux_libc_make_file_system_pathname(&old_ptn, "/path/to/old-file.ext");
+mmux_libc_make_file_system_pathname(&new_ptn, "/path/to/new-file.ext");
+mmux_libc_at_fdcwd(&fd);
+if (mmux_libc_linkat(fd, src_ptn, fd, dst_ptn, flags)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
@@ -5001,6 +5030,18 @@ current mask.
 @section File attributes
 
 
+@menu
+* fs attributes struct::        The @objtype{mmux_libc_stat_t} data structure.
+* fs attributes stat::          The @cfunc{stat} functions.
+* fs attributes mode::          Inspecting the mode field of @objtype{mmux_libc_stat_t}.
+* fs attributes pathnames::     File system pathname predicates.
+@end menu
+
+@c page
+@node fs attributes struct
+@subsection The @objtype{mmux_libc_stat_t} data structure
+
+
 @MmuxCStructOpaqueTypedef{stat}
 @MmuxSetterGetter{stat, st_mode,        mmux_mode_t}
 @MmuxSetterGetter{stat,	st_ino,		mmux_uintmax_t}
@@ -5018,6 +5059,25 @@ current mask.
 @MmuxSetterGetter{stat,	st_blocks,	mmux_uintmax_t}
 @MmuxSetterGetter{stat,	st_blksize,	mmux_uint_t}
 @MmuxStructDumper{stat}
+
+
+@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@MmuxCInterface{S_TYPESIMQ}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@MmuxCInterface{S_TYPEISSEM}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@MmuxCInterface{S_TYPEISSHM}.
+@end deftypefun
+
+@c page
+@node fs attributes stat
+@subsection The @cfunc{stat} functions
 
 
 @deftypefun bool mmux_libc_stat (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
@@ -5039,20 +5099,9 @@ current mask.
 @MmuxCInterface{fstatat}.
 @end deftypefun
 
-
-@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
-@MmuxCInterface{S_TYPESIMQ}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
-@MmuxCInterface{S_TYPEISSEM}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
-@MmuxCInterface{S_TYPEISSHM}.
-@end deftypefun
+@c page
+@node fs attributes mode
+@subsection Inspecting the mode field of @objtype{mmux_libc_stat_t}
 
 
 @deftypefun bool mmux_libc_S_ISDIR (bool * @var{result_p}, mmux_mode_t @var{mode})
@@ -5087,6 +5136,46 @@ current mask.
 
 @deftypefun bool mmux_libc_S_ISSOCK (bool * @var{result_p}, mmux_mode_t @var{mode})
 @MmuxCInterface{S_ISSOCK}.
+@end deftypefun
+
+@c page
+@node fs attributes pathnames
+@subsection File system pathname predicates
+
+
+@deftypefun bool mmux_libc_file_exists (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+if (mmux_libc_file_exists(&the_pathname_exists, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_regular (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a regular; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+if (mmux_libc_file_is_regular(&the_pathname_exists, ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page

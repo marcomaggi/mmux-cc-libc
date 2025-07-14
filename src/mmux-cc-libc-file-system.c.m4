@@ -842,6 +842,67 @@ DEFINE_STAT_MODE_PREDICATE([[[S_ISFIFO]]])
 DEFINE_STAT_MODE_PREDICATE([[[S_ISLNK]]])
 DEFINE_STAT_MODE_PREDICATE([[[S_ISSOCK]]])
 
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  mmux_libc_stat_t	stru;
+
+  if (mmux_libc_stat(ptn, &stru)) {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (ENOENT == errnum) {
+      /* The directory entry does not exist.  This function was successful. */
+      mmux_libc_errno_set(0);
+      *result_p = false;
+      return false;
+    } else {
+      /* An error occurred in "stat()". */
+      return true;
+    }
+  } else {
+    /* The directory entry exists. */
+    *result_p = true;
+    return false;
+  }
+}
+bool
+mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  mmux_libc_stat_t	stru;
+
+  if (mmux_libc_stat(ptn, &stru)) {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (ENOENT == errnum) {
+      /* The directory entry does not exist.  This function was successful. */
+      mmux_libc_errno_set(0);
+      *result_p = false;
+      return false;
+    } else {
+      /* An error occurred in "stat()". */
+      return true;
+    }
+  } else {
+    mmux_mode_t		mode;
+
+    if (mmux_libc_st_mode_ref(&mode, &stru)) {
+      return true;
+    } else {
+      /* The directory entry exists. */
+      if (mmux_libc_S_ISREG(result_p, mode)) {
+	return true;
+      } else {
+	/* The directory entry is a regular file. */
+	return false;
+      }
+    }
+  }
+}
+
 
 /** --------------------------------------------------------------------
  ** File times.

@@ -218,6 +218,8 @@ check_PROGRAMS	= \
 	tests/test-struct-iovec-array			\
 	\
 	tests/test-file-system-pathname			\
+	tests/test-file-system-link			\
+	tests/test-file-system-linkat			\
 	\
 	tests/test-interprocess-signals-kill-pause	\
 	tests/test-interprocess-signals-kill-bub
@@ -312,6 +314,12 @@ tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_pathname_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_link_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_link_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_linkat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_linkat_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
