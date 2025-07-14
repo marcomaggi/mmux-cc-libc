@@ -4827,6 +4827,14 @@ when compared as @asciiz{} strings.
 @section Hard and symbolic links
 
 
+@cindex File system, hard links
+@cindex File system, symbolic links
+@cindex File system, real pathnames
+@cindex Hard links, file system
+@cindex Symbolic links, file system
+@cindex Real pathnames, file system
+
+
 @deftypefun bool mmux_libc_link (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{link}.
 

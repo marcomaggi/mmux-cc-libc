@@ -20,8 +20,8 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-linkat.src.ext";
-static mmux_asciizcp_t		dst_pathname_asciiz = "./test-file-system-linkat.dst.ext";
+static mmux_asciizcp_t		src_pathname_asciiz = "/tmp/marco/test-file-system-symlink.src.ext";
+static mmux_asciizcp_t		dst_pathname_asciiz = "/tmp/marco/test-file-system-symlink.dst.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,7 +34,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-file-system-linkat";
+    PROGNAME = "test-file-system-symlink";
     cleanfiles_register(src_pathname_asciiz);
     cleanfiles_register(dst_pathname_asciiz);
     cleanfiles();
@@ -52,8 +52,6 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Do it. */
   {
     mmux_libc_ptn_t	src_ptn, dst_ptn;
-    mmux_libc_fd_t	fd;
-    mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_FOLLOW;
 
     if (mmux_libc_make_file_system_pathname(&src_ptn, src_pathname_asciiz)) {
       handle_error();
@@ -62,11 +60,14 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
 
-    mmux_libc_at_fdcwd(&fd);
-
-    printf_message("linkingat");
-    if (mmux_libc_linkat(fd, src_ptn, fd, dst_ptn, flags)) {
+    printf_message("symlinking");
+    if (mmux_libc_symlink(src_ptn, dst_ptn)) {
       handle_error();
+    }
+
+    if (0) {
+      printf_message("original link pathname: \"%s\"", src_ptn.value);
+      printf_message("symbolic link pathname: \"%s\"", dst_ptn.value);
     }
 
     /* Check file existence. */
@@ -77,19 +78,19 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_error("exists");
 	handle_error();
       } else if (result) {
-	printf_message("link pathname exists as a directory entry");
+	printf_message("symlink pathname exists as a directory entry");
       } else {
-	printf_error("link pathname does NOT exist");
+	printf_error("symlink pathname does NOT exist");
 	handle_error();
       }
 
-      if (mmux_libc_file_is_regular(&result, dst_ptn)) {
-	printf_error("calling is_regular");
+      if (mmux_libc_file_is_symlink(&result, dst_ptn)) {
+	printf_error("calling is_symlink");
 	handle_error();
       } else if (result) {
-	printf_message("link pathname is a regular file");
+	printf_message("symlink pathname is a symbolic link");
       } else {
-	printf_error("link pathname is NOT a regular file");
+	printf_error("symlink pathname is NOT a symbolic link");
 	handle_error();
       }
     }

@@ -70,13 +70,24 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       bool	result;
 
       if (mmux_libc_file_exists(&result, dst_ptn)) {
+	printf_error("exists");
+	handle_error();
+      } else if (result) {
+	printf_message("link pathname exists as a directory entry");
+      } else {
+	printf_error("link pathname does NOT exist");
 	handle_error();
       }
-      assert(result);
+
       if (mmux_libc_file_is_regular(&result, dst_ptn)) {
+	printf_error("calling is_regular");
+	handle_error();
+      } else if (result) {
+	printf_message("link pathname is a regular file");
+      } else {
+	printf_error("link pathname is NOT a regular file");
 	handle_error();
       }
-      assert(result);
     }
   }
 

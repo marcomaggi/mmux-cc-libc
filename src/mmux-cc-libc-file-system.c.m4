@@ -119,6 +119,10 @@ mmux_libc_linkat (mmux_libc_file_descriptor_t oldfd, mmux_libc_file_system_pathn
 bool
 mmux_libc_symlink (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
 {
+  if (0) {
+    mmux_libc_dprintfer("%s: original link pathname: \"%s\"\n", __func__, oldname.value);
+    mmux_libc_dprintfer("%s: symbolic link pathname: \"%s\"\n", __func__, newname.value);
+  }
   int	rv = symlink(oldname.value, newname.value);
 
   return ((0 == rv)? false : true);
@@ -849,7 +853,9 @@ mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 {
   mmux_libc_stat_t	stru;
 
-  if (mmux_libc_stat(ptn, &stru)) {
+  /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
+     symlinks. */
+  if (mmux_libc_lstat(ptn, &stru)) {
     mmux_sint_t		errnum;
 
     mmux_libc_errno_ref(&errnum);
@@ -859,21 +865,34 @@ mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
       *result_p = false;
       return false;
     } else {
-      /* An error occurred in "stat()". */
+      /* An error occurred in "lstat()". */
       return true;
     }
   } else {
+    if (0) {
+      mmux_libc_fd_t	er;
+
+      mmux_libc_stder(&er);
+      mmux_libc_stat_dump(er, &stru, NULL);
+    }
     /* The directory entry exists. */
     *result_p = true;
     return false;
   }
 }
-bool
-mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+
+/* ------------------------------------------------------------------ */
+
+typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
+
+static bool
+mmux_libc_file_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t ptn, mmux_libc_stat_mode_pred_t * pred)
 {
   mmux_libc_stat_t	stru;
 
-  if (mmux_libc_stat(ptn, &stru)) {
+  /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
+     symlinks. */
+  if (mmux_libc_lstat(ptn, &stru)) {
     mmux_sint_t		errnum;
 
     mmux_libc_errno_ref(&errnum);
@@ -883,7 +902,7 @@ mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn
       *result_p = false;
       return false;
     } else {
-      /* An error occurred in "stat()". */
+      /* An error occurred in "lstat()". */
       return true;
     }
   } else {
@@ -891,16 +910,22 @@ mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn
 
     if (mmux_libc_st_mode_ref(&mode, &stru)) {
       return true;
-    } else {
-      /* The directory entry exists. */
-      if (mmux_libc_S_ISREG(result_p, mode)) {
+    } else /* The directory entry exists. */ if (pred(result_p, mode)) {
 	return true;
       } else {
-	/* The directory entry is a regular file. */
 	return false;
       }
-    }
   }
+}
+bool
+mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_S_ISREG);
+}
+bool
+mmux_libc_file_is_symlink (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_S_ISLNK);
 }
 
 

@@ -27,7 +27,7 @@
 
 static mmux_asciizcp_t		PROGNAME;
 static mmux_asciizcp_t		CLEANFILES_PATHNAMES_ASCIIZ[16];
-static mmux_uint_t		CLEANFILES_PATHNAMES_COUNT = 0;
+static mmux_usize_t		CLEANFILES_PATHNAMES_COUNT = 0;
 
 
 /** --------------------------------------------------------------------
@@ -164,21 +164,31 @@ cleanfiles_register (mmux_asciizcp_t pathname_asciiz)
 /* Register a file pathname as file to cleanup by "cleanfiles()".*/
 {
   CLEANFILES_PATHNAMES_ASCIIZ[CLEANFILES_PATHNAMES_COUNT] = pathname_asciiz;
+  printf_message("common: registered cleanfile[%lu]: \"%s\"", CLEANFILES_PATHNAMES_COUNT, pathname_asciiz);
   ++CLEANFILES_PATHNAMES_COUNT;
 }
 void
 cleanfiles (void)
 /* Clean all the files registered in "CLEANFILES_PATHNAMES_ASCIIZ[]". */
 {
-  for (mmux_uint_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
+  for (mmux_usize_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
     mmux_libc_ptn_t	ptn;
 
     if (mmux_libc_make_file_system_pathname(&ptn, CLEANFILES_PATHNAMES_ASCIIZ[i])) {
-      return;
-    };
+      continue;
+    } else {
+      bool	exists;
 
-    if (mmux_libc_unlink(ptn)) {
-      return;
+      if (mmux_libc_file_exists(&exists, ptn)) {
+	continue;
+      } else if (exists) {
+	printf_message("common: unlinking existent cleanfile[%lu]: \"%s\"", i, ptn.value);
+	if (mmux_libc_unlink(ptn)) {
+	  printf_error("common: unlinking \"%s\"", ptn.value);
+	}
+      } else {
+	printf_message("common: unexistent cleanfile[%lu]: \"%s\"", i, ptn.value);
+      }
     }
   }
 }
