@@ -28,12 +28,6 @@
 static void
 test_small_string (void)
 {
-  /* Initialisation. */
-  {
-    mmux_cc_libc_init();
-    PROGNAME			= "test-mfd";
-  }
-
   mmux_asciizcp_t	asciiz_string = "ciao mamma";
   mmux_usize_t		asciiz_string_len;
   mmux_libc_fd_t	fd;
@@ -241,6 +235,12 @@ test_big_string (void)
 int
 main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
 {
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME			= "test-memfd";
+  }
+
   test_small_string();
   test_big_string();
 

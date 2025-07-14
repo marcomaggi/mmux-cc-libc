@@ -205,7 +205,7 @@ check_PROGRAMS	= \
 	\
 	tests/test-copy-file-range			\
 	tests/test-fcntl-flock				\
-	tests/test-mfd					\
+	tests/test-memfd				\
 	tests/test-open-pwrite-pread-close		\
 	tests/test-open-write-read-close		\
 	tests/test-openat-write-read-close		\
@@ -216,6 +216,8 @@ check_PROGRAMS	= \
 	tests/test-struct-flock				\
 	tests/test-struct-iovec				\
 	tests/test-struct-iovec-array			\
+	\
+	tests/test-file-system-pathname			\
 	\
 	tests/test-interprocess-signals-kill-pause	\
 	tests/test-interprocess-signals-kill-bub
@@ -278,8 +280,8 @@ tests_test_openat_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
 tests_test_openat2_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_openat2_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_mfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-tests_test_mfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_memfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_memfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_struct_iovec_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_struct_iovec_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -304,6 +306,11 @@ tests_test_struct_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+
+tests_test_file_system_pathname_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_pathname_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
