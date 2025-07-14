@@ -51,6 +51,12 @@ mmux_libc_strlen (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr)
   return false;
 }
 bool
+mmux_libc_strlen_plus_nil (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr)
+{
+  *result_len_p = 1 + strlen(ptr);
+  return false;
+}
+bool
 mmux_libc_strnlen (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr, mmux_usize_t maxlen)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRNLEN]]],[[[

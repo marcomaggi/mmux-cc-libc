@@ -301,6 +301,7 @@ typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t value; } mmux_
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t value; } mmux_libc_interprocess_signal_t;
 
 typedef struct mmux_libc_file_system_pathname_t { mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
+typedef mmux_libc_file_system_pathname_t	mmux_libc_ptn_t;
 
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;

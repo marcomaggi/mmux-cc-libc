@@ -1276,6 +1276,13 @@ if (mmux_libc_strlen(&buflen, bufptr)) @{
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_strlen_plus_nil (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{ptr})
+Wrapper for @cfunc{mmux_libc_strlen} that adds @samp{1} to the result of the call to @cfunc{strlen};
+so the number of characters stored in the variable referenced by @var{result_len_p} includes the
+terminating null character.
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_strnlen (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{ptr}, mmux_usize_t @var{maxlen})
 @MmuxCInterface{strnlen}.
 
@@ -4746,7 +4753,7 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 
 
 @menu
-* fs types::                    Type definitions for file system operations.
+* fs pathnames::                File system pathnames type definition.
 * fs links::                    Hard and symbolic links.
 * fs deleting::                 Deleting links.
 * fs renaming::                 Renaming links.
@@ -4759,8 +4766,8 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 @end menu
 
 @c page
-@node fs types
-@section Type definitions for file system operations
+@node fs pathnames
+@section File system pathnames type definition
 
 
 @deftp {Opaque Struct Type} mmux_libc_file_system_pathname_t
@@ -4770,7 +4777,38 @@ Data type representing a file system pathname as a non--@cnull{} pointer to @asc
 
 
 @deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{pathname_p}, mmux_asciizcp_t @var{asciiz_pathname})
-Make a new file system pathname value.
+Make a new file system pathname value.  The pointer @var{asciiz_pathname} is stored in the data
+structure referenced by @var{pathname_p}.
+
+@example
+mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, asciiz_pathname)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{pathname_p}, mmux_asciizcp_t @var{asciiz_pathname})
+Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
+the given pathname.
+
+@example
+mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_file_system_pathname_malloc(&ptn, asciiz_pathname)) @{
+  /* error */
+@}
+@{
+  ...
+@}
+if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 

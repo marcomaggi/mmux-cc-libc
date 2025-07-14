@@ -54,9 +54,45 @@ mmux_libc_file_system_pathname_asciizp_ref (mmux_asciizcpp_t asciiz_pathname_p, 
   return false;
 }
 bool
+mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * pathname_p, mmux_asciizcp_t pathname_asciiz)
+{
+  mmux_usize_t		buflen;
+  mmux_asciizp_t	bufptr;
+
+  if (mmux_libc_strlen_plus_nil(&buflen, pathname_asciiz)) {
+    return true;
+  } else if (mmux_libc_malloc(&bufptr, buflen)) {
+    return true;
+  } else if (mmux_libc_strncpy(bufptr, pathname_asciiz, buflen)) {
+    return true;
+  } else if (mmux_libc_make_file_system_pathname(pathname_p, bufptr)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
 mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t pathname)
 {
   return mmux_libc_free((mmux_pointer_t)pathname.value);
+}
+bool
+mmux_libc_file_system_pathname_equal (bool * result_p,
+				      mmux_libc_file_system_pathname_t ptn1,
+				      mmux_libc_file_system_pathname_t ptn2)
+{
+  mmux_sint_t	cmpnum;
+
+  if (mmux_libc_strcmp(&cmpnum, ptn1.value, ptn2.value)) {
+    return true;
+  } else {
+    if (0 == cmpnum) {
+      *result_p = true;
+    } else {
+      *result_p = false;
+    }
+    return false;
+  }
 }
 
 

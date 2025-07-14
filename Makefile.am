@@ -308,6 +308,7 @@ tests_test_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
+## file system
 
 tests_test_file_system_pathname_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD		= $(mmux_cc_libc_tests_ldadd)

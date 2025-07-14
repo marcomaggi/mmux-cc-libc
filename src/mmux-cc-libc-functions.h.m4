@@ -89,6 +89,9 @@ mmux_cc_libc_decl bool mmux_libc_program_invocation_short_name (mmux_asciizcpp_t
 mmux_cc_libc_decl bool mmux_libc_strlen (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr)
   __attribute__((__nonnull__(1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_strlen_plus_nil (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_strnlen (mmux_usize_t * result_len_p, mmux_asciizcp_t ptr, mmux_usize_t maxlen)
   __attribute__((__nonnull__(1,2)));
 
@@ -1138,7 +1141,16 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_asciizp_ref (mmux_asciizcp
 								   mmux_libc_file_system_pathname_t pathname)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * pathname_p,
+							      mmux_asciizcp_t asciiz_pathname)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t pathname);
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_equal (bool * result_p,
+							     mmux_libc_file_system_pathname_t ptn1,
+							     mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
