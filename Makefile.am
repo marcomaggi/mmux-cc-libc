@@ -225,6 +225,8 @@ check_PROGRAMS	= \
 	tests/test-file-system-readlink-malloc		\
 	tests/test-file-system-readlinkat		\
 	tests/test-file-system-readlinkat-malloc	\
+	tests/test-file-system-readlinkfd		\
+	tests/test-file-system-readlinkfd-malloc	\
 	\
 	tests/test-interprocess-signals-kill-pause	\
 	tests/test-interprocess-signals-kill-bub
@@ -340,6 +342,12 @@ tests_test_file_system_readlinkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_readlinkat_malloc_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlinkat_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_readlinkfd_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_readlinkfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_readlinkfd_malloc_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_readlinkfd_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

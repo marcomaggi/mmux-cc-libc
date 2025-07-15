@@ -1170,16 +1170,22 @@ mmux_cc_libc_decl bool mmux_libc_readlink_malloc (mmux_libc_file_system_pathname
 						  mmux_libc_file_system_pathname_t linkname)
   __attribute__((__nonnull__(1)));
 
-/* The argument "linkname" can be NULL on some versions of Linux. */
 mmux_cc_libc_decl bool mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
 					     mmux_libc_file_system_pathname_t linkname,
 					     mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
   __attribute__((__nonnull__(1,4)));
 
-/* The argument "linkname" can be NULL on some versions of Linux. */
 mmux_cc_libc_decl bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
 						    mmux_libc_file_descriptor_t dirfd,
 						    mmux_libc_file_system_pathname_t linkname)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+					     mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+  __attribute__((__nonnull__(1,3)));
+
+mmux_cc_libc_decl bool mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
+						    mmux_libc_file_descriptor_t dirfd)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_file_system_pathname_t * result_pathname_p,

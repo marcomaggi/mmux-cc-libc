@@ -127,6 +127,9 @@ mmux_libc_symlink (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_syst
 
   return ((0 == rv)? false : true);
 }
+
+/* ------------------------------------------------------------------ */
+
 bool
 mmux_libc_readlink (mmux_usize_t * required_nbytes_p, mmux_libc_file_system_pathname_t linkname,
 		    mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
@@ -179,12 +182,12 @@ mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
     }
   }
 }
-bool
-mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
-		      mmux_libc_file_system_pathname_t linkname,
-		      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+static bool
+mmux_libc_readlinkat_pathname_asciiz (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+				      mmux_asciizcp_t linkname_asciiz,
+				      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
 {
-  mmux_ssize_t	required_nbytes = readlinkat(dirfd.value, linkname.value, buffer, provided_nbytes);
+  mmux_ssize_t	required_nbytes = readlinkat(dirfd.value, linkname_asciiz, buffer, provided_nbytes);
 
   if (required_nbytes < 0) {
     return true;
@@ -199,9 +202,9 @@ mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descripto
     }
   }
 }
-bool
-mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd,
-			     mmux_libc_file_system_pathname_t linkname)
+static bool
+mmux_libc_readlinkat_malloc_pathname_asciiz (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd,
+					     mmux_asciizcp_t linkname_asciiz)
 {
   mmux_usize_t	provided_nbytes_with_nul = 0;
 
@@ -212,7 +215,7 @@ mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_
       mmux_usize_t	required_nbytes_no_nul;
 
       memset(buffer, '\0', provided_nbytes_with_nul);
-      if (mmux_libc_readlinkat(&required_nbytes_no_nul, dirfd, linkname, buffer, provided_nbytes_with_nul-1)) {
+      if (mmux_libc_readlinkat_pathname_asciiz(&required_nbytes_no_nul, dirfd, linkname_asciiz, buffer, provided_nbytes_with_nul-1)) {
 	return true;
       } else if (required_nbytes_no_nul == provided_nbytes_with_nul) {
 	continue;
@@ -233,6 +236,32 @@ mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_
     }
   }
 }
+bool
+mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+		      mmux_libc_file_system_pathname_t linkname,
+		      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+{
+  return mmux_libc_readlinkat_pathname_asciiz (required_nbytes_p, dirfd, linkname.value, buffer, provided_nbytes);
+}
+bool
+mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd,
+			     mmux_libc_file_system_pathname_t linkname)
+{
+  return mmux_libc_readlinkat_malloc_pathname_asciiz(result_pathname_p, dirfd, linkname.value);
+}
+bool
+mmux_libc_readlinkfd (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+				  mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+{
+  return mmux_libc_readlinkat_pathname_asciiz (required_nbytes_p, dirfd, "", buffer, provided_nbytes);
+}
+bool
+mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd)
+{
+  return mmux_libc_readlinkat_malloc_pathname_asciiz(result_pathname_p, dirfd, "");
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
 mmux_libc_canonicalize_file_name (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t input_pathname)

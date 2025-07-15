@@ -4834,12 +4834,19 @@ when compared as @asciiz{} strings.
 @section Hard and symbolic links
 
 
+@menu
+* fs links hard::               File system hard links.
+* fs links symbolic::           File system symbolic links.
+* fs links follow::             Following file system symbolic links.
+@end menu
+
+@c page
+@node fs links hard
+@subsection File system hard links
+
+
 @cindex File system, hard links
-@cindex File system, symbolic links
-@cindex File system, real pathnames
 @cindex Hard links, file system
-@cindex Symbolic links, file system
-@cindex Real pathnames, file system
 
 
 @deftypefun bool mmux_libc_link (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
@@ -4874,6 +4881,14 @@ if (mmux_libc_linkat(fd, src_ptn, fd, dst_ptn, flags)) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs links symbolic
+@subsection File system symbolic links
+
+
+@cindex File system, symbolic links
+@cindex Symbolic links, file system
+
 
 @deftypefun bool mmux_libc_symlink (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{symlink}.
@@ -4888,6 +4903,24 @@ if (mmux_libc_symlink(old_ptn, new_ptn)) @{
 @}
 @end example
 @end deftypefun
+
+@c page
+@node fs links follow
+@subsection Following file system symbolic links
+
+
+@cindex File system, real pathnames
+@cindex Real pathnames, file system
+
+
+@menu
+* fs links follow pathnames::   Follow file system links by pathname.
+* fs links follow fds::         Follow file system links by file descriptor.
+@end menu
+
+@c page
+@node fs links follow pathnames
+@subsubsection Follow file system links by pathname
 
 
 @deftypefun bool mmux_libc_readlink (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
@@ -4907,7 +4940,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
   if (mmux_libc_readlink(&nbytes_done_no_nul, lnk_ptn, bufptr, provided_nbytes_with_nul-1)) @{
     /* error */
   @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
-    /* not enough bytes in the provided buffer */
+    /* not enough bytes in the supplied buffer */
   @}
   if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
     /* error */
@@ -4940,11 +4973,40 @@ mmux_libc_file_system_pathname_free(rea_ptn);
 @end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_readlinkat (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
 @MmuxCInterface{readlinkat}.  It is usually better to use @cfunc{mmux_libc_readlinkat_malloc}.
+
+@example
+mmux_libc_ptn_t 	org_ptn, rea_ptn;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+@{
+  mmux_usize_t          provided_nbytes_with_nul = 1024;
+  char                  bufptr[provided_nbytes_with_nul];
+  mmux_usize_t          nbytes_done_no_nul;
+  mmux_libc_fd_t        dirfd;
+
+  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
+
+  if (mmux_libc_readlinkat(&nbytes_done_no_nul, dirfd, lnk_ptn, bufptr, provided_nbytes_with_nul-1)) @{
+    /* error */
+  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
+    /* not enough bytes in the supplied buffer */
+  @}
+  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+    /* error */
+  @}
+@}
+@{
+  ... /* do something with "rea_ptn" */
+@}
+mmux_libc_file_system_pathname_free(rea_ptn);
+@end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname})
 Like @cfunc{mmux_libc_readlinkat} but when successful: allocate a memory block, using
@@ -4982,6 +5044,115 @@ responsibility of the caller to release the buffer with a call to @cfunc{mmux_li
 a pointer to the buffer is stored in the location referenced by @var{result_pathname_p}.  It is
 responsibility of the caller to release the buffer with a call to @cfunc{mmux_libc_free}.
 @end deftypefun
+
+@c page
+@node fs links follow fds
+@subsubsection Follow file system links by file descriptor
+
+
+The following functions are wrappers for @cfunc{readlinkat}, @MmuxCFuncpage{readlinkat}.  They are
+invoked in the special way supported by the latest Linux kernels: with the @asciiz{} string
+representing the file system pathname set to the empty string.  This causes the file descriptor
+argument to be meant to represent the link to follow through to the real file description.
+
+
+@deftypefn {Linux Function} bool mmux_libc_readlinkfd (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
+Wrapper for @cfunc{readlinkat} called with empty file system pathname.  It is usually better to use
+@cfunc{mmux_libc_readlinkfd_malloc}.
+
+@example
+mmux_libc_ptn_t         org_ptn, rea_ptn;
+mmux_libc_fd_t          org_fd;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&org_fd, org_ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Read the link. */
+@{
+  mmux_usize_t          provided_nbytes_with_nul = 1024;
+  char                  bufptr[provided_nbytes_with_nul];
+  mmux_usize_t          nbytes_done_no_nul;
+
+  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
+
+  if (mmux_libc_readlinkfd(&nbytes_done_no_nul, org_fd, bufptr, provided_nbytes_with_nul-1)) @{
+    /* error */
+  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
+    /* not enough bytes in the supplied buffer */
+  @}
+  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "rea_ptn". */
+@{
+  ...
+@}
+
+/* Release the asynchronous resources. */
+@{
+  mmux_libc_file_system_pathname_free(rea_ptn);
+  if (mmux_libc_close(org_fd)) @{
+      /* error */
+  @}
+@}
+@end example
+@end deftypefn
+
+@c ------------------------------------------------------------------------
+
+@deftypefn {Linux Function} bool mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Like @cfunc{mmux_libc_readlinkfd} but when successful: allocate a memory block, using
+@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
+the allocated memory using @cfunc{mmux_libc_free}.
+
+@example
+mmux_libc_ptn_t         org_ptn, rea_ptn;
+mmux_libc_fd_t          org_fd;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&org_fd, org_ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Read the link. */
+@{
+  if (mmux_libc_readlinkfd_malloc(&rea_ptn, org_fd)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "rea_ptn". */
+@{
+  ...
+@}
+
+/* Release the asynchronous resources. */
+@{
+  mmux_libc_file_system_pathname_free(rea_ptn);
+  if (mmux_libc_close(org_fd)) @{
+      /* error */
+  @}
+@}
+@end example
+@end deftypefn
 
 @c page
 @node fs deleting
