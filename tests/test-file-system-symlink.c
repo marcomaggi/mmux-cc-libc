@@ -81,7 +81,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("symlink pathname exists as a directory entry");
       } else {
 	printf_error("symlink pathname does NOT exist");
-	handle_error();
+	mmux_libc_exit_failure();
       }
 
       if (mmux_libc_file_is_symlink(&result, dst_ptn)) {
@@ -91,7 +91,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("symlink pathname is a symbolic link");
       } else {
 	printf_error("symlink pathname is NOT a symbolic link");
-	handle_error();
+	mmux_libc_exit_failure();
       }
     }
   }

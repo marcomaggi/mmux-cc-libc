@@ -76,7 +76,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("link pathname exists as a directory entry");
       } else {
 	printf_error("link pathname does NOT exist");
-	handle_error();
+	mmux_libc_exit_failure();
       }
 
       if (mmux_libc_file_is_regular(&result, dst_ptn)) {
@@ -86,7 +86,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("link pathname is a regular file");
       } else {
 	printf_error("link pathname is NOT a regular file");
-	handle_error();
+	mmux_libc_exit_failure();
       }
     }
   }
