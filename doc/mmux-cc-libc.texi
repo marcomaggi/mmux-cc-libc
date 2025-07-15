@@ -4870,18 +4870,67 @@ if (mmux_libc_linkat(fd, src_ptn, fd, dst_ptn, flags)) @{
 
 @deftypefun bool mmux_libc_symlink (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{symlink}.
+
+@example
+mmux_libc_ptn_t         old_ptn, new_ptn;
+
+mmux_libc_make_file_system_pathname(&old_ptn, "/path/to/old-file.ext");
+mmux_libc_make_file_system_pathname(&new_ptn, "/path/to/new-file.ext");
+if (mmux_libc_symlink(old_ptn, new_ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_readlink (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
-@MmuxCInterface{readlink}.
+@MmuxCInterface{readlink}.  It is usually better to use @cfunc{mmux_libc_readlink_malloc}.
+
+@example
+mmux_libc_ptn_t 	org_ptn, rea_ptn;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+@{
+  mmux_usize_t          provided_nbytes_with_nul = 1024;
+  char                  bufptr[provided_nbytes_with_nul];
+  mmux_usize_t          nbytes_done_no_nul;
+
+  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
+
+  if (mmux_libc_readlink(&nbytes_done_no_nul, lnk_ptn, bufptr, provided_nbytes_with_nul-1)) @{
+    /* error */
+  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
+    /* not enough bytes in the provided buffer */
+  @}
+  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+    /* error */
+  @}
+@}
+@{
+  ... /* do something with "rea_ptn" */
+@}
+mmux_libc_file_system_pathname_free(rea_ptn);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * @var{result_pathname_p}, mmux_libc_file_system_pathname_t @var{linkname})
+@deftypefun bool mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Like @cfunc{mmux_libc_readlink} but when successful: allocate a memory block, using
-@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it, including the
-terminating nul character; we must release the allocated memory using @cfunc{mmux_libc_free}.
+@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
+the allocated memory using @cfunc{mmux_libc_free}.
+
+@example
+mmux_libc_ptn_t	org_ptn, rea_ptn;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+if (mmux_libc_readlink_malloc(&rea_ptn, org_ptn)) @{
+  /* error */
+@}
+@{
+  ... /* do something with "rea_ptn" */
+@}
+mmux_libc_file_system_pathname_free(rea_ptn);
+@end example
 @end deftypefun
 
 
@@ -4892,8 +4941,8 @@ terminating nul character; we must release the allocated memory using @cfunc{mmu
 
 @deftypefun bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * @var{result_pathname_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname})
 Like @cfunc{mmux_libc_readlinkat} but when successful: allocate a memory block, using
-@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it, including the
-terminating nul character; we must release the allocated memory using @cfunc{mmux_libc_free}.
+@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
+the allocated memory using @cfunc{mmux_libc_free}.
 @end deftypefun
 
 
@@ -5151,6 +5200,10 @@ current mask.
 @subsection File system pathname predicates
 
 
+For all the following functions: the test is performed using @cfunc{mmux_libc_lstat}, so the
+pathname itself is inspected without following symbolic links.
+
+
 @deftypefun bool mmux_libc_file_exists (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry; otherwise store @cfalse{}.
@@ -5159,9 +5212,7 @@ directory entry; otherwise store @cfalse{}.
 mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 if (mmux_libc_file_exists(&the_pathname_exists, ptn)) @{
   /* error */
 @}
@@ -5175,12 +5226,106 @@ directory entry and it is a regular; file otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
-bool                    the_pathname_exists;
+bool                    the_pathname_exists_and_it_is_regular;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_regular(&the_pathname_exists_and_it_is_regular, ptn)) @{
   /* error */
 @}
-if (mmux_libc_file_is_regular(&the_pathname_exists, ptn)) @{
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_symlink (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_symlink;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_symlink(&the_pathname_exists_and_it_is_symlink, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_directory (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_directory;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_directory(&the_pathname_exists_and_it_is_directory, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_character_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_character_special;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_character_special(&the_pathname_exists_and_it_is_character_special, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_block_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_block_special;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_block_special(&the_pathname_exists_and_it_is_block_special, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_fifo (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_fifo;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_fifo(&the_pathname_exists_and_it_is_fifo, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_is_socket (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
+directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    the_pathname_exists_and_it_is_socket;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_file_is_socket(&the_pathname_exists_and_it_is_socket, ptn)) @{
   /* error */
 @}
 @end example

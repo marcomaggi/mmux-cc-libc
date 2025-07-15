@@ -221,6 +221,8 @@ check_PROGRAMS	= \
 	tests/test-file-system-link			\
 	tests/test-file-system-linkat			\
 	tests/test-file-system-symlink			\
+	tests/test-file-system-readlink			\
+	tests/test-file-system-readlink-malloc		\
 	\
 	tests/test-interprocess-signals-kill-pause	\
 	tests/test-interprocess-signals-kill-bub
@@ -232,98 +234,104 @@ TESTS				= $(check_PROGRAMS)
 
 ## ------------------------------------------------------------------------
 
-tests_test_version_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_version_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_version_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_version_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_strerror_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_strerror_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_strerror_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_strerror_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes
 
-tests_test_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_fork_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_fork_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_wait_any_process_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_any_process_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_any_process_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_wait_my_process_group_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_my_process_group_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_my_process_group_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_wait_process_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_process_id_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_process_id_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_wait_group_id_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_group_id_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_group_id_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_wait_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_wait_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## waiting for input/output
 
-tests_test_select_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_select_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_select_fd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_select_fd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_select_fd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_select_fd_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file descriptors
 
-tests_test_open_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_open_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_open_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_open_write_read_close_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_open_pwrite_pread_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_open_pwrite_pread_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_open_pwrite_pread_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_open_pwrite_pread_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_openat_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_openat_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_openat_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_openat_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_openat2_write_read_close_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_openat2_write_read_close_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_openat2_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_openat2_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_memfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_memfd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_memfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_memfd_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_struct_iovec_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_struct_iovec_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_struct_iovec_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_struct_iovec_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_struct_iovec_array_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_struct_iovec_array_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_struct_iovec_array_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_struct_iovec_array_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_readv_writev_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_readv_writev_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_readv_writev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_readv_writev_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_preadv_pwritev_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_preadv_pwritev_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_preadv_pwritev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_preadv_pwritev_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_preadv2_pwritev2_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_preadv2_pwritev2_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_preadv2_pwritev2_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_preadv2_pwritev2_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_copy_file_range_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_copy_file_range_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_copy_file_range_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_copy_file_range_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_struct_flock_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_struct_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_struct_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_struct_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_fcntl_flock_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_fcntl_flock_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_fcntl_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system
 
-tests_test_file_system_pathname_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_pathname_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_file_system_link_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_link_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_system_link_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_link_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_file_system_linkat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_linkat_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_system_linkat_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_linkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_file_system_symlink_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_symlink_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_system_symlink_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_symlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_readlink_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_readlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_readlink_malloc_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_readlink_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -20,8 +20,8 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "/tmp/marco/test-file-system-symlink.src.ext";
-static mmux_asciizcp_t		dst_pathname_asciiz = "/tmp/marco/test-file-system-symlink.dst.ext";
+static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-symlink.src.ext";
+static mmux_asciizcp_t		dst_pathname_asciiz = "./test-file-system-symlink.dst.ext";
 
 
 /** --------------------------------------------------------------------

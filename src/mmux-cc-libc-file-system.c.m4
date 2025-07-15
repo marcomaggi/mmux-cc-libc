@@ -155,12 +155,12 @@ mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
     provided_nbytes_with_nul += 1024;
     {
       char		buffer[provided_nbytes_with_nul];
-      mmux_usize_t	required_nbytes_no_nul;
+      mmux_usize_t	nbytes_done_no_nul;
 
-      memset(buffer, '\0', provided_nbytes_with_nul);
-      if (mmux_libc_readlink(&required_nbytes_no_nul, linkname, buffer, provided_nbytes_with_nul-1)) {
+      mmux_libc_memzero(buffer, provided_nbytes_with_nul);
+      if (mmux_libc_readlink(&nbytes_done_no_nul, linkname, buffer, provided_nbytes_with_nul-1)) {
 	return true;
-      } else if (required_nbytes_no_nul == provided_nbytes_with_nul) {
+      } else if (nbytes_done_no_nul == provided_nbytes_with_nul) {
 	continue;
       } else {
 	mmux_asciizp_t	asciiz_pathname;
@@ -917,16 +917,20 @@ mmux_libc_file_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t p
       }
   }
 }
-bool
-mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+
+m4_define([[[DEFINE_DIRECTORY_ENTRY_PREDICATE]]],[[[bool
+mmux_libc_file_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 {
-  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_S_ISREG);
-}
-bool
-mmux_libc_file_is_symlink (bool * result_p, mmux_libc_file_system_pathname_t ptn)
-{
-  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_S_ISLNK);
-}
+  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_$2);
+}]]])
+
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_regular]]],[[[S_ISREG]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_symlink]]],[[[S_ISLNK]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_directory]]],[[[S_ISDIR]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_character_special]]],[[[S_ISCHR]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_block_special]]],[[[S_ISBLK]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_fifo]]],[[[S_ISFIFO]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_socket]]],[[[S_ISSOCK]]])
 
 
 /** --------------------------------------------------------------------
