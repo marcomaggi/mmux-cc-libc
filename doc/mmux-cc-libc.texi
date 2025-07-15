@@ -4773,6 +4773,13 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 @deftp {Opaque Struct Type} mmux_libc_file_system_pathname_t
 @deftpx {Opaque Struct Type} mmux_libc_ptn_t
 Data type representing a file system pathname as a non--@cnull{} pointer to @asciiz{} string.
+
+@quotation
+@strong{NOTE} At present a file system pathname value is considered ``validated'' if its internal
+pointer to @asciiz{} string is non--@cnull{}; no validation is performed on the string itself, which
+means that the string could be empty or invalid as a file system pathname.  This may change in the
+future.
+@end quotation
 @end deftp
 
 
@@ -4935,14 +4942,29 @@ mmux_libc_file_system_pathname_free(rea_ptn);
 
 
 @deftypefun bool mmux_libc_readlinkat (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
-@MmuxCInterface{readlinkat}.
+@MmuxCInterface{readlinkat}.  It is usually better to use @cfunc{mmux_libc_readlinkat_malloc}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * @var{result_pathname_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname})
+@deftypefun bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname})
 Like @cfunc{mmux_libc_readlinkat} but when successful: allocate a memory block, using
 @cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
 the allocated memory using @cfunc{mmux_libc_free}.
+
+@example
+mmux_libc_ptn_t         org_ptn, rea_ptn;
+mmux_libc_fd_t          dirfd;
+
+mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
+mmux_libc_at_fdcwd(&dirfd);
+if (mmux_libc_readlinkat_malloc(&rea_ptn, dirfd, org_ptn)) @{
+  /* error */
+@}
+@{
+  ... /* do something with "rea_ptn" */
+@}
+mmux_libc_file_system_pathname_free(rea_ptn);
+@end example
 @end deftypefun
 
 
