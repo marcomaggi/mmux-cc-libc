@@ -677,6 +677,24 @@ mmux_libc_st_blksize_ref (mmux_uint_t * value_p, mmux_libc_stat_t const * stat_p
 
 /* ------------------------------------------------------------------ */
 
+static bool
+mmux_libc_stat_dump_time (mmux_libc_fd_t fd, mmux_time_t T)
+{
+  mmux_libc_tm_t *	tm_p;
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK  4096
+  mmux_usize_t		buflen = IS_THIS_ENOUGH_QUESTION_MARK;
+  mmux_char_t		bufptr[buflen];
+
+  if (mmux_libc_gmtime(&tm_p, T)) {
+    return true;
+  }
+  if (mmux_libc_strftime(bufptr, &buflen, "%Y-%m-%dT%H:%M:%S%z", tm_p)) {
+    return true;
+  }
+  DPRINTF(fd, " (%s)\n", bufptr);
+  return false;
+}
 bool
 mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * const stat_p, char const * struct_name)
 {
@@ -691,7 +709,35 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_mode_sprint(str, len, stat_p->st_mode);
-    DPRINTF(fd, "%s->st_mode = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_mode = %s", struct_name, str);
+    {
+      mmux_asciizcp_t	type;
+
+      if (S_ISDIR(stat_p->st_mode)) {
+	type = "directory";
+      } else if (S_ISCHR(stat_p->st_mode)) {
+	type = "character special device";
+      } else if (S_ISBLK(stat_p->st_mode)) {
+	type = "block special device";
+      } else if (S_ISREG(stat_p->st_mode)) {
+	type = "regular file";
+      } else if (S_ISLNK(stat_p->st_mode)) {
+	type = "symbolic link";
+      } else if (S_ISSOCK(stat_p->st_mode)) {
+	type = "socket";
+      } else if (S_ISFIFO(stat_p->st_mode)) {
+	type = "FIFO";
+      } else if (S_TYPEISMQ(stat_p)) {
+	type = "message queue";
+      } else if (S_TYPEISSEM(stat_p)) {
+	type = "semaphore object";
+      } else if (S_TYPEISSHM(stat_p)) {
+	type = "shared memory object";
+      } else {
+	type = "unknown device";
+      }
+      DPRINTF(fd, " (%s)\n", type);
+    }
   }
 
   {
@@ -755,7 +801,10 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_atim.tv_sec);
-    DPRINTF(fd, "%s->st_atime_sec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_atime_sec = %s", struct_name, str);
+    if (mmux_libc_stat_dump_time(fd, stat_p->st_atim.tv_sec)) {
+      return true;
+    }
   }
 
   {
@@ -771,7 +820,10 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_mtim.tv_sec);
-    DPRINTF(fd, "%s->st_mtime_sec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_mtime_sec = %s", struct_name, str);
+    if (mmux_libc_stat_dump_time(fd, stat_p->st_mtim.tv_sec)) {
+      return true;
+    }
   }
 
   {
@@ -787,7 +839,10 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_ctim.tv_sec);
-    DPRINTF(fd, "%s->st_ctime_sec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_ctime_sec = %s", struct_name, str);
+    if (mmux_libc_stat_dump_time(fd, stat_p->st_ctim.tv_sec)) {
+      return true;
+    }
   }
 
   {
