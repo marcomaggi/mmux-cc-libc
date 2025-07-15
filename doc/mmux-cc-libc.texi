@@ -5285,6 +5285,7 @@ current mask.
 * fs attributes stat::          The @cfunc{stat} functions.
 * fs attributes mode::          Inspecting the mode field of @objtype{mmux_libc_stat_t}.
 * fs attributes pathnames::     File system pathname predicates.
+* fs attributes fds::           File descriptors predicates.
 @end menu
 
 @c page
@@ -5415,7 +5416,7 @@ if (mmux_libc_file_system_pathname_exists(&the_pathname_exists, ptn)) @{
 
 @deftypefun bool mmux_libc_file_system_pathname_is_regular (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a regular; file otherwise store @cfalse{}.
+directory entry and it is a regular file; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5431,7 +5432,7 @@ if (mmux_libc_file_system_pathname_is_regular(&the_pathname_exists_and_it_is_reg
 
 @deftypefun bool mmux_libc_file_system_pathname_is_symlink (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a symbolic link; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5447,7 +5448,7 @@ if (mmux_libc_file_system_pathname_is_symlink(&the_pathname_exists_and_it_is_sym
 
 @deftypefun bool mmux_libc_file_system_pathname_is_directory (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a directory; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5463,7 +5464,7 @@ if (mmux_libc_file_system_pathname_is_directory(&the_pathname_exists_and_it_is_d
 
 @deftypefun bool mmux_libc_file_system_pathname_is_character_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a character special device; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5479,7 +5480,7 @@ if (mmux_libc_file_system_pathname_is_character_special(&the_pathname_exists_and
 
 @deftypefun bool mmux_libc_file_system_pathname_is_block_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a block special device; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5495,7 +5496,7 @@ if (mmux_libc_file_system_pathname_is_block_special(&the_pathname_exists_and_it_
 
 @deftypefun bool mmux_libc_file_system_pathname_is_fifo (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a FIFO; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5511,7 +5512,7 @@ if (mmux_libc_file_system_pathname_is_fifo(&the_pathname_exists_and_it_is_fifo, 
 
 @deftypefun bool mmux_libc_file_system_pathname_is_socket (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
-directory entry and it is a symbolic link; file otherwise store @cfalse{}.
+directory entry and it is a socket; otherwise store @cfalse{}.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -5519,6 +5520,206 @@ bool                    the_pathname_exists_and_it_is_socket;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 if (mmux_libc_file_system_pathname_is_socket(&the_pathname_exists_and_it_is_socket, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs attributes fds
+@subsection File descriptors predicates
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_regular (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
+regular file; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_regular;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_regular(&the_fd_is_regular, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_symlink (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
+symbolic link; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_symlink;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_symlink(&the_fd_is_symlink, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_directory (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
+directory; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_directory;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_directory(&the_fd_is_directory, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_character_special (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
+character special device; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_character_special;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_character_special(&the_fd_is_character_special, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_block_special (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a block
+special device; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_block_special;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_block_special(&the_fd_is_block_special, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_fifo (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a FIFO;
+otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_fifo;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_fifo(&the_fd_is_fifo, ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_is_socket (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
+socket; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+bool                    the_fd_is_socket;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+/* Open the link. */
+@{
+  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_file_descriptor_is_socket(&the_fd_is_socket, ptn)) @{
   /* error */
 @}
 @end example

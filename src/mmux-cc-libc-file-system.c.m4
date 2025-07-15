@@ -28,6 +28,8 @@
 
 #include <mmux-cc-libc-internals.h>
 
+typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
+
 #define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
 
 
@@ -912,8 +914,6 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pa
 
 /* ------------------------------------------------------------------ */
 
-typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
-
 static bool
 mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t ptn, mmux_libc_stat_mode_pred_t * pred)
 {
@@ -947,19 +947,66 @@ mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_sys
   }
 }
 
-m4_define([[[DEFINE_DIRECTORY_ENTRY_PREDICATE]]],[[[bool
+m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE]]],[[[bool
 mmux_libc_file_system_pathname_is_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 {
   return mmux_libc_file_system_pathname_is_predicate(result_p, ptn, mmux_libc_$2);
 }]]])
 
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[regular]]],			[[[S_ISREG]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[symlink]]],			[[[S_ISLNK]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[directory]]],		[[[S_ISDIR]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[character_special]]],	[[[S_ISCHR]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[block_special]]],		[[[S_ISBLK]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[fifo]]],			[[[S_ISFIFO]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[regular]]],		[[[S_ISREG]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[symlink]]],		[[[S_ISLNK]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[directory]]],		[[[S_ISDIR]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[character_special]]],	[[[S_ISCHR]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[block_special]]],	[[[S_ISBLK]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[fifo]]],		[[[S_ISFIFO]]])
+DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE([[[socket]]],		[[[S_ISSOCK]]])
+
+/* ------------------------------------------------------------------ */
+
+static bool
+mmux_libc_file_descriptor_is_predicate (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_stat_mode_pred_t * pred)
+{
+  mmux_libc_stat_t	stru;
+
+  if (mmux_libc_fstat(fd, &stru)) {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (ENOENT == errnum) {
+      /* The directory entry does not exist.  This function was successful. */
+      mmux_libc_errno_set(0);
+      *result_p = false;
+      return false;
+    } else {
+      /* An error occurred in "fstat()". */
+      return true;
+    }
+  } else {
+    mmux_mode_t		mode;
+
+    if (mmux_libc_st_mode_ref(&mode, &stru)) {
+      return true;
+    } else /* The directory entry exists. */ if (pred(result_p, mode)) {
+	return true;
+      } else {
+	return false;
+      }
+  }
+}
+
+m4_define([[[DEFINE_FILE_DESCRIPTOR_PREDICATE]]],[[[bool
+mmux_libc_file_descriptor_is_$1 (bool * result_p, mmux_libc_file_descriptor_t fd)
+{
+  return mmux_libc_file_descriptor_is_predicate(result_p, fd, mmux_libc_$2);
+}]]])
+
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[regular]]],			[[[S_ISREG]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[symlink]]],			[[[S_ISLNK]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[directory]]],		[[[S_ISDIR]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[character_special]]],	[[[S_ISCHR]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[block_special]]],		[[[S_ISBLK]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[fifo]]],			[[[S_ISFIFO]]])
+DEFINE_FILE_DESCRIPTOR_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 
 
 /** --------------------------------------------------------------------

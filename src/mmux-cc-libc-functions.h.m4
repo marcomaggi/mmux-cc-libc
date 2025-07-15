@@ -1352,6 +1352,29 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_socket (bool * result_p
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_regular (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_symlink (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_directory (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_character_special (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_block_special (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_fifo (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_socket (bool * result_p, mmux_libc_file_descriptor_t ptn)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, actime,  mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, modtime, mmux_time_t)
 
