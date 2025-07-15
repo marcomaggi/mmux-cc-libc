@@ -1326,13 +1326,28 @@ mmux_cc_libc_decl bool mmux_libc_S_ISSOCK (bool * result_p, mmux_mode_t mode)
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_regular (bool * result_p, mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_is_symlink (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_symlink (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_directory (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_character_special (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_block_special (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_fifo (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_socket (bool * result_p, mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */

@@ -179,7 +179,7 @@ cleanfiles (void)
     } else {
       bool	exists;
 
-      if (mmux_libc_file_exists(&exists, ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&exists, ptn)) {
 	continue;
       } else if (exists) {
 	printf_message("common: unlinking existent cleanfile[%lu]: \"%s\"", i, ptn.value);

@@ -878,7 +878,7 @@ DEFINE_STAT_MODE_PREDICATE([[[S_ISSOCK]]])
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 {
   mmux_libc_stat_t	stru;
 
@@ -915,7 +915,7 @@ mmux_libc_file_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
 
 static bool
-mmux_libc_file_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t ptn, mmux_libc_stat_mode_pred_t * pred)
+mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t ptn, mmux_libc_stat_mode_pred_t * pred)
 {
   mmux_libc_stat_t	stru;
 
@@ -948,18 +948,18 @@ mmux_libc_file_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t p
 }
 
 m4_define([[[DEFINE_DIRECTORY_ENTRY_PREDICATE]]],[[[bool
-mmux_libc_file_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_is_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn)
 {
-  return mmux_libc_file_is_predicate(result_p, ptn, mmux_libc_$2);
+  return mmux_libc_file_system_pathname_is_predicate(result_p, ptn, mmux_libc_$2);
 }]]])
 
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_regular]]],[[[S_ISREG]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_symlink]]],[[[S_ISLNK]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_directory]]],[[[S_ISDIR]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_character_special]]],[[[S_ISCHR]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_block_special]]],[[[S_ISBLK]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_fifo]]],[[[S_ISFIFO]]])
-DEFINE_DIRECTORY_ENTRY_PREDICATE([[[is_socket]]],[[[S_ISSOCK]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[regular]]],			[[[S_ISREG]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[symlink]]],			[[[S_ISLNK]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[directory]]],		[[[S_ISDIR]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[character_special]]],	[[[S_ISCHR]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[block_special]]],		[[[S_ISBLK]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[fifo]]],			[[[S_ISFIFO]]])
+DEFINE_DIRECTORY_ENTRY_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 
 
 /** --------------------------------------------------------------------

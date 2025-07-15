@@ -74,7 +74,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       bool	result;
 
-      if (mmux_libc_file_exists(&result, dst_ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&result, dst_ptn)) {
 	printf_error("exists");
 	handle_error();
       } else if (result) {
@@ -84,7 +84,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	mmux_libc_exit_failure();
       }
 
-      if (mmux_libc_file_is_symlink(&result, dst_ptn)) {
+      if (mmux_libc_file_system_pathname_is_symlink(&result, dst_ptn)) {
 	printf_error("calling is_symlink");
 	handle_error();
       } else if (result) {

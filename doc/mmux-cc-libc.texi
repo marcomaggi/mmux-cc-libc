@@ -5397,7 +5397,7 @@ For all the following functions: the test is performed using @cfunc{mmux_libc_ls
 pathname itself is inspected without following symbolic links.
 
 
-@deftypefun bool mmux_libc_file_exists (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_exists (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry; otherwise store @cfalse{}.
 
@@ -5406,14 +5406,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_exists(&the_pathname_exists, ptn)) @{
+if (mmux_libc_file_system_pathname_exists(&the_pathname_exists, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_regular (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_regular (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a regular; file otherwise store @cfalse{}.
 
@@ -5422,14 +5422,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_regular;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_regular(&the_pathname_exists_and_it_is_regular, ptn)) @{
+if (mmux_libc_file_system_pathname_is_regular(&the_pathname_exists_and_it_is_regular, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_symlink (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_symlink (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5438,14 +5438,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_symlink;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_symlink(&the_pathname_exists_and_it_is_symlink, ptn)) @{
+if (mmux_libc_file_system_pathname_is_symlink(&the_pathname_exists_and_it_is_symlink, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_directory (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_directory (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5454,14 +5454,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_directory;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_directory(&the_pathname_exists_and_it_is_directory, ptn)) @{
+if (mmux_libc_file_system_pathname_is_directory(&the_pathname_exists_and_it_is_directory, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_character_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_character_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5470,14 +5470,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_character_special;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_character_special(&the_pathname_exists_and_it_is_character_special, ptn)) @{
+if (mmux_libc_file_system_pathname_is_character_special(&the_pathname_exists_and_it_is_character_special, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_block_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_block_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5486,14 +5486,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_block_special;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_block_special(&the_pathname_exists_and_it_is_block_special, ptn)) @{
+if (mmux_libc_file_system_pathname_is_block_special(&the_pathname_exists_and_it_is_block_special, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_fifo (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_fifo (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5502,14 +5502,14 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_fifo;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_fifo(&the_pathname_exists_and_it_is_fifo, ptn)) @{
+if (mmux_libc_file_system_pathname_is_fifo(&the_pathname_exists_and_it_is_fifo, ptn)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_is_socket (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_socket (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; file otherwise store @cfalse{}.
 
@@ -5518,7 +5518,7 @@ mmux_libc_ptn_t         ptn;
 bool                    the_pathname_exists_and_it_is_socket;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_file_is_socket(&the_pathname_exists_and_it_is_socket, ptn)) @{
+if (mmux_libc_file_system_pathname_is_socket(&the_pathname_exists_and_it_is_socket, ptn)) @{
   /* error */
 @}
 @end example
