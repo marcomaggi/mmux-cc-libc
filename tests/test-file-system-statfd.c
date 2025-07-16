@@ -20,25 +20,16 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-fstatfd.src.ext";
+static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-statfd.src.ext";
 
 
 /** --------------------------------------------------------------------
- ** Let's go.
+ ** Test data file.
  ** ----------------------------------------------------------------- */
 
-int
-main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
+static bool
+test_data_file (void)
 {
-  /* Initialisation. */
-  {
-    mmux_cc_libc_init();
-    PROGNAME = "test-file-system-fstatfd";
-    cleanfiles_register(src_pathname_asciiz);
-    cleanfiles();
-    mmux_libc_atexit(cleanfiles);
-  }
-
   mmux_libc_ptn_t	ptn;
   mmux_libc_fd_t	fd;
 
@@ -69,8 +60,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_stat_t	ST[1];
     mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
 
-    printf_message("fstatfding");
-    if (mmux_libc_fstatfd(fd, ST, flags)) {
+    printf_message("statfding");
+    if (mmux_libc_statfd(fd, ST, flags)) {
       handle_error();
     }
 
@@ -82,6 +73,63 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
     }
+  }
+
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Test current directory.
+ ** ----------------------------------------------------------------- */
+
+static bool
+test_current_directory (void)
+{
+  mmux_libc_fd_t	dirfd;
+  mmux_libc_stat_t	ST[1];
+  mmux_sint_t		flags = 0;
+
+  mmux_libc_at_fdcwd(&dirfd);
+
+  printf_message("statfding");
+  if (mmux_libc_statfd(dirfd, ST, flags)) {
+    handle_error();
+  } else {
+    mmux_libc_fd_t	er;
+
+    mmux_libc_stder(&er);
+    if (mmux_libc_stat_dump(er, ST, NULL)) {
+      handle_error();
+    }
+  }
+
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Let's go.
+ ** ----------------------------------------------------------------- */
+
+int
+main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
+{
+  /* Initialisation. */
+  {
+    mmux_cc_libc_init();
+    PROGNAME = "test-file-system-statfd";
+    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles();
+    mmux_libc_atexit(cleanfiles);
+  }
+
+  if (test_data_file()) {
+    mmux_libc_exit_failure();
+  }
+
+  if (test_current_directory()) {
+    mmux_libc_exit_failure();
   }
 
   mmux_libc_exit_success();

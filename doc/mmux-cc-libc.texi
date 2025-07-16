@@ -5696,7 +5696,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_fstatfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t @var{flags})
 @MmuxCInterface{fstatat}.  This function invokes @cfunc{fstatat} with an empty file system pathname
 and adding @samp{MMUX_LIBC_AT_EMPTY_PATH} to the @var{flags} argument; this causes the function to
 operate on the file descriptor @var{fd}.
@@ -5724,7 +5724,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_stat_t    ST[1];
   mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
 
-  if (mmux_libc_fstatfd(fd, ST, flags)) @{
+  if (mmux_libc_statfd(fd, ST, flags)) @{
     /* error */
   @}
 

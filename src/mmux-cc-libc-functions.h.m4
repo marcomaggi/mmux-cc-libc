@@ -1321,7 +1321,7 @@ mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_file_descriptor_t dirfd, mmu
 					  mmux_libc_stat_t * stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(3)));
 
-mmux_cc_libc_decl bool mmux_libc_fstatfd (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(2)));
 
 /* ------------------------------------------------------------------ */
