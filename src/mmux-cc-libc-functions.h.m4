@@ -358,25 +358,37 @@ mmux_cc_libc_decl bool mmux_libc_tm_reset (mmux_libc_tm_t * tm_p)
  ** ----------------------------------------------------------------- */
 
 mmux_cc_libc_decl bool mmux_libc_time      (mmux_time_t * result_p)
-       __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_localtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
-       __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_localtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
+  __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_gmtime    (mmux_libc_tm_t * * result_p, mmux_time_t T)
-       __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_gmtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
+  __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_ctime     (mmux_asciizcp_t * result_p, mmux_time_t T)
-       __attribute__((__nonnull__(1)));
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ctime (mmux_asciizcpp_t result_p, mmux_time_t T)
+  __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_mktime    (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
-       __attribute__((__nonnull__(1,2)));
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_timegm    (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
-       __attribute__((__nonnull__(1,2)));
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_asctime   (mmux_asciizcp_t * result_p, mmux_libc_tm_t * tm_p)
-       __attribute__((__nonnull__(1,2)));
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_t * tm_p)
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
 									 mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)

@@ -247,9 +247,21 @@ mmux_libc_localtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
   return false;
 }
 bool
+mmux_libc_localtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
+{
+  localtime_r(&T, result_p);
+  return false;
+}
+bool
 mmux_libc_gmtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
 {
   *result_p = gmtime(&T);
+  return false;
+}
+bool
+mmux_libc_gmtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
+{
+  gmtime_r(&T, result_p);
   return false;
 }
 bool
@@ -271,10 +283,32 @@ mmux_libc_asctime (char const * * result_p, mmux_libc_tm_t * tm_p)
   return false;
 }
 bool
-mmux_libc_ctime (char const * * result_p, mmux_time_t T)
+mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_t * tm_p)
+{
+  mmux_asciizcp_t	rv = asctime_r(tm_p, result_p);
+
+  if (NULL == rv) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
+mmux_libc_ctime (mmux_asciizcpp_t result_p, mmux_time_t T)
 {
   *result_p = ctime(&T);
   return false;
+}
+bool
+mmux_libc_ctime_r (mmux_asciizp_t result_p, mmux_time_t T)
+{
+  mmux_asciizcp_t	rv = ctime_r(&T, result_p);
+
+  if (NULL == rv) {
+    return true;
+  } else {
+    return false;
+  }
 }
 bool
 mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
