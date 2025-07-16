@@ -228,8 +228,10 @@ check_PROGRAMS	= \
 	tests/test-file-system-symlink				\
 	tests/test-file-system-stat				\
 	\
+	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
-	tests/test-interprocess-signals-kill-bub
+	\
+	tests/test-time-strftime
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -356,6 +358,11 @@ tests_test_interprocess_signals_kill_pause_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_interprocess_signals_kill_bub_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+
+tests_test_time_strftime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_strftime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

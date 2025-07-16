@@ -378,8 +378,14 @@ mmux_cc_libc_decl bool mmux_libc_timegm    (mmux_time_t * result_p, mmux_libc_tm
 mmux_cc_libc_decl bool mmux_libc_asctime   (mmux_asciizcp_t * result_p, mmux_libc_tm_t * tm_p)
        __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_strftime (char * bufptr, mmux_usize_t * buflen_p, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
-  __attribute__((__nonnull__(1,2,3,4),__format__(__strftime__,3,0)));
+mmux_cc_libc_decl bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
+									 mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+  __attribute__((__nonnull__(1,2),__format__(__strftime__,2,0)));
+
+mmux_cc_libc_decl bool mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
+					   mmux_asciizp_t bufptr, mmux_usize_t buflen,
+					   mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+  __attribute__((__nonnull__(1,2,4,5),__format__(__strftime__,4,0)));
 
 mmux_cc_libc_decl bool mmux_libc_strptime (char ** first_unprocessed_after_timestamp_p,
 					   mmux_asciizcp_t input_string, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)

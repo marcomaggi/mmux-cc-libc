@@ -680,20 +680,24 @@ mmux_libc_st_blksize_ref (mmux_uint_t * value_p, mmux_libc_stat_t const * stat_p
 static bool
 mmux_libc_stat_dump_time (mmux_libc_fd_t fd, mmux_time_t T)
 {
-  mmux_libc_tm_t *	tm_p;
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK  4096
-  mmux_usize_t		buflen = IS_THIS_ENOUGH_QUESTION_MARK;
-  mmux_char_t		bufptr[buflen];
+  mmux_asciizcp_t	template = "%Y-%m-%dT%H:%M:%S%z";
+  mmux_libc_tm_t *	BT;
+  mmux_usize_t		required_nbytes_including_nil;
 
-  if (mmux_libc_gmtime(&tm_p, T)) {
+  mmux_libc_gmtime(&BT, T);
+  if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
     return true;
+  } else {
+    mmux_char_t		bufptr[required_nbytes_including_nil];
+    mmux_usize_t	required_nbytes_without_zero;
+
+    if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
+      return true;
+    } else {
+      DPRINTF(fd, " (%s)\n", bufptr);
+      return false;
+    }
   }
-  if (mmux_libc_strftime(bufptr, &buflen, "%Y-%m-%dT%H:%M:%S%z", tm_p)) {
-    return true;
-  }
-  DPRINTF(fd, " (%s)\n", bufptr);
-  return false;
 }
 bool
 mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * const stat_p, char const * struct_name)

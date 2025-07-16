@@ -7,7 +7,7 @@
 
 	This module implements the time and dates API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -241,6 +241,8 @@ mmux_libc_time (mmux_time_t * result_p)
 bool
 mmux_libc_localtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
 {
+  /* A call to "localtime()" returns a  pointer to a "struct tm" statically allocated
+     by the C library. */
   *result_p = localtime(&T);
   return false;
 }
@@ -275,19 +277,40 @@ mmux_libc_ctime (char const * * result_p, mmux_time_t T)
   return false;
 }
 bool
-mmux_libc_strftime (char * bufptr, mmux_usize_t * buflen_p, char const * template, mmux_libc_tm_t * tm_p)
+mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
+						  mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
 {
-  if (0 < *buflen_p) {
-    mmux_usize_t	required_nbytes;
+  for (mmux_usize_t buflen=1024; buflen; buflen+=1024) {
+    mmux_usize_t required_nbytes_excluding_nil = strftime(NULL, buflen, template, tm_p);
+
+    if (0 == required_nbytes_excluding_nil) {
+      /* The numbe of bytes "buflen" is not big enough. */
+      continue;
+    } else if (required_nbytes_excluding_nil == mmux_usize_maximum()) {
+      return true;
+    } else {
+      *required_nbytes_including_nil_p = 1 + required_nbytes_excluding_nil;
+      return false;
+    }
+  }
+  return true;
+}
+bool
+mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
+		    mmux_asciizp_t bufptr, mmux_usize_t buflen,
+		    mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+{
+  if (0 < buflen) {
+    mmux_usize_t	required_nbytes_without_zero;
 
     /* See the documentation  of "strftime()" in the GLIBC manual  for an explanation
        of this nonsense. */
     bufptr[0]       = '\1';
-    required_nbytes = strftime(bufptr, *buflen_p, template, tm_p);
-    if ((0 == required_nbytes) && ('\0' != bufptr[0])) {
+    required_nbytes_without_zero = strftime(bufptr, buflen, template, tm_p);
+    if ((0 == required_nbytes_without_zero) && ('\0' != bufptr[0])) {
       return true;
     } else {
-      *buflen_p = required_nbytes;
+      *required_nbytes_without_zero_p = required_nbytes_without_zero;
       return false;
     }
   } else {
