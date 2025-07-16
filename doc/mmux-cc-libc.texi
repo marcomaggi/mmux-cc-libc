@@ -1735,6 +1735,7 @@ number of bytes, @strong{including} the terminating zero, required to hold the s
 @end deftypefun
 
 
+@anchor{mmux_libc_strftime}
 @deftypefun bool mmux_libc_strftime (mmux_usize_t * @var{required_nbytes_without_zero_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{tm_p})
 @MmuxCInterface{strftime}.  Format an output string representation of the timestamp referenced by
 @var{TM_P} according to @var{template}, and store it in the buffer referenced by @var{bufptr}; at
@@ -1742,6 +1743,9 @@ most @var{buflen} characters, including the terminating zero, will be written to
 
 When successful: the generated string length, without the terminating zero, is stored in the
 variable referenced by @var{required_nbytes_without_zero_p}.
+
+It is sometimes better to use the function @cfunc{mmux_libc_dprintf_strftime},
+@ref{mmux_libc_dprintf_strftime} for details.
 
 @example
 mmux_asciizcp_t         template = "%Y-%m-%dT%H:%M:%S%z";
@@ -3214,6 +3218,14 @@ Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{
 @deftypefun bool mmux_libc_dprintf_strerror (mmux_libc_fd_t @var{fd}, mmux_sint_t @var{errnum})
 Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @asciiz{} string resulting from a
 call to @cfunc{mmux_libc_strerror}.
+@end deftypefun
+
+
+@anchor{mmux_libc_dprintf_strftime}
+@deftypefun bool mmux_libc_dprintf_strftime (mmux_libc_fd_t @var{fd}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+Wrapper for @cfunc{mmux_libc_printf} that prints to @var{fd} the timestamp representation of
+@var{BT} formatted according to @var{template} using @cfunc{mmux_libc_strftime},
+@ref{mmux_libc_strftime} for details.
 @end deftypefun
 
 @c ------------------------------------------------------------------------

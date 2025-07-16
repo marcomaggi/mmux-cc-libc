@@ -318,6 +318,24 @@ mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum)
     return false;
   }
 }
+bool
+mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
+{
+  mmux_usize_t		required_nbytes_including_nil;
+
+  if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
+    return true;
+  } else {
+    mmux_char_t		bufptr[required_nbytes_including_nil];
+    mmux_usize_t	required_nbytes_without_zero;
+
+    if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
+      return true;
+    } else {
+      return mmux_libc_dprintf(fd, "%s", bufptr);
+    }
+  }
+}
 
 /* ------------------------------------------------------------------ */
 

@@ -443,6 +443,9 @@ mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum);
 
+mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
+  __attribute__((__nonnull__(2,3)));
+
 mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
   __attribute__((__nonnull__(2),__format__(__printf__,2,0)));
 
