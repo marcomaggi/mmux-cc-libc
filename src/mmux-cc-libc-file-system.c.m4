@@ -907,6 +907,16 @@ mmux_libc_fstatat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_path
 
   return ((0 == rv)? false : true);
 }
+bool
+mmux_libc_fstatfd (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
+{
+  mmux_sint_t	rv;
+
+  flags |= MMUX_LIBC_AT_EMPTY_PATH;
+  rv = fstatat(fd.value, "", stat_p, flags);
+
+  return ((0 == rv)? false : true);
+}
 
 /* ------------------------------------------------------------------ */
 
