@@ -233,6 +233,9 @@ check_PROGRAMS	= \
 	\
 	tests/test-time-time					\
 	tests/test-time-localtime				\
+	tests/test-time-gmtime					\
+	tests/test-time-asctime					\
+	tests/test-time-ctime					\
 	tests/test-time-strftime
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
@@ -368,6 +371,15 @@ tests_test_time_time_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_localtime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_localtime_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_gmtime_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_gmtime_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_asctime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_asctime_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_ctime_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_ctime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_strftime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_strftime_LDADD				= $(mmux_cc_libc_tests_ldadd)

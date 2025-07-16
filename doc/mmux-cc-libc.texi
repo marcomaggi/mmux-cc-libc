@@ -1552,7 +1552,12 @@ if (mmux_libc_strnlen(&buflen, bufptr, 4096)) @{
 * time timeval::                The @objtype{mmux_libc_timeval_t} type.
 * time timespec::               The @objtype{mmux_libc_timespec_t} type.
 * time tm::                     The @objtype{mmux_libc_tm_t} type.
-* time functions::              Handling time.
+* time acquiring::              Acquiring the current time.
+* time epoch time::             Converting from Epoch time to other formats.
+* time broken time::            Converting from broken time to other formats.
+* time format::                 Formatting string timestamps.
+* time scanning::               Converting from string timestamps to other formats.
+* time sleeping::               Suspending a process for a time.
 @end menu
 
 @c page
@@ -1628,8 +1633,8 @@ tm_zone   = NULL
 @end deftypefun
 
 @c page
-@node time functions
-@section Handling time
+@node time acquiring
+@section Acquiring the current time
 
 
 @deftypefun bool mmux_libc_time (mmuc_time_t * @var{result_p})
@@ -1649,6 +1654,10 @@ mmux_libc_time(&T);
 @}
 @end example
 @end deftypefun
+
+@c page
+@node time epoch time
+@section Converting from Epoch time to other formats
 
 
 @deftypefun bool mmux_libc_localtime (mmux_libc_tm_t * * @var{result_p}, mmux_time_t @var{T})
@@ -1696,30 +1705,87 @@ mmux_libc_localtime_r(BT, T);
 
 
 @deftypefun bool mmux_libc_gmtime (mmux_libc_tm_t * * @var{result_p}, mmux_time_t @var{T})
-@MmuxCInterface{gmtime}.
+@MmuxCInterface{gmtime}.  Store in the variable referenced by @var{result_p} a pointer to a
+statically allocated @objtype{mmux_libc_tm_t} that will be overwritten by future calls to time
+functions; we should just use @cfunc{mmux_libc_gmtime_r}.
 
 @example
-mmux_time_t       T;
-mmux_libc_tm_t *  BT;
+mmux_time_t             T;
+mmux_libc_tm_t *        BT;
 
 mmux_libc_time(&T);
 mmux_libc_gmtime(&BT, T);
+@{
+  mmux_libc_fd_t        fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_tm_dump(fd, BT, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_gmtime_r (mmux_libc_tm_t * @var{result_p}, mmux_time_t @var{T})
+@MmuxCInterface{gmtime_r}.
+
+@example
+mmux_time_t             T;
+mmux_libc_tm_t          BT[1];
+
+mmux_libc_time(&T);
+mmux_libc_gmtime_r(BT, T);
+@{
+  mmux_libc_fd_t        fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_tm_dump(fd, BT, NULL)) @{
+    /* error */
+  @}
+@}
 @end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_ctime (mmux_asciizcp_t * @var{result_p}, mmux_time_t @var{T})
-@MmuxCInterface{ctime}.
+@MmuxCInterface{ctime}.  The variable referenced by @var{result_p} is set to a pointer to a
+statically allocated string, which will be overwritten by future calls to time functions; we should
+just use @cfunc{mmux_libc_ctime_r}.
 
 @example
-mmux_time_t     T;
-mmux_asciizcp_t    str;
+mmux_time_t         T;
+mmux_asciizcp_t     bufptr;
 
 mmux_libc_time(&T);
-mmux_libc_ctime(&str, T);
-mmux_libc_dprintfou("%s\n", str);
+mmux_libc_asctime(&bufptr, T);
+if (mmux_libc_dprintfer("the timestamp from ctime is: \"%s\"\n", bufptr)) @{
+  /* error */
+@}
 @end example
 @end deftypefun
+
+
+@deftypefun bool mmux_libc_ctime_r (mmux_asciizp_t * @var{result_p}, mmux_time_t @var{T})
+@MmuxCInterface{ctime_r}.
+
+@example
+mmux_time_t         T;
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK            512
+mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+
+mmux_libc_time(&T);
+mmux_libc_asctime_r(bufptr, T);
+if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node time broken time
+@section Converting from broken time to other formats
 
 
 @deftypefun bool mmux_libc_mktime (mmux_time_t * @var{result_p}, mmux_libc_tm_t * @var{BT})
@@ -1751,19 +1817,47 @@ mmux_libc_timegm(&T2, BT);
 
 
 @deftypefun bool mmux_libc_asctime (mmux_asciizcp_t * @var{result_p}, mmux_libc_tm_t * @var{BT})
-@MmuxCInterface{asctime}.
+@MmuxCInterface{asctime}.  The variable referenced by @var{result_p} is set to a pointer to a
+statically allocated string, which will be overwritten by future calls to time functions; we should
+just use @cfunc{mmux_libc_asctime_r}.
 
 @example
-mmux_time_t       T;
-mmux_libc_tm_t *  BT;
-mmux_asciizcp_t      str;
+mmux_time_t         T;
+mmux_libc_tm_t      BT[1];
+mmux_asciizcp_t     bufptr;
 
 mmux_libc_time(&T);
-mmux_libc_localtime(&BT, T);
-mmux_libc_asctime(&str, BT);
-mmux_libc_dprintfou("%s\n", str);
+mmux_libc_localtime_r(BT, T);
+mmux_libc_asctime(&bufptr, BT);
+if (mmux_libc_dprintfer("the timestamp from asctime is: \"%s\"\n", bufptr)) @{
+  /* error */
+@}
 @end example
 @end deftypefun
+
+
+@deftypefun bool mmux_libc_asctime_r (mmux_asciizcp_t @var{result_p}, mmux_libc_tm_t * @var{BT})
+@MmuxCInterface{asctime_r}.
+
+@example
+mmux_time_t         T;
+mmux_libc_tm_t      BT[1];
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK            512
+mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+
+mmux_libc_time(&T);
+mmux_libc_localtime_r(BT, T);
+mmux_libc_asctime_r(bufptr, BT);
+if (mmux_libc_dprintfer("the timestamp from asctime_r is: \"%s\"\n", bufptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node time format
+@section Formatting string timestamps
 
 
 @deftypefun bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * @var{required_nbytes_including_nil_p}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
@@ -1809,6 +1903,10 @@ mmux_libc_dprintfou("%s\n", bufptr);
 @end example
 @end deftypefun
 
+@c page
+@node time scanning
+@section Converting from string timestamps to other formats
+
 
 @deftypefun bool mmux_libc_strptime (char ** @var{first_unprocessed_after_timestamp_p}, mmux_asciizcp_t @var{input_string}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
 @MmuxCInterface{strptime}.
@@ -1828,6 +1926,10 @@ if (mmux_libc_strptime(&first_unprocessed_after_timestamp, input_string, templat
 mmux_libc_tm_dump(MMUX_LIBC_STDOU, BT, NULL);
 @end example
 @end deftypefun
+
+@c page
+@node time sleeping
+@section Suspending a process for a time
 
 
 @deftypefun mmux_uint_t mmux_libc_sleep (mmux_uint_t * @var{leftover_result_p}, mmux_uint_t @var{seconds})
