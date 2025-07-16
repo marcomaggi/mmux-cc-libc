@@ -20,7 +20,7 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		pathname_asciiz = "./test-open-write-read-close.file.ext";
+static mmux_asciizcp_t		pathname_asciiz = "./test-file-descriptors-open-write-read-close.file.ext";
 
 
 /** --------------------------------------------------------------------
@@ -33,7 +33,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-open-write-read-close";
+    PROGNAME = "test-file-descriptors-open-write-read-close";
     cleanfiles_register(pathname_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
