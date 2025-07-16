@@ -5472,6 +5472,54 @@ current mask.
 @subsection The @objtype{mmux_libc_stat_t} data structure
 
 
+
+The standard @cfunc{stat} function and its variants inspect the file system to retrieve most of the
+informations associated to a directory entry; the informations are stored in data structures of type
+@objtype{mmux_libc_stat_t}.  The core function is @cfunc{mmux_libc_stat}, which we can use as
+follows:
+
+@example
+mmux_libc_ptn_t     ptn;
+mmux_libc_stat_t    ST[1];
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+if (mmux_libc_stat(ptn, ST)) @{
+  /* error */
+@} else @{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_stder(&fd);
+  if (mmux_libc_stat_dump(fd, ST, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+this code prints something like:
+
+@example
+struct stat = 0x7ffd58c7b320
+struct stat->st_mode = 33152 (regular file)
+struct stat->st_ino = 4069062
+struct stat->st_dev = 66316
+struct stat->st_nlink = 1
+struct stat->st_ino = 4069062
+struct stat->st_uid = 1000
+struct stat->st_gid = 1000
+struct stat->st_size = 41
+struct stat->st_atime_sec = 1752688262 (2025-07-16T17:51:02+0000)
+struct stat->st_atime_nsec = 74991584
+struct stat->st_mtime_sec = 1752688262 (2025-07-16T17:51:02+0000)
+struct stat->st_mtime_nsec = 74991584
+struct stat->st_ctime_sec = 1752688262 (2025-07-16T17:51:02+0000)
+struct stat->st_ctime_nsec = 74991584
+struct stat->st_blocks = 8
+struct stat->st_blksize = 4096
+@end example
+
+
 @MmuxCStructOpaqueTypedef{stat}
 @MmuxSetterGetter{stat, st_mode,        mmux_mode_t}
 @MmuxSetterGetter{stat,	st_ino,		mmux_uintmax_t}
@@ -5512,16 +5560,111 @@ current mask.
 
 @deftypefun bool mmux_libc_stat (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
 @MmuxCInterface{stat}.
+
+@example
+mmux_libc_ptn_t     ptn;
+mmux_libc_stat_t    ST[1];
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+if (mmux_libc_stat(ptn, ST)) @{
+  /* error */
+@} else @{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_stder(&fd);
+  if (mmux_libc_stat_dump(fd, ST, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_fstat (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_stat_t * @var{stat_p})
 @MmuxCInterface{fstat}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          fd;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t         mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_stat_t    ST[1];
+
+  if (mmux_libc_fstat(fd, ST)) @{
+    /* error */
+  @} else @{
+    mmux_libc_fd_t    er;
+
+    mmux_libc_stder(&er);
+    if (mmux_libc_stat_dump(er, ST, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_lstat (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
 @MmuxCInterface{lstat}.
+
+@example
+mmux_libc_ptn_t       src_ptn, dst_ptn;
+
+/* Create the data file. */
+@{
+  if (test_create_data_file(src_pathname_asciiz)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_make_file_system_pathname(&src_ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_make_file_system_pathname(&dst_ptn, "/path/to/symlink.ext")) @{
+  /* error */
+@}
+
+/* Create the symbolic link. */
+@{
+  if (mmux_libc_symlink(src_ptn, dst_ptn)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_stat_t    ST[1];
+
+  if (mmux_libc_lstat(dst_ptn, ST)) @{
+    /* error */
+  @} else @{
+    mmux_libc_fd_t    er;
+
+    mmux_libc_stder(&er);
+    if (mmux_libc_stat_dump(er, ST, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 

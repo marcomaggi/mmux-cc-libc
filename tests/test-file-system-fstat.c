@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Jul 15, 2025
+  Date: Jul 16, 2025
 
   Abstract
 
@@ -20,7 +20,7 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-stat.src.ext";
+static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-fstat.src.ext";
 
 
 /** --------------------------------------------------------------------
@@ -33,11 +33,14 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-file-system-stat";
+    PROGNAME = "test-file-system-fstat";
     cleanfiles_register(src_pathname_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
+
+  mmux_libc_ptn_t	ptn;
+  mmux_libc_fd_t	fd;
 
   /* Create the data file. */
   {
@@ -47,17 +50,26 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
-  /* Do it. */
-  {
-    mmux_libc_ptn_t	ptn;
-    mmux_libc_stat_t	ST[1];
+  if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) {
+    handle_error();
+  }
 
-    if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) {
+  /* Open the data file. */
+  {
+    mmux_sint_t		flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+    mmux_mode_t		mode  = 0;
+
+    if (mmux_libc_open(&fd, ptn, flags, mode)) {
       handle_error();
     }
+  }
 
-    printf_message("statting");
-    if (mmux_libc_stat(ptn, ST)) {
+  /* Do it. */
+  {
+    mmux_libc_stat_t	ST[1];
+
+    printf_message("fstatting");
+    if (mmux_libc_fstat(fd, ST)) {
       handle_error();
     }
 
