@@ -1792,12 +1792,20 @@ if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
 @MmuxCInterface{mktime}.
 
 @example
-mmux_time_t       T1, T2;
-mmux_libc_tm_t *  BT;
+mmux_time_t     T1, T2;
+mmux_libc_tm_t  BT[1];
 
 mmux_libc_time(&T1);
-mmux_libc_localtime(&BT, T1);
+mmux_libc_localtime_r(BT, T1);
 mmux_libc_mktime(&T2, BT);
+@{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_libou(&fd);
+  if (mmux_libc_dprintf_time(fd, T2)) @{
+    /* error */
+  @}
+@}
 @end example
 @end deftypefun
 
@@ -1806,12 +1814,20 @@ mmux_libc_mktime(&T2, BT);
 @MmuxCInterface{timegm}.
 
 @example
-mmux_time_t       T1, T2;
-mmux_libc_tm_t *  BT;
+mmux_time_t     T1, T2;
+mmux_libc_tm_t  BT[1];
 
 mmux_libc_time(&T1);
-mmux_libc_localtime(&BT, T1);
+mmux_libc_localtime_r(BT, T1);
 mmux_libc_timegm(&T2, BT);
+@{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_libou(&fd);
+  if (mmux_libc_dprintf_time(fd, T2)) @{
+    /* error */
+  @}
+@}
 @end example
 @end deftypefun
 
