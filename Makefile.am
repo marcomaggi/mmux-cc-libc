@@ -238,7 +238,9 @@ check_PROGRAMS	= \
 	tests/test-time-ctime					\
 	tests/test-time-mktime					\
 	tests/test-time-timegm					\
-	tests/test-time-strftime
+	tests/test-time-strftime				\
+	tests/test-time-strptime
+
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -391,6 +393,9 @@ tests_test_time_timegm_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_strftime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_strftime_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_strptime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_strptime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"
