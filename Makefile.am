@@ -232,6 +232,9 @@ check_PROGRAMS	= \
 	tests/test-file-system-readlinkfd			\
 	tests/test-file-system-readlinkfd-malloc		\
 	tests/test-file-system-symlink				\
+	tests/test-file-system-mkdir				\
+	tests/test-file-system-mkdirat				\
+	tests/test-file-system-rmdir				\
 	tests/test-file-system-stat				\
 	tests/test-file-system-fstat				\
 	tests/test-file-system-lstat				\
@@ -348,6 +351,15 @@ tests_test_file_system_linkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_symlink_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_symlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_mkdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_mkdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_mkdirat_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_mkdirat_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_rmdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_rmdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_unlink_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_unlink_LDADD			= $(mmux_cc_libc_tests_ldadd)

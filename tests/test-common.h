@@ -188,9 +188,9 @@ cleanfiles (void)
       if (mmux_libc_file_system_pathname_exists(&exists, ptn)) {
 	continue;
       } else if (exists) {
-	printf_message("common: unlinking existent cleanfile[%lu]: \"%s\"", i, ptn.value);
-	if (mmux_libc_unlink(ptn)) {
-	  printf_error("common: unlinking \"%s\"", ptn.value);
+	printf_message("common: removing existent cleanfile[%lu]: \"%s\"", i, ptn.value);
+	if (mmux_libc_remove(ptn)) {
+	  printf_error("common: removing \"%s\"", ptn.value);
 	}
       } else {
 	printf_message("common: unexistent cleanfile[%lu]: \"%s\"", i, ptn.value);

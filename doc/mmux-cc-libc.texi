@@ -5597,16 +5597,47 @@ if (mmux_libc_renameat2(dirfd, src_ptn, dirfd, dst_ptn, flags)) @{
 
 @deftypefun bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t mode)
 @MmuxCInterface{mkdir}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+if (mmux_libc_mkdir(ptn, mode)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
 @MmuxCInterface{mkdirat}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          dirfd;
+mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+mmux_libc_at_fdcwd(&dirfd);
+if (mmux_libc_mkdir(ptn, mode)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
 @MmuxCInterface{rmdir}.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+if (mmux_libc_rmdir(ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page
