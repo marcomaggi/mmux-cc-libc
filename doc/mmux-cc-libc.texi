@@ -5477,21 +5477,46 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 
 @deftypefun bool mmux_libc_unlink (mmux_libc_file_system_pathname_t pathname)
 @MmuxCInterface{unlink}.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_unlink(ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags)
 @MmuxCInterface{unlinkat}.
-@end deftypefun
 
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          dirfd;
+mmux_sint_t             flags = 0;
 
-@deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
-@MmuxCInterface{rmdir}.
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+mmux_libc_at_fdcwd(&dirfd);
+if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_remove (mmux_libc_file_system_pathname_t pathname)
 @MmuxCInterface{remove}.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+if (mmux_libc_remove(ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page
@@ -5525,6 +5550,11 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 
 @deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
 @MmuxCInterface{mkdirat}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
+@MmuxCInterface{rmdir}.
 @end deftypefun
 
 @c page
