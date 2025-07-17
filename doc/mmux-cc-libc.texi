@@ -5503,6 +5503,20 @@ if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
   /* error */
 @}
 @end example
+
+We can remove directories with this function:
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          dirfd;
+mmux_sint_t             flags = MMUX_LIBC_AT_REMOVEDIR;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/dirname");
+mmux_libc_at_fdcwd(&dirfd);
+if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
@@ -5526,16 +5540,54 @@ if (mmux_libc_remove(ptn)) @{
 
 @deftypefun bool mmux_libc_rename (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{rename}.
+
+@example
+mmux_libc_ptn_t     src_ptn, dst_ptn;
+
+mmux_libc_make_file_system_pathname(&src_ptn, "/path/to/file.ext");
+mmux_libc_make_file_system_pathname(&dst_ptn, "/path/to/other-file.ext");
+
+if (mmux_libc_rename(src_ptn, dst_ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_renameat (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname})
 @MmuxCInterface{renameat}.
+
+@example
+mmux_libc_ptn_t     src_ptn, dst_ptn;
+mmux_libc_fd_t      dirfd;
+
+mmux_libc_make_file_system_pathname(&src_ptn, "/path/to/file.ext");
+mmux_libc_make_file_system_pathname(&dst_ptn, "/path/to/other-file.ext");
+mmux_libc_at_fdcwd(&dirfd);
+
+if (mmux_libc_renameat(dirfd, src_ptn, dirfd, dst_ptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefn {Linux Function} bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_uint_t flags)
 @MmuxCInterface{renameat2}.
+
+@example
+mmux_libc_ptn_t     src_ptn, dst_ptn;
+mmux_libc_fd_t      dirfd;
+mmux_uint_t         flags = MMUX_LIBC_RENAME_NOREPLACE;
+
+mmux_libc_make_file_system_pathname(&src_ptn, "/path/to/file.ext");
+mmux_libc_make_file_system_pathname(&dst_ptn, "/path/to/other-file.ext");
+mmux_libc_at_fdcwd(&dirfd);
+
+if (mmux_libc_renameat2(dirfd, src_ptn, dirfd, dst_ptn, flags)) @{
+  /* error */
+@}
+@end example
 @end deftypefn
 
 @c page
