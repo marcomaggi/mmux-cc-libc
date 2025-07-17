@@ -10,6 +10,8 @@
 
 * Add a builtin interfacing "statx(2)"? (Documented in a manual page.)
 
+* Add a builtin interfacing "statfs(2)" and "fstatfs(2)"? (Documented in a manual page.)
+
 * Add a builtin interfacing "sendfile(2)"? (Documented in a manual page.)
 
 * Add a builtin interfacing Linux's "openat2()"?
