@@ -232,7 +232,7 @@ play_child (void)
   /* Pause until the parent sends the child a signal. */
   {
     printf_message("child process: pause until the paren sends a signal");
-    mmux_libc_pause();
+    MMUX_LIBC_IGNORE_RETVAL(mmux_libc_pause());
     printf_message("child process: waking up because signal received");
   }
 

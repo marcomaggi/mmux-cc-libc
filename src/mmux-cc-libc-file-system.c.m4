@@ -142,10 +142,6 @@ mmux_libc_linkat (mmux_libc_file_descriptor_t oldfd, mmux_libc_file_system_pathn
 bool
 mmux_libc_symlink (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
 {
-  if (0) {
-    mmux_libc_dprintfer("%s: original link pathname: \"%s\"\n", __func__, oldname.value);
-    mmux_libc_dprintfer("%s: symbolic link pathname: \"%s\"\n", __func__, newname.value);
-  }
   int	rv = symlink(oldname.value, newname.value);
 
   return ((0 == rv)? false : true);

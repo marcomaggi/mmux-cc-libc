@@ -53,7 +53,7 @@ bool test_create_data_file (mmux_asciizcp_t pathname_ascii);
 __attribute__((__nonnull__(1))) void
 print_error (mmux_asciizcp_t errmsg)
 {
-  mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg);
+  if (mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg)) {;};
 }
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
 printf_error (mmux_asciizcp_t errmsg_template, ...)
@@ -78,14 +78,16 @@ printf_error (mmux_asciizcp_t errmsg_template, ...)
       if (rv) {
 	return;
       } else {
-	mmux_libc_dprintf_newline(mfd);
+	if (mmux_libc_dprintf_newline(mfd)) {
+	  return;
+	}
       }
     }
     if (mmux_libc_memfd_copyer(mfd)) {
       return;
     }
   }
-  mmux_libc_close(mfd);
+  if (mmux_libc_close(mfd)) {;};
 }
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
 printf_message (mmux_asciizcp_t template, ...)
@@ -110,14 +112,18 @@ printf_message (mmux_asciizcp_t template, ...)
       if (rv) {
 	return;
       } else {
-	mmux_libc_dprintf_newline(mfd);
+	if (mmux_libc_dprintf_newline(mfd)) {
+	  return;
+	}
       }
     }
     if (mmux_libc_memfd_copyer(mfd)) {
       return;
     }
   }
-  mmux_libc_close(mfd);
+  if (mmux_libc_close(mfd)) {
+    return;
+  }
 }
 __attribute__((__noreturn__)) void
 handle_error (void)

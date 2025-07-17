@@ -92,7 +92,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     printf_error("child: no fds ready");
     handle_error();
   } else {
-    mmux_libc_dprintfer("%s: paren: number of ready fds: %d\n", PROGNAME, nfds_ready);
+    MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: paren: number of ready fds: %d\n", PROGNAME, nfds_ready));
   }
 
   /* Check that no exceptional event happened. */
@@ -130,11 +130,11 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
       printf_error("paren: reading from read_fr_child_fd");
       handle_error();
     } else {
-      mmux_libc_dprintfer("%s: paren: received greetings from child: \"", PROGNAME);
+      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: paren: received greetings from child: \"", PROGNAME));
       if (mmux_libc_write_buffer_to_stder(bufptr, buflen)) {
 	handle_error();
       }
-      mmux_libc_dprintfer("\"\n");
+      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("\"\n"));
 
       {
 	mmux_sint_t	result;
@@ -352,7 +352,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
       printf_error("child: no fds ready");
       handle_error();
     } else {
-      mmux_libc_dprintfer("%s: child: number of ready fds: %d\n", PROGNAME, nfds_ready);
+      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: child: number of ready fds: %d\n", PROGNAME, nfds_ready));
     }
 
     /* Check that no exceptional event happened. */
@@ -391,11 +391,11 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 	printf_error("child: reading from read_fr_paren_fd");
 	handle_error();
       } else {
-	mmux_libc_dprintfer("%s: child: received greetings from paren: \"", PROGNAME);
+	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: child: received greetings from paren: \"", PROGNAME));
 	if (mmux_libc_write_buffer_to_stder(bufptr, buflen)) {
 	  handle_error();
 	}
-	mmux_libc_dprintfer("\"\n");
+	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("\"\n"));
 
 	{
 	  mmux_sint_t		result;

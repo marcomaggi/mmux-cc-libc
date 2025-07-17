@@ -47,7 +47,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     if (mmux_libc_dprintf_libc_ptn(er, ptn)) {
       handle_error();
     }
-    mmux_libc_dprintfer_newline();
+    if (mmux_libc_dprintfer_newline()) { handle_error(); }
   }
 
   /* Allocate a pathname in dynamic memory using standard functions. */
@@ -78,7 +78,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (mmux_libc_dprintf_libc_ptn(er, ptn)) {
 	handle_error();
       }
-      mmux_libc_dprintfer_newline();
+      if (mmux_libc_dprintfer_newline()) { handle_error(); }
     }
     if (mmux_libc_file_system_pathname_free(ptn)) {
       handle_error();
@@ -102,7 +102,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (mmux_libc_dprintf_libc_ptn(er, ptn)) {
 	handle_error();
       }
-      mmux_libc_dprintfer_newline();
+      if (mmux_libc_dprintfer_newline()) { handle_error(); }
     }
     if (mmux_libc_file_system_pathname_free(ptn)) {
       handle_error();
@@ -152,11 +152,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     if (mmux_libc_dprintf_libc_ptn(er, ptn1)) {
       handle_error();
     }
-    mmux_libc_dprintfer_newline();
+    if (mmux_libc_dprintfer_newline()) { handle_error(); }
     if (mmux_libc_dprintf_libc_ptn(er, ptn2)) {
       handle_error();
     }
-    mmux_libc_dprintfer_newline();
+    if (mmux_libc_dprintfer_newline()) { handle_error(); }
   }
 
   /* Compare two different pathnames. */
@@ -185,11 +185,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     if (mmux_libc_dprintf_libc_ptn(er, ptn1)) {
       handle_error();
     }
-    mmux_libc_dprintfer_newline();
+    if (mmux_libc_dprintfer_newline()) { handle_error(); }
     if (mmux_libc_dprintf_libc_ptn(er, ptn2)) {
       handle_error();
     }
-    mmux_libc_dprintfer_newline();
+    if (mmux_libc_dprintfer_newline()) { handle_error(); }
   }
 
   mmux_libc_exit_success();

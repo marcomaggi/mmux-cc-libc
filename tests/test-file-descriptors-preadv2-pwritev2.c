@@ -117,7 +117,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       }
 
       if (0) {
-	mmux_libc_dprintfer("after reading: nbytes_done=%lu, buflen*bufnum=%lu\n", nbytes_done, buflen * bufnum);
+	if (mmux_libc_dprintfer("after reading: nbytes_done=%lu, buflen*bufnum=%lu\n", nbytes_done, buflen * bufnum)) {
+	  handle_error();
+	}
       }
       assert(nbytes_done == (buflen * bufnum));
     }
@@ -126,7 +128,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     for (mmux_uint_t i=0; i<bufnum; ++i) {
       for (mmux_uint_t j=0; j<buflen; ++j) {
 	if (0) {
-	  mmux_libc_dprintfer("bufptr[%u][%u] = %u\n", i, j, bufptr[i][j]);
+	  if (mmux_libc_dprintfer("bufptr[%u][%u] = %u\n", i, j, bufptr[i][j])) {
+	    handle_error();
+	  }
 	}
 	assert(bufptr[i][j] == (10 * i + j));
       }

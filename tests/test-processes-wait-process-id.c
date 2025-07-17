@@ -65,15 +65,15 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       goto error;
     } else {
       if (completed_process_status_available) {
-	mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status.value);
+	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status.value));
 	mmux_libc_exit_success();
       } else {
-	mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME);
+	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME));
 	mmux_libc_exit_failure();
       }
     }
   } else {
-    mmux_libc_dprintfou("%s: child process: exiting\n", PROGNAME);
+    MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: child process: exiting\n", PROGNAME));
     mmux_libc_exit_success();
   }
 

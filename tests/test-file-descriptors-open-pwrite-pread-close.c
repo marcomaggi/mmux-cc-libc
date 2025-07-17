@@ -84,7 +84,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
 
     if (expected_nbytes_done != nbytes_done) {
-      mmux_libc_dprintfer("wrong expected nbytes done: expected %lu got %lu\n", expected_nbytes_done, nbytes_done);
+      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("wrong expected nbytes done: expected %lu got %lu\n", expected_nbytes_done, nbytes_done));
       handle_error();
     }
 

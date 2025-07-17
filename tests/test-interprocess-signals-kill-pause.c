@@ -105,7 +105,9 @@ test_delivery_and_handling (void)
     }
 
     printf_message("child process: pausing");
-    mmux_libc_pause();
+    if (mmux_libc_pause()) {
+      handle_error();
+    }
 
     printf_message("child process: exiting");
     mmux_libc_exit_success();
@@ -185,7 +187,9 @@ test_delivery_and_termination (void)
     printf_message("child process: entering");
 
     printf_message("child process: pausing until termination by signal");
-    mmux_libc_pause();
+    if (mmux_libc_pause()) {
+      handle_error();
+    }
 
     printf_message("child process: exiting");
     mmux_libc_exit_failure();
