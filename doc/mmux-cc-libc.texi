@@ -3470,36 +3470,43 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{socklen}
 @MmuxDefineTypePrinterFunc{rlim}
 
+@anchor{mmux_libc_dprintf_libc_fd}
 @deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_descriptor_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_pid}
 @deftypefun bool mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_pid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_uid}
 @deftypefun bool mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_gid}
 @deftypefun bool mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_gid_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_ptn}
 @deftypefun bool mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_completed_process_status}
 @deftypefun bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_completed_process_status_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_interprocess_signal}
 @deftypefun bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
@@ -4951,20 +4958,56 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 
 @deftp {Opaque Struct Type} mmux_libc_file_system_pathname_t
 @deftpx {Opaque Struct Type} mmux_libc_ptn_t
-Data type representing a file system pathname as a non--@cnull{} pointer to @asciiz{} string.
-
-@quotation
-@strong{NOTE} At present a file system pathname value is considered ``validated'' if its internal
-pointer to @asciiz{} string is non--@cnull{}; no validation is performed on the string itself, which
-means that the string could be empty or invalid as a file system pathname.  This may change in the
-future.
-@end quotation
+Data type representing a file system pathname as a non--@cnull{} pointer to non--empty @asciiz{}
+string.
 @end deftp
 
+@menu
+* fs pathnames examples::       Usage examples for file system pathnames.
+* fs pathnames constructors::   Building file system pathnames.
+* fs pathnames inspection::     Inspecting file system pathnames.
+* fs pathnames comparison::     Comparing file system pathnames.
+@end menu
 
-@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{pathname_p}, mmux_asciizcp_t @var{asciiz_pathname})
-Make a new file system pathname value.  The pointer @var{asciiz_pathname} is stored in the data
-structure referenced by @var{pathname_p}.
+@c page
+@node fs pathnames examples
+@subsection Usage examples for file system pathnames
+
+
+We can print a file system pathname to a file descriptor using the function
+@cfunc{mmux_libc_dprintf_libc_ptn}; @ref{mmux_libc_dprintf_libc_ptn} for details.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else @{
+  mmux_libc_fd_t        fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_dprintf_libc_ptn(fd, ptn)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node fs pathnames constructors
+@subsection Building file system pathnames
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{asciiz_pathname})
+Make a new file system pathname value; the pointer @var{asciiz_pathname} is stored in the data
+structure referenced by @var{result_p}.  The @asciiz{} string @var{asciiz_pathname} is validated:
+
+@enumerate
+@item
+@var{asciiz_pathname} itself must not be @cnull{};
+
+@item
+the string length must not be zero: the first character must not be null.
+@end enumerate
 
 @example
 mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
@@ -4977,7 +5020,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, asciiz_pathname)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{pathname_p}, mmux_asciizcp_t @var{asciiz_pathname})
+@deftypefun bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{asciiz_pathname})
 Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
 the given pathname.
 
@@ -5002,10 +5045,104 @@ if (mmux_libc_file_system_pathname_free(ptn)) @{
 Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_libc_free}.
 @end deftypefun
 
+@c page
+@node fs pathnames inspection
+@subsection Inspecting file system pathnames
+
+
+@deftypefun bool mmux_libc_file_system_pathname_length (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+Store in the variable referenced by @var{result_p} the number of characters in the pathname
+@var{ptn}.  A call to this function should never fail, so we can avoid checking its return value.
+
+@example
+mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, asciiz_pathname)) @{
+  /* error */
+@} else @{
+  mmux_usize_t          len;
+
+  mmux_libc_file_system_pathname_length(&len, ptn);
+  ...
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames comparison
+@subsection Comparing file system pathnames
+
+
+@deftypefun bool mmux_libc_file_system_pathname_compare (mmux_sint_t * @var{result_p}, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Compare the @asciiz{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store the
+result in the variable referenced by @var{result_p}.
+
+@example
+mmux_libc_ptn_t         ptn1, ptn2;
+mmux_sint_t             cmpnum;
+
+mmux_libc_make_file_system_pathname(&ptn1, "AAA");
+mmux_libc_make_file_system_pathname(&ptn2, "BBB");
+
+if (mmux_libc_make_file_system_pathname_compare(&cmpnum, ptn1, ptn2)) @{
+  /* error */
+@}
+assert(-1 == cmpnum);
+
+if (mmux_libc_make_file_system_pathname_compare(&cmpnum, ptn2, ptn1)) @{
+  /* error */
+@}
+assert(+1 == cmpnum);
+@end example
+@end deftypefun
+
 
 @deftypefun bool mmux_libc_file_system_pathname_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} is the two given pathnames are equal
-when compared as @asciiz{} strings.
+Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are equal
+when compared as @asciiz{} strings; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    eq;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+
+if (mmux_libc_make_file_system_pathname_compare(&eq, ptn, ptn)) @{
+  /* error */
+@}
+assert(true == eq);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are different
+when compared as @asciiz{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_less (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} < @varii{ptn}} when
+compared as @asciiz{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_greater (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} > @varii{ptn}} when
+compared as @asciiz{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} <= @varii{ptn}} when
+compared as @asciiz{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} >= @varii{ptn}} when
+compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page

@@ -1178,9 +1178,42 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_sys
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t pathname);
 
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_length (mmux_usize_t * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
+							       mmux_libc_file_system_pathname_t ptn1,
+							       mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_equal (bool * result_p,
 							     mmux_libc_file_system_pathname_t ptn1,
 							     mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_not_equal (bool * result_p,
+								 mmux_libc_file_system_pathname_t ptn1,
+								 mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_less (bool * result_p,
+							    mmux_libc_file_system_pathname_t ptn1,
+							    mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater (bool * result_p,
+							       mmux_libc_file_system_pathname_t ptn1,
+							       mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_less_equal (bool * result_p,
+								  mmux_libc_file_system_pathname_t ptn1,
+								  mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater_equal (bool * result_p,
+								     mmux_libc_file_system_pathname_t ptn1,
+								     mmux_libc_file_system_pathname_t ptn2)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */

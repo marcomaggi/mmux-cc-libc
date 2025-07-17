@@ -40,10 +40,8 @@ typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
 bool
 mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * pathname_p, mmux_asciizcp_t asciiz_pathname)
 {
-  if (NULL != asciiz_pathname) {
-    mmux_libc_file_system_pathname_t	pathname = { .value = asciiz_pathname };
-
-    *pathname_p = pathname;
+  if ((NULL != asciiz_pathname) && ('\0' != asciiz_pathname[0])) {
+    pathname_p->value = asciiz_pathname;
     return false;
   } else {
     return true;
@@ -78,24 +76,47 @@ mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t pathname)
 {
   return mmux_libc_free((mmux_pointer_t)pathname.value);
 }
+
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_file_system_pathname_equal (bool * result_p,
-				      mmux_libc_file_system_pathname_t ptn1,
-				      mmux_libc_file_system_pathname_t ptn2)
+mmux_libc_file_system_pathname_length (mmux_usize_t * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  return mmux_libc_strlen(result_p, ptn.value);
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
+					mmux_libc_file_system_pathname_t ptn1,
+					mmux_libc_file_system_pathname_t ptn2)
+{
+  return mmux_libc_strcmp(result_p, ptn1.value, ptn2.value);
+}
+
+m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[
+bool
+mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn1, mmux_libc_file_system_pathname_t ptn2)
 {
   mmux_sint_t	cmpnum;
 
   if (mmux_libc_strcmp(&cmpnum, ptn1.value, ptn2.value)) {
     return true;
+  } else if ($2) {
+    *result_p = true;
   } else {
-    if (0 == cmpnum) {
-      *result_p = true;
-    } else {
-      *result_p = false;
-    }
-    return false;
+    *result_p = false;
   }
+  return false;
 }
+]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[equal]]],		[[[0 == cmpnum]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[not_equal]]],	[[[0 != cmpnum]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]],		[[[0 >  cmpnum]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum]]])
 
 
 /** --------------------------------------------------------------------

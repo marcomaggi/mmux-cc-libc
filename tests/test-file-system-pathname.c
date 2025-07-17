@@ -50,7 +50,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_dprintfer_newline();
   }
 
-  /* Allocate a pathname in dynamic memory. */
+  /* Allocate a pathname in dynamic memory using standard functions. */
   if (1) {
     //                                     012345678901234567
     mmux_asciizcp_t	pathname_asciiz = "/path/to/file.ext";
@@ -85,7 +85,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
-  /* Allocate a pathname in dynamic memory. */
+  /* Allocate       a       pathname        in       dynamic       memory       using
+     "mmux_libc_file_system_pathname_malloc()". */
   if (1) {
     mmux_asciizcp_t	pathname_asciiz = "/path/to/file.ext";
     mmux_libc_ptn_t	ptn;
@@ -108,6 +109,23 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
+  /* Determine the length of a file system pathname. */
+  if (1) {
+    mmux_libc_ptn_t	ptn;
+    mmux_usize_t	len;
+
+    //                                             012345678901234567
+    if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+      handle_error();
+    } else if (mmux_libc_file_system_pathname_length(&len, ptn)) {
+      handle_error();
+    } else if (17 != len) {
+      handle_error();
+    }
+
+    printf_message("the pathname length is: %lu", len);
+  }
+
   /* Compare two equal pathnames. */
   if (1) {
     mmux_libc_ptn_t	ptn1, ptn2;
@@ -126,7 +144,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
     if (! equal) {
-      print_error("pathnames not equal");
+      print_error("pathnames are not equal");
+      mmux_libc_exit_failure();
     }
 
     mmux_libc_stder(&er);
@@ -159,6 +178,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
     if (equal) {
       print_error("pathnames are equal");
+      mmux_libc_exit_failure();
     }
 
     mmux_libc_stder(&er);
