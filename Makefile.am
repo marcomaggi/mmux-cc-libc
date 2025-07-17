@@ -218,6 +218,8 @@ check_PROGRAMS	= \
 	\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
+	tests/test-file-system-unlink				\
+	tests/test-file-system-remove				\
 	tests/test-file-system-pathname				\
 	tests/test-file-system-readlink				\
 	tests/test-file-system-readlink-malloc			\
@@ -342,6 +344,12 @@ tests_test_file_system_linkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_symlink_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_symlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_unlink_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_unlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_remove_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_remove_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_readlink_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
