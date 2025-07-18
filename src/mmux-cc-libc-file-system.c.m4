@@ -1094,6 +1094,40 @@ DEFINE_FILE_DESCRIPTOR_PREDICATE([[[block_special]]],		[[[S_ISBLK]]])
 DEFINE_FILE_DESCRIPTOR_PREDICATE([[[fifo]]],			[[[S_ISFIFO]]])
 DEFINE_FILE_DESCRIPTOR_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t dirfd, mmux_libc_file_system_pathname_t ptn)
+{
+  mmux_libc_stat_t	ST[1];
+  mmux_sint_t		flags = 0;
+
+  if (mmux_libc_fstatat(dirfd, ptn, ST, flags)) {
+    return true;
+  } else {
+    mmux_off_t		result;
+
+    mmux_libc_st_size_ref(&result, ST);
+    *result_p = (mmux_usize_t) result;
+    return false;
+  }
+}
+bool
+mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t fd)
+{
+  mmux_libc_stat_t	ST[1];
+
+  if (mmux_libc_fstat(fd, ST)) {
+    return true;
+  } else {
+    mmux_off_t		result;
+
+    mmux_libc_st_size_ref(&result, ST);
+    *result_p = (mmux_usize_t) result;
+    return false;
+  }
+}
+
 
 /** --------------------------------------------------------------------
  ** File times.

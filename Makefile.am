@@ -215,6 +215,7 @@ check_PROGRAMS	= \
 	tests/test-file-descriptors-struct-flock		\
 	tests/test-file-descriptors-struct-iovec		\
 	tests/test-file-descriptors-struct-iovec-array		\
+	tests/test-file-descriptors-file-size			\
 	\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
@@ -240,6 +241,7 @@ check_PROGRAMS	= \
 	tests/test-file-system-lstat				\
 	tests/test-file-system-fstatat				\
 	tests/test-file-system-statfd				\
+	tests/test-file-system-pathname-file-size		\
 	\
 	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
@@ -337,6 +339,9 @@ tests_test_file_descriptors_struct_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 tests_test_file_descriptors_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_fcntl_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
+tests_test_file_descriptors_file_size_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
 ## ------------------------------------------------------------------------
 ## file system
 
@@ -411,6 +416,9 @@ tests_test_file_system_fstatat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_statfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_statfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_pathname_file_size_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_pathname_file_size_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

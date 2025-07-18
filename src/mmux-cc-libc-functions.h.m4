@@ -1523,6 +1523,15 @@ mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_socket (bool * result_p, mmu
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t dirfd,
+								     mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t fd)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+/* ------------------------------------------------------------------ */
+
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, actime,  mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, modtime, mmux_time_t)
 
