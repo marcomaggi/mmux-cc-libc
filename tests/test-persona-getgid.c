@@ -31,14 +31,14 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-persona-getuid";
+    PROGNAME = "test-persona-getgid";
   }
 
   /* Do it. */
   {
-    mmux_libc_uid_t	uid;
+    mmux_libc_gid_t	gid;
 
-    if (mmux_libc_getuid(&uid)) {
+    if (mmux_libc_getgid(&gid)) {
       handle_error();
     }
 
@@ -46,10 +46,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       mmux_libc_fd_t	fd;
 
       mmux_libc_stder(&fd);
-      if (mmux_libc_dprintfer("the UID is: ")) {
+      if (mmux_libc_dprintfer("the GID is: ")) {
 	handle_error();
       }
-      if (mmux_libc_dprintf_libc_uid(fd, uid)) {
+      if (mmux_libc_dprintf_libc_gid(fd, gid)) {
 	handle_error();
       }
       if (mmux_libc_dprintfer_newline()) {

@@ -194,6 +194,7 @@ check_PROGRAMS	= \
 	tests/test-strerror					\
 	\
 	tests/test-persona-getuid				\
+	tests/test-persona-getgid				\
 	\
 	tests/test-processes-fork				\
 	tests/test-processes-wait				\
@@ -277,6 +278,9 @@ tests_test_strerror_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_persona_getuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getgid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getgid_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes
