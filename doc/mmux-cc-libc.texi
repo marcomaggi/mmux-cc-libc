@@ -2254,19 +2254,30 @@ the actual number of values stored in the array.
 To retrieve the groups a user belongs to we do:
 
 @example
-mmux_asciizcp_t    user_name = gimme_a_username();
-mmux_libc_git_t user_gid  = gimme_its_gid(user_name);
-mmux_usize_t    ngroups;
+mmux_libc_uid_t         uid;
+mmux_libc_passwd_t *    PW;
 
-if (mmux_libc_getgrouplist_size(&ngroups, user_name, user_gid)) @{
+mmux_libc_getuid(&uid);
+if (mmux_libc_getpwuid(&PW, uid)) @{
   /* error */
 @} else @{
-  mmux_libc_gid_t       gids[ngroups];
+  mmux_asciizcp_t       name;
+  mmux_libc_gid_t       gid;
+  mmux_usize_t          ngroups;
 
-  if (mmux_libc_getgrouplist(user_name, user_gid, &ngroups, gids)) @{
+  mmux_libc_pw_name_ref (&name, PW);
+  mmux_libc_pw_gid_ref  (&gid,  PW);
+
+  if (mmux_libc_getgrouplist_size(&ngroups, name, gid)) @{
     /* error */
   @} else @{
-    /* do something with gids */
+    mmux_libc_gid_t       gids[ngroups];
+
+    if (mmux_libc_getgrouplist(name, gid, &ngroups, gids)) @{
+      /* error */
+    @} else @{
+     /* do something with "gids" */
+    @}
   @}
 @}
 @end example
