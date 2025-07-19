@@ -2614,6 +2614,21 @@ if (mmux_libc_getgrnam(&GR, name)) @{
 
 @deftypefn {@gnu{} Function} bool mmux_libc_group_member (bool * @var{result_is_member_p}, mmux_libc_gid_t @var{gid})
 @MmuxCInterface{group_member}.
+
+@example
+mmux_libc_gid_t     gid;
+bool                this_process_belongs_to_group;
+
+if (mmux_libc_getgid(&gid)) @{
+  /* error */
+@} else if (mmux_libc_group_member(&this_process_belongs_to_group, gid)) @{
+  /* error */
+@} else if (this_process_belongs_to_group) @{
+  /* it belongs */
+@} else @{
+  /* it does not belong */
+@}
+@end example
 @end deftypefn
 
 @c page
