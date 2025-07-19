@@ -189,73 +189,7 @@ src/%.$(OBJEXT): \
 
 EXTRA_DIST	+= tests/test-common.h
 
-check_PROGRAMS	= \
-	tests/test-version					\
-	tests/test-strerror					\
-	\
-	tests/test-processes-fork				\
-	tests/test-processes-wait				\
-	tests/test-processes-wait-any-process			\
-	tests/test-processes-wait-group-id			\
-	tests/test-processes-wait-my-process-group		\
-	tests/test-processes-wait-process-id			\
-	\
-	tests/test-file-descriptors-copy-file-range		\
-	tests/test-file-descriptors-fcntl-flock			\
-	tests/test-file-descriptors-memfd			\
-	tests/test-file-descriptors-open-pwrite-pread-close	\
-	tests/test-file-descriptors-open-write-read-close	\
-	tests/test-file-descriptors-openat-write-read-close	\
-	tests/test-file-descriptors-openat2-write-read-close	\
-	tests/test-file-descriptors-preadv-pwritev		\
-	tests/test-file-descriptors-preadv2-pwritev2		\
-	tests/test-file-descriptors-readv-writev		\
-	tests/test-file-descriptors-select			\
-	tests/test-file-descriptors-select-fd			\
-	tests/test-file-descriptors-struct-flock		\
-	tests/test-file-descriptors-struct-iovec		\
-	tests/test-file-descriptors-struct-iovec-array		\
-	tests/test-file-descriptors-file-size			\
-	\
-	tests/test-file-system-link				\
-	tests/test-file-system-linkat				\
-	tests/test-file-system-unlink				\
-	tests/test-file-system-unlinkat				\
-	tests/test-file-system-remove				\
-	tests/test-file-system-rename				\
-	tests/test-file-system-renameat				\
-	tests/test-file-system-renameat2			\
-	tests/test-file-system-pathname				\
-	tests/test-file-system-readlink				\
-	tests/test-file-system-readlink-malloc			\
-	tests/test-file-system-readlinkat			\
-	tests/test-file-system-readlinkat-malloc		\
-	tests/test-file-system-readlinkfd			\
-	tests/test-file-system-readlinkfd-malloc		\
-	tests/test-file-system-symlink				\
-	tests/test-file-system-mkdir				\
-	tests/test-file-system-mkdirat				\
-	tests/test-file-system-rmdir				\
-	tests/test-file-system-stat				\
-	tests/test-file-system-fstat				\
-	tests/test-file-system-lstat				\
-	tests/test-file-system-fstatat				\
-	tests/test-file-system-statfd				\
-	tests/test-file-system-pathname-file-size		\
-	\
-	tests/test-interprocess-signals-kill-bub		\
-	tests/test-interprocess-signals-kill-pause		\
-	\
-	tests/test-time-time					\
-	tests/test-time-localtime				\
-	tests/test-time-gmtime					\
-	tests/test-time-asctime					\
-	tests/test-time-ctime					\
-	tests/test-time-mktime					\
-	tests/test-time-timegm					\
-	tests/test-time-strftime				\
-	tests/test-time-strptime
-
+check_PROGRAMS	= tests/test-version
 
 mmux_cc_libc_tests_cppflags	= $(AM_CPPFLAGS) -I$(srcdir)/tests
 mmux_cc_libc_tests_ldadd	= $(AM_LDFLAGS) libmmux-cc-libc.la
@@ -266,6 +200,12 @@ TESTS				= $(check_PROGRAMS)
 
 tests_test_version_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_version_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+## errors
+
+check_PROGRAMS	+= \
+	tests/test-strerror
 
 tests_test_strerror_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_strerror_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -326,6 +266,14 @@ tests_test_persona_setregid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 ## processes
 
+check_PROGRAMS	+= \
+	tests/test-processes-fork				\
+	tests/test-processes-wait				\
+	tests/test-processes-wait-any-process			\
+	tests/test-processes-wait-group-id			\
+	tests/test-processes-wait-my-process-group		\
+	tests/test-processes-wait-process-id
+
 tests_test_processes_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_processes_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
@@ -346,6 +294,24 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file descriptors
+
+check_PROGRAMS	+= \
+	tests/test-file-descriptors-copy-file-range		\
+	tests/test-file-descriptors-fcntl-flock			\
+	tests/test-file-descriptors-memfd			\
+	tests/test-file-descriptors-open-pwrite-pread-close	\
+	tests/test-file-descriptors-open-write-read-close	\
+	tests/test-file-descriptors-openat-write-read-close	\
+	tests/test-file-descriptors-openat2-write-read-close	\
+	tests/test-file-descriptors-preadv-pwritev		\
+	tests/test-file-descriptors-preadv2-pwritev2		\
+	tests/test-file-descriptors-readv-writev		\
+	tests/test-file-descriptors-select			\
+	tests/test-file-descriptors-select-fd			\
+	tests/test-file-descriptors-struct-flock		\
+	tests/test-file-descriptors-struct-iovec		\
+	tests/test-file-descriptors-struct-iovec-array		\
+	tests/test-file-descriptors-file-size
 
 tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -397,6 +363,33 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system
+
+check_PROGRAMS	+= \
+	tests/test-file-system-link				\
+	tests/test-file-system-linkat				\
+	tests/test-file-system-unlink				\
+	tests/test-file-system-unlinkat				\
+	tests/test-file-system-remove				\
+	tests/test-file-system-rename				\
+	tests/test-file-system-renameat				\
+	tests/test-file-system-renameat2			\
+	tests/test-file-system-pathname				\
+	tests/test-file-system-readlink				\
+	tests/test-file-system-readlink-malloc			\
+	tests/test-file-system-readlinkat			\
+	tests/test-file-system-readlinkat-malloc		\
+	tests/test-file-system-readlinkfd			\
+	tests/test-file-system-readlinkfd-malloc		\
+	tests/test-file-system-symlink				\
+	tests/test-file-system-mkdir				\
+	tests/test-file-system-mkdirat				\
+	tests/test-file-system-rmdir				\
+	tests/test-file-system-stat				\
+	tests/test-file-system-fstat				\
+	tests/test-file-system-lstat				\
+	tests/test-file-system-fstatat				\
+	tests/test-file-system-statfd				\
+	tests/test-file-system-pathname-file-size
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -475,6 +468,10 @@ tests_test_file_system_pathname_file_size_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
+check_PROGRAMS	+= \
+	tests/test-interprocess-signals-kill-bub		\
+	tests/test-interprocess-signals-kill-pause
+
 tests_test_interprocess_signals_kill_pause_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_kill_pause_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
@@ -482,6 +479,17 @@ tests_test_interprocess_signals_kill_bub_CPPFLAGS	= $(mmux_cc_libc_tests_cppflag
 tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
+
+check_PROGRAMS	+= \
+	tests/test-time-time					\
+	tests/test-time-localtime				\
+	tests/test-time-gmtime					\
+	tests/test-time-asctime					\
+	tests/test-time-ctime					\
+	tests/test-time-mktime					\
+	tests/test-time-timegm					\
+	tests/test-time-strftime				\
+	tests/test-time-strptime
 
 tests_test_time_time_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_time_LDADD				= $(mmux_cc_libc_tests_ldadd)
