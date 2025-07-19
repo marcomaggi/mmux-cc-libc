@@ -2502,7 +2502,7 @@ if (mmux_libc_getuid(&uid)) @{
   /* error */
 @} else if (mmux_libc_getpwuid(&PW, uid)) @{
   /* error */
-@} else if (mmux_libc_passwd_dump(fd, PW, NULL)) @{
+@} else if (PW && mmux_libc_passwd_dump(fd, PW, NULL)) @{
   /* error */
 @}
 @end example
@@ -2519,7 +2519,7 @@ mmux_libc_fd_t              fd;
 
 if (mmux_libc_getpwnam(&PW, name)) @{
   /* error */
-@} else if (mmux_libc_passwd_dump(fd, PW, NULL)) @{
+@} else if (PW && mmux_libc_passwd_dump(fd, PW, NULL)) @{
   /* error */
 @}
 @end example
@@ -2588,7 +2588,7 @@ if (mmux_libc_getgid(&gid)) @{
   /* error */
 @} else if (mmux_libc_getgrgid(&GR, gid)) @{
   /* error */
-@} else if (mmux_libc_group_dump(fd, GR, NULL)) @{
+@} else if (GR && mmux_libc_group_dump(fd, GR, NULL)) @{
   /* error */
 @}
 @end example
@@ -2605,7 +2605,7 @@ mmux_libc_fd_t              fd;
 
 if (mmux_libc_getgrnam(&GR, name)) @{
   /* error */
-@} else if (mmux_libc_group_dump(fd, GR, NULL)) @{
+@} else if (GR && mmux_libc_group_dump(fd, GR, NULL)) @{
   /* error */
 @}
 @end example

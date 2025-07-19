@@ -42,7 +42,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     if (mmux_libc_getpwnam(&PW, name)) {
       handle_error();
-    } else if (mmux_libc_passwd_dump(fd, PW, NULL)) {
+    } else if (PW && mmux_libc_passwd_dump(fd, PW, NULL)) {
       handle_error();
     }
   }

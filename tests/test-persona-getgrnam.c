@@ -42,7 +42,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     if (mmux_libc_getgrnam(&GR, name)) {
       handle_error();
-    } else if (mmux_libc_group_dump(fd, GR, NULL)) {
+    } else if (GR && mmux_libc_group_dump(fd, GR, NULL)) {
       handle_error();
     }
   }
