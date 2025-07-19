@@ -233,7 +233,8 @@ check_PROGRAMS	+= \
 	tests/test-persona-passwd				\
 	tests/test-persona-getgrgid				\
 	tests/test-persona-getgrnam				\
-	tests/test-persona-group
+	tests/test-persona-group				\
+	tests/test-persona-group-member
 
 tests_test_persona_getuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -294,6 +295,9 @@ tests_test_persona_getgrnam_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_persona_group_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_group_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_group_member_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_group_member_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

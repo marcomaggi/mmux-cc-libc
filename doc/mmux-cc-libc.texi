@@ -2577,18 +2577,44 @@ mmux_libc_endgrent();
 
 @deftypefun bool mmux_libc_getgrgid (mmux_libc_group_t * * @var{result_group_pp}, mmux_libc_gid_t @var{gid})
 @MmuxCInterface{getgrgid}.
+
+@example
+mmux_libc_gid_t             gid;
+mmux_libc_group_t *        GR;
+mmux_libc_fd_t              fd;
+
+mmux_libc_stder(&fd);
+if (mmux_libc_getgid(&gid)) @{
+  /* error */
+@} else if (mmux_libc_getgrgid(&GR, gid)) @{
+  /* error */
+@} else if (mmux_libc_group_dump(fd, GR, NULL)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_getgrnam (mmux_libc_group_t * * @var{result_group_pp}, mmux_asciizcp_t @var{groupname})
 @MmuxCInterface{getgrnam}.
+
+@example
+mmux_asciizcp_t             name = "root";
+mmux_libc_group_t *         GR;
+mmux_libc_fd_t              fd;
+
+if (mmux_libc_getgrnam(&GR, name)) @{
+  /* error */
+@} else if (mmux_libc_group_dump(fd, GR, NULL)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefn {@gnu{} Function} bool mmux_libc_group_member (bool * @var{result_is_member_p}, mmux_libc_gid_t @var{gid})
 @MmuxCInterface{group_member}.
 @end deftypefn
-
 
 @c page
 @node processes
