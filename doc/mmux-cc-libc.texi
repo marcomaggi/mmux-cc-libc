@@ -2409,8 +2409,30 @@ if (mmux_libc_setregid(gid, gid)) @{
 @section Identifying who logged in
 
 
-@deftypefun bool mmux_libc_getlogin (mmux_asciizcp_t * @var{result_username_p})
+@deftypefun bool mmux_libc_getlogin (mmux_asciizcpp_t @var{result_username_p})
 @MmuxCInterface{getlogin}.
+
+@example
+mmux_asciizcp_t     name;
+
+if (mmux_libc_getlogin(&name)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getlogin_r (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
+@MmuxCInterface{getlogin_r}.
+
+@example
+mmux_usize_t    buflen = 64;
+mmux_char_t     bufptr[buflen];
+
+if (mmux_libc_getlogin_r(bufptr, buflen)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page

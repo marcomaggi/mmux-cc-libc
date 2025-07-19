@@ -1188,8 +1188,11 @@ mmux_cc_libc_decl bool mmux_libc_setregid (mmux_libc_gid_t gid, mmux_libc_gid_t 
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_getlogin (mmux_asciizcp_t * username_p)
-    __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getlogin (mmux_asciizcpp_t username_p)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_getlogin_r (mmux_asciizp_t bufptr, mmux_usize_t buflen)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 

@@ -225,7 +225,9 @@ check_PROGRAMS	+= \
 	tests/test-persona-setreuid				\
 	tests/test-persona-setgid				\
 	tests/test-persona-setegid				\
-	tests/test-persona-setregid
+	tests/test-persona-setregid				\
+	tests/test-persona-getlogin				\
+	tests/test-persona-getlogin-r
 
 tests_test_persona_getuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -262,6 +264,12 @@ tests_test_persona_setegid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_persona_setregid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_setregid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getlogin_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getlogin_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getlogin_r_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getlogin_r_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

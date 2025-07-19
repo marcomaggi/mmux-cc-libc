@@ -546,10 +546,23 @@ mmux_libc_getgrent (mmux_libc_group_t * * result_group_pp)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_getlogin (char const * * username_p)
+mmux_libc_getlogin (mmux_asciizcpp_t username_p)
 {
-  *username_p = getlogin();
-  return false;
+  mmux_asciizcp_t	rv = getlogin();
+
+  if (rv) {
+    *username_p = rv;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_getlogin_r (mmux_asciizp_t bufptr, mmux_usize_t buflen)
+{
+  mmux_sint_t	rv = getlogin_r(bufptr, buflen);
+
+  return (rv)? true : false;
 }
 
 /* end of file */
