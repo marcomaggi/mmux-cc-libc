@@ -108,7 +108,7 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
       if (mmux_libc_uid_sprint(str, required_nchars, uid)) {
 	return true;
       } else {
-	DPRINTF(fd, "%s.pw_uid = %s\n", struct_name, str);
+	DPRINTF(fd, "%s.pw_uid    = %s\n", struct_name, str);
       }
     }
   }
@@ -125,7 +125,7 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
       if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
 	return true;
       } else {
-	DPRINTF(fd, "%s.pw_gid = %s\n", struct_name, str);
+	DPRINTF(fd, "%s.pw_gid    = %s\n", struct_name, str);
       }
     }
   }

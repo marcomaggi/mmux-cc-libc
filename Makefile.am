@@ -227,7 +227,13 @@ check_PROGRAMS	+= \
 	tests/test-persona-setegid				\
 	tests/test-persona-setregid				\
 	tests/test-persona-getlogin				\
-	tests/test-persona-getlogin-r
+	tests/test-persona-getlogin-r				\
+	tests/test-persona-getpwuid				\
+	tests/test-persona-getpwnam				\
+	tests/test-persona-passwd				\
+	tests/test-persona-getgrgid				\
+	tests/test-persona-getgrnam				\
+	tests/test-persona-group
 
 tests_test_persona_getuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -270,6 +276,24 @@ tests_test_persona_getlogin_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_persona_getlogin_r_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getlogin_r_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getpwuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getpwuid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getpwnam_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getpwnam_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_passwd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_passwd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getgrgid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getgrgid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_getgrnam_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_getgrnam_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_group_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_group_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

@@ -2440,6 +2440,29 @@ if (mmux_libc_getlogin_r(bufptr, buflen)) @{
 @section User database
 
 
+To print the whole @file{/etc/passwd} database using the non--reentrant function
+@cfunc{mmux_libc_getpwent} we do:
+
+@example
+mmux_libc_setpwent();
+@{
+  mmux_libc_passwd_t *      PW;
+  mmux_libc_fd_t            fd;
+
+  mmux_libc_stder(&fd);
+  for (;;) @{
+    mmux_libc_getpwent(&PW);
+    if (NULL == PW) @{
+      break;
+    @} else if (mmux_libc_passwd_dump(fd, PW, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+mmux_libc_endpwent();
+@end example
+
+
 @MmuxCStructOpaqueTypedef{passwd}
 @MmuxSetterGetter{passwd,	pw_name,	mmux_asciizcp_t}
 @MmuxSetterGetter{passwd,	pw_passwd,	mmux_asciizcp_t}
@@ -2449,16 +2472,6 @@ if (mmux_libc_getlogin_r(bufptr, buflen)) @{
 @MmuxSetterGetter{passwd,	pw_dir,		mmux_asciizcp_t}
 @MmuxSetterGetter{passwd,	pw_shell,	mmux_asciizcp_t}
 @MmuxStructDumper{passwd}
-
-
-@deftypefun bool mmux_libc_getpwuid (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_libc_uid_t @var{uid})
-@MmuxCInterface{getpwuid}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getpwnam (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_asciizcp_t @var{username})
-@MmuxCInterface{getpwnam}.
-@end deftypefun
 
 
 @deftypefun bool mmux_libc_setpwent (void)
@@ -2475,9 +2488,69 @@ if (mmux_libc_getlogin_r(bufptr, buflen)) @{
 @MmuxCInterface{getpwent}.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_getpwuid (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_libc_uid_t @var{uid})
+@MmuxCInterface{getpwuid}.
+
+@example
+mmux_libc_uid_t             uid;
+mmux_libc_passwd_t *        PW;
+mmux_libc_fd_t              fd;
+
+mmux_libc_stder(&fd);
+if (mmux_libc_getuid(&uid)) @{
+  /* error */
+@} else if (mmux_libc_getpwuid(&PW, uid)) @{
+  /* error */
+@} else if (mmux_libc_passwd_dump(fd, PW, NULL)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getpwnam (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_asciizcp_t @var{username})
+@MmuxCInterface{getpwnam}.
+
+@example
+mmux_asciizcp_t             name = "root";
+mmux_libc_passwd_t *        PW;
+mmux_libc_fd_t              fd;
+
+if (mmux_libc_getpwnam(&PW, name)) @{
+  /* error */
+@} else if (mmux_libc_passwd_dump(fd, PW, NULL)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
 @c page
 @node persona database group
 @section Group database
+
+
+To print the whole @file{/etc/group} database using the non--reentrant function
+@cfunc{mmux_libc_getgrent} we do:
+
+@example
+mmux_libc_setgrent();
+@{
+  mmux_libc_group_t *   GR;
+  mmux_libc_fd_t        fd;
+
+  mmux_libc_stder(&fd);
+  for (;;) @{
+    mmux_libc_getgrent(&GR);
+    if (NULL == GR) @{
+      break;
+    @} else if (mmux_libc_group_dump(fd, GR, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+mmux_libc_endgrent();
+@end example
 
 
 @MmuxCStructOpaqueTypedef{group}
@@ -2485,21 +2558,6 @@ if (mmux_libc_getlogin_r(bufptr, buflen)) @{
 @MmuxSetterGetter{group,	gr_gid,		mmux_libc_gid_t}
 @MmuxSetterGetter{group,	gr_mem,		mmux_asciizcp_t*}
 @MmuxStructDumper{group}
-
-
-@deftypefun bool mmux_libc_getgrgid (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_libc_gid_t @var{gid})
-@MmuxCInterface{getgrgid}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getgrnam (mmux_libc_passwd_t * * @var{result_passwd_pp}, mmux_asciizcp_t @var{groupname})
-@MmuxCInterface{getgrnam}.
-@end deftypefun
-
-
-@deftypefn {@gnu{} Function} bool mmux_libc_group_member (bool * @var{result_is_member_p}, mmux_libc_gid_t @var{gid})
-@MmuxCInterface{group_member}.
-@end deftypefn
 
 
 @deftypefun bool mmux_libc_setgrent (void)
@@ -2515,6 +2573,22 @@ if (mmux_libc_getlogin_r(bufptr, buflen)) @{
 @deftypefun bool mmux_libc_getgrent (mmux_libc_group_t * * @var{result_group_pp})
 @MmuxCInterface{getgrent}.
 @end deftypefun
+
+
+@deftypefun bool mmux_libc_getgrgid (mmux_libc_group_t * * @var{result_group_pp}, mmux_libc_gid_t @var{gid})
+@MmuxCInterface{getgrgid}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getgrnam (mmux_libc_group_t * * @var{result_group_pp}, mmux_asciizcp_t @var{groupname})
+@MmuxCInterface{getgrnam}.
+@end deftypefun
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_group_member (bool * @var{result_is_member_p}, mmux_libc_gid_t @var{gid})
+@MmuxCInterface{group_member}.
+@end deftypefn
+
 
 @c page
 @node processes
