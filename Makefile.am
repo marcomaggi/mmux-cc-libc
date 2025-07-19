@@ -425,7 +425,8 @@ check_PROGRAMS	+= \
 	tests/test-file-system-lstat				\
 	tests/test-file-system-fstatat				\
 	tests/test-file-system-statfd				\
-	tests/test-file-system-pathname-file-size
+	tests/test-file-system-pathname-file-size		\
+	tests/test-file-system-chown
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -501,6 +502,9 @@ tests_test_file_system_statfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_pathname_file_size_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_file_size_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_chown_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_chown_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -6099,6 +6099,40 @@ if (mmux_libc_rmdir(ptn)) @{
 
 @deftypefun bool mmux_libc_chown (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
 @MmuxCInterface{chown}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_uid_t       uid;
+mmux_libc_gid_t       gid;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Acquire example UID and GID. */
+@{
+  mmux_asciizcp_t             name;
+  mmux_libc_passwd_t *        PW;
+
+  if (mmux_libc_getlogin(&name)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_getpwnam(&PW, name)) @{
+    /* error */
+  @}
+
+  mmux_libc_pw_uid_ref(&uid, PW);
+  mmux_libc_pw_gid_ref(&gid, PW);
+@}
+
+/* Do it. */
+@{
+  if (mmux_libc_chown(ptn, uid, gid)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
