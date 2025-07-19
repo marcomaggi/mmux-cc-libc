@@ -279,7 +279,13 @@ check_PROGRAMS	+= \
 	tests/test-persona-geteuid				\
 	tests/test-persona-getegid				\
 	tests/test-persona-getgroups				\
-	tests/test-persona-getgrouplist
+	tests/test-persona-getgrouplist				\
+	tests/test-persona-setuid				\
+	tests/test-persona-seteuid				\
+	tests/test-persona-setreuid				\
+	tests/test-persona-setgid				\
+	tests/test-persona-setegid				\
+	tests/test-persona-setregid
 
 tests_test_persona_getuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -298,6 +304,24 @@ tests_test_persona_getgroups_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_persona_getgrouplist_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_persona_getgrouplist_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_setuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_setuid_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_seteuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_seteuid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_setreuid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_setreuid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_setgid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_setgid_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_setegid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_setegid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_persona_setregid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_persona_setregid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## processes

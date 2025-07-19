@@ -2311,31 +2311,97 @@ the actual number of values stored in the array.
 
 @deftypefun bool mmux_libc_setuid (mmux_libc_uid_t @var{uid})
 @MmuxCInterface{setuid}.
+
+@example
+mmux_libc_uid_t     uid;
+
+if (mmux_libc_getuid(&uid)) @{
+  /* error */
+@}
+if (mmux_libc_setuid(uid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_seteuid (mmux_libc_uid_t @var{uid})
 @MmuxCInterface{seteuid}.
+
+@example
+mmux_libc_uid_t     euid;
+
+if (mmux_libc_geteuid(&euid)) @{
+  /* error */
+@}
+if (mmux_libc_seteuid(euid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_setreuid (mmux_libc_uid_t @var{uid}, mmux_libc_uid_t @var{euid})
 @MmuxCInterface{setreuid}.
+
+@example
+mmux_libc_uid_t     uid;
+
+if (mmux_libc_geteuid(&uid)) @{
+  /* error */
+@}
+if (mmux_libc_setreuid(uid, uid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_setgid (mmux_libc_gid_t @var{gid})
 @MmuxCInterface{setgid}.
+
+@example
+mmux_libc_gid_t     gid;
+
+if (mmux_libc_getgid(&gid)) @{
+  /* error */
+@}
+if (mmux_libc_setgid(gid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_setegid (mmux_libc_gid_t @var{gid})
 @MmuxCInterface{setegid}.
+
+@example
+mmux_libc_gid_t     gid;
+
+if (mmux_libc_getegid(&gid)) @{
+  /* error */
+@}
+if (mmux_libc_setegid(gid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_setregid (mmux_libc_gid_t @var{gid}, mmux_libc_gid_t @var{egid})
 @MmuxCInterface{setregid}.
+
+@example
+mmux_libc_gid_t     gid;
+
+if (mmux_libc_getegid(&gid)) @{
+  /* error */
+@}
+if (mmux_libc_setregid(gid, gid)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page
