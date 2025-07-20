@@ -5719,7 +5719,7 @@ mmux_libc_dirstream_t               dirstream;
 /* Open the directory's file descriptor. */
 @{
   mmux_libc_ptn_t   dirptn;
-  mmux_sint_t       flags = MMUX_LIBC_O_RDONLY;
+  mmux_sint_t       flags = MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_RDONLY;
   mmux_mode_t       mode  = 0;
 
   if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
@@ -5732,6 +5732,45 @@ mmux_libc_dirstream_t               dirstream;
 @}
 
 if (mmux_libc_fdopendir(&dirstream, dirfd)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_dirfd (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_dirstream_t @var{dirstream})
+@MmuxCInterfaceGlibc{dirfd, Opening a Directory}.  After retrieving the file descriptor, we can use
+it with functions like @cfunc{mmux_libc_fstat} and @cfunc{mmux_libc_fchdir}.
+
+@example
+mmux_libc_ptn_t             dirptn;
+mmux_libc_dirstream_t       dirstream;
+mmux_libc_fd_t              dirfd;
+
+if (mmux_libc_make_file_system_pathname(&dirptn, ".")) @{
+  /* error */
+@}
+
+if (mmux_libc_opendir(&dirstream, dirptn)) @{
+  /* error */
+@}
+
+if (mmux_libc_dirfd(&dirfd, dirstream)) @{
+  /* error */
+@}
+
+/* Retrieve a "mmux_libc_stat_t" object. */
+@{
+  mmux_libc_stat_t  ST[1];
+
+  if (mmux_libc_fstat(dirfd, ST)) @{
+    /* error */
+  @}
+
+  ...
+@}
+
+if (mmux_libc_closedir(dirstream)) @{
   /* error */
 @}
 @end example

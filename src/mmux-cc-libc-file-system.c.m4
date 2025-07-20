@@ -287,6 +287,18 @@ mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
     return false;
   }
 }
+bool
+mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t dirstream)
+{
+  mmux_sint_t	rv = dirfd(dirstream.value);
+
+  if (-1 == rv) {
+    return true;
+  } else {
+    result_p->value = rv;
+    return false;
+  }
+}
 
 
 /** --------------------------------------------------------------------

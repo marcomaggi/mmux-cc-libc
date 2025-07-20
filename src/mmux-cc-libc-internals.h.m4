@@ -329,7 +329,7 @@ typedef struct stat		mmux_libc_stat_t;
 typedef struct utimbuf		mmux_libc_utimbuf_t;
 typedef struct dirent		mmux_libc_dirent_t;
 
-typedef struct mmux_libc_dirxtream_t {
+typedef struct mmux_libc_dirtream_t {
   DIR *		value; /* DIR is opaque as defined by the C library */
 } mmux_libc_dirstream_t;
 

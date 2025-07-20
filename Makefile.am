@@ -404,6 +404,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-chdir				\
 	tests/test-file-system-chown				\
 	tests/test-file-system-chownfd				\
+	tests/test-file-system-dirfd				\
 	tests/test-file-system-fchdir				\
 	tests/test-file-system-fchown				\
 	tests/test-file-system-fchownat				\
@@ -541,6 +542,9 @@ tests_test_file_system_opendir_readdir_closedir_LDADD		= $(mmux_cc_libc_tests_ld
 
 tests_test_file_system_fdopendir_readdir_closedir_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_fdopendir_readdir_closedir_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_dirfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_dirfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -1300,7 +1300,10 @@ mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mm
 mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
+mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t dirstream)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t dirstream)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
