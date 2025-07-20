@@ -404,6 +404,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-chdir				\
 	tests/test-file-system-chown				\
 	tests/test-file-system-chownfd				\
+	tests/test-file-system-fchdir				\
 	tests/test-file-system-fchown				\
 	tests/test-file-system-fchownat				\
 	tests/test-file-system-fstat				\
@@ -529,6 +530,9 @@ tests_test_file_system_chownfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_chdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_chdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_fchdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_fchdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

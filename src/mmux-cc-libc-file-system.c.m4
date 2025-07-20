@@ -163,6 +163,13 @@ mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
 
   return (rv)? true : false;
 }
+bool
+mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
+{
+  mmux_sint_t	rv = fchdir(fd.value);
+
+  return (rv)? true : false;
+}
 
 
 /** --------------------------------------------------------------------

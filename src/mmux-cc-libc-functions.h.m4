@@ -1291,6 +1291,9 @@ mmux_cc_libc_decl bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname
 mmux_cc_libc_decl bool mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
   __attribute__((__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
+  __attribute__((__warn_unused_result__));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_chroot (mmux_libc_file_system_pathname_t ptn)

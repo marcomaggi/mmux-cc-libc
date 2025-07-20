@@ -5663,6 +5663,56 @@ if (mmux_libc_getcwd_pathname(&ptn)) @{
 
 @deftypefun bool mmux_libc_chdir (mmux_libc_file_system_pathname_t @var{dirptn})
 @MmuxCInterfaceGlibc{chdir, Working Directory}.
+
+@example
+mmux_libc_file_system_pathname_t    ptn;
+
+mmux_libc_make_file_system_pathname(&ptn, "..");
+if (mmux_libc_chdir(ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
+@MmuxCInterfaceGlibc{fchdir, Working Directory}.
+
+@example
+mmux_libc_file_descriptor_t           dirfd;
+
+@{
+  mmux_libc_file_system_pathname_t    ptn;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, "..")) @{
+    /* error */
+  @}
+
+  /* Open the directory. */
+  @{
+    mmux_sint_t         flags = MMUX_LIBC_O_PATH;
+    mmux_mode_t         mode  = 0;
+
+    if (mmux_libc_open(&dirfd, ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Do it. */
+@{
+  if (mmux_libc_fchdir(dirfd)) @{
+    /* error */
+  @}
+@}
+
+/* Close the directory. */
+@{
+  if (mmux_libc_close(dirfd)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page
