@@ -426,7 +426,11 @@ check_PROGRAMS	+= \
 	tests/test-file-system-fstatat				\
 	tests/test-file-system-statfd				\
 	tests/test-file-system-pathname-file-size		\
-	tests/test-file-system-chown
+	tests/test-file-system-chown				\
+	tests/test-file-system-fchown				\
+	tests/test-file-system-lchown				\
+	tests/test-file-system-fchownat				\
+	tests/test-file-system-chownfd
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -505,6 +509,18 @@ tests_test_file_system_pathname_file_size_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_chown_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_chown_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_fchown_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_fchown_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_lchown_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_lchown_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_fchownat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_fchownat_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_chownfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_chownfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

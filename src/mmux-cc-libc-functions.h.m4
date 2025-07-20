@@ -1370,6 +1370,9 @@ mmux_cc_libc_decl bool mmux_libc_fchownat (mmux_libc_file_descriptor_t dirfd, mm
 					   mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
+  __attribute__((__warn_unused_result__));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_umask (mmux_mode_t * old_mask_p, mmux_mode_t new_mask)

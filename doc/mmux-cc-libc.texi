@@ -89,6 +89,10 @@ Interface to the function @cfunc{\FUNCNAME\}, @MmuxCFuncpage{\MANPAGE\}
 @MmuxCInterfaceTwo{\FUNCNAME\,\FUNCNAME\}
 @end macro
 
+@macro MmuxCInterfaceGlibc{FUNCNAME,GLIBCNODENAME}
+Interface to the function @cfunc{\FUNCNAME\}, @glibcref{\GLIBCNODENAME\,\GLIBCNODENAME\}
+@end macro
+
 @macro MmuxCMacroInterfaceTwo{FUNCNAME,MANPAGE}
 Interface to the preprocessor macro @cfunc{\FUNCNAME\}, @MmuxCFuncpage{\MANPAGE\}
 @end macro
@@ -6098,7 +6102,7 @@ if (mmux_libc_rmdir(ptn)) @{
 
 
 @deftypefun bool mmux_libc_chown (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
-@MmuxCInterface{chown}.
+@MmuxCInterfaceGlibc{chown, File Owner}.
 
 @example
 mmux_libc_ptn_t       ptn;
@@ -6137,18 +6141,169 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 
 
 @deftypefun bool mmux_libc_fchown (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
-@MmuxCInterface{fchown}.
+@MmuxCInterfaceGlibc{fchown, File Owner}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_fd_t        fd;
+mmux_libc_uid_t       uid;
+mmux_libc_gid_t       gid;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t     flags    = MMUX_LIBC_O_RDWR;
+  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Acquire example UID and GID. */
+@{
+  mmux_asciizcp_t             name;
+  mmux_libc_passwd_t *        PW;
+
+  if (mmux_libc_getlogin(&name)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_getpwnam(&PW, name)) @{
+    /* error */
+  @}
+
+  mmux_libc_pw_uid_ref(&uid, PW);
+  mmux_libc_pw_gid_ref(&gid, PW);
+@}
+
+/* Do it. */
+@{
+  if (mmux_libc_fchown(fd, uid, gid)) @{
+    /* error */
+  @}
+@}
+
+/* Close the file. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_lchown (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
-@MmuxCInterface{lchown}.
+@MmuxCInterface{lchown}.  This function does not dereference symbolic links.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_fchownat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t flags);
 @MmuxCInterface{fchownat}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_uid_t       uid;
+mmux_libc_gid_t       gid;
+
+if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
+  /* error */
+@}
+
+/* Acquire example UID and GID. */
+@{
+  mmux_asciizcp_t             name;
+  mmux_libc_passwd_t *        PW;
+
+  if (mmux_libc_getlogin(&name)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_getpwnam(&PW, name)) @{
+    /* error */
+  @}
+
+  mmux_libc_pw_uid_ref(&uid, PW);
+  mmux_libc_pw_gid_ref(&gid, PW);
+@}
+
+/* Do it. */
+@{
+  mmux_libc_fd_t      dirfd;
+  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+
+  mmux_libc_at_fdcwd(&dirfd);
+
+  if (mmux_libc_fchownat(dirfd, ptn, uid, gid, flags)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
+
+
+@deftypefn {Linux Function} bool mmux_libc_chownfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{flags})
+Like @cfunc{mmux_libc_fchownat} but always add @code{MMUX_LIBC_AT_EMPTY_PATH} to @var{flags}, so it
+operates on @var{fd}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_fd_t        fd;
+mmux_libc_uid_t       uid;
+mmux_libc_gid_t       gid;
+
+if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t     flags    = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
+  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Acquire example UID and GID. */
+@{
+  mmux_asciizcp_t             name;
+  mmux_libc_passwd_t *        PW;
+
+  if (mmux_libc_getlogin(&name)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_getpwnam(&PW, name)) @{
+    /* error */
+  @}
+
+  mmux_libc_pw_uid_ref(&uid, PW);
+  mmux_libc_pw_gid_ref(&gid, PW);
+@}
+
+/* Do it. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+
+  if (mmux_libc_chownfd(fd, uid, gid, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Close the file. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefn
 
 @c page
 @node fs permissions

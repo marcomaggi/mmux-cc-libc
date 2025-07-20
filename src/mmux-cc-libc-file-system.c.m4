@@ -427,6 +427,16 @@ mmux_libc_fchownat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pat
 
   return ((0 == rv)? false : true);
 }
+bool
+mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
+{
+  mmux_sint_t	rv;
+
+  flags |= MMUX_LIBC_AT_EMPTY_PATH;
+  rv = fchownat(fd.value, "", uid.value, gid.value, flags);
+
+  return ((0 == rv)? false : true);
+}
 
 
 /** --------------------------------------------------------------------
