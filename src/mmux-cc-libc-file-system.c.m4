@@ -193,6 +193,70 @@ mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_f
 
 
 /** --------------------------------------------------------------------
+ ** Diretories.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t * DE)
+{
+  *result_p = DE->d_name;
+  return false;
+}
+bool
+mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t * DE)
+{
+  *result_p = (mmux_uintmax_t)(DE->d_fileno);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathname_t ptn)
+{
+  DIR *		rv = opendir(ptn.value);
+
+  if (rv) {
+    result_p->value = rv;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_closedir (mmux_libc_dirstream_t DS)
+{
+  mmux_sint_t	rv = closedir(DS.value);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
+{
+  mmux_libc_dirent_t *	rv;
+
+  /* Setting errno to zero  here is the only way to distinguish an  error from an end
+     of stream condition. */
+  errno = 0;
+  rv    = readdir(DS.value);
+
+  if (NULL == rv) {
+    if (errno) {
+      /* An error occurred. */
+      return true;
+    } else {
+      /* No more entries from the stream. */
+      *result_p = NULL;
+      return false;
+    }
+  } else {
+    *result_p = rv;
+    return false;
+  }
+}
+
+
+/** --------------------------------------------------------------------
  ** File system: links.
  ** ----------------------------------------------------------------- */
 

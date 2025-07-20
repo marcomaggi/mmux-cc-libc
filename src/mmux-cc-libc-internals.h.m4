@@ -154,6 +154,10 @@ extern "C" {
 #  include <ctype.h>
 #endif
 
+#ifdef HAVE_DIRENT_H
+#  include <dirent.h>
+#endif
+
 #ifdef HAVE_ERRNO_H
 #  include <errno.h>
 #endif
@@ -323,6 +327,11 @@ typedef struct passwd		mmux_libc_passwd_t;
 typedef struct group		mmux_libc_group_t;
 typedef struct stat		mmux_libc_stat_t;
 typedef struct utimbuf		mmux_libc_utimbuf_t;
+typedef struct dirent		mmux_libc_dirent_t;
+
+typedef struct mmux_libc_dirxtream_t {
+  DIR *		value; /* DIR is opaque as defined by the C library */
+} mmux_libc_dirstream_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

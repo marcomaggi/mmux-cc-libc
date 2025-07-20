@@ -1225,6 +1225,14 @@ mmux_cc_libc_decl bool mmux_libc_getgrent (mmux_libc_group_t * * result_group_pp
  ** File system.
  ** ----------------------------------------------------------------- */
 
+mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t * DE)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t * DE)
+  __attribute__((__nonnull__(1,2)));
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * pathname_p,
 							    mmux_asciizcp_t asciiz_pathname)
   __attribute__((__nonnull__(1,2)));
@@ -1276,6 +1284,17 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater_equal (bool * resu
 								     mmux_libc_file_system_pathname_t ptn1,
 								     mmux_libc_file_system_pathname_t ptn2)
   __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
+  __attribute__((__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 

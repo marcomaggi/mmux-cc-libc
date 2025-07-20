@@ -109,6 +109,7 @@ typedef struct mmux_libc_uid_t				{ mmux_uid_t  value; } mmux_libc_uid_t;
 typedef struct mmux_libc_gid_t				{ mmux_gid_t  value; } mmux_libc_gid_t;
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t value; } mmux_libc_completed_process_status_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t value; } mmux_libc_interprocess_signal_t;
+typedef struct mmux_libc_dirstream_t			{ mmux_pointer_t value; } mmux_libc_dirstream_t;
 
 typedef struct mmux_libc_file_system_pathname_t { mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
 
@@ -124,6 +125,7 @@ typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP]
 typedef struct mmux_libc_stat_t     { mmux_uint8_t value[MMUX_LIBC_SIZEOF_STAT];     } mmux_libc_stat_t;
 typedef struct mmux_libc_utimbuf_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_UTIMBUF];  } mmux_libc_utimbuf_t;
 typedef struct mmux_libc_open_how_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW]; } mmux_libc_open_how_t;
+typedef struct mmux_libc_dirent_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_DIRENT];   } mmux_libc_dirent_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

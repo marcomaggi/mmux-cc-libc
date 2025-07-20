@@ -5396,12 +5396,10 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 @menu
 * fs pathnames::                File system pathnames type definition.
-* fs working directory::        Handling the current working directory.
-* fs root directory::           Handling the root directory.
+* fs directories::              File system directories.
 * fs links::                    Hard and symbolic links.
 * fs deleting::                 Deleting links.
 * fs renaming::                 Renaming links.
-* fs directories::              Directories.
 * fs ownership::                File ownership.
 * fs permissions::              File access permissions.
 * fs attributes::               File attributes.
@@ -5543,12 +5541,12 @@ mmux_sint_t             cmpnum;
 mmux_libc_make_file_system_pathname(&ptn1, "AAA");
 mmux_libc_make_file_system_pathname(&ptn2, "BBB");
 
-if (mmux_libc_make_file_system_pathname_compare(&cmpnum, ptn1, ptn2)) @{
+if (mmux_libc_file_system_pathname_compare(&cmpnum, ptn1, ptn2)) @{
   /* error */
 @}
 assert(-1 == cmpnum);
 
-if (mmux_libc_make_file_system_pathname_compare(&cmpnum, ptn2, ptn1)) @{
+if (mmux_libc_file_system_pathname_compare(&cmpnum, ptn2, ptn1)) @{
   /* error */
 @}
 assert(+1 == cmpnum);
@@ -5566,7 +5564,7 @@ bool                    eq;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
-if (mmux_libc_make_file_system_pathname_compare(&eq, ptn, ptn)) @{
+if (mmux_libc_file_system_pathname_compare(&eq, ptn, ptn)) @{
   /* error */
 @}
 assert(true == eq);
@@ -5604,8 +5602,147 @@ compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
-@node fs working directory
-@section Handling the current working directory
+@node fs directories
+@section File system directories
+
+
+@menu
+* fs directories streams::      Directory inspection objects.
+* fs directories entries::      Directory entry objects.
+* fs directories inspection::   Inspecting file system directories.
+* fs directories creation::     Creating file system directories.
+* fs directories deletion::     Deleting file system directories.
+* fs directories working::      Handling the current working directory.
+* fs directories root::         Handling the root directory.
+@end menu
+
+@c page
+@node fs directories streams
+@subsection Directory inspection objects
+
+
+To open, then read, then close a directory inspection object we do:
+
+@example
+mmux_libc_ptn_t         dirptn;
+mmux_libc_dirstream_t   dirstream;
+
+if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
+  /* error */
+@}
+
+if (mmux_libc_opendir(&dirstream, dirptn)) @{
+  /* error */
+@}
+
+for (;;) @{
+  mmux_libc_dirent_t *  direntry;
+
+  if (mmux_libc_readdir(&direntry, dirstream)) @{
+    /* error */
+  @} else if (direntry) @{
+    /* there is an entry available */
+  @} else @{
+    /* no more entries are available */
+    break;
+  @}
+@}
+
+if (mmux_libc_closedir(dirstream)) @{
+  /* error */
+@}
+@end example
+
+
+@deftp {Opaque Struct Pointer} mmux_libc_dirstream_t
+Opaque alias to the standard type @code{DIR *}.
+@end deftp
+
+@c page
+@node fs directories entries
+@subsection Directory entry objects
+
+
+@deftp {Opaque Struct} mmux_libc_dirent_t
+Opaque alias to the standard type @code{struct dirent}.
+@end deftp
+
+@c page
+@node fs directories inspection
+@subsection Inspecting file system directories
+
+
+@deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@MmuxCInterfaceGlibc{opendir, Opening a Directory}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_closedir (mmux_libc_dirstream_t @var{DS})
+@MmuxCInterfaceGlibc{closedir, Reading/Closing Directory}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_readdir (mmux_libc_dirent_t ** @var{result_p}, mmux_libc_dirstream_t @var{DS})
+@MmuxCInterfaceGlibc{readdir, Reading/Closing Directory}.
+@end deftypefun
+
+@c page
+@node fs directories creation
+@subsection Creating file system directories
+
+
+@deftypefun bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t mode)
+@MmuxCInterface{mkdir}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+if (mmux_libc_mkdir(ptn, mode)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
+@MmuxCInterface{mkdirat}.
+
+@example
+mmux_libc_ptn_t         ptn;
+mmux_libc_fd_t          dirfd;
+mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+mmux_libc_at_fdcwd(&dirfd);
+if (mmux_libc_mkdir(ptn, mode)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs directories deletion
+@subsection Deleting file system directories
+
+
+@deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
+@MmuxCInterface{rmdir}.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
+if (mmux_libc_rmdir(ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs directories working
+@subsection Handling the current working directory
 
 
 @deftypefun bool mmux_libc_getcwd (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
@@ -5716,8 +5853,8 @@ mmux_libc_file_descriptor_t           dirfd;
 @end deftypefun
 
 @c page
-@node fs root directory
-@section Handling the root directory
+@node fs directories root
+@subsection Handling the root directory
 
 
 The following functions require the calling process to have special privileges.  They are included
@@ -6177,56 +6314,6 @@ if (mmux_libc_renameat2(dirfd, src_ptn, dirfd, dst_ptn, flags)) @{
 @}
 @end example
 @end deftypefn
-
-@c page
-@node fs directories
-@section Directories
-
-
-@deftypefun bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t mode)
-@MmuxCInterface{mkdir}.
-
-@example
-mmux_libc_ptn_t         ptn;
-mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
-
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-if (mmux_libc_mkdir(ptn, mode)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
-@MmuxCInterface{mkdirat}.
-
-@example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          dirfd;
-mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
-
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-mmux_libc_at_fdcwd(&dirfd);
-if (mmux_libc_mkdir(ptn, mode)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
-@MmuxCInterface{rmdir}.
-
-@example
-mmux_libc_ptn_t         ptn;
-
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-if (mmux_libc_rmdir(ptn)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
 
 @c page
 @node fs ownership

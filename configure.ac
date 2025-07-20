@@ -78,7 +78,7 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h])
+                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h dirent.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -147,6 +147,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IOVEC],        [sizeof(struct iovec)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_FLOCK],        [sizeof(struct flock)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_FD_SET],       [sizeof(fd_set)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_OPEN_HOW],     [sizeof(struct open_how)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_DIRENT],       [sizeof(struct dirent)])
 
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN_ADDR],      [sizeof(struct in_addr)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN6_ADDR],     [sizeof(struct in6_addr)])

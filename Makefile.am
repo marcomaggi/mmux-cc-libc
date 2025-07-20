@@ -416,6 +416,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-lstat				\
 	tests/test-file-system-mkdir				\
 	tests/test-file-system-mkdirat				\
+	tests/test-file-system-opendir-readdir-closedir		\
 	tests/test-file-system-pathname				\
 	tests/test-file-system-pathname-file-size		\
 	tests/test-file-system-readlink				\
@@ -533,6 +534,9 @@ tests_test_file_system_chdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_fchdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_fchdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_opendir_readdir_closedir_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_opendir_readdir_closedir_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
