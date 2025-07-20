@@ -1279,6 +1279,17 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater_equal (bool * resu
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_getcwd (mmux_asciizp_t bufptr, mmux_usize_t buflen)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_getcwd_malloc (mmux_asciizcpp_t result_p)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_link (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
   __attribute__((__warn_unused_result__));
 

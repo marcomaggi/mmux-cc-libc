@@ -5396,6 +5396,7 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 @menu
 * fs pathnames::                File system pathnames type definition.
+* fs working directory::        Handling the current working directory.
 * fs links::                    Hard and symbolic links.
 * fs deleting::                 Deleting links.
 * fs renaming::                 Renaming links.
@@ -5599,6 +5600,68 @@ compared as @asciiz{} strings; otherwise store @cfalse{}.
 @deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} >= @varii{ptn}} when
 compared as @asciiz{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+@c page
+@node fs working directory
+@section Handling the current working directory
+
+
+@deftypefun bool mmux_libc_getcwd (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
+@MmuxCInterfaceGlibc{getcwd, Working Directory}.  When successful: @var{bufptr} is filled with the
+@asciiz{} string representing the file system pathname of the current working directory, including
+the terminating null character.
+
+@example
+mmux_usize_t        buflen = 4096;
+mmux_char_t         bufptr[buflen];
+
+if (mmux_libc_getcwd(bufptr, buflen)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefn {@gnu{} Function} bool mmux_libc_getcwd_malloc (mmux_asciizcpp_t * @var{result_p})
+@MmuxCInterfaceGlibc{getcwd, Working Directory}.  When successful: a memory block has been
+dynamically allocated and filled with the @asciiz{} string representing the file system pathname of
+the current working directory, including the terminating null character; a pointer to such memory
+block is stored in the variable referenced by @var{result_p}.
+
+@example
+mmux_asciizcp_t     bufptr;
+
+if (mmux_libc_getcwd_malloc(&bufptr)) @{
+  /* error */
+@} else @{
+  /* do something with "bufptr" */
+  mmux_libc_free((mmux_pointer_t)bufptr);
+@}
+@end example
+@end deftypefn
+
+
+@deftypefun bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * @var{result_p})
+Wrapper for @cfunc{mmux_libc_getcwd_malloc} that stores the memory block pointer in a
+@objtype{mmux_libc_file_system_pathname_t} object.  The pathname object must later be released using
+@cfunc{mmux_libc_file_system_pathname_free}.
+
+@example
+mmux_libc_file_system_pathname_t    ptn;
+
+if (mmux_libc_getcwd_pathname(&ptn)) @{
+  /* error */
+@} else @{
+  /* do something with "ptn" */
+  mmux_libc_file_system_pathname_free(ptn);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_chdir (mmux_libc_file_system_pathname_t @var{dirptn})
+@MmuxCInterfaceGlibc{chdir, Working Directory}.
 @end deftypefun
 
 @c page

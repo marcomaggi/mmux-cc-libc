@@ -401,6 +401,7 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## file system
 
 check_PROGRAMS	+= \
+	tests/test-file-system-getcwd				\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
 	tests/test-file-system-unlink				\
@@ -434,6 +435,9 @@ check_PROGRAMS	+= \
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_getcwd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_getcwd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_link_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_link_LDADD			= $(mmux_cc_libc_tests_ldadd)

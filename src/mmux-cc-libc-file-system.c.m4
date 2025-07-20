@@ -120,6 +120,45 @@ DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cm
 
 
 /** --------------------------------------------------------------------
+ ** Current working directory.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_getcwd (mmux_asciizp_t bufptr, mmux_usize_t buflen)
+{
+  mmux_asciizp_t	rv = getcwd(bufptr, buflen);
+
+  return (rv)? false : true;
+}
+bool
+mmux_libc_getcwd_malloc (mmux_asciizcpp_t result_p)
+{
+  mmux_asciizp_t	rv = getcwd(NULL, 0);
+
+  if (rv) {
+    *result_p = rv;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
+{
+  mmux_asciizcp_t	bufptr;
+
+  if (mmux_libc_getcwd_malloc(&bufptr)) {
+    return true;
+  } else if (mmux_libc_make_file_system_pathname(result_p, bufptr)) {
+    mmux_libc_free((mmux_pointer_t)bufptr);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+/** --------------------------------------------------------------------
  ** File system: links.
  ** ----------------------------------------------------------------- */
 
