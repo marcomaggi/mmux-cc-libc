@@ -5642,6 +5642,12 @@ for (;;) @{
     /* error */
   @} else if (direntry) @{
     /* there is an entry available */
+    mmux_asciizcp_t     name;
+    mmux_uintmax_t      fileno;
+
+    mmux_libc_d_name_ref   (&name,   direntry);
+    mmux_libc_d_fileno_ref (&fileno, direntry);
+    ...
   @} else @{
     /* no more entries are available */
     break;
@@ -5663,9 +5669,20 @@ Opaque alias to the standard type @code{DIR *}.
 @subsection Directory entry objects
 
 
-@deftp {Opaque Struct} mmux_libc_dirent_t
-Opaque alias to the standard type @code{struct dirent}.
-@end deftp
+@MmuxCStructOpaqueTypedef{dirent}
+
+@deftypefun bool mmux_libc_d_name_ref (mmux_asciizcp_t * @var{RESULT_P}, mmux_libc_dirent_t const * @var{dirent_p})
+Getter for the field @code{d_name} of @objtype{mmux_libc_dirent_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_d_fileno_ref (mmux_uintmax_t * @var{result_p}, mmux_libc_dirent_t const * @var{dirent_p})
+Getter for the field @code{d_fileno} of @objtype{mmux_libc_dirent_t}.
+@end deftypefun
+
+
+@MmuxStructDumper{dirent}
+
 
 @c page
 @node fs directories inspection
@@ -5674,6 +5691,19 @@ Opaque alias to the standard type @code{struct dirent}.
 
 @deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 @MmuxCInterfaceGlibc{opendir, Opening a Directory}.
+
+@example
+mmux_libc_ptn_t         dirptn;
+mmux_libc_dirstream_t   dirstream;
+
+if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
+  /* error */
+@}
+
+if (mmux_libc_opendir(&dirstream, dirptn)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
@@ -5684,6 +5714,25 @@ Opaque alias to the standard type @code{struct dirent}.
 
 @deftypefun bool mmux_libc_readdir (mmux_libc_dirent_t ** @var{result_p}, mmux_libc_dirstream_t @var{DS})
 @MmuxCInterfaceGlibc{readdir, Reading/Closing Directory}.
+
+@example
+mmux_libc_dirstream_t   dirstream = ...;
+mmux_libc_dirent_t *    direntry;
+
+if (mmux_libc_readdir(&direntry, dirstream)) @{
+  /* error */
+@} else if (direntry) @{
+  /* there is an entry available */
+  mmux_asciizcp_t     name;
+  mmux_uintmax_t      fileno;
+
+  mmux_libc_d_name_ref   (&name,   direntry);
+  mmux_libc_d_fileno_ref (&fileno, direntry);
+  ...
+@} else @{
+  /* no more entries are available */
+@}
+@end example
 @end deftypefun
 
 @c page

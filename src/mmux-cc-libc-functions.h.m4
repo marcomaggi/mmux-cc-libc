@@ -1225,11 +1225,15 @@ mmux_cc_libc_decl bool mmux_libc_getgrent (mmux_libc_group_t * * result_group_pp
  ** File system.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t * DE)
+mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t * DE)
+mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
   __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_dirent_t const * dirent_p,
+					      mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(2)));
 
 /* ------------------------------------------------------------------ */
 

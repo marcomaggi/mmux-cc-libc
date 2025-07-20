@@ -48,7 +48,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
 
     {
-      mmux_libc_dirent_t *  direntry;
+      mmux_libc_dirent_t *	direntry;
+      mmux_libc_fd_t		er;
+
+      mmux_libc_stder(&er);
 
       for (;;) {
 	if (mmux_libc_readdir(&direntry, dirstream)) {
@@ -61,6 +64,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	  mmux_libc_d_fileno_ref (&fileno, direntry);
 	  printf_message("directory entry name: %s", name);
 	  printf_message("directory entry fileno: %lu", (mmux_usize_t)fileno);
+
+	  if (mmux_libc_dirent_dump(er, direntry, NULL)) {
+	    handle_error();
+	  }
 	} else {
 	  printf_message("no more entries");
 	  break;

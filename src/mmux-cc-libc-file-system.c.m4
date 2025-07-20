@@ -197,15 +197,36 @@ mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_f
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t * DE)
+mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
 {
   *result_p = DE->d_name;
   return false;
 }
 bool
-mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t * DE)
+mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
 {
   *result_p = (mmux_uintmax_t)(DE->d_fileno);
+  return false;
+}
+bool
+mmux_libc_dirent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_dirent_t const * dirent_p, mmux_asciizcp_t struct_name)
+{
+  if (NULL == struct_name) {
+    struct_name = "struct dirent";
+  }
+
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)dirent_p);
+
+  {
+    mmux_asciizcp_t		name;
+    mmux_uintmax_t		fileno;
+
+    mmux_libc_d_name_ref   (&name,   dirent_p);
+    mmux_libc_d_fileno_ref (&fileno, dirent_p);
+
+    DPRINTF(fd, "%s->d_name   = %s\n",  struct_name, name);
+    DPRINTF(fd, "%s->d_fileno = %lu\n", struct_name, (mmux_usize_t)fileno);
+  }
   return false;
 }
 
