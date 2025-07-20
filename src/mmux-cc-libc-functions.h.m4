@@ -1294,6 +1294,9 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater_equal (bool * resu
 mmux_cc_libc_decl bool mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_descriptor_t fd)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
 mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
   __attribute__((__warn_unused_result__));
 

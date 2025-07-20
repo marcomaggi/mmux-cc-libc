@@ -5707,6 +5707,37 @@ if (mmux_libc_opendir(&dirstream, dirptn)) @{
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_fdopendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@MmuxCInterfaceGlibc{fdopendir, Opening a Directory}.  The descriptor @var{fd} will be closed if we
+apply @cfunc{mmux_libc_closedir} to the resulting @objtype{mmux_libc_dirent_t} object; so we do not
+need to close @var{fd} with @cfunc{mmux_libc_close}.
+
+@example
+mmux_libc_file_descriptor_t         dirfd;
+mmux_libc_dirstream_t               dirstream;
+
+/* Open the directory's file descriptor. */
+@{
+  mmux_libc_ptn_t   dirptn;
+  mmux_sint_t       flags = MMUX_LIBC_O_RDONLY;
+  mmux_mode_t       mode  = 0;
+
+  if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
+    /* error */
+  @}
+
+  if (mmux_libc_open(&dirfd, dirptn, flags, mode)) @{
+    /* error */
+  @};
+@}
+
+if (mmux_libc_fdopendir(&dirstream, dirfd)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_closedir (mmux_libc_dirstream_t @var{DS})
 @MmuxCInterfaceGlibc{closedir, Reading/Closing Directory}.
 @end deftypefun

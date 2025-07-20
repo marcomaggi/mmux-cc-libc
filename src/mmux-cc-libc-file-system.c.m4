@@ -245,6 +245,18 @@ mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathn
   }
 }
 bool
+mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_descriptor_t fd)
+{
+  DIR *		rv = fdopendir(fd.value);
+
+  if (rv) {
+    result_p->value = rv;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
 mmux_libc_closedir (mmux_libc_dirstream_t DS)
 {
   mmux_sint_t	rv = closedir(DS.value);
