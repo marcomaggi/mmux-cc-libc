@@ -401,37 +401,38 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## file system
 
 check_PROGRAMS	+= \
+	tests/test-file-system-chdir				\
+	tests/test-file-system-chown				\
+	tests/test-file-system-chownfd				\
+	tests/test-file-system-fchown				\
+	tests/test-file-system-fchownat				\
+	tests/test-file-system-fstat				\
+	tests/test-file-system-fstatat				\
 	tests/test-file-system-getcwd				\
+	tests/test-file-system-lchown				\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
-	tests/test-file-system-unlink				\
-	tests/test-file-system-unlinkat				\
-	tests/test-file-system-remove				\
-	tests/test-file-system-rename				\
-	tests/test-file-system-renameat				\
-	tests/test-file-system-renameat2			\
+	tests/test-file-system-lstat				\
+	tests/test-file-system-mkdir				\
+	tests/test-file-system-mkdirat				\
 	tests/test-file-system-pathname				\
+	tests/test-file-system-pathname-file-size		\
 	tests/test-file-system-readlink				\
 	tests/test-file-system-readlink-malloc			\
 	tests/test-file-system-readlinkat			\
 	tests/test-file-system-readlinkat-malloc		\
 	tests/test-file-system-readlinkfd			\
 	tests/test-file-system-readlinkfd-malloc		\
-	tests/test-file-system-symlink				\
-	tests/test-file-system-mkdir				\
-	tests/test-file-system-mkdirat				\
+	tests/test-file-system-remove				\
+	tests/test-file-system-rename				\
+	tests/test-file-system-renameat				\
+	tests/test-file-system-renameat2			\
 	tests/test-file-system-rmdir				\
 	tests/test-file-system-stat				\
-	tests/test-file-system-fstat				\
-	tests/test-file-system-lstat				\
-	tests/test-file-system-fstatat				\
 	tests/test-file-system-statfd				\
-	tests/test-file-system-pathname-file-size		\
-	tests/test-file-system-chown				\
-	tests/test-file-system-fchown				\
-	tests/test-file-system-lchown				\
-	tests/test-file-system-fchownat				\
-	tests/test-file-system-chownfd
+	tests/test-file-system-symlink				\
+	tests/test-file-system-unlink				\
+	tests/test-file-system-unlinkat
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -525,6 +526,9 @@ tests_test_file_system_fchownat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_chownfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_chownfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_chdir_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_chdir_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -5397,6 +5397,7 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 @menu
 * fs pathnames::                File system pathnames type definition.
 * fs working directory::        Handling the current working directory.
+* fs root directory::           Handling the root directory.
 * fs links::                    Hard and symbolic links.
 * fs deleting::                 Deleting links.
 * fs renaming::                 Renaming links.
@@ -5663,6 +5664,24 @@ if (mmux_libc_getcwd_pathname(&ptn)) @{
 @deftypefun bool mmux_libc_chdir (mmux_libc_file_system_pathname_t @var{dirptn})
 @MmuxCInterfaceGlibc{chdir, Working Directory}.
 @end deftypefun
+
+@c page
+@node fs root directory
+@section Handling the root directory
+
+
+The following functions require the calling process to have special privileges.  They are included
+in the @api{} of this package for completeness.
+
+
+@deftypefun bool mmux_libc_chroot (mmux_libc_file_system_pathname_t @var{ptn})
+@MmuxCInterface{chroot}.
+@end deftypefun
+
+
+@deftypefn {Linux Function} bool mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
+@MmuxCInterface{pivot_root}.
+@end deftypefn
 
 @c page
 @node fs links

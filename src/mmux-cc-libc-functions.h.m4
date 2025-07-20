@@ -1288,6 +1288,17 @@ mmux_cc_libc_decl bool mmux_libc_getcwd_malloc (mmux_asciizcpp_t result_p)
 mmux_cc_libc_decl bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
+  __attribute__((__warn_unused_result__));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_chroot (mmux_libc_file_system_pathname_t ptn)
+  __attribute__((__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
+  __attribute__((__warn_unused_result__));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_link (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)

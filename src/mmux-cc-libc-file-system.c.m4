@@ -156,6 +156,33 @@ mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
     return false;
   }
 }
+bool
+mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
+{
+  mmux_sint_t	rv = chdir(dirptn.value);
+
+  return (rv)? true : false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Root directory.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_chroot (mmux_libc_file_system_pathname_t ptn)
+{
+  mmux_sint_t	rv = chroot(ptn.value);
+
+  return (rv)? true : false;
+}
+bool
+mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
+{
+  mmux_sint_t	rv = syscall(SYS_pivot_root, new_root_ptn, put_old_ptn.value);
+
+  return (rv)? true : false;
+}
 
 
 /** --------------------------------------------------------------------
