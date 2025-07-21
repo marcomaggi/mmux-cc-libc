@@ -78,6 +78,8 @@
 
 * Add functions interfacing "unshare(2)"?  (Documented in a manual page.)
 
+* Add functions interfacing "ftw(3)"?
+
 ### end of file
 # Local Variables:
 # mode: text
