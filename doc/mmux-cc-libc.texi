@@ -6670,13 +6670,25 @@ if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
 
 
 @deftypefun bool mmux_libc_umask (mmux_mode_t * @var{old_mask_p}, mmux_mode_t @var{new_mask})
-@MmuxCInterface{umask}.
+@MmuxCInterfaceGlibc{umask, Setting Permissions}.
+
+@example
+mmux_mode_t     old_mask, new_mask = 0755;
+
+mmux_libc_umask(&old_mask, new_mask);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_getumask (mmux_mode_t * @var{current_mask_p})
 Store the current mask in the location referenced by @var{current_mask_p}.  Do not change the
 current mask.
+
+@example
+mmux_mode_t     cur_mask;
+
+mmux_libc_getumask(&cur_mask);
+@end example
 @end deftypefun
 
 

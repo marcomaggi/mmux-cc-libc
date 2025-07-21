@@ -412,6 +412,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-fstat				\
 	tests/test-file-system-fstatat				\
 	tests/test-file-system-getcwd				\
+	tests/test-file-system-getumask				\
 	tests/test-file-system-lchown				\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
@@ -436,6 +437,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-stat				\
 	tests/test-file-system-statfd				\
 	tests/test-file-system-symlink				\
+	tests/test-file-system-umask				\
 	tests/test-file-system-unlink				\
 	tests/test-file-system-unlinkat
 
@@ -549,6 +551,12 @@ tests_test_file_system_dirfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_rewinddir_telldir_seekdir_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_rewinddir_telldir_seekdir_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_umask_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_umask_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_getumask_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_getumask_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
