@@ -402,10 +402,13 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 check_PROGRAMS	+= \
 	tests/test-file-system-chdir				\
+	tests/test-file-system-chmod				\
 	tests/test-file-system-chown				\
 	tests/test-file-system-chownfd				\
 	tests/test-file-system-dirfd				\
 	tests/test-file-system-fchdir				\
+	tests/test-file-system-fchmod				\
+	tests/test-file-system-fchmodat				\
 	tests/test-file-system-fchown				\
 	tests/test-file-system-fchownat				\
 	tests/test-file-system-fdopendir-readdir-closedir	\
@@ -557,6 +560,15 @@ tests_test_file_system_umask_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_getumask_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_getumask_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_chmod_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_chmod_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_fchmod_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_fchmod_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_fchmodat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_fchmodat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

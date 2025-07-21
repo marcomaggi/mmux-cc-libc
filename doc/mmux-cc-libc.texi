@@ -6693,17 +6693,97 @@ mmux_libc_getumask(&cur_mask);
 
 
 @deftypefun bool mmux_libc_chmod (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
-@MmuxCInterface{chmod}.
+@MmuxCInterfaceGlibc{chmod, Setting Permissions}.
+
+@example
+mmux_libc_ptn_t     ptn;
+mmux_mode_t         mode = 0755;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_chmod(ptn, mode)) @{
+  /* error */
+@}
+
+/* Check it. */
+@{
+  mmux_libc_stat_t  ST[1];
+  mmux_mode_t       st_mode;
+
+  if (mmux_libc_stat(ptn, ST)) @{
+    handle_error();
+  @}
+
+  mmux_libc_st_mode_ref(&st_mode, ST);
+
+  if ((MMUX_LIBC_S_IRWXU                       == (MMUX_LIBC_S_IRWXU & st_mode)) &&
+      ((MMUX_LIBC_S_IRGRP | MMUX_LIBC_S_IXGRP) == (MMUX_LIBC_S_IRWXG & st_mode)) &&
+      ((MMUX_LIBC_S_IROTH | MMUX_LIBC_S_IXOTH) == (MMUX_LIBC_S_IRWXO & st_mode))) @{
+    /* mode checks out */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_fchmod (mmux_libc_file_descriptor_t @var{fd}, mmux_mode_t @var{mode})
-@MmuxCInterface{fchmod}.
+@MmuxCInterfaceGlibc{fchmod, Setting Permissions}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_fd_t        fd;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_O_RDWR;
+  mmux_mode_t         mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_mode_t         mode = 0755;
+
+  if (mmux_libc_fchmod(fd, mode)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode}, mmux_sint_t @var{flags})
 @MmuxCInterface{fchmodat}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_libc_fd_t      dirfd;
+  mmux_mode_t         mode  = 0755;
+  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+
+  mmux_libc_at_fdcwd(&dirfd);
+
+  if (mmux_libc_fchmodat(dirfd, ptn, mode, flags)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
