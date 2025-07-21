@@ -294,17 +294,18 @@ typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
 typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
 typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
 
-typedef struct mmux_libc_file_descriptor_t { mmux_sint_t value; } mmux_libc_file_descriptor_t;
-typedef mmux_libc_file_descriptor_t	mmux_libc_fd_t;
-typedef mmux_libc_file_descriptor_t	mmux_libc_network_socket_t;
+typedef struct mmux_libc_pid_t				{ mmux_pid_t      value; } mmux_libc_pid_t;
+typedef struct mmux_libc_uid_t				{ mmux_uid_t      value; } mmux_libc_uid_t;
+typedef struct mmux_libc_gid_t				{ mmux_gid_t      value; } mmux_libc_gid_t;
+typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t     value; } mmux_libc_file_descriptor_t;
+typedef struct mmux_libc_file_system_pathname_t		{ mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
+typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t     value; } mmux_libc_completed_process_status_t;
+typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t     value; } mmux_libc_interprocess_signal_t;
+typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
+typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t    value; } mmux_libc_dirstream_position_t;
 
-typedef struct mmux_libc_pid_t	{ mmux_pid_t  value; } mmux_libc_pid_t;
-typedef struct mmux_libc_uid_t	{ mmux_uid_t  value; } mmux_libc_uid_t;
-typedef struct mmux_libc_gid_t	{ mmux_gid_t  value; } mmux_libc_gid_t;
-typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t value; } mmux_libc_completed_process_status_t;
-typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t value; } mmux_libc_interprocess_signal_t;
-
-typedef struct mmux_libc_file_system_pathname_t { mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
+typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t;
+typedef mmux_libc_file_descriptor_t		mmux_libc_network_socket_t;
 typedef mmux_libc_file_system_pathname_t	mmux_libc_ptn_t;
 
 typedef struct timeval		mmux_libc_timeval_t;
@@ -328,10 +329,6 @@ typedef struct group		mmux_libc_group_t;
 typedef struct stat		mmux_libc_stat_t;
 typedef struct utimbuf		mmux_libc_utimbuf_t;
 typedef struct dirent		mmux_libc_dirent_t;
-
-typedef struct mmux_libc_dirtream_t {
-  DIR *		value; /* DIR is opaque as defined by the C library */
-} mmux_libc_dirstream_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

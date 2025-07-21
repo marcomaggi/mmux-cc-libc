@@ -1306,6 +1306,13 @@ mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_l
 mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t dirstream)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream);
+
+mmux_cc_libc_decl bool mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos);
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_getcwd (mmux_asciizp_t bufptr, mmux_usize_t buflen)

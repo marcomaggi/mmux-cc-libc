@@ -299,6 +299,26 @@ mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t d
     return false;
   }
 }
+bool
+mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream)
+{
+  rewinddir(dirstream.value);
+  return false;
+}
+bool
+mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+{
+  mmux_slong_t	rv = telldir(dirstream.value);
+
+  result_p->value = rv;
+  return false;
+}
+bool
+mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos)
+{
+  seekdir(dirstream.value, dirpos.value);
+  return false;
+}
 
 
 /** --------------------------------------------------------------------

@@ -5664,6 +5664,12 @@ if (mmux_libc_closedir(dirstream)) @{
 Opaque alias to the standard type @code{DIR *}.
 @end deftp
 
+
+@deftp {Opaque Struct Type} mmux_libc_dirstream_position_t
+Opaque data structure used to represent the position in a directory stream retrieved with
+@cfunc{mmux_libc_telldir}.
+@end deftp
+
 @c page
 @node fs directories entries
 @subsection Directory entry objects
@@ -5803,6 +5809,21 @@ if (mmux_libc_readdir(&direntry, dirstream)) @{
   /* no more entries are available */
 @}
 @end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream)
+@MmuxCInterfaceGlibc{rewinddir, Random Access Directory}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+@MmuxCInterfaceGlibc{telldir, Random Access Directory}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos)
+@MmuxCInterfaceGlibc{seekdir, Random Access Directory}.
 @end deftypefun
 
 @c page

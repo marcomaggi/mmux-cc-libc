@@ -431,6 +431,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-rename				\
 	tests/test-file-system-renameat				\
 	tests/test-file-system-renameat2			\
+	tests/test-file-system-rewinddir-telldir-seekdir	\
 	tests/test-file-system-rmdir				\
 	tests/test-file-system-stat				\
 	tests/test-file-system-statfd				\
@@ -545,6 +546,9 @@ tests_test_file_system_fdopendir_readdir_closedir_LDADD		= $(mmux_cc_libc_tests_
 
 tests_test_file_system_dirfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_dirfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_rewinddir_telldir_seekdir_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_rewinddir_telldir_seekdir_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
