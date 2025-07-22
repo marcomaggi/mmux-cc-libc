@@ -401,11 +401,14 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## file system
 
 check_PROGRAMS	+= \
+	tests/test-file-system-access				\
 	tests/test-file-system-chdir				\
 	tests/test-file-system-chmod				\
 	tests/test-file-system-chown				\
 	tests/test-file-system-chownfd				\
 	tests/test-file-system-dirfd				\
+	tests/test-file-system-faccessat			\
+	tests/test-file-system-faccessat2			\
 	tests/test-file-system-fchdir				\
 	tests/test-file-system-fchmod				\
 	tests/test-file-system-fchmodat				\
@@ -569,6 +572,15 @@ tests_test_file_system_fchmod_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_fchmodat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_fchmodat_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_access_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_access_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_faccessat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_faccessat_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_faccessat2_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_faccessat2_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

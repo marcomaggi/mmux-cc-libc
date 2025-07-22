@@ -1452,12 +1452,16 @@ mmux_cc_libc_decl bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mm
 					   mmux_mode_t mode, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_access (mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_faccessat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
-					    mmux_sint_t how, mmux_sint_t flags)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+					    mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+					     mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 

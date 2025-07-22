@@ -6723,6 +6723,10 @@ if (mmux_libc_chmod(ptn, mode)) @{
       ((MMUX_LIBC_S_IROTH | MMUX_LIBC_S_IXOTH) == (MMUX_LIBC_S_IRWXO & st_mode))) @{
     /* mode checks out */
   @}
+
+  if (0755 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode)) @{
+    /* mode checks out */
+  @}
 @}
 @end example
 @end deftypefun
@@ -6787,13 +6791,121 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_access (mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how})
-@MmuxCInterface{access}.
+@deftypefun bool mmux_libc_access (bool * @var{access_is_permitted_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how})
+@MmuxCInterfaceGlibc{access, Testing File Access}.  When successful the access mode specified by
+@var{how} could be permitted or denied:
+
+@itemize
+@item
+if the requested access is permitted: the variable referenced by @var{access_is_permitted_p} is set
+to @ctrue{};
+
+@item
+if the requested access is denied: the variable referenced by @var{access_is_permitted_p} is set to
+@cfalse{}.
+@end itemize
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Check: it is a file, it is readable, it is writable, it is executable. */
+@{
+  mmux_sint_t         how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK | MMUX_LIBC_X_OK;
+  bool                access_is_permitted;
+
+  if (mmux_libc_access(&access_is_permitted, ptn, how)) @{
+    /* error */
+  @} else if (access_is_permitted) @{
+    /* access is permitted */
+  @} else @{
+    /* access is denied */
+  @}
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_faccessat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
-@MmuxCInterface{faccessat}.
+@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+@MmuxCInterface{faccessat}.  When successful the access mode specified by
+@var{how} could be permitted or denied:
+
+@itemize
+@item
+if the requested access is permitted: the variable referenced by @var{access_is_permitted_p} is set
+to @ctrue{};
+
+@item
+if the requested access is denied: the variable referenced by @var{access_is_permitted_p} is set to
+@cfalse{}.
+@end itemize
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Check: it is a file, it is readable, it is writable, it is executable. */
+@{
+  mmux_libc_fd_t  dirfd;
+  mmux_sint_t     how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK | MMUX_LIBC_X_OK;
+  mmux_sint_t     flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+  bool            access_is_permitted;
+
+  if (mmux_libc_faccessat(&access_is_permitted, dirfd, ptn, how, flags)) @{
+    /* error */
+  @} else if (access_is_permitted) @{
+    /* access is permitted */
+  @} else @{
+    /* access is denied */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+@MmuxCInterface{faccessat2}.  When successful the access mode specified by @var{how} could be
+permitted or denied:
+
+@itemize
+@item
+if the requested access is permitted: the variable referenced by @var{access_is_permitted_p} is set
+to @ctrue{};
+
+@item
+if the requested access is denied: the variable referenced by @var{access_is_permitted_p} is set to
+@cfalse{}.
+@end itemize
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Check: it is a file, it is readable, it is writable, it is executable. */
+@{
+  mmux_libc_fd_t  dirfd;
+  mmux_sint_t     how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK | MMUX_LIBC_X_OK;
+  mmux_sint_t     flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+  bool            access_is_permitted;
+
+  if (mmux_libc_faccessat2(&access_is_permitted, dirfd, ptn, how, flags)) @{
+    /* error */
+  @} else if (access_is_permitted) @{
+    /* access is permitted */
+  @} else @{
+    /* access is denied */
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page

@@ -682,19 +682,84 @@ mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pat
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_access (mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
+mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
 {
-  int	rv = access(pathname.value, how);
+  mmux_sint_t	rv;
 
-  return ((0 == rv)? false : true);
+  mmux_libc_errno_set(0);
+  rv = access(pathname.value, how);
+
+  if (0 == rv) {
+    *access_is_permitted_p = true;
+    return false;
+  } else {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (MMUX_LIBC_EACCES == errnum) {
+      /* The specified access is NOT permitted. */
+      mmux_libc_errno_set(0);
+      *access_is_permitted_p = false;
+      return false;
+    } else {
+      /* An error occurred, the error code is in "errno". */
+      return true;
+    }
+  }
 }
 bool
-mmux_libc_faccessat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
-		     mmux_sint_t how, mmux_sint_t flags)
+mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+		     mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
 {
-  int	rv = faccessat(dirfd.value, pathname.value, how, flags);
+  mmux_sint_t	rv;
 
-  return ((0 == rv)? false : true);
+  mmux_libc_errno_set(0);
+  rv = faccessat(dirfd.value, pathname.value, how, flags);
+
+  if (0 == rv) {
+    *access_is_permitted_p = true;
+    return false;
+  } else {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (MMUX_LIBC_EACCES == errnum) {
+      /* The specified access is NOT permitted. */
+      mmux_libc_errno_set(0);
+      *access_is_permitted_p = false;
+      return false;
+    } else {
+      /* An error occurred, the error code is in "errno". */
+      return true;
+    }
+  }
+}
+bool
+mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+		      mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
+{
+  mmux_sint_t	rv;
+
+  mmux_libc_errno_set(0);
+  rv = syscall(SYS_faccessat2, dirfd.value, pathname.value, how, flags);
+
+  if (0 == rv) {
+    *access_is_permitted_p = true;
+    return false;
+  } else {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_ref(&errnum);
+    if (MMUX_LIBC_EACCES == errnum) {
+      /* The specified access is NOT permitted. */
+      mmux_libc_errno_set(0);
+      *access_is_permitted_p = false;
+      return false;
+    } else {
+      /* An error occurred, the error code is in "errno". */
+      return true;
+    }
+  }
 }
 
 
