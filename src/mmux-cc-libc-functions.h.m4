@@ -1625,6 +1625,15 @@ mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_file_descriptor_t fd,
 					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
   __attribute__((__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_futimens (mmux_libc_file_descriptor_t fd,
+					   mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec)
+  __attribute__((__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
+					    mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
+					    mmux_sint_t flags)
+  __attribute__((__warn_unused_result__));
+
 
 /** --------------------------------------------------------------------
  ** Sockets.

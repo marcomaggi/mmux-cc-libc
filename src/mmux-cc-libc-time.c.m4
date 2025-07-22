@@ -62,7 +62,7 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
     char	str[len];
 
     mmux_time_sprint(str, len, timeval_p->tv_sec);
-    rv = dprintf(fd.value, "%s->tv_sec = %s\n", struct_name, str);
+    rv = dprintf(fd.value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
     if (0 > rv) { return true; }
   }
 
@@ -71,7 +71,7 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
     char	str[len];
 
     mmux_time_sprint(str, len, timeval_p->tv_usec);
-    rv = dprintf(fd.value, "%s->tv_usec = %s\n", struct_name, str);
+    rv = dprintf(fd.value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
     if (0 > rv) { return true; }
   }
 
@@ -133,7 +133,7 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
     char	str[len];
 
     mmux_time_sprint(str, len, timespec_p->tv_sec);
-    rv = dprintf(fd.value, "%s->ts_sec = %s\n", struct_name, str);
+    rv = dprintf(fd.value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
     if (0 > rv) { return true; }
   }
 
@@ -142,7 +142,7 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
     char	str[len];
 
     mmux_time_sprint(str, len, timespec_p->tv_nsec);
-    rv = dprintf(fd.value, "%s->ts_nsec = %s\n", struct_name, str);
+    rv = dprintf(fd.value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
     if (0 > rv) { return true; }
   }
 

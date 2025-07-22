@@ -1099,7 +1099,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_atim.tv_sec);
-    DPRINTF(fd, "%s->st_atime_sec = %s", struct_name, str);
+    DPRINTF(fd, "%s->st_atime_sec = %s [seconds]", struct_name, str);
     if (mmux_libc_stat_dump_time(fd, stat_p->st_atim.tv_sec)) {
       return true;
     }
@@ -1110,7 +1110,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_atim.tv_nsec);
-    DPRINTF(fd, "%s->st_atime_nsec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_atime_nsec = %s [nanoseconds]\n", struct_name, str);
   }
 
   {
@@ -1118,7 +1118,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_mtim.tv_sec);
-    DPRINTF(fd, "%s->st_mtime_sec = %s", struct_name, str);
+    DPRINTF(fd, "%s->st_mtime_sec = %s [seconds]", struct_name, str);
     if (mmux_libc_stat_dump_time(fd, stat_p->st_mtim.tv_sec)) {
       return true;
     }
@@ -1129,7 +1129,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_mtim.tv_nsec);
-    DPRINTF(fd, "%s->st_mtime_nsec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_mtime_nsec = %s [nanoseconds]\n", struct_name, str);
   }
 
   {
@@ -1137,7 +1137,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_time_sprint(str, len, stat_p->st_ctim.tv_sec);
-    DPRINTF(fd, "%s->st_ctime_sec = %s", struct_name, str);
+    DPRINTF(fd, "%s->st_ctime_sec = %s [seconds]", struct_name, str);
     if (mmux_libc_stat_dump_time(fd, stat_p->st_ctim.tv_sec)) {
       return true;
     }
@@ -1148,7 +1148,7 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
     char	str[len];
 
     mmux_slong_sprint(str, len, stat_p->st_ctim.tv_nsec);
-    DPRINTF(fd, "%s->st_ctime_nsec = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_ctime_nsec = %s [nanoseconds]\n", struct_name, str);
   }
 
   {
@@ -1429,7 +1429,10 @@ mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t cons
     char	str[len];
 
     mmux_time_sprint(str, len, utimbuf_p->actime);
-    DPRINTF(fd, "%s->st_actime = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_actime  = %s", struct_name, str);
+    if (mmux_libc_stat_dump_time(fd, utimbuf_p->actime)) {
+      return true;
+    }
   }
 
   {
@@ -1437,7 +1440,10 @@ mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t cons
     char	str[len];
 
     mmux_time_sprint(str, len, utimbuf_p->modtime);
-    DPRINTF(fd, "%s->st_modtime = %s\n", struct_name, str);
+    DPRINTF(fd, "%s->st_modtime = %s", struct_name, str);
+    if (mmux_libc_stat_dump_time(fd, utimbuf_p->modtime)) {
+      return true;
+    }
   }
 
   return false;
@@ -1476,6 +1482,25 @@ mmux_libc_futimes (mmux_libc_file_descriptor_t fd,
 {
   mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
   int			rv   = futimes(fd.value, T);
+
+  return ((0 == rv)? false : true);
+}
+bool
+mmux_libc_futimens (mmux_libc_file_descriptor_t fd,
+		    mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec)
+{
+  mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
+  int			rv   = futimens(fd.value, T);
+
+  return ((0 == rv)? false : true);
+}
+bool
+mmux_libc_utimensat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t ptn,
+		     mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
+		     mmux_sint_t flags)
+{
+  mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
+  int			rv   = utimensat(dirfd.value, ptn.value, T, flags);
 
   return ((0 == rv)? false : true);
 }

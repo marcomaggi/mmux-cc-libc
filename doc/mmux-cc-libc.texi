@@ -7465,28 +7465,265 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @section File system times
 
 
+@menu
+* fs times utimbuf::            Data structures of type @objtype{mmux_libc_utimbuf_t}.
+* fs times setting::            Setting the file system times associated to files.
+@end menu
+
+@c page
+@node fs times utimbuf
+@subsection Data structures of type @objtype{mmux_libc_utimbuf_t}
+
+
+If we want to toy with a @objtype{mmux_libc_utimbuf_t} objects, we do:
+
+@example
+mmux_libc_utimbuf_t   UTB[1];
+mmux_time_t           T1, T2;
+
+mmux_libc_time(&T1);
+mmux_libc_time(&T2);
+
+mmux_libc_actime_set  (UTB, T1);
+mmux_libc_modtime_set (UTB, T2);
+
+@{
+  mmux_libc_fd_t      fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_utimbuf_dump(fd, UTB, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
 @MmuxCStructOpaqueTypedef{utimbuf}
 @MmuxSetterGetter{utimbuf, actime,  mmux_time_t}
 @MmuxSetterGetter{utimbuf, modtime, mmux_time_t}
 @MmuxStructDumper{utimbuf}
 
+@c page
+@node fs times setting
+@subsection Setting the file system times associated to files
+
 
 @deftypefun bool mmux_libc_utime (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_utimbuf_t @var{utimbuf})
 @MmuxCInterface{utime}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_libc_utimbuf_t UTB;
+  mmux_time_t         T1, T2;
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  mmux_libc_actime_set  (&UTB, T1);
+  mmux_libc_modtime_set (&UTB, T2);
+
+  if (mmux_libc_utime(ptn, UTB)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_utimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{utimes}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_time_t                 T1, T2;
+  mmux_slong_t                microsecs1, microsecs2;
+  mmux_libc_timeval_t         access_timeval, modification_timeval;
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  microsecs1 = 123;
+  microsecs2 = 456;
+
+  mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
+  mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+
+  if (mmux_libc_utimes(ptn, access_timeval, modification_timeval)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 @deftypefun bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{lutimes}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_time_t                 T1, T2;
+  mmux_slong_t                microsecs1, microsecs2;
+  mmux_libc_timeval_t         access_timeval, modification_timeval;
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  microsecs1 = 123;
+  microsecs2 = 456;
+
+  mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
+  mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+
+  if (mmux_libc_lutimes(ptn, access_timeval, modification_timeval)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_futimes (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{futimes}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_fd_t        fd;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_O_RDONLY;
+  mmux_mode_t         mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_time_t                 T1, T2;
+  mmux_slong_t                microsecs1, microsecs2;
+  mmux_libc_timeval_t         access_timeval, modification_timeval;
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  microsecs1 = 123;
+  microsecs2 = 456;
+
+  mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
+  mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+
+  if (mmux_libc_futimes(fd, access_timeval, modification_timeval)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_futimens (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec})
+@MmuxCInterface{futimens}.
+
+@example
+mmux_libc_ptn_t       ptn;
+mmux_libc_fd_t        fd;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_O_RDONLY;
+  mmux_mode_t         mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_time_t                 T1, T2;
+  mmux_slong_t                nanosecs1, nanosecs2;
+  mmux_libc_timespec_t        access_timespec, modification_timespec;
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  nanosecs1 = 123;
+  nanosecs2 = 456;
+
+  mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
+  mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+
+  if (mmux_libc_futimes(fd, access_timespec, modification_timespec)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_utimensat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec}, mmux_sint_t @var{flags})
+@MmuxCInterface{utimensat}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_libc_fd_t              dirfd;
+  mmux_time_t                 T1, T2;
+  mmux_slong_t                nanosecs1, nanosecs2;
+  mmux_libc_timespec_t        access_timespec, modification_timespec;
+  mmux_sint_t                 flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+
+  mmux_libc_at_fdcwd(&dirfd);
+
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
+
+  nanosecs1 = 123;
+  nanosecs2 = 456;
+
+  mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
+  mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+
+  if (mmux_libc_utimensat(dirfd, ptn, access_timespec, modification_timespec, flags)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page

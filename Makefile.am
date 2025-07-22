@@ -418,12 +418,15 @@ check_PROGRAMS	+= \
 	tests/test-file-system-fstat				\
 	tests/test-file-system-fstatat				\
 	tests/test-file-system-ftruncate			\
+	tests/test-file-system-futimes				\
+	tests/test-file-system-futimens				\
 	tests/test-file-system-getcwd				\
 	tests/test-file-system-getumask				\
 	tests/test-file-system-lchown				\
 	tests/test-file-system-link				\
 	tests/test-file-system-linkat				\
 	tests/test-file-system-lstat				\
+	tests/test-file-system-lutimes				\
 	tests/test-file-system-mkdir				\
 	tests/test-file-system-mkdirat				\
 	tests/test-file-system-opendir-readdir-closedir		\
@@ -443,11 +446,15 @@ check_PROGRAMS	+= \
 	tests/test-file-system-rmdir				\
 	tests/test-file-system-stat				\
 	tests/test-file-system-statfd				\
+	tests/test-file-system-struct-utimbuf			\
 	tests/test-file-system-symlink				\
 	tests/test-file-system-truncate				\
 	tests/test-file-system-umask				\
 	tests/test-file-system-unlink				\
-	tests/test-file-system-unlinkat
+	tests/test-file-system-unlinkat				\
+	tests/test-file-system-utime				\
+	tests/test-file-system-utimes				\
+	tests/test-file-system-utimensat
 
 tests_test_file_system_pathname_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
@@ -589,6 +596,27 @@ tests_test_file_system_truncate_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_ftruncate_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_ftruncate_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_struct_utimbuf_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_struct_utimbuf_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_utime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_utime_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_utimes_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_utimes_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_lutimes_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_lutimes_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_futimes_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_futimes_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_futimens_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_futimens_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_utimensat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_utimensat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
