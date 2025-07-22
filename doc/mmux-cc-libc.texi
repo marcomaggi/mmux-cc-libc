@@ -6869,7 +6869,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
 @MmuxCInterface{faccessat2}.  When successful the access mode specified by @var{how} could be
 permitted or denied:
 
@@ -6906,7 +6906,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   @}
 @}
 @end example
-@end deftypefun
+@end deftypefn
 
 @c page
 @node fs attributes
