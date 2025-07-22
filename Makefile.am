@@ -417,6 +417,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-fdopendir-readdir-closedir	\
 	tests/test-file-system-fstat				\
 	tests/test-file-system-fstatat				\
+	tests/test-file-system-ftruncate			\
 	tests/test-file-system-getcwd				\
 	tests/test-file-system-getumask				\
 	tests/test-file-system-lchown				\
@@ -443,6 +444,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-stat				\
 	tests/test-file-system-statfd				\
 	tests/test-file-system-symlink				\
+	tests/test-file-system-truncate				\
 	tests/test-file-system-umask				\
 	tests/test-file-system-unlink				\
 	tests/test-file-system-unlinkat
@@ -581,6 +583,12 @@ tests_test_file_system_faccessat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_faccessat2_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_faccessat2_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_truncate_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_truncate_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_ftruncate_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_ftruncate_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -7407,11 +7407,57 @@ if (mmux_libc_file_system_pathname_file_size_ref(&size, dirfd, ptn)) @{
 
 @deftypefun bool mmux_libc_truncate (mmux_libc_file_system_pathname_t pathname, mmux_off_t len)
 @MmuxCInterface{truncate}.
+
+@example
+mmux_libc_ptn_t       ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Do it. */
+@{
+  mmux_off_t          len = 10;
+
+  if (mmux_libc_truncate(ptn, len)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux_off_t len);
+@deftypefun bool mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux_off_t len)
 @MmuxCInterface{ftruncate}.
+
+@example
+mmux_libc_ptn_t  ptn;
+mmux_libc_fd_t   fd;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  mmux_sint_t         flags = MMUX_LIBC_O_RDWR;
+  mmux_mode_t         mode  = 0;
+
+  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+
+/* Do it. */
+@{
+  mmux_off_t          len = 10;
+
+  if (mmux_libc_ftruncate(fd, len)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page
