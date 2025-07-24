@@ -103,16 +103,25 @@ typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
 typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
 typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
 
-typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t    value; } mmux_libc_file_descriptor_t;
-typedef struct mmux_libc_pid_t				{ mmux_pid_t     value; } mmux_libc_pid_t;
-typedef struct mmux_libc_uid_t				{ mmux_uid_t     value; } mmux_libc_uid_t;
-typedef struct mmux_libc_gid_t				{ mmux_gid_t     value; } mmux_libc_gid_t;
-typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t    value; } mmux_libc_completed_process_status_t;
-typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t    value; } mmux_libc_interprocess_signal_t;
-typedef struct mmux_libc_dirstream_t			{ mmux_pointer_t value; } mmux_libc_dirstream_t;
-typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t	 value; } mmux_libc_dirstream_position_t;
+typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t     value; } mmux_libc_completed_process_status_t;
+typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t	  value; } mmux_libc_dirstream_position_t;
+typedef struct mmux_libc_dirstream_t			{ mmux_pointer_t  value; } mmux_libc_dirstream_t;
+typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t     value; } mmux_libc_file_descriptor_t;
+typedef struct mmux_libc_file_system_pathname_t		{ mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
+typedef struct mmux_libc_gid_t				{ mmux_gid_t      value; } mmux_libc_gid_t;
+typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t     value; } mmux_libc_interprocess_signal_t;
+typedef struct mmux_libc_pid_t				{ mmux_pid_t      value; } mmux_libc_pid_t;
+typedef struct mmux_libc_uid_t				{ mmux_uid_t      value; } mmux_libc_uid_t;
 
-typedef struct mmux_libc_file_system_pathname_t { mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
+typedef struct mmux_libc_file_system_pathname_extension_t {
+  mmux_asciizcp_t	ptr;
+  mmux_usize_t		len;
+} mmux_libc_file_system_pathname_extension_t;
+
+typedef struct mmux_libc_file_system_pathname_segment_t {
+  mmux_asciicp_t 	ptr;
+  mmux_usize_t		len;
+} mmux_libc_file_system_pathname_segment_t;
 
 typedef struct mmux_libc_timeval_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVAL];  } mmux_libc_timeval_t;
 typedef struct mmux_libc_timespec_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC]; } mmux_libc_timespec_t;
@@ -133,9 +142,11 @@ typedef struct mmux_libc_iovec_array_t {
   mmux_usize_t		iova_len;
 } mmux_libc_iovec_array_t;
 
-typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t;
-typedef mmux_libc_file_descriptor_t		mmux_libc_network_socket_t;
-typedef mmux_libc_file_system_pathname_t	mmux_libc_ptn_t;
+typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
+typedef mmux_libc_file_descriptor_t			mmux_libc_network_socket_t;
+typedef mmux_libc_file_system_pathname_t		mmux_libc_ptn_t;
+typedef mmux_libc_file_system_pathname_extension_t	mmux_libc_ptn_extension_t;
+typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
 
 /* This must be big enough to contain any "struct sockaddr_*" value. */
 typedef struct mmux_libc_sockaddr_t		{ mmux_uint8_t value[256];                             } mmux_libc_sockaddr_t;

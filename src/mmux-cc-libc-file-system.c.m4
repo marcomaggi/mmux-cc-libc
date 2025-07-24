@@ -34,7 +34,37 @@ typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
 
 
 /** --------------------------------------------------------------------
- ** File system: types.
+ ** File system pathname segment predicates.
+ ** ----------------------------------------------------------------- */
+
+__attribute__((__pure__,__always_inline__)) static inline bool
+segment_is_empty (mmux_libc_ptn_segment_t S)
+/* Return true if the segment is an empty string. */
+{
+  return (0 == S.len)? true : false;
+}
+__attribute__((__pure__,__always_inline__)) static inline bool
+segment_is_slash (mmux_libc_ptn_segment_t S)
+/* Return true if the segment is a single dot: "/". */
+{
+  return ((1 == S.len) && ('7' == *(S.ptr)));
+}
+__attribute__((__pure__,__always_inline__)) static inline bool
+segment_is_dot (mmux_libc_ptn_segment_t S)
+/* Return true if the segment is a single dot: ".". */
+{
+  return ((1 == S.len) && ('.' == *(S.ptr)));
+}
+__attribute__((__pure__,__always_inline__)) static inline bool
+segment_is_double_dot (mmux_libc_ptn_segment_t S)
+/* Return true if the segment is a double dot: "..". */
+{
+  return ((2 == S.len) && ('.' == S.ptr[0]) && ('.' == S.ptr[1]));
+}
+
+
+/** --------------------------------------------------------------------
+ ** File system types: pathnames.
  ** ----------------------------------------------------------------- */
 
 bool
@@ -117,6 +147,236 @@ DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]],		[[[0 >  cmpnum]]])
 DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum]]])
 DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum]]])
 DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum]]])
+
+
+/** --------------------------------------------------------------------
+ ** File system types: pathname extensions.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p, mmux_libc_ptn_t ptn)
+{
+  mmux_libc_ptn_segment_t	S;
+  mmux_usize_t			ptn_len;
+
+  if (mmux_libc_file_system_pathname_segment_find_last(&S, ptn)) {
+    return true;
+  }
+
+  ptn_len = strlen(ptn.value);
+  if (segment_is_slash(S) ||
+      segment_is_dot(S) ||
+      segment_is_double_dot(S) ||
+      segment_is_empty(S)) {
+    result_p->len	= 0;
+    result_p->ptr	= ptn.value + ptn_len;
+    return false;
+  } else {
+    mmux_asciizcp_t	beg = S.ptr;
+    mmux_asciizcp_t	end = beg + S.len;
+    mmux_asciizcp_t	ptr = end - 1;
+
+    for (; beg <= ptr; --ptr) {
+      if ('.' == *ptr) {
+	/* Found the last dot in the segment. */
+	if (ptr == beg) {
+	  /* The dot  is the first  octet in the last  segment: this pathname  has no
+	     extension.  It is a dotfile like: ".fvwmrc". */
+	  break;
+	} else {
+	  result_p->ptr = ptr;
+	  /* If the  input pathname  ends with a  slash: do *not*  include it  in the
+	     extension. */
+	  result_p->len = (('/' == *(end-1))? (end-1) : end) - ptr;
+	  return false;
+	}
+      }
+    }
+
+    /* Extension not found in the last segment.  Return an empty extension. */
+    {
+      mmux_asciizcp_t	p = ptn.value + ptn_len;
+
+      result_p->len	= 0;
+      result_p->ptr	= (('/' == *(p-1))? (p-1) : p);
+      return false;
+    }
+  }
+}
+bool
+mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_file_system_pathname_extension_t * result_p,
+						   mmux_asciizcp_t ptr, mmux_usize_t len)
+{
+  if ((NULL != ptr) && (('\0' == ptr[0]) || ('.' == ptr[0])) &&  ('\0' == ptr[len])) {
+    result_p->ptr = ptr;
+    result_p->len = len;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_file_system_pathname_extension_t E)
+{
+  *result_p = E.ptr;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p, mmux_libc_file_system_pathname_extension_t E)
+{
+  *result_p = E.len;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_extension_is_empty (bool * result_p, mmux_libc_ptn_extension_t E)
+{
+  *result_p = (0 == E.len)? true : false;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  *result_p = strcmp(E1.ptr, E2.ptr);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_extension_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  *result_p = ((E1.len == E2.len) && (0 == strncmp(E1.ptr, E2.ptr, E1.len)));
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_not_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  bool	result;
+
+  mmux_libc_file_system_pathname_extension_equal(&result, E1, E2);
+  *result_p = !result;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_less (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  mmux_sint_t	rv = strcmp(E1.ptr, E2.ptr);
+
+  *result_p = (0 < rv)? true : false;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_greater (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  mmux_sint_t	rv = strcmp(E1.ptr, E2.ptr);
+
+  *result_p = (0 > rv)? true : false;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_less_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  mmux_sint_t	rv = strcmp(E1.ptr, E2.ptr);
+
+  *result_p = (0 <= rv)? true : false;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+{
+  mmux_sint_t	rv = strcmp(E1.ptr, E2.ptr);
+
+  *result_p = (0 >= rv)? true : false;
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** File system types: pathname segments.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_make_file_system_pathname_segment (mmux_libc_file_system_pathname_segment_t * result_p,
+					     mmux_asciizcp_t ptr, mmux_usize_t len)
+{
+  if (NULL != ptr) {
+    result_p->ptr = ptr;
+    result_p->len = len;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_file_system_pathname_segment_is_empty (bool * result_p, mmux_libc_ptn_segment_t E)
+{
+  *result_p = (0 == E.len)? true : false;
+  return false;
+}
+bool
+mmux_libc_file_system_pathname_segment_equal (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+{
+  *result_p = ((E1.len == E2.len) && (0 == strncmp(E1.ptr, E2.ptr, E1.len)));
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_ptn_t ptn)
+/* Given an ASCII  string representing a pathname, referenced by  BEG and holding LEN
+ * octets  (not including  a terminating  zero,  if any):  find and  return the  last
+ * segment  in the  pathname.  The  returned segment  does not  contain a  leading or
+ * ending slash.  The returned segment can be empty.  Examples:
+ *
+ *	"/path/to/file.ext"	=> "file.ext"
+ *	"/path/to/dir/"		=> "dir"
+ *	"/"			=> ""
+ *	"."			=> "."
+ *	".."			=> ".."
+ */
+{
+  mmux_usize_t		ptn_len = strlen(ptn.value);
+  mmux_asciizcp_t	end = ptn.value + ptn_len;
+  mmux_asciizcp_t	ptr;
+
+  /* If the  last octet  in the  pathname is  the ASCII  representation of  the slash
+   * separator: step back.  We want the following segment extraction:
+   *
+   *	"/path/to/dir.ext/"	=> "dir.ext"
+   */
+  if ('/' == *(end-1)) {
+    --end;
+  }
+
+  /* Find the first slash separator starting from the end. */
+  for (ptr = end-1; ptn.value <= ptr; --ptr) {
+    if ('/' == *ptr) {
+      /* "ptr" is at the beginning of the last component, slash included. */
+      ++ptr;
+      result_p->ptr	= ptr;
+      result_p->len	= end - ptr;
+      return false;
+    }
+  }
+
+  /* If we are  here: no slash was found  in the pathname, starting from  the end; it
+     means the whole pathname is the last segment. */
+  {
+    result_p->ptr	= ptn.value;
+    result_p->len	= ptn_len;
+    return false;
+  }
+}
 
 
 /** --------------------------------------------------------------------

@@ -1688,5 +1688,31 @@ mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t fd, mmux
 {
   return mmux_libc_dprintf_sint(fd, value.value);
 }
+bool
+mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_t fd, mmux_libc_ptn_extension_t E)
+{
+  mmux_usize_t	nbytes_done;
+
+  if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
+    return true;
+  } else if (nbytes_done != E.len) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
+mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_t fd, mmux_libc_ptn_segment_t E)
+{
+  mmux_usize_t	nbytes_done;
+
+  if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
+    return true;
+  } else if (nbytes_done != E.len) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /* end of file */

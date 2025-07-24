@@ -835,6 +835,12 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fil
 								   mmux_libc_interprocess_signal_t value)
   __attribute__((__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_t fd, mmux_libc_ptn_extension_t E)
+  __attribute__((__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_t fd, mmux_libc_ptn_segment_t E)
+  __attribute__((__warn_unused_result__));
+
 
 /** --------------------------------------------------------------------
  ** System configuration.
@@ -1287,6 +1293,72 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_less_equal (bool * result_
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_greater_equal (bool * result_p,
 								     mmux_libc_file_system_pathname_t ptn1,
 								     mmux_libc_file_system_pathname_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p,
+								      mmux_libc_ptn_t ptn)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_ptn_extension_t * result_p,
+									  mmux_asciizcp_t ptr, mmux_usize_t len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p,
+									 mmux_libc_file_system_pathname_extension_t E)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p,
+									 mmux_libc_file_system_pathname_extension_t E)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_is_empty (bool * result_p,
+									  mmux_libc_ptn_extension_t E)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p,
+									 mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+  __attribute__((__nonnull__(1)));
+
+typedef bool mmux_libc_file_system_pathname_extension_comparison_predicate_t (bool * result_p,
+									      mmux_libc_ptn_extension_t E1,
+									      mmux_libc_ptn_extension_t E2);
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_equal
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_not_equal
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_less
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_greater
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_less_equal
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_greater_equal
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_segment (mmux_libc_ptn_segment_t * result_p,
+								    mmux_asciizcp_t ptr, mmux_usize_t len)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_empty (bool * result_p,
+									  mmux_libc_ptn_segment_t E)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_equal (bool * result_p,
+								     mmux_libc_ptn_segment_t E1,
+								     mmux_libc_ptn_segment_t E2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_ptn_t ptn)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
