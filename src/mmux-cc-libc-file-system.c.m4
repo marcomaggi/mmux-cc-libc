@@ -157,10 +157,10 @@ pathname_is_relative (mmux_libc_ptn_t ptn)
 bool
 mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * result_p, mmux_asciizcp_t ptn_asciiz)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnonnull-compare"
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
   if ((NULL != ptn_asciiz) && ('\0' != ptn_asciiz[0])) {
-#pragma GCC diagnostic pop
+_Pragma("GCC diagnostic pop")
     result_p->value = ptn_asciiz;
     return false;
   } else {
@@ -474,14 +474,14 @@ bool
 mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_file_system_pathname_extension_t * result_p,
 						   mmux_asciizcp_t ptr, mmux_usize_t len)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnonnull-compare"
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
   if ((NULL != ptr)
       /* Either the extension is empty, or it begins with a dot. */
       && (('\0' == ptr[0]) || ('.' == ptr[0]))
       /* Either the extension ends with a zero byte, or it ends with a slash. */
       && ('\0' == ptr[len] || '/' == ptr[len])) {
-#pragma GCC diagnostic pop
+_Pragma("GCC diagnostic pop")
     result_p->ptr = ptr;
     result_p->len = len;
     return false;
@@ -650,10 +650,10 @@ bool
 mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_file_system_pathname_segment_t * result_p,
 						 mmux_asciizcp_t ptr, mmux_usize_t len)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnonnull-compare"
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
   if (NULL != ptr) {
-#pragma GCC diagnostic pop
+_Pragma("GCC diagnostic pop")
     result_p->ptr = ptr;
     result_p->len = len;
     return false;
@@ -1731,19 +1731,19 @@ mmux_libc_stat_dump_time (mmux_libc_fd_t fd, mmux_time_t T)
   mmux_usize_t		required_nbytes_including_nil;
 
   mmux_libc_gmtime(&BT, T);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
   if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
-#pragma GCC diagnostic pop
+_Pragma("GCC diagnostic pop")
     return true;
   } else {
     mmux_char_t		bufptr[required_nbytes_including_nil];
     mmux_usize_t	required_nbytes_without_zero;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
     if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
-#pragma GCC diagnostic pop
+_Pragma("GCC diagnostic pop")
       return true;
     } else {
       DPRINTF(fd, " (%s)\n", bufptr);
