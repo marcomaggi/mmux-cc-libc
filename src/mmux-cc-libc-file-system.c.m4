@@ -411,7 +411,47 @@ mmux_libc_make_file_system_pathname_filename (mmux_libc_ptn_t * result_p, mmux_l
 bool
 mmux_libc_make_file_system_pathname_dirname (mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
 {
-  return false;
+  if (pathname_is_standalone_slash(ptn)) {
+    /* If the pathname is "/" just copy it as dirname. */
+    return mmux_libc_make_file_system_pathname_malloc(result_p, ptn.value);
+  } else {
+    mmux_usize_t	len = strlen(ptn.value);
+
+    if ('/' == ptn.value[len-1]) {
+      /* If  the  pathname ends  with  "/"  just copy  it  as  dirname.  For  example
+	 "/path/to/directory/" is itself its dirname. */
+      return mmux_libc_make_file_system_pathname_malloc(result_p, ptn.value);
+    } else {
+      mmux_libc_file_system_pathname_segment_t	seg;
+
+      if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+	return true;
+      } else if (segment_is_dot(seg)) {
+	if (len == seg.len) {
+	  /* If the full pathname is "." just copy it as dirname. */
+	  return mmux_libc_make_file_system_pathname_malloc(result_p, ptn.value);
+	} else {
+	  /* If the  pathname ends with  "." just copy  it as dirname,  stripping the
+	     ending dot. */
+	  return mmux_libc_make_file_system_pathname_malloc_from_buffer(result_p, ptn.value, (len - seg.len));
+	}
+      } else if (segment_is_double_dot(seg)) {
+	/* If the pathname ends with ".." just copy it as dirname. */
+	return mmux_libc_make_file_system_pathname_malloc(result_p, ptn.value);
+      } else {
+	if (len == seg.len) {
+	  /* If we are  here: the pathname has  a single segment and  such segment is
+	     not a special  directory; we establish the convention  that: its dirname
+	     is ".". */
+	  return mmux_libc_make_file_system_pathname_malloc(result_p, ".");
+	} else {
+	  /* If  we are  here: the  dirname  is the  pathname with  the last  segment
+	     removed. */
+	  return mmux_libc_make_file_system_pathname_malloc_from_buffer(result_p, ptn.value, (len - seg.len));
+	}
+      }
+    }
+  }
 }
 
 

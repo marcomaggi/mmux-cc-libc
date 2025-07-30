@@ -5833,14 +5833,15 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
 Build a new file system pathname representing the dirname of @var{ptn}; store in the variable
 referenced by @var{result_p} the new pathname object.  The @dfn{dirname} of a file system pathname
-is the directory part, the input pathname with the last segment stripped:
+is its directory part; if the pathname is itself a directory: its dirname is the full pathname
+itself.
 
 @example
-/path/to/file.ext       @result{} /path/to
+/path/to/file.ext       @result{} /path/to/
 file.ext                @result{} .
-/path/to/dir/           @result{} /path/to
-/path/to/.              @result{} /path/to
-/path/to/..             @result{} /path
+/path/to/dir/           @result{} /path/to/dir/
+/path/to/.              @result{} /path/to/
+/path/to/..             @result{} /path/to/..
 .                       @result{} .
 ..                      @result{} ..
 /                       @result{} /

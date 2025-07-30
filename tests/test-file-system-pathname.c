@@ -578,6 +578,7 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn_
   if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname_dirname(&root_ptn, ptn)) {
+    printf_error("extracting the dirname from '%s'", ptn_asciiz);
     handle_error();
   } else {
     mmux_asciizcp_t	root_ptn_asciiz;
@@ -604,12 +605,12 @@ file_system_pathname_dirname (void)
 {
   printf_message("running test: %s", __func__);
 
-  one_dirname_case("/path/to/file.ext",		"/path/to");
-  one_dirname_case("/path/to/.dotfile.ext",	"/path/to");
-  one_dirname_case("/path/to/directory/",	"/path/to");
+  one_dirname_case("/path/to/file.ext",		"/path/to/");
+  one_dirname_case("/path/to/.dotfile.ext",	"/path/to/");
+  one_dirname_case("/path/to/directory/",	"/path/to/directory/");
 
-  one_dirname_case("path/to/file.ext",		"path/to");
-  one_dirname_case("path/to/.dotfile.ext",	"path/to");
+  one_dirname_case("path/to/file.ext",		"path/to/");
+  one_dirname_case("path/to/.dotfile.ext",	"path/to/");
 
   one_dirname_case("file.ext",			".");
   one_dirname_case(".dotfile.ext",		".");
@@ -620,8 +621,8 @@ file_system_pathname_dirname (void)
   one_dirname_case("/",				"/");
   one_dirname_case(".",				".");
   one_dirname_case("..",			"..");
-  one_dirname_case("/path/to/.",		"/path");
-  one_dirname_case("/path/to/..",		"/path");
+  one_dirname_case("/path/to/.",		"/path/to/");
+  one_dirname_case("/path/to/..",		"/path/to/..");
 }
 
 
@@ -981,7 +982,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   if (1) {	file_system_pathname_predicates();	}
   if (1) {	file_system_pathname_rootname();	}
-  if (0) {	file_system_pathname_dirname();		}
+  if (1) {	file_system_pathname_dirname();		}
   if (1) {	file_system_pathname_tailname();	}
   if (1) {	file_system_pathname_filename();	}
 
