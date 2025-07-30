@@ -20,6 +20,8 @@
 #undef NDEBUG
 #include <assert.h>
 
+#define BOOL_STRING(BOOL)	((true == BOOL)? "true" : "false")
+
 
 /** --------------------------------------------------------------------
  ** External declarations.

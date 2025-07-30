@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Jul 23, 2025
+  Date: Jul 27, 2025
 
   Abstract
 
@@ -26,16 +26,16 @@
  ** ----------------------------------------------------------------- */
 
 static void
-making_an_extension_from_raw_arguments (void)
+making_a_segment_from_raw_arguments (void)
 {
   printf_message("running test: %s", __func__);
   mmux_libc_ptn_t		ptn;
   mmux_asciizcp_t		ptn_asciiz;
-  mmux_libc_ptn_extension_t	ext;
+  mmux_libc_ptn_segment_t	ext;
   mmux_libc_fd_t		er;
 
   //                                             012345678901234567
-  //                                                          ^
+  //                                                      ^
   if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
     handle_error();
   }
@@ -44,7 +44,7 @@ making_an_extension_from_raw_arguments (void)
     handle_error();
   }
 
-  if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 4)) {
+  if (mmux_libc_make_file_system_pathname_segment_raw(&ext, ptn_asciiz + 9, 9)) {
     handle_error();
   }
 
@@ -58,10 +58,10 @@ making_an_extension_from_raw_arguments (void)
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
 
-  if (mmux_libc_dprintfer("*** the pathname extension is: ")) {
+  if (mmux_libc_dprintfer("*** the pathname last segment is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn_extension(er, ext)) {
+  if (mmux_libc_dprintf_libc_ptn_segment(er, ext)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
@@ -70,20 +70,20 @@ making_an_extension_from_raw_arguments (void)
 /* ------------------------------------------------------------------ */
 
 static void
-making_an_extension_from_pathname (void)
+making_the_last_segment_from_pathname (void)
 {
   printf_message("running test: %s", __func__);
   mmux_libc_ptn_t		ptn;
-  mmux_libc_ptn_extension_t	ext;
+  mmux_libc_ptn_segment_t	ext;
   mmux_libc_fd_t		er;
 
   //                                             012345678901234567
-  //                                                          ^
+  //                                                      ^
   if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
-  if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
+  if (mmux_libc_file_system_pathname_segment_find_last(&ext, ptn)) {
     handle_error();
   }
 
@@ -97,10 +97,10 @@ making_an_extension_from_pathname (void)
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
 
-  if (mmux_libc_dprintfer("*** the pathname extension is: ")) {
+  if (mmux_libc_dprintfer("*** the pathname last segment is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn_extension(er, ext)) {
+  if (mmux_libc_dprintf_libc_ptn_segment(er, ext)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
@@ -112,18 +112,18 @@ making_an_extension_from_pathname (void)
  ** ----------------------------------------------------------------- */
 
 static void
-extension_accessors (void)
+segment_accessors (void)
 {
   printf_message("running test: %s", __func__);
 
   mmux_libc_ptn_t		ptn;
   mmux_asciizcp_t		ptn_asciiz;
-  mmux_libc_ptn_extension_t	ext;
+  mmux_libc_ptn_segment_t	ext;
   mmux_asciizcp_t		ptr_field;
   mmux_usize_t			len_field;
 
   //                                             012345678901234567
-  //                                                          ^
+  //                                                      ^
   if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
     handle_error();
   }
@@ -132,20 +132,22 @@ extension_accessors (void)
     handle_error();
   }
 
-  if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 4)) {
+  if (mmux_libc_file_system_pathname_segment_find_last(&ext, ptn)) {
     handle_error();
   }
 
-  mmux_libc_file_system_pathname_extension_ptr_ref(&ptr_field, ext);
-  mmux_libc_file_system_pathname_extension_len_ref(&len_field, ext);
+  mmux_libc_file_system_pathname_segment_ptr_ref(&ptr_field, ext);
+  mmux_libc_file_system_pathname_segment_len_ref(&len_field, ext);
 
 
-  if ((ptn_asciiz + 13) != ptr_field) {
-    printf_error("wrong ptr field, expedted \"%p\", got \"%p\"", (mmux_pointer_t)(ptn_asciiz + 13), (mmux_pointer_t)ptr_field);
+  if ((ptn_asciiz + 9) != ptr_field) {
+    printf_error("wrong ptr field, expedted \"%p\", got \"%p\"",
+		 (mmux_pointer_t)(ptn_asciiz + 9),
+		 (mmux_pointer_t)ptr_field);
     handle_error();
   }
-  if (4 != len_field) {
-    printf_error("wrong len field, expedted \"%lu\", got \"%lu\"", (mmux_usize_t)4, len_field);
+  if (8 != len_field) {
+    printf_error("wrong len field, expedted \"%lu\", got \"%lu\"", (mmux_usize_t)8, len_field);
     handle_error();
   }
 }
@@ -156,32 +158,60 @@ extension_accessors (void)
  ** ----------------------------------------------------------------- */
 
 void
-extension_predicates (void)
+one_segment_predicate (bool is_dot_expected_result, bool is_double_dot_expected_result,
+		       bool is_slash_expected_result,
+		       mmux_asciizcp_t seg_asciiz)
 {
-  printf_message("running test: %s", __func__);
+  mmux_libc_ptn_segment_t	seg;
+  bool				result;
 
-  mmux_libc_ptn_t		ptn;
-  mmux_libc_ptn_extension_t	ext;
-
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname_segment_raw_asciiz(&seg, seg_asciiz)) {
     handle_error();
   }
 
-  if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
-    handle_error();
-  }
-
-  /* is_empty */
-  {
-    bool	is_empty;
-
-    mmux_libc_file_system_pathname_extension_is_empty(&is_empty, ext);
-
-    if (is_empty) {
-      printf_error("is empty predicate failure");
+  if (1) {
+    if (mmux_libc_file_system_pathname_segment_is_dot(&result, seg)) {
+      handle_error();
+    }
+    if (is_dot_expected_result != result) {
+      printf_error("is dot predicate failure, segment %s, expected %s, got %s", seg_asciiz,
+		   BOOL_STRING(is_dot_expected_result), BOOL_STRING(result));
       handle_error();
     }
   }
+
+  if (1) {
+    if (mmux_libc_file_system_pathname_segment_is_double_dot(&result, seg)) {
+      handle_error();
+    }
+    if (is_double_dot_expected_result != result) {
+      printf_error("is double dot predicate failure, segment %s, expected %s, got %s", seg_asciiz,
+		   BOOL_STRING(is_double_dot_expected_result), BOOL_STRING(result));
+      handle_error();
+    }
+  }
+
+  if (1) {
+    if (mmux_libc_file_system_pathname_segment_is_slash(&result, seg)) {
+      handle_error();
+    }
+    if (is_slash_expected_result != result) {
+      printf_error("is slash predicate failure, segment %s, expected %s, got %s", seg_asciiz,
+		   BOOL_STRING(is_slash_expected_result), BOOL_STRING(result));
+      handle_error();
+    }
+  }
+}
+
+void
+segment_predicates (void)
+{
+  printf_message("running test: %s", __func__);
+
+  one_segment_predicate(false, false, false,	"file.ext");
+  one_segment_predicate(true,  false, false,	".");
+  one_segment_predicate(false, true,  false,	"..");
+  one_segment_predicate(false, false, true,	"/");
 }
 
 
@@ -190,94 +220,71 @@ extension_predicates (void)
  ** ----------------------------------------------------------------- */
 
 static void
-one_common_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_asciiz)
+one_last_segment_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_seg_asciiz)
 {
   mmux_libc_ptn_t		ptn;
-  mmux_libc_ptn_extension_t	ext, expected;
-  mmux_usize_t			expected_asciiz_len;
+  mmux_libc_ptn_segment_t	seg, expected_seg;
   bool				correct;
 
-  mmux_libc_strlen(&expected_asciiz_len, expected_asciiz);
-
-  if (mmux_libc_make_file_system_pathname_extension_raw(&expected, expected_asciiz, expected_asciiz_len)) {
+  if (mmux_libc_make_file_system_pathname_segment_raw_asciiz(&expected_seg, expected_seg_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
+  } else if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
     handle_error();
-  } else if (mmux_libc_file_system_pathname_extension_equal(&correct, expected, ext)) {
+  } else if (mmux_libc_file_system_pathname_segment_equal(&correct, expected_seg, seg)) {
     handle_error();
   } else if (correct) {
-    printf_message("pathname \"%s\", extension \"%s\"", ptn_asciiz, ext.ptr);
-  } else {
-    printf_error("invalid result, expected \"%s\", got \"%s\"", expected.ptr, ext.ptr);
-    mmux_libc_exit_failure();
-  }
-}
-static void
-one_error_case (mmux_asciizcp_t ptn_asciiz)
-{
-  mmux_libc_ptn_t		ptn;
-  mmux_libc_ptn_extension_t	ext;
+    mmux_libc_fd_t	er;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
-    handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
-    mmux_sint_t		errnum;
-
-    mmux_libc_errno_consume(&errnum);
-    if (MMUX_LIBC_EINVAL == errnum) {
-      printf_message("correctly detected invalid pathname for extension \"%s\"", ptn_asciiz);
-    } else {
-      printf_error("expected EINVAL result, pathname \"%s\"", ptn_asciiz);
-      mmux_libc_exit_failure();
+    mmux_libc_stder(&er);
+    if (mmux_libc_dprintfer("pathname \"%s\", last segment \"", ptn_asciiz)) {
+      handle_error();
+    }
+    if (mmux_libc_dprintf_libc_ptn_segment(er, seg)) {
+      handle_error();
+    }
+    if (mmux_libc_dprintfer("\"\n")) {
+      handle_error();
     }
   } else {
-    printf_error("expected EINVAL result, pathname \"%s\"", ptn_asciiz);
+    mmux_libc_fd_t	er;
+
+    mmux_libc_stder(&er);
+    if (mmux_libc_dprintfer("invalid result, pathname \"%s\", last segment \"", ptn_asciiz)) {
+      handle_error();
+    }
+    if (mmux_libc_dprintf_libc_ptn_segment(er, seg)) {
+      handle_error();
+    }
+    if (mmux_libc_dprintfer("\"\n")) {
+      handle_error();
+    }
     mmux_libc_exit_failure();
   }
 }
 
 static void
-common_cases (void)
+last_segment_cases (void)
 {
   printf_message("running test: %s", __func__);
 
-  one_common_case("/path/to/file.ext",		".ext");
-  one_common_case("/path/to/file-1.2.3.ext",	".ext");
-  one_common_case("/path/to/file",		"");
-  one_common_case("/path/to/file.",		".");
-  one_common_case("/path/to/directory.ext/",	".ext");
-  one_common_case("/path/to/directory/",	"");
-  one_common_case("/path/to/.dotfile",		"");
-  one_common_case("/path/to/.dotfile.ext",	".ext");
+  one_last_segment_case("/path/to/file.ext",		"file.ext");
+  one_last_segment_case("file.ext",			"file.ext");
 
-  one_common_case("file.ext",			".ext");
-  one_common_case("file-1.2.3.ext",		".ext");
-  one_common_case("file",			"");
-  one_common_case("file.",			".");
-  one_common_case("directory.ext/",		".ext");
-  one_common_case("directory/",			"");
-//  one_common_case("directory.ext//",		".ext");
-//  one_common_case("directory.ext////",		".ext");
-  one_common_case(".dotfile",			"");
-  one_common_case(".dotfile.ext",		".ext");
+  one_last_segment_case("/path/to/.dotfile",		".dotfile");
+  one_last_segment_case(".dotfile",			".dotfile");
 
-  one_common_case("./file.ext",			".ext");
-  one_common_case("./file-1.2.3.ext",		".ext");
-  one_common_case("./file",			"");
-  one_common_case("./file.",			".");
-  one_common_case("./directory.ext/",		".ext");
-  one_common_case("./.dotfile",			"");
-  one_common_case("./.dotfile.ext",		".ext");
+  one_last_segment_case("/path/to/directory.d/",	"directory.d");
+  one_last_segment_case("directory.d/",			"directory.d");
 
-  one_error_case("/");
-  one_error_case(".");
-  one_error_case("..");
-  one_error_case("/path/to/.");
-  one_error_case("/path/to/..");
+  one_last_segment_case("/path/to/.",			".");
+  one_last_segment_case(".",				".");
 
-  one_common_case("/path/to/../file.ext",	".ext");
+  one_last_segment_case("/path/to/..",			"..");
+  one_last_segment_case("..",				"..");
+
+  one_last_segment_case("/",				"/");
 }
 
 
@@ -289,18 +296,18 @@ static void
 one_comparison (mmux_sint_t expected_cmpnum, mmux_asciizcp_t ptn_asciiz_1, mmux_asciizcp_t ptn_asciiz_2)
 {
   mmux_libc_ptn_t		ptn1, ptn2;
-  mmux_libc_ptn_extension_t	ext1, ext2;
+  mmux_libc_ptn_segment_t	ext1, ext2;
   mmux_sint_t			cmpnum;
 
   if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext1, ptn1)) {
+  } else if (mmux_libc_file_system_pathname_segment_find_last(&ext1, ptn1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext2, ptn2)) {
+  } else if (mmux_libc_file_system_pathname_segment_find_last(&ext2, ptn2)) {
     handle_error();
-  } else if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, ext1, ext2)) {
+  } else if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, ext1, ext2)) {
     handle_error();
   } else if (expected_cmpnum != cmpnum) {
     printf_error("invalid comparison, expected_cmpnum %d, cmpnum %d",
@@ -331,20 +338,20 @@ one_comparison_predicate (bool expected_equal,
 		mmux_asciizcp_t ptn_asciiz_1, mmux_asciizcp_t ptn_asciiz_2)
 {
   mmux_libc_ptn_t		ptn1, ptn2;
-  mmux_libc_ptn_extension_t	ext1, ext2;
+  mmux_libc_ptn_segment_t	ext1, ext2;
 
   if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext1, ptn1)) {
+  } else if (mmux_libc_file_system_pathname_segment_find_last(&ext1, ptn1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_extension(&ext2, ptn2)) {
+  } else if (mmux_libc_file_system_pathname_segment_find_last(&ext2, ptn2)) {
     handle_error();
   } else {
     bool	result;
 
-    if (mmux_libc_file_system_pathname_extension_equal(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_equal(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_equal == result) {
       printf_message("ext1=%s, ext2=%s equal result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -353,7 +360,7 @@ one_comparison_predicate (bool expected_equal,
       mmux_libc_exit_failure();
     }
 
-    if (mmux_libc_file_system_pathname_extension_not_equal(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_not_equal(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_equal != result) {
       printf_message("ext1=%s, ext2=%s not_equal result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -362,7 +369,7 @@ one_comparison_predicate (bool expected_equal,
       mmux_libc_exit_failure();
     }
 
-    if (mmux_libc_file_system_pathname_extension_less(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_less(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_less == result) {
       printf_message("ext1=%s, ext2=%s less result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -371,7 +378,7 @@ one_comparison_predicate (bool expected_equal,
       mmux_libc_exit_failure();
     }
 
-    if (mmux_libc_file_system_pathname_extension_greater(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_greater(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_greater == result) {
       printf_message("ext1=%s, ext2=%s greater result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -380,7 +387,7 @@ one_comparison_predicate (bool expected_equal,
       mmux_libc_exit_failure();
     }
 
-    if (mmux_libc_file_system_pathname_extension_less_equal(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_less_equal(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_less_equal == result) {
       printf_message("ext1=%s, ext2=%s less_equal result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -389,7 +396,7 @@ one_comparison_predicate (bool expected_equal,
       mmux_libc_exit_failure();
     }
 
-    if (mmux_libc_file_system_pathname_extension_greater_equal(&result, ext1, ext2)) {
+    if (mmux_libc_file_system_pathname_segment_greater_equal(&result, ext1, ext2)) {
       handle_error();
     } else if (expected_greater_equal == result) {
       printf_message("ext1=%s, ext2=%s greater_equal result: %s", ext1.ptr, ext2.ptr, BOOL_STRING(result));
@@ -434,52 +441,6 @@ comparison_predicate_functions (void)
 
 
 /** --------------------------------------------------------------------
- ** Pathname has extension.
- ** ----------------------------------------------------------------- */
-
-static void
-one_pathname_has_extension (bool expected_result, mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t ext_asciiz)
-{
-  mmux_libc_file_system_pathname_t		ptn;
-  mmux_libc_file_system_pathname_extension_t	ext;
-  mmux_usize_t					ext_len;
-  bool						result;
-
-  mmux_libc_strlen(&ext_len, ext_asciiz);
-
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
-    handle_error();
-  }
-  if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ext_asciiz, ext_len)) {
-    handle_error();
-  }
-  if (mmux_libc_file_system_pathname_has_extension(&result, ptn, ext)) {
-    handle_error();
-  } else if (expected_result == result) {
-    printf_message("pathname \"%s\" has extension \"%s\"? %s", ptn_asciiz, ext_asciiz, BOOL_STRING(result));
-  } else {
-    printf_message("pathname \"%s\" has extension \"%s\"? wrong result %s", ptn_asciiz, ext_asciiz, BOOL_STRING(result));
-    mmux_libc_exit_failure();
-  }
-}
-
-static void
-pathname_has_extension (void)
-{
-  printf_message("running test: %s", __func__);
-
-  one_pathname_has_extension(true,	"/path/to/file.ext",	".ext");
-  one_pathname_has_extension(false,	"/path/to/file.ext",	".bak");
-
-  one_pathname_has_extension(true,	"/path/to/file",	"");
-  one_pathname_has_extension(false,	"/path/to/file.ext",	"");
-
-  one_pathname_has_extension(true,	"/path/to/file.",	".");
-  one_pathname_has_extension(false,	"/path/to/file.ext",	".");
-}
-
-
-/** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
 
@@ -489,17 +450,16 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME			= "test-file-system-pathname-extensions";
+    PROGNAME			= "test-file-system-pathname-segments";
   }
 
-  if (1) {	making_an_extension_from_raw_arguments();	}
-  if (1) {	making_an_extension_from_pathname();		}
-  if (1) {	extension_accessors();				}
-  if (1) {	extension_predicates();				}
-  if (1) {	common_cases();					}
+  if (1) {	making_a_segment_from_raw_arguments();		}
+  if (1) {	making_the_last_segment_from_pathname();	}
+  if (1) {	segment_accessors();				}
+  if (1) {	segment_predicates();				}
+  if (1) {	last_segment_cases();				}
   if (1) {	comparison_functions();				}
   if (1) {	comparison_predicate_functions();		}
-  if (1) {	pathname_has_extension();			}
 
   mmux_libc_exit_success();
 }

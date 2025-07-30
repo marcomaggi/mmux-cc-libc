@@ -315,7 +315,10 @@ mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes
 						  mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
 {
   for (mmux_usize_t buflen=1024; buflen; buflen+=1024) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
     mmux_usize_t required_nbytes_excluding_nil = strftime(NULL, buflen, template, tm_p);
+#pragma GCC diagnostic pop
 
     if (0 == required_nbytes_excluding_nil) {
       /* The numbe of bytes "buflen" is not big enough. */
@@ -340,7 +343,10 @@ mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
     /* See the documentation  of "strftime()" in the GLIBC manual  for an explanation
        of this nonsense. */
     bufptr[0]       = '\1';
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
     required_nbytes_without_zero = strftime(bufptr, buflen, template, tm_p);
+#pragma GCC diagnostic pop
     if ((0 == required_nbytes_without_zero) && ('\0' != bufptr[0])) {
       return true;
     } else {

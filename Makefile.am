@@ -432,6 +432,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-opendir-readdir-closedir		\
 	tests/test-file-system-pathname				\
 	tests/test-file-system-pathname-extensions		\
+	tests/test-file-system-pathname-segments		\
 	tests/test-file-system-pathname-file-size		\
 	tests/test-file-system-readlink				\
 	tests/test-file-system-readlink-malloc			\
@@ -462,6 +463,9 @@ tests_test_file_system_pathname_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_pathname_extensions_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_extensions_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_pathname_segments_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_pathname_segments_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_getcwd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_getcwd_LDADD			= $(mmux_cc_libc_tests_ldadd)

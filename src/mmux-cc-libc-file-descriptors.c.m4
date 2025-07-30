@@ -323,13 +323,19 @@ mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_li
 {
   mmux_usize_t		required_nbytes_including_nil;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
   if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
+#pragma GCC diagnostic pop
     return true;
   } else {
     mmux_char_t		bufptr[required_nbytes_including_nil];
     mmux_usize_t	required_nbytes_without_zero;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
     if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
+#pragma GCC diagnostic pop
       return true;
     } else {
       return mmux_libc_dprintf(fd, "%s", bufptr);

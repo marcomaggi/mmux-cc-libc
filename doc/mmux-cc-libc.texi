@@ -3539,7 +3539,7 @@ mmux_mode_t             mode  = 0;
 
 if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_open(&fd, ptn, flags, mode)) @{
   /* error */
@@ -3720,6 +3720,18 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
+@anchor{mmux_libc_dprintf_libc_ptn_extension}
+@deftypefun bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_extension_t @var{value})
+Print to @var{fd} the string representation of @var{value}.
+@end deftypefun
+
+
+@anchor{mmux_libc_dprintf_libc_ptn_segment}
+@deftypefun bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_segment_t @var{value})
+Print to @var{fd} the string representation of @var{value}.
+@end deftypefun
+
+
 @anchor{mmux_libc_dprintf_libc_completed_process_status}
 @deftypefun bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_completed_process_status_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
@@ -3758,7 +3770,7 @@ mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
 if (mmux_libc_make_file_system_pathname(&pathname, "/path/to/file.ext")) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_open(&fd, pathname, flags, mode)) @{
   /* error */
@@ -3780,7 +3792,7 @@ mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
 if (mmux_libc_make_file_system_pathname(&pathname, "/path/to/file.ext")) @{
   /* error */
-@};
+@}
 
 mmux_libc_at_fdcwd(&dirfd);
 
@@ -3872,7 +3884,7 @@ mmux_libc_open_how_resolve_set(&open_how, \
 
 if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
   /* error */
-@};
+@}
 
 mmux_libc_at_fdcwd(&dirfd);
 
@@ -5414,7 +5426,8 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 @menu
 * fs pathnames pathnames::      File system full pathnames.
-* fs pathnames extensions::     Extensions of file names.
+* fs pathnames extensions::     Extensions of file system pathnames.
+* fs pathnames segments::       Extensions of file system pathnames.
 @end menu
 
 @c page
@@ -5441,6 +5454,8 @@ Pointer to the first octet in the array of octets.
 * fs pathnames pathnames constructors::   Building file system pathnames.
 * fs pathnames pathnames inspection::     Inspecting file system pathnames.
 * fs pathnames pathnames comparison::     Comparing file system pathnames.
+* fs pathnames pathnames predicates::     Predicates on file system pathnames.
+* fs pathnames pathnames components::     Components of file system pathnames.
 @end menu
 
 @c page
@@ -5448,6 +5463,71 @@ Pointer to the first octet in the array of octets.
 @subsubsection Usage examples for file system pathnames
 
 
+Build a pathname from an @asciiz{} string, by allocating dynamic memory:
+
+@example
+mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) @{
+  /* error */
+@}
+@{
+  ...
+@}
+if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
+Build a pathname from an @mmuxascii{} string, by allocating dynamic memory:
+
+@example
+//                                  012345678
+mmux_asciizcp_t         bufptr[] = "/path/to/file.ext";
+mmux_usize_t            buflen   = 8;
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)) @{
+  /* error */
+@}
+@{
+  ...
+@}
+if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
+Allocate a buffer containing the pathname, then store the buffer in the pathname object:
+
+@example
+mmux_asciizcp_t       ptn_asciiz = "/path/to/file.ext";
+mmux_usize_t          buflen;
+mmux_asciizp_t        bufptr;
+mmux_libc_ptn_t       ptn;
+
+mmux_libc_strlen(&buflen, ptn_asciiz);
+if (mmux_libc_malloc(&bufptr, 1 + buflen)) @{
+  /* error */
+@} else @{
+  bufptr[buflen]='\0';
+  mmux_libc_strncpy(bufptr, ptn_asciiz, buflen);
+  if (mmux_libc_make_file_system_pathname(&ptn, bufptr)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
 We can print a file system pathname to a file descriptor using the function
 @cfunc{mmux_libc_dprintf_libc_ptn}; @ref{mmux_libc_dprintf_libc_ptn} for details.
 
@@ -5471,44 +5551,65 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @subsubsection Building file system pathnames
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{asciiz_pathname})
-Make a new file system pathname value; the pointer @var{asciiz_pathname} is stored in the data
-structure referenced by @var{result_p}.  The @asciiz{} string @var{asciiz_pathname} is validated:
+@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{ptn_asciiz})
+Make a new file system pathname value; the pointer @var{ptn_asciiz} is stored in the data
+structure referenced by @var{result_p}.  The @asciiz{} string @var{ptn_asciiz} is validated:
 
 @enumerate
 @item
-@var{asciiz_pathname} itself must not be @cnull{};
+@var{ptn_asciiz} itself must not be @cnull{};
 
 @item
 the string length must not be zero: the first character must not be null.
 @end enumerate
 
 @example
-mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
 mmux_libc_ptn_t         ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, asciiz_pathname)) @{
+if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{asciiz_pathname})
+@deftypefun bool mmux_libc_make_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{ptn_asciiz})
 Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
 the given pathname.
 
 @example
-mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
 mmux_libc_ptn_t         ptn;
 
-if (mmux_libc_file_system_pathname_malloc(&ptn, asciiz_pathname)) @{
+if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) @{
   /* error */
 @}
 @{
   ...
 @}
 if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_malloc_from_buffer (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{bufptr}, mmux_usize_t @var{buflen})
+Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
+@var{buflen} bytes from the given buffer referenced by @var{bufptr}.
+
+The argument @var{buflen} must @strong{not} include the terminating zero byte, but this function
+will allocate enough bytes for the buffer and the terminating zero and it will set to zero the
+terminating byte.
+
+@example
+//                                  012345678
+mmux_asciizcp_t         bufptr[] = "/path/to/file.ext";
+mmux_usize_t            buflen   = 8;
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)) @{
   /* error */
 @}
 @end example
@@ -5524,26 +5625,26 @@ Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_li
 @subsubsection Inspecting file system pathnames
 
 
-@deftypefun bool mmux_libc_file_system_pathname_asciizp_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store in the variable referenced by @var{result_p} a pointer to the first octet in the array
 representing the file system pathname.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_length (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
 Store in the variable referenced by @var{result_p} the number of characters in the pathname
 @var{ptn}.  A call to this function should never fail, so we can avoid checking its return value.
 
 @example
-mmux_asciizcp_t         asciiz_pathname = "/path/to/file.ext";
+mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
 mmux_libc_ptn_t         ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, asciiz_pathname)) @{
+if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
   /* error */
 @} else @{
   mmux_usize_t          len;
 
-  mmux_libc_file_system_pathname_length(&len, ptn);
+  mmux_libc_file_system_pathname_len_ref(&len, ptn);
   ...
 @}
 @end example
@@ -5626,29 +5727,221 @@ compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
-@node fs pathnames extensions
-@subsection Extensions of file names
+@node fs pathnames pathnames predicates
+@subsubsection Predicates on file system pathnames
 
 
-@menu
-* fs pathnames extensions types::               Data types representing file names extensions.
-* fs pathnames extensions accessors::           File system pathname extensions Field accessors.
-* fs pathnames extensions constructors::        Building file names extensions.
-@end menu
+The following predicates work best when applied to file system pathnames that have been previously
+normalised, either with @cfunc{mmux_libc_make_file_system_pathname_normalised} or
+@cfunc{mmux_libc_realpath} and similar functions.
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_dot (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone dot
+(@file{.} or @file{/path/to/.}); otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t         ptn;
+bool                    result;
+
+mmux_libc_file_system_pathname_is_standalone_dot(&result, ptn);
+if (result) @{
+  ...
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_double_dot (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone double dot
+(@file{..} or @file{/path/to/..}); otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_slash (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone slash
+(@file{/}); otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_special_directory (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is on among: a standalone
+slash, a standalone dot, a standalone double dot; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_absolute (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the first byte in @var{ptn}
+@strong{does} represent an @mmuxascii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
+byte represents an @mmuxascii{} slash: the process of finding the file corresponding to @var{ptn} on
+the file system, @strong{does not} depend on the current working directory.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_is_relative (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the first byte in @var{ptn}
+@strong{does not} represent an @mmuxascii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
+byte does not represent an @mmuxascii{} slash: the process of finding the file corresponding to
+@var{ptn} on the file system, @strong{does} depend on the current working directory.
+@end deftypefun
 
 @c page
-@node fs pathnames extensions types
-@subsubsection Data types representing file names extensions
+@node fs pathnames pathnames components
+@subsubsection Components of file system pathnames
 
 
-@deftp {Struct Typedef} mmux_libc_file_system_pathname_extension_t
-@deftpx {Struct Typedef} mmux_libc_ptn_extension_t
-Data structure representing a file name extension; it is meant to be associated to an object of type
-@objtype{mmux_libc_file_system_pathname_t} with which, usually, it shares memory.
+@deftypefun bool mmux_libc_make_file_system_pathname_rootname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Build a new file system pathname representing the rootname of @var{ptn}; store in the variable
+referenced by @var{result_p} the new pathname object.  The @dfn{rootname} of a file system pathname
+is the whole pathname with the extension stripped:
 
-Given that a file system pathname is an array of octets (not bytes) terminated by a zero octet, to
-be interpreted as @asciiz{} string: a file system pathname extension is also an array of octets
-terminated by a zero octet, to be interpreted an @asciiz{} string.
+@example
+/path/to/file.ext       @result{} /path/to/file
+/path/to/file           @result{} /path/to/file
+/path/to/dir/           @result{} /path/to/dir
+file.ext                @result{} file.ext
+.fvwmrc                 @result{} .fvwmrc
+.                       @error{} invalid argument
+..                      @error{} invalid argument
+/                       @error{} invalid argument
+@end example
+
+@noindent
+if @var{ptn} is the root directory @file{/}, a standalone dot @file{.} or @file{/path/to/.}, a
+standalone double dot @file{..} or @file{/path/to/..}, then the function call fails: @code{errno} is
+set to @code{MMUX_LIBC_EINVAL} and the return value is true.
+
+The memory required to contain the rootname is allocated with @cfunc{mmux_libc_malloc}, to it must
+be released later with @cfunc{mmux_libc_file_system_pathname_free}.
+
+@example
+mmux_libc_ptn_t         ptn, root_ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_rootname(&root_ptn, ptn)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_file_system_pathname_free(root_ptn);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Build a new file system pathname representing the dirname of @var{ptn}; store in the variable
+referenced by @var{result_p} the new pathname object.  The @dfn{dirname} of a file system pathname
+is the directory part, the input pathname with the last segment stripped:
+
+@example
+/path/to/file.ext       @result{} /path/to
+file.ext                @result{} .
+/path/to/dir/           @result{} /path/to
+/path/to/.              @result{} /path/to
+/path/to/..             @result{} /path
+.                       @result{} .
+..                      @result{} ..
+/                       @result{} /
+@end example
+
+The memory required to contain the dirname is allocated with @cfunc{mmux_libc_malloc}, to it must be
+released later with @cfunc{mmux_libc_file_system_pathname_free}.
+
+@example
+mmux_libc_ptn_t         ptn, dir_ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_dirname(&dir_ptn, ptn)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_file_system_pathname_free(dir_ptn);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_file_system_pathname_tailname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Build a new file system pathname representing the tailname of @var{ptn}; store in the variable
+referenced by @var{result_p} the new pathname object.  The @dfn{tailname} of a file system pathname
+is the last segment of the input pathname:
+
+@example
+/path/to/file.ext       @result{} file.ext
+/path/to/dir/           @result{} dir
+file.ext                @result{} file.ext
+.                       @result{} .
+..                      @result{} ..
+/                       @result{} /
+@end example
+
+The memory required to contain the tailname is allocated with @cfunc{mmux_libc_malloc}, to it must
+be released later with @cfunc{mmux_libc_file_system_pathname_free}.
+
+@example
+mmux_libc_ptn_t         ptn, tail_ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_tailname(&tail_ptn, ptn)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_file_system_pathname_free(tail_ptn);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_file_system_pathname_filename (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Build a new file system pathname representing the filename of @var{ptn}; store in the variable
+referenced by @var{result_p} the new pathname object.  The @dfn{filename} of a file system pathname
+is the relative pathname representing the last segment of the input pathname, if it does not
+represent a directory:
+
+@example
+/path/to/file.ext       @result{} file.ext
+file.ext                @result{} file.ext
+/path/to/dir/           @error{}  invalid argument
+.                       @error{}  invalid argument
+..                      @error{}  invalid argument
+/                       @error{}  invalid argument
+@end example
+
+@noindent
+if @var{ptn} represents a directory, then the function call fails: @code{errno} is set to
+@code{MMUX_LIBC_EINVAL} and the return value is true.
+
+The memory required to contain the filename is allocated with @cfunc{mmux_libc_malloc}, to it must
+be released later with @cfunc{mmux_libc_file_system_pathname_free}.
+
+@example
+mmux_libc_ptn_t         ptn, file_ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_filename(&file_ptn, ptn)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_file_system_pathname_free(file_ptn);
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames extensions
+@subsection Extensions of file system pathnames
+
+
+Given that a file system pathname is an array of bytes terminated by a zero byte, to be interpreted
+as @asciiz{} string: a file system pathname extension is also an array of bytes to be interpreted an
+@mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero byte.
 
 Examples defining what a file system pathname extension is:
 
@@ -5660,10 +5953,37 @@ Examples defining what a file system pathname extension is:
 /path/to/.dotfile.ext           @result{} .ext
 /path/to/.dotfile               @result{} <empty>
 /path/to/directory.d/           @result{} .d
-/                               @result{} <empty>
-.                               @result{} <empty>
-..                              @result{} <empty>
+/                               @error{} <invalid pathname>
+.                               @error{} <invalid pathname>
+..                              @error{} <invalid pathname>
+/path/to/.                      @error{} <invalid pathname>
+/path/to/..                     @error{} <invalid pathname>
 @end example
+
+Under @value{PACKAGE}: file system pathname extensions are represented with objects of type
+@objtype{mmux_libc_file_system_pathname_extension_t}.  Some constructors of this object attempt to
+determine the extension of the last portion of a file system pathname even when such pathname is not
+normalised; it is the responsibility of the caller to make sure that the pathname can be parsed in
+such a way that the correct extension is determined.
+
+@menu
+* fs pathnames extensions types::               Data types representing file names extensions.
+* fs pathnames extensions inspection::          File system pathname extensions inspection.
+* fs pathnames extensions constructors::        Building file system pathname extensions.
+* fs pathnames extensions comparison::          Comparing file system pathname extensions.
+* fs pathnames extensions predicates::          Predicates for file system pathname extensions.
+@end menu
+
+@c page
+@node fs pathnames extensions types
+@subsubsection Data types representing file names extensions
+
+
+@deftp {Struct Typedef} mmux_libc_file_system_pathname_extension_t
+@deftpx {Struct Typedef} mmux_libc_ptn_extension_t
+Data structure representing a file system pathname extension.  Sometimes it is meant to be
+associated to an object of type @objtype{mmux_libc_file_system_pathname_t} with which, usually, it
+shares memory.
 
 It has two fields:
 
@@ -5678,23 +5998,23 @@ Number of octets in the file pathname extension.  It can be zero if the associat
 empty extension.
 @end table
 
-In a correctly built @objtype{mmux_libc_file_system_pathname_t} object, the following expression:
+In a correctly built @objtype{mmux_libc_file_system_pathname_extension_t} object, the following
+expression is true:
 
 @example
-(NULL != ptr) && ('\0' == ptr[0] || '.' == ptr[0]) && ('\0' == ptr[len])
+(NULL != ptr)                           \
+&& ('\0' == ptr[0]   || '.' == ptr[0])  \
+&& ('\0' == ptr[len] || '/' == ptr[len])
 @end example
-
-@noindent
-is true.
 @end deftp
 
 @c page
-@node fs pathnames extensions accessors
-@subsubsection File system pathname extensions Field accessors
+@node fs pathnames extensions inspection
+@subsubsection File system pathname extensions inspection
 
 
 @deftypefun bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t @var{result_p}, mmux_libc_file_system_pathname_extension_t @var{ext})
-Accessor for the field @var{ptr} of @var{E}.
+Accessor for the field @code{ptr} of @var{E}.
 
 @example
 mmux_libc_ptn_t                 ptn;
@@ -5703,45 +6023,48 @@ mmux_asciizcp_t                 ptr;
 
 if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
   /* error */
-@};
+@}
 
 mmux_libc_file_system_pathname_extension_ptr_ref(&ptr, ext);
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p, mmux_libc_file_system_pathname_extension_t @var{ext})
-Accessor for the field @var{len} of @var{E}.
+@deftypefun bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_extension_t @var{ext})
+Accessor for the field @code{len} of @var{E}.
 
 @example
 mmux_libc_ptn_t                 ptn;
 mmux_libc_ptn_extension_t       ext;
-mmux_asciizcp_t                 ptr;
+mmux_usize_t                    len;
 
 if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
   /* error */
-@};
+@}
 
-mmux_libc_file_system_pathname_extension_len_ref(&ptr, ext);
+mmux_libc_file_system_pathname_extension_len_ref(&len, ext);
 @end example
 @end deftypefun
 
 @c page
 @node fs pathnames extensions constructors
-@subsubsection Building file names extensions
+@subsubsection Building file system pathnames extensions
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_ptn_extension_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+@deftypefun bool mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
 Build an already allocated @objtype{mmux_libc_file_system_pathname_extension_t} object from a file
 system pathname object.  The resulting extension object shares memory with the pathname object.
+
+If the pathname is a special directory (@file{/} or @file{.} or @file{..} or @file{/path/to/.} or
+@file{/path/to/..}): this function sets @code{errno} to @samp{MMUX_LIBC_EINVAL}, then returns true.
 
 @example
 mmux_asciizcp_t                 ptn_asciiz = "/path/to/file.ext";
@@ -5750,11 +6073,11 @@ mmux_libc_ptn_extension_t       ext;
 
 if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
   /* error */
-@};
+@}
 @end example
 @end deftypefun
 
@@ -5772,11 +6095,11 @@ mmux_libc_ptn_extension_t       ext;
 
 if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 3)) @{
   /* error */
-@};
+@}
 @end example
 
 For a pathname that has no extension:
@@ -5789,12 +6112,420 @@ mmux_libc_ptn_extension_t       ext;
 
 if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
   /* error */
-@};
+@}
 
 if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 0)) @{
   /* error */
-@};
+@}
 @end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extension_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
+Build an already allocated file system pathname extension from the raw pointer to an @asciiz{}
+string.
+
+@example
+mmux_libc_file_system_pathname_extension_t      ext;
+
+if (mmux_libc_make_file_system_pathname_extension_raw_asciiz(&ext, ".ext")) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames extensions comparison
+@subsubsection Comparing file system pathname extensions
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare two extensions and store in the variable referenced by @var{result_p} the value:
+
+@table @code
+@item 0
+when @code{@vari{ext} == @varii{ext}};
+@item -1
+when @code{@vari{ext} < @varii{ext}};
+@item +1
+when @code{@vari{ext} > @varii{ext}};
+@end table
+
+The file system pathname extensions are compared as strings, using the standard @cfunc{strncmp}:
+
+@itemize
+@item
+if the extensions have the same length, @cfunc{strncmp} is applied to the whole strings;
+
+@item
+if the extensions have different length, @cfunc{strncmp} is applied to portion of the strings of
+maximum common length; if these substrings are equal: the shortest is considered less than the
+longest.
+@end itemize
+@end deftypefun
+
+
+For all the functions below the comparison is performed using
+@cfunc{mmux_libc_file_system_pathname_extension_compare}.
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} == @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_not_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} != @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_less (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} < @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_greater (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} > @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_less_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} <= @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_greater_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} >= @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+@c page
+@node fs pathnames extensions predicates
+@subsubsection Predicates for file system pathname extensions
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_is_empty (bool * @var{result_p}, mmux_libc_ptn_extension_t @var{ext})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ext} represents the empty file
+system pathname extension; otherwise store @cfalse{}.
+
+@example
+mmux_libc_ptn_t                 ptn;
+mmux_libc_ptn_extension_t       ext;
+bool                            is_empty;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
+  /* error */
+@}
+
+mmux_libc_file_system_pathname_extension_is_empty(&is_empty, ext);
+if (is_empty) @{
+  ...
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_has_extension (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn}, mmux_libc_ptn_extension_t @var{ext})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} has extension @var{ext};
+otherwise store @cfalse{}.
+
+@example
+mmux_libc_file_system_pathname_t              ptn;
+mmux_libc_file_system_pathname_extension_t    ext;
+bool                                          ptn_has_extension_ext;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+if (mmux_libc_make_file_system_pathname_extension_raw_asciiz(&ext, ".ext")) @{
+  /* error */
+@}
+mmux_libc_file_system_pathname_has_extension(&ptn_has_extension_ext, ptn, ext);
+if (ptn_has_extension_ext) @{
+   /* it has */
+@} else @{
+   /* it has not */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames segments
+@subsection Extensions of file system pathnames
+
+
+Given the file system pathname:
+
+@example
+/path/to/file.ext
+@end example
+
+@noindent
+the segments are the strings:
+
+@example
+path
+to
+file.ext
+@end example
+
+@noindent
+notice that the slash separators are @strong{excluded}.  There is a special case: if the pathname is
+a single @samp{/} character, its only segment is a single @samp{/} character.  File system pathname
+segments cannot be empty strings.
+
+Given that a file system pathname is an array of bytes terminated by a zero byte, to be interpreted
+as @asciiz{} string: a file system pathname segment is also an array of bytes to be interpreted an
+@mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero byte.
+
+Under @value{PACKAGE}: file system pathname segments are represented with objects of type
+@objtype{mmux_libc_file_system_pathname_segment_t}.  Some constructors of this object attempt to
+determine the segments of a file system pathname even when such pathname is not normalised; it is
+the responsibility of the caller to make sure that the pathname can be parsed in such a way that the
+correct segment is determined.
+
+@menu
+* fs pathnames segments types::               Data types representing file system pathname segments.
+* fs pathnames segments inspection::          File system pathname segments inspection.
+* fs pathnames segments constructors::        Building file system pathname segments.
+* fs pathnames segments comparison::          Comparing file system pathname segments.
+* fs pathnames segments predicates::          Predicates on file system pathname segments.
+@end menu
+
+@c page
+@node fs pathnames segments types
+@subsubsection Data types representing file system pathname segments
+
+
+@deftp {Struct Typedef} mmux_libc_file_system_pathname_segment_t
+@deftpx {Struct Typedef} mmux_libc_ptn_segment_t
+Data structure representing a file system pathname segment.  Sometimes it is meant to be
+associated to an object of type @objtype{mmux_libc_file_system_pathname_t} with which, usually, it
+shares memory.
+
+It has two fields:
+
+@table @code
+@item mmux_asciizcp_t ptr
+Pointer to the first octet in the file pathname segment.  It cannot be @cnull{}: if this object
+represents the empty segment, this field must reference the null character at the end of the
+pathname.
+
+@item mmux_usize_t len
+Number of octets in the file pathname segment.  It can be zero if the associated pathname has
+empty segment.
+@end table
+
+In a correctly built @objtype{mmux_libc_file_system_pathname_segment_t} object, the following
+expression is true:
+
+@example
+(NULL != ptr)                           \
+&& ('\0' == ptr[0]   || '.' == ptr[0])  \
+&& ('\0' == ptr[len] || '/' == ptr[len])
+@end example
+@end deftp
+
+@c page
+@node fs pathnames segments inspection
+@subsubsection File system pathname segments inspection
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciizcpp_t @var{result_p}, mmux_libc_file_system_pathname_segment_t @var{seg})
+Accessor for the field @code{ptr} of @var{E}.
+
+@example
+mmux_libc_ptn_t                 ptn;
+mmux_libc_ptn_segment_t         seg;
+mmux_asciizcp_t                 ptr;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_make_file_system_pathname_segment(&seg, ptn)) @{
+  /* error */
+@}
+
+mmux_libc_file_system_pathname_segment_ptr_ref(&ptr, seg);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_segment_t @var{seg})
+Accessor for the field @code{len} of @var{E}.
+
+@example
+mmux_libc_ptn_t                 ptn;
+mmux_libc_ptn_segment_t         seg;
+mmux_usize_t                    len;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_make_file_system_pathname_segment(&seg, ptn)) @{
+  /* error */
+@}
+
+mmux_libc_file_system_pathname_segment_len_ref(&len, seg);
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames segments constructors
+@subsubsection Building file system pathnames segments
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_ptn_segment_t * @var{result_p}, mmux_asciizcp_t ptr, mmux_usize_t @var{len})
+Build an already allocated @objtype{mmux_libc_file_system_pathname_segment_t} object from raw
+values.
+
+@example
+//                                            012345678901234567
+//                                                     ^
+mmux_asciizcp_t                 ptn_asciiz = "/path/to/file.ext";
+mmux_libc_ptn_segment_t         seg;
+
+if (mmux_libc_make_file_system_pathname_segment_raw(&seg, ptn_asciiz + 9, 8)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
+Build an already allocated file system pathname segment from the raw pointer to an @asciiz{} string.
+
+@example
+mmux_libc_file_system_pathname_segment_t        seg;
+
+if (mmux_libc_make_file_system_pathname_segment_raw_asciiz(&seg, "file.ext")) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Build an already allocated file system pathname segment representing the last segment in a given
+file system pathname.
+
+@example
+mmux_libc_ptn_t                 ptn;
+mmux_libc_ptn_segment_t         seg;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) @{
+  /* error */
+@}
+
+/* Here "seg" references the segment "file.ext". */
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames segments comparison
+@subsubsection Comparing file system pathname segments
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare two segments and store in the variable referenced by @var{result_p} the value:
+
+@table @code
+@item 0
+when @code{@vari{ext} == @varii{ext}};
+@item -1
+when @code{@vari{ext} < @varii{ext}};
+@item +1
+when @code{@vari{ext} > @varii{ext}};
+@end table
+
+The file system pathname segments are compared as strings, using the standard @cfunc{strncmp}:
+
+@itemize
+@item
+if the segments have the same length, @cfunc{strncmp} is applied to the whole strings;
+
+@item
+if the segments have different length, @cfunc{strncmp} is applied to portion of the strings of
+maximum common length; if these substrings are equal: the shortest is considered less than the
+longest.
+@end itemize
+@end deftypefun
+
+
+For all the functions below the comparison is performed using
+@cfunc{mmux_libc_file_system_pathname_segment_compare}.
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} == @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_not_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} != @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_less (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} < @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_greater (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} > @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_less_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} <= @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_greater_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+Compare the file system pathname segments and store @ctrue{} in the variable referenced by
+@var{result_p} if @code{@vari{ext} >= @varii{ext}}; otherwise store @cfalse{}.
+@end deftypefun
+
+@c page
+@node fs pathnames segments predicates
+@subsubsection Predicates on file system pathname segments
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_dot (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the single dot
+segment @samp{.}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_double_dot (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the double dot
+@samp{..}; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_slash (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the single slash
+segment @samp{/}; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
@@ -5930,7 +6661,7 @@ mmux_libc_dirstream_t               dirstream;
 
   if (mmux_libc_open(&dirfd, dirptn, flags, mode)) @{
     /* error */
-  @};
+  @}
 @}
 
 if (mmux_libc_fdopendir(&dirstream, dirfd)) @{
@@ -6319,7 +7050,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
   @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
     /* not enough bytes in the supplied buffer */
   @}
-  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
     /* error */
   @}
 @}
@@ -6372,7 +7103,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
   @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
     /* not enough bytes in the supplied buffer */
   @}
-  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
     /* error */
   @}
 @}
@@ -6466,7 +7197,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
   @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
     /* not enough bytes in the supplied buffer */
   @}
-  if (mmux_libc_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
     /* error */
   @}
 @}
