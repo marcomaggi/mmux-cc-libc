@@ -5425,10 +5425,64 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 
 @menu
+* fs pathnames intro::          Introduction to file system pathnames.
 * fs pathnames pathnames::      File system full pathnames.
 * fs pathnames extensions::     Extensions of file system pathnames.
 * fs pathnames segments::       Extensions of file system pathnames.
 @end menu
+
+@c page
+@node fs pathnames intro
+@subsection Introduction to file system pathnames
+
+
+A @dfn{file system pathname} is an array of bytes terminated by a zero byte, to be interpreted as
+@asciiz{} string; in this package a file system package is represented by the object type
+@objtype{mmux_libc_file_system_package_t}.
+
+Most pathnames are composed of @dfn{segments} separated by the slash character @file{/}, examples:
+
+@example
+/path/to/file.ext
+/path/to/directory/
+./path/to/file.ext
+/path/to/.dotfile
+@end example
+
+@noindent
+the segments of @file{/path/to/file.ext} are the three strings:
+
+@example
+path
+to
+file.ext
+@end example
+
+@noindent
+the ``first segment'' is the leftmost segment @samp{path}; the ``last segment'' is the rightmost
+segment @samp{file.ext}.  In this package a file system pathname segment is represented by the
+object type @objtype{mmux_libc_file_system_package_segment_t}.
+
+By convention, in the rightmost segment of a pathname: if there is a trailing sequence of bytes
+beginning with a dot character, such sequence is called @dfn{extension}; the extension of
+@samp{file.ext} is @samp{.ext} and it includes the dot; the extension is defined only if it follows
+other bytes, so @file{.dotfile} has empty extension.  In this package a file system pathname
+extension is represented by the object type @objtype{mmux_libc_file_system_pathname_extension_t}.
+
+Some file system pathnames are ``special directories'':
+
+@table @file
+@item /
+the root directory, the top of the tree for file system pathnames; it has no segments; it has no
+extension;
+
+@item .
+the current directory; it has the single segment @samp{.}; it has no extension;
+
+@item ..
+the uplevel directory from the current directory; it has the single segment @samp{..}; it has no
+extension.
+@end table
 
 @c page
 @node fs pathnames pathnames
@@ -5438,10 +5492,7 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
 @deftpx {Struct Typedef} mmux_libc_ptn_t
 Data type representing a file system pathname as a non--@cnull{} pointer to non--empty @asciiz{}
-string.  A file system pathname is an array of octets (not bytes) terminated by a zero octet, to be
-interpreted as @asciiz{} string.
-
-It has a single field:
+string.  It has a single field:
 
 @table @code
 @item mmux_asciizcp_t value
@@ -5826,6 +5877,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_file_system_pathname_free(root_ptn);
 @}
 @end example
+
+The main purpose of extracting the rootname from a pathname is to create a file pathname from a
+another file pathname by changing the extension, for example to build @file{/path/to/file.o} from
+@file{/path/to/file.c}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -5862,6 +5917,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_file_system_pathname_free(dir_ptn);
 @}
 @end example
+
+The main purpose of extracting the dirname from a pathname is to create a file pathname from a
+another file pathname by changing the filename, for example to build @file{/path/to/other.ext} from
+@file{/path/to/some.ext}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -5895,6 +5954,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_file_system_pathname_free(tail_ptn);
 @}
 @end example
+
+The main purpose of extracting the tailname from a pathname is to create a pathname from a another
+pathname using the same last segment, for example to build @file{/path/to/this} from
+@file{/path/from/that}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -5933,6 +5996,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_file_system_pathname_free(file_ptn);
 @}
 @end example
+
+The main purpose of extracting the filename from a pathname is to create a pathname from a another
+pathname using the same filename, for example to build @file{/path/to/file.ext} from
+@file{/path/from/file.ext}.
 @end deftypefun
 
 @c page
