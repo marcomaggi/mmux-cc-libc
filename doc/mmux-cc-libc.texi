@@ -5436,9 +5436,17 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 @subsection Introduction to file system pathnames
 
 
-A @dfn{file system pathname} is an array of bytes terminated by a zero byte, to be interpreted as
-@asciiz{} string; in this package a file system package is represented by the object type
-@objtype{mmux_libc_file_system_package_t}.
+A @dfn{file system pathname} is an array of octets terminated by a zero octet, to be interpreted as
+@asciiz{} string; file system pathnames are naturally interpreted as representing a tree in the
+hierarchy of file systems.  By convention: we consider the bytes in a file system pathname as
+unsigned characters, so we refer to them as @dfn{octets}; even though their type, according to the
+Unix standards, is @code{char} which does not specify if they are signed or unsigned.  In this
+package a file system pathname is represented by the object type
+@objtype{mmux_libc_file_system_pathname_t}.
+
+Unless otherwise specified: in this package a file system pathname can have any length, it can be
+composed of any number of octets.  For security and efficiency reasons: some functions impose the
+arbitrary limit of @math{4095} octets plus the terminating zero octet; in total, @math{4096} octets.
 
 Most pathnames are composed of @dfn{segments} separated by the slash character @file{/}, examples:
 
@@ -5447,6 +5455,7 @@ Most pathnames are composed of @dfn{segments} separated by the slash character @
 /path/to/directory/
 ./path/to/file.ext
 /path/to/.dotfile
+file.ext
 @end example
 
 @noindent
@@ -5463,10 +5472,10 @@ the ``first segment'' is the leftmost segment @samp{path}; the ``last segment'' 
 segment @samp{file.ext}.  In this package a file system pathname segment is represented by the
 object type @objtype{mmux_libc_file_system_package_segment_t}.
 
-By convention, in the rightmost segment of a pathname: if there is a trailing sequence of bytes
+By convention, in the rightmost segment of a pathname: if there is a trailing sequence of octets
 beginning with a dot character, such sequence is called @dfn{extension}; the extension of
 @samp{file.ext} is @samp{.ext} and it includes the dot; the extension is defined only if it follows
-other bytes, so @file{.dotfile} has empty extension.  In this package a file system pathname
+other octets, so @file{.dotfile} has empty extension.  In this package a file system pathname
 extension is represented by the object type @objtype{mmux_libc_file_system_pathname_extension_t}.
 
 Some file system pathnames are ``special directories'':
@@ -5482,6 +5491,38 @@ the current directory; it has the single segment @samp{.}; it has no extension;
 @item ..
 the uplevel directory from the current directory; it has the single segment @samp{..}; it has no
 extension.
+@end table
+
+When a file system pathname is @strong{not} a special directory:
+
+@itemize
+@item
+if the file system pathname ends with a slash character: by convention it represents a directory;
+
+@item
+if the file system pathname does @strong{not} end with a slash character: it can represent both a
+directory or a file.
+@end itemize
+
+When a file system pathname begins with a slash character: it is an @dfn{absolute} pathname.
+Otherwise it is a @dfn{relative pathname} to be interpreted as child of the current working
+directory in the hierarchy of file systems.
+
+The syntax of file system pathnames allows some freedom, which pushes us to ``normalise'' a pathname
+to simplify it and to make it more amenable to processing; examples:
+
+@table @code
+@item ///... -> /
+a sequence of slash characters can be normalised to a single slash;
+
+@item /./ -> /
+a sequence slash, dot, slash can be normalised to a slash;
+
+@item segment/..
+a sequence segment, slash, double dot can be normalised to the empty string;
+
+@item ./segment -> segment
+a sequence dot, slash, segment can be normalised to the segment.
 @end table
 
 @c page
@@ -5648,11 +5689,11 @@ if (mmux_libc_file_system_pathname_free(ptn)) @{
 
 @deftypefun bool mmux_libc_make_file_system_pathname_malloc_from_buffer (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{bufptr}, mmux_usize_t @var{buflen})
 Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
-@var{buflen} bytes from the given buffer referenced by @var{bufptr}.
+@var{buflen} octets from the given buffer referenced by @var{bufptr}.
 
-The argument @var{buflen} must @strong{not} include the terminating zero byte, but this function
-will allocate enough bytes for the buffer and the terminating zero and it will set to zero the
-terminating byte.
+The argument @var{buflen} must @strong{not} include the terminating zero octet, but this function
+will allocate enough octets for the buffer and the terminating zero and it will set to zero the
+terminating octet.
 
 @example
 //                                  012345678
@@ -5822,17 +5863,17 @@ slash, a standalone dot, a standalone double dot; otherwise store @cfalse{}.
 
 
 @deftypefun bool mmux_libc_file_system_pathname_is_absolute (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if the first byte in @var{ptn}
+Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{ptn}
 @strong{does} represent an @mmuxascii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
-byte represents an @mmuxascii{} slash: the process of finding the file corresponding to @var{ptn} on
+octet represents an @mmuxascii{} slash: the process of finding the file corresponding to @var{ptn} on
 the file system, @strong{does not} depend on the current working directory.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_file_system_pathname_is_relative (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if the first byte in @var{ptn}
+Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{ptn}
 @strong{does not} represent an @mmuxascii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
-byte does not represent an @mmuxascii{} slash: the process of finding the file corresponding to
+octet does not represent an @mmuxascii{} slash: the process of finding the file corresponding to
 @var{ptn} on the file system, @strong{does} depend on the current working directory.
 @end deftypefun
 
@@ -6007,9 +6048,9 @@ pathname using the same filename, for example to build @file{/path/to/file.ext} 
 @subsection Extensions of file system pathnames
 
 
-Given that a file system pathname is an array of bytes terminated by a zero byte, to be interpreted
-as @asciiz{} string: a file system pathname extension is also an array of bytes to be interpreted an
-@mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero byte.
+Given that a file system pathname is an array of octets terminated by a zero octet, to be interpreted
+as @asciiz{} string: a file system pathname extension is also an array of octets to be interpreted an
+@mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero octet.
 
 Examples defining what a file system pathname extension is:
 
@@ -6351,9 +6392,9 @@ notice that the slash separators are @strong{excluded}.  There is a special case
 a single @samp{/} character, its only segment is a single @samp{/} character.  File system pathname
 segments cannot be empty strings.
 
-Given that a file system pathname is an array of bytes terminated by a zero byte, to be interpreted
-as @asciiz{} string: a file system pathname segment is also an array of bytes to be interpreted an
-@mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero byte.
+Given that a file system pathname is an array of octets terminated by a zero octet, to be
+interpreted as @asciiz{} string: a file system pathname segment is also an array of octets to be
+interpreted an @mmuxascii{} string, but it is @strong{not} necessarily terminated by a zero octet.
 
 Under @value{PACKAGE}: file system pathname segments are represented with objects of type
 @objtype{mmux_libc_file_system_pathname_segment_t}.  Some constructors of this object attempt to
