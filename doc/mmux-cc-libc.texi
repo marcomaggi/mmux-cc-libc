@@ -5532,12 +5532,13 @@ a sequence dot, slash, segment can be normalised to the segment.
 
 
 @menu
-* fs pathnames pathnames types::        File system pathname types.
-* fs pathnames pathnames constructors:: Building file system pathnames.
-* fs pathnames pathnames inspection::   Inspecting file system pathnames.
-* fs pathnames pathnames comparison::   Comparing file system pathnames.
-* fs pathnames pathnames predicates::   Predicates on file system pathnames.
-* fs pathnames pathnames components::   Components of file system pathnames.
+* fs pathnames pathnames types::          File system pathname types.
+* fs pathnames pathnames constructors::   Building file system pathnames.
+* fs pathnames pathnames inspection::     Inspecting file system pathnames.
+* fs pathnames pathnames comparison::     Comparing file system pathnames.
+* fs pathnames pathnames predicates::     Predicates on file system pathnames.
+* fs pathnames pathnames components::     Components of file system pathnames.
+* fs pathnames pathnames normalisation::  Components of file system pathnames.
 @end menu
 
 @c page
@@ -5959,6 +5960,59 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 The main purpose of extracting the filename from a pathname is to create a pathname from a another
 pathname using the same filename, for example to build @file{/path/to/file.ext} from
 @file{/path/from/file.ext}.
+@end deftypefun
+
+@c page
+@node fs pathnames pathnames normalisation
+@subsubsection Components of file system pathnames
+
+
+@cindex Normalising file system pathnames
+@cindex File system pathnames, normalisation
+
+
+A @dfn{normalised} file system pathname: has no multiple slashes; has no useless terminating slash;
+has no useless single--dot components; has the double--dot components removed as much as possible.
+Examples:
+
+@example
+/                               @result{} /
+file.ext                        @result{} file.ext
+/path/to/file.ext               @result{} /path/to/file.ext
+//                              @result{} /
+/path///to///file.ext           @result{} /path/to/file.ext
+/path/to/dir/                   @result{} /path/to/dir/
+/path/to/././file.ext           @result{} /path/to/file.ext
+/path/to/.                      @result{} /path/to
+/path/to/../file.ext            @result{} /path/file.ext
+/path/to/../../this/file.ext    @result{} /this/file.ext
+path/../../../file.ext          @result{} ../../file.ext
+./path/../../../file.ext        @result{} ../../file.ext
+.                               @result{} .
+..                              @result{} ..
+./                              @result{} .
+../                             @result{} ..
+/.                              @result{} /
+/..                             @error{} invalid pathname
+/path/../..                     @error{} invalid pathname
+@end example
+
+Most of the times we want to normalise a pathname before using it with this package.
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
+Make a new file system pathname value normalising the pathname @var{ptn}; the new pathname has
+memory allocated with @cfunc{mmux_libc_malloc}.
+
+@example
+mmux_libc_ptn_t         ptn, normal_ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path///to/.//.//file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page

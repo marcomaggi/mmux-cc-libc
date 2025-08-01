@@ -28,7 +28,156 @@
 
 #include <mmux-cc-libc-internals.h>
 
+
+/** --------------------------------------------------------------------
+ ** Preprocessor macros.
+ ** ----------------------------------------------------------------- */
+
 #define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
+
+/* Evaluate to true  if PTR references an array of  ASCII characters, of
+   LEN octets, representing a single-dot segment. */
+#define IS_SINGLE_DOT(PTR,LEN)		\
+  ((1 == (LEN)) && ('.' == (PTR)[0]))
+
+/* Evaluate to true  if PTR references an array of  ASCII characters, of
+   LEN octets, representing a double-dot segment. */
+#define IS_DOUBLE_DOT(PTR,LEN)		\
+  ((2 == (LEN)) && ('.' == (PTR)[0]) && ('.' == (PTR)[1]))
+
+/* Evaluate to true  if PTR references an array of  ASCII characters, of
+   LEN octets, representing a slash followed by a double-dot segment. */
+#define IS_SLASH_DOUBLE_DOT(PTR,LEN)	\
+  ((3 == (LEN)) && ('/' == (PTR)[0]) && ('.' == (PTR)[1]) && ('.' == (PTR)[2]))
+
+
+/** --------------------------------------------------------------------
+ ** Inline functions and function prototypes.
+ ** ----------------------------------------------------------------- */
+
+#define INLINE1	__attribute__((__always_inline__,__nonnull__(1))) static inline
+#define INLINE2	__attribute__((__always_inline__,__nonnull__(1,2))) static inline
+
+INLINE1 bool
+INPUT_IS_RELATIVE (char const * const input_ptr)
+{
+  return ('/' != *input_ptr);
+}
+
+INLINE1 bool
+INPUT_IS_ABSOLUTE (char const * const input_ptr)
+{
+  return ('/' == *input_ptr);
+}
+
+/* ------------------------------------------------------------------ */
+
+INLINE2 bool
+IS_STANDALONE_SLASH (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate to true if the string has 1 octet representing the
+   pathname "/"; otherwise evaluate to false. */
+{
+  return ((end == (1+in)) && ('/' == in[0]));
+}
+
+/* ------------------------------------------------------------------ */
+
+INLINE2 bool
+IS_STANDALONE_SINGLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate to true if the string has 1 octet representing the
+   pathname "."; otherwise evaluate to false. */
+{
+  return ((end == (1+in)) && ('.' == in[0]));
+}
+
+INLINE2 bool
+IS_STANDALONE_SINGLE_DOT_SLASH (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true if  the string has 2  octets representing
+   the pathname "./"; otherwise evaluate to false. */
+{
+  return ((end == (2+in)) && ('.' == in[0]) && ('/' == in[1]));
+}
+
+INLINE2 bool
+IS_STANDALONE_SLASH_SINGLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true if  the string has 2  octets representing
+   the pathname "/."; otherwise evaluate to false. */
+{
+  return ((end == (2+in)) && ('/' == in[0]) && ('.' == in[1]));
+}
+
+/* ------------------------------------------------------------------ */
+
+INLINE2 bool
+IS_STANDALONE_DOUBLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true if  the string has 2  octets representing
+   the pathname ".."; otherwise evaluate to false. */
+{
+  return ((end == (2+in)) && ('.' == in[0]) && ('.' == in[1]));
+}
+
+INLINE2 bool
+IS_STANDALONE_DOUBLE_DOT_SLASH (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true if  the string has 3  octets representing
+   the pathname "../"; otherwise evaluate to false. */
+{
+  return ((end == (3+in)) && ('.' == in[0]) && ('.' == in[1]) && ('/' == in[2]));
+}
+
+INLINE2 bool
+IS_STANDALONE_SLASH_DOUBLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true if  the string has 3  octets representing
+   the pathname "/.."; otherwise evaluate to false. */
+{
+  return ((end == (3+in)) && ('/' == in[0]) && ('.' == in[1]) && ('.' == in[2]));
+}
+
+/* ------------------------------------------------------------------ */
+
+INLINE2 bool
+BEGINS_WITH_SINGLE_DOT_SLASH (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true  if the string  begins with  the pathname
+   "./"; otherwise evaluate to false. */
+{
+  return ((end > (1+in)) && ('.' == in[0]) && ('/' == in[1]));
+}
+
+INLINE2 bool
+BEGINS_WITH_SLASH_SINGLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true  if the string  begins with  the pathname
+   "/.", but not "/.."; otherwise evaluate to false. */
+{
+  return ((end > (1 + in)) && ('/' == in[0]) && ('.' == in[1]) && ('.' != in[2]));
+}
+
+/* ------------------------------------------------------------------ */
+
+INLINE2 bool
+BEGINS_WITH_DOUBLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true  if the string  begins with  the pathname
+   ".."; otherwise evaluate to false. */
+{
+  return ((end > (1+in)) && ('.' == in[0]) && ('.' == in[1]));
+}
+
+INLINE2 bool
+BEGINS_WITH_SLASH_DOUBLE_DOT (char const * const in, char const * const end)
+/* Given an ASCII string referenced by IN and terminating at pointer END
+   excluded: evaluate  to true  if the string  begins with  the pathname
+   "/.."; otherwise evaluate to false. */
+{
+  return ((end > (2+in)) && ('/' == in[0]) && ('.' == in[1]) && ('.' == in[2]));
+}
 
 
 /** --------------------------------------------------------------------
@@ -907,5 +1056,631 @@ mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_ptn_
   }
   return false;
 }
+
+
+/** --------------------------------------------------------------------
+ ** File system pathname manipulation: helpers.
+ ** ----------------------------------------------------------------- */
+
+__attribute__((__always_inline__,__nonnull__(1,2),__returns_nonnull__))
+static inline char const *
+find_next_slash_or_end (char const * in, char const * const end)
+/* Given an  ASCII string referenced by  IN and terminating at  pointer END excluded:
+   find  the  next slash  octet  in  the string.   If  successful:  return a  pointer
+   referencing the slash.  Otherwise return END. */
+{
+  while ((in < end) && ('/' != *in)) {
+    ++in;
+  }
+  return in;
+}
+__attribute__((__always_inline__,__nonnull__(1,2),__returns_nonnull__))
+static inline char const *
+find_prev_slash_or_begin (char const * const output_ptr, char const * ou)
+/* Given  an ASCII  string  referenced  by OU  and  beginning  at pointer  OUTPUT_PTR
+   included: find  the previous slash octet  in the string.  If  successful: return a
+   pointer referencing the slash.  Otherwise return OUTPUT_PTR. */
+{
+  while ((output_ptr < ou) && ('/' != *ou)) {
+    --ou;
+  }
+  return ou;
+}
+
+__attribute__((__always_inline__,__nonnull__(1,2),__returns_nonnull__))
+static inline char const *
+skip_repeated_slashes_or_end (char const * in, char const * const end)
+/* Given an  ASCII string referenced by  IN and terminating at  pointer END excluded:
+   skip all slash octets starting from  IN onwards.  Return a pointer referencing the
+   first octet that is not a slash; this pointer may be END. */
+{
+  while ((in < end) && ('/' == *in)) {
+    ++in;
+  }
+  return in;
+}
+
+/* ------------------------------------------------------------------ */
+
+#define COPY_INPUT_TO_OUTPUT(OU, IN, IN_END)	\
+  while ((IN) < (IN_END)) { *(OU)++ = *(IN)++; }
+
+
+/** --------------------------------------------------------------------
+ ** Low-level normalisation functions: useless slashses removal.
+ ** ----------------------------------------------------------------- */
+
+static bool
+normalisation_pass_remove_useless_slashes (mmux_usize_t * result_p, char * output_ptr,
+					   char const * const input_ptr, size_t const input_len)
+/* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
+   in the process: removal of multiple slashes.
+
+   The array referenced by "input_ptr" must  represent an ASCIIZ string with at least
+   "input_len"  octets,   terminating  zero   excluded.   The  array   referenced  by
+   "output_ptr" must be at least "1 + input_len" octets wide.
+
+   Store  in "*result_p"  the number  of  octets stored  in the  array referenced  by
+   "output_ptr", terminating zero excluded. */
+{
+  char const * const	end = input_ptr + input_len;
+  char const *		in  = input_ptr;
+  char *		ou  = output_ptr;
+
+  while (in < end) {
+    *ou++ = *in++;
+    /* If there are repeated slahses: skip them. */
+    if ('/' == in[-1]) {
+      in = skip_repeated_slashes_or_end(in, end);
+    }
+  }
+  *ou = '\0';
+  *result_p = (ou - output_ptr);
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Low-level normalisation functions: useless single-dot removal.
+ ** ----------------------------------------------------------------- */
+
+static bool
+normalisation_pass_remove_single_dot_segments (mmux_usize_t * result_p, char * output_ptr,
+					       char const * const input_ptr, size_t const input_len)
+/* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
+   in the process: removal of single-dot segments.   This pass is meant to be applied
+   after "normalisation_pass_remove_useless_slashes()".
+
+   The array referenced by "input_ptr" must  represent an ASCIIZ string with at least
+   "input_len"  octets,   terminating  zero   excluded.   The  array   referenced  by
+   "output_ptr" must be at least "1 + input_len" octets wide.
+
+   Store  in "*result_p"  the number  of  octets stored  in the  array referenced  by
+   "output_ptr", terminating zero excluded. */
+{
+#undef VERBOSE
+#define VERBOSE		0
+  char const * const	end = input_ptr + input_len;
+  char const *		in  = input_ptr;
+  char *		ou  = output_ptr;
+
+  if (INPUT_IS_ABSOLUTE(input_ptr)) {
+    /* The input pathname is absolute, we want these normalisations:
+     *
+     *		"/"		=> "/"
+     *		"/."		=> "/"
+     *		"/././."	=> "/"
+     *		"/./path"	=> "/path"
+     *		"/./././path"	=> "/path"
+     */
+    if (IS_STANDALONE_SLASH(in, end)) {
+      *ou++ = '/';
+      goto done;
+    } else {
+      /* Remove all the leading "/." chunks. */
+      while (BEGINS_WITH_SLASH_SINGLE_DOT(in,end)) {
+	in += 2;
+      }
+      /* If  we have  removed  the whole  input: the  output  is just  a
+	 slash. */
+      if (end == in) {
+	*ou++ = '/';
+	goto done;
+      }
+    }
+    /* If  we  are  still  here:  IN references  the  slash  starting  a
+       chunk. */
+  } else {
+    /* The input pathname is relative, we want these normalisations:
+     *
+     *		"."			=> "."
+     *		"./"			=> "."
+     *		"./././"		=> "."
+     *		"./path"		=> "./"
+     *		"./././path"		=> "./path"
+     *		"file.ext"		=> "file.ext"
+     *		"./file.ext"		=> "./file.ext"
+     *		"./path/to/file.ext"	=> "path/to/file.ext"
+     */
+    if (IS_STANDALONE_SINGLE_DOT(in, end)) {
+      /* This relative input pathname is a standalone dot ".". */
+      *ou++ = '.';
+      goto done;
+    } else if (! BEGINS_WITH_SINGLE_DOT_SLASH(in,end)) {
+      /* This relative input pathname starts  with a segment that is not
+	 a standalone dot. */
+      COPY_INPUT_TO_OUTPUT(ou, in, find_next_slash_or_end(in, end));
+    } else {
+      /* Skip all the leading "./" chunks. */
+      while (BEGINS_WITH_SINGLE_DOT_SLASH(in,end)) {
+	in += 2;
+      }
+      /* If  we have  skipped  the whole  input: the  output  is just  a
+	 single-dot. */
+      if (end == in) {
+	*ou++ = '.';
+	goto done;
+      }
+      {
+	char const *	next = find_next_slash_or_end(in, end);
+	if (VERBOSE) {
+	  fprintf(stderr, "%s: in=", __func__);
+	  fwrite(in, 1, (end - in), stderr);
+	  fprintf(stderr, ", output_ptr=");
+	  fwrite(output_ptr, 1, (ou - output_ptr), stderr);
+	  fprintf(stderr, ", next=");
+	  fwrite(in, 1, (next - in), stderr);
+	  fprintf(stderr, "\n");
+	}
+	/* We  do not  want to  wholly skip  a directory  part.  If  the
+	   remaining input  has no  slash in  it: insert  a "./"  in the
+	   output. */
+	if ((end == next) &&
+	    (! IS_STANDALONE_SINGLE_DOT(in, next)) &&
+	    (! IS_STANDALONE_DOUBLE_DOT(in, next))) {
+	  /* Here the string starting at IN is one among:
+	   *
+	   *	"file.ext"
+	   *	"."
+	   *	".."
+	   */
+	  *ou++	= '.';
+	  *ou++	= '/';
+	}
+	/* Now copy the segment to the output. */
+	COPY_INPUT_TO_OUTPUT(ou, in, next);
+      }
+    }
+  }
+
+  /* Now either IN references the end  of input or it references a slash
+     octet. */
+
+  /* In the  following loop  we copy normal  segments from  INPUT_PTR to
+   * OUTPUT_PTR  in chunks  including the  leading slash.   For example,
+   * given the input:
+   *
+   *    /path/to/file.ext
+   *
+   * we copy it to the output in the three chunks:
+   *
+   *    /path
+   *    /to
+   *    /file.ext
+   *
+   * only when a chunk is "/." we do something different.
+   */
+  while (in < end) {
+    /* Set NEXT to point  to the slash after this segment  or the end of
+     * input.  For example:
+     *
+     *    /path/to/file.ext
+     *    ^    ^
+     *    in   next
+     */
+    char const * next = find_next_slash_or_end(1+in, end);
+
+    if (VERBOSE) {
+      fprintf(stderr, "%s: in=", __func__);
+      fwrite(in, 1, (end - in), stderr);
+      fprintf(stderr, ", output_ptr=");
+      fwrite(output_ptr, 1, (ou - output_ptr), stderr);
+      fprintf(stderr, ", next=");
+      fwrite(in, 1, (next - in), stderr);
+      fprintf(stderr, "\n");
+    }
+
+    if (IS_STANDALONE_SLASH_SINGLE_DOT(in,next)) {
+      /* Skip the next chunk because it is a "/.", but if it is the last
+       * append a slash to the output.
+       *
+       *	"/path/./to"	=> "path/to"
+       *	      ^in
+       *	"dir/."		=> "dir/"
+       *	    ^in
+       */
+      in = next;
+      if (end == in) {
+	if ((output_ptr == ou) && INPUT_IS_RELATIVE(input_ptr)) {
+	  *ou++ = '.';
+	} else {
+	  *ou++ = '/';
+	}
+      }
+    } else {
+      /* Copy the next chunk because it is normal. */
+      COPY_INPUT_TO_OUTPUT(ou, in, next);
+    }
+  }
+
+  /* Done. */
+ done:
+  *ou = '\0';
+  if (VERBOSE) {
+    fprintf(stderr, "%s: final in=", __func__);
+    fwrite(in, 1, (end - in), stderr);
+    fprintf(stderr, ", output_ptr=%s, len=%lu\n", output_ptr, strlen(output_ptr));
+  }
+  *result_p = (ou - output_ptr);
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Low-level normalisation functions: double-dot processing.
+ ** ----------------------------------------------------------------- */
+
+bool
+normalisation_pass_remove_double_dot_segments (size_t * result_p, char * output_ptr,
+					       char const * const input_ptr, size_t const input_len)
+/* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
+   in the process: removal of double-dot segments and the segments before them.  This
+   pass         is         meant          to         be         applied         after
+   "normalisation_pass_remove_single_dot_segments()".
+
+   The array referenced by "input_ptr" must  represent an ASCIIZ string with at least
+   "input_len"  octets,   terminating  zero   excluded.   The  array   referenced  by
+   "output_ptr" must be at least "1 + input_len" octets wide.
+
+   Store  in "*result_p"  the number  of  octets stored  in the  array referenced  by
+   "output_ptr", terminating zero excluded. */
+{
+#undef VERBOSE
+#define VERBOSE		0
+  char const * const	end = input_ptr + input_len;
+  char const *		in  = input_ptr;
+  char *		ou  = output_ptr;
+
+  if (VERBOSE) {
+    fprintf(stderr, "%s: begin in=%s\n", __func__, input_ptr);
+  }
+
+  if (BEGINS_WITH_DOUBLE_DOT(in, end)) {
+    in    += 2;
+    *ou++ = '.';
+    *ou++ = '.';
+    if ((end == in) || IS_STANDALONE_SLASH(in, end)) {
+      /* The input is a standalone double-dot ".." or "../". */
+      goto done;
+    }
+  } else if (INPUT_IS_RELATIVE(input_ptr)) {
+    /* This relative input pathname starts with  a segment that is not a
+       double dot. */
+    COPY_INPUT_TO_OUTPUT(ou, in, find_next_slash_or_end(in, end));
+  }
+
+  /* Now either IN references the end  of input or it references a slash
+     octet. */
+
+  /* In this loop  we copy normal segments from  INPUT_PTR to OUTPUT_PTR
+   * in  chunks including  the leading  slash.  For  example, given  the
+   * input:
+   *
+   *    /path/to/file.ext
+   *
+   * we copy it to the output in the three chunks:
+   *
+   *    /path
+   *    /to
+   *    /file.ext
+   *
+   * only when a chunk is "/.." we do something different.
+   */
+  while (in < end) {
+    /* Set NEXT to point  to the slash after this segment  or the end of
+     * input.  For example:
+     *
+     *    /path/to/file.ext
+     *    ^    ^
+     *    in   next
+     *
+     * another example:
+     *
+     *    path/to/file.ext
+     *    ^   ^
+     *    in  next
+     */
+    char const *	next = find_next_slash_or_end(1+in, end);
+
+    if (VERBOSE) {
+      fprintf(stderr, "%s: in=", __func__);
+      fwrite(in, 1, (end - in), stderr);
+      fprintf(stderr, ", output_ptr=");
+      fwrite(output_ptr, 1, (ou - output_ptr), stderr);
+      fprintf(stderr, ", next=");
+      fwrite(in, 1, (next - in), stderr);
+      fprintf(stderr, "\n");
+    }
+
+    /* Now NEXT points to a slash octet or to the end of input. */
+    if (! BEGINS_WITH_SLASH_DOUBLE_DOT(in, next)) {
+      /* No, the next chunk is *not* a "/..": copy it to the output. */
+      COPY_INPUT_TO_OUTPUT(ou, in, next);
+    } else {
+      char const *	prev = find_prev_slash_or_begin(output_ptr, ou-1);
+
+      if (VERBOSE) {
+	fprintf(stderr, "%s: prev=", __func__);
+	fwrite(prev, 1, (ou - prev), stderr);
+	fprintf(stderr, "\n");
+      }
+
+      if (output_ptr < ou) {
+	/* The  pointer OU  does *not*  reference the  beginning of  the
+	   output: there is a previous segment we can remove by stepping
+	   back the pointer OU itself. */
+	if (BEGINS_WITH_DOUBLE_DOT(prev, ou) || BEGINS_WITH_SLASH_DOUBLE_DOT(prev, ou)) {
+	  /* The previous segment is a ".."   or "/..", this is the case
+	   * of the following normalisations:
+	   *
+	   *	"/../../path"	=> "/../../path"
+	   *	    ^in
+	   *
+	   *	"../../path"	=> "../../path"
+	   *	   ^in
+	   */
+	  in    = next;
+	  *ou++ = '/';
+	  *ou++ = '.';
+	  *ou++ = '.';
+	} else {
+	  /* The  previous segment  is neither  a double-dot:  remove it
+	   * from  the  output.   This  is the  case  of  the  following
+	   * normalisation:
+	   *
+	   *	"path/to/../file.ext"	=> "path/file.ext"
+	   */
+	  in = next;
+	  ou = (char *)prev;
+	  /* We  must handle  the case  of  first segment  removal in  a
+	   * pathname.
+	   *
+	   * When  the  pathname  is  absolute, we  want  the  following
+	   * normalisations:
+	   *
+	   *	"/path/../to/file.ext"	=> "/to/file.ext"
+	   *	"/path/.."		=> "/"
+	   *
+	   * When  the  pathname  is  relative, we  want  the  following
+	   * normalisations:
+	   *
+	   *	"path/../to/file.ext"	=> "to/file.ext"
+	   *	"path/../file.ext"	=> "./file.ext"
+	   *
+	   * where the output is still a relative pathname and still has
+	   * a directory part; we do *not* want the following results:
+	   *
+	   *	"path/../to/file.ext"	=> "/to/file.ext"
+	   *	"path/../file.ext"	=> "file.ext"
+	   *
+	   * where the output has become  an absolute pathname or has no
+	   * directory part anymore.
+	   */
+	  if (output_ptr == ou) {
+	    if (INPUT_IS_ABSOLUTE(input_ptr)) {
+	      if (end == in) {
+		/* The  pathname is  absolute  and we  have removed  the
+		 * whole input.  This is the case of:
+		 *
+		 *	"/path/.."	=> "/"
+		 */
+		*ou++ = '/';
+	      }
+	    } else {
+	      if (end == in) {
+		/* We are at the end  of the relative input pathname and
+		 * we have  removed the whole output  pathname.  This is
+		 * the case of:
+		 *
+		 *	"path/.."	=> "."
+		 */
+		*ou++ = '.';
+	      } else if (IS_STANDALONE_SLASH(in, end)) {
+		/* In the  relative input pathname: the  next segment is
+		 * an ending slash and we  have removed the whole output
+		 * pathname.  This is the case of:
+		 *
+		 *	"path/../"	=> "."
+		 */
+		++in;
+		*ou++ = '.';
+	      } else if (IS_STANDALONE_SLASH_SINGLE_DOT(in, end)) {
+		/* In the  relative input pathname: the  next segment is
+		 * an ending "/."  and we  have removed the whole output
+		 * pathname.  This is the case of:
+		 *
+		 *	"path/../."	=> "."
+		 */
+		in    = end;
+		*ou++ = '.';
+	      } else if (IS_STANDALONE_SLASH_DOUBLE_DOT(in, end)) {
+		/* In the  relative input pathname: the  next segment is
+		 * an ending "/.."  and we have removed the whole output
+		 * pathname.  This is the case of:
+		 *
+		 *	"path/../.."	=> ".."
+		 */
+		in    = end;
+		*ou++ = '.';
+		*ou++ = '.';
+	      } else if (end == find_next_slash_or_end(1+in, end)) {
+		/* The rest of the relative input pathname has no slash in
+		 * it and we have removed the whole output pathname.  This
+		 * is the case of:
+		 *
+		 *	"path/../file.ext"	=> "./file.ext"
+		 */
+		*ou++ = '.';
+	      }
+	    }
+	  }
+	}
+      } else {
+	/* The pointer OU references the  beginning of the output: there
+	   is no previous segment to remove. */
+	if (INPUT_IS_RELATIVE(input_ptr)) {
+	  /* The input  pathname is  relative, this is  the case  of the
+	   * following normalisation:
+	   *
+	   *	"path/../../to"	=> "../to"
+	   *	        ^in
+	   */
+	  in    = next;
+	  *ou++ = '.';
+	  *ou++ = '.';
+	} else {
+	  /* The input  pathname is  absolute, this is  the case  of the
+	   * following input:
+	   *
+	   *	"/path/../.."
+	   *
+	   * raise an exception, there is no way to normalise the input.
+	   */
+	  return true;
+	}
+      }
+    }
+  }
+
+done:
+  *ou = '\0';
+  if (VERBOSE) {
+    fprintf(stderr, "%s: final in=", __func__);
+    fwrite(in, 1, (end - in), stderr);
+    fprintf(stderr, ", output_ptr=%s, len=%lu\n", output_ptr, strlen(output_ptr));
+  }
+  *result_p = (ou - output_ptr);
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Normalisation: pathname normalisation.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
+{
+  mmux_usize_t	ptn_len = strlen(ptn.value);
+  mmux_char_t	one[1 + ptn_len];
+  mmux_usize_t	one_len;
+
+  if (normalisation_pass_remove_useless_slashes(&one_len, one, ptn.value, ptn_len)) {
+    goto error_invalid_input_pathname;
+  } else {
+    char	two[1 + one_len];
+    size_t	two_len;
+
+    if        (normalisation_pass_remove_single_dot_segments(&two_len, two, one, one_len)) {
+      goto error_invalid_input_pathname;
+    } else if (normalisation_pass_remove_double_dot_segments(&one_len, one, two, two_len)) {
+      goto error_invalid_input_pathname;
+    } else if (mmux_libc_make_file_system_pathname_malloc_from_buffer(result_p, one, one_len)) {
+      goto error_invalid_input_pathname;
+    } else {
+      return false;
+    }
+  }
+
+ error_invalid_input_pathname:
+  mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+  return true;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Composition.
+ ** ----------------------------------------------------------------- */
+
+#if 0
+static ccptn_t *
+ptn_concat (cce_destination_t L, ccmem_allocator_t const * const A, ccptn_t * R,
+	    ccptn_t const * const prefix, ccptn_t const * const suffix)
+{
+  /* The resulting length is the sum of  the original lengths, plus one for the slash
+   * separator.
+   *
+   * If the suffix  is absolute: its first  octet is the ASCII  representation of the
+   * slash separator; we will copy it into the output.
+   *
+   * If the suffix is relative: its first  octet is *not* the ASCII representation of
+   * the slash separator; we will explicitly insert a separator.
+   */
+  size_t	R_len = ccptn_len(prefix) + ccptn_len(suffix);
+  if (! ccptn_is_absolute(suffix)) {
+    ++R_len;
+  }
+
+  if (CCPTN_PATH_MAX < R_len) {
+    cce_raise(L, ccptn_condition_new_exceeded_length(L));
+  } else {
+    /* This array must hold the whole pathname plus the terminating zero
+       octet. */
+    char	R_ptr[R_len + 1];
+    char *	ptr = R_ptr;
+
+    /* Copy the prefix. */
+    {
+      size_t	len = ccptn_len(prefix);
+
+      strncpy(ptr, prefix->ptr, len);
+      ptr += len;
+    }
+
+    /* Insert a separator if needed. */
+    if (! ccptn_is_absolute(suffix)) {
+      *ptr++ = '/';
+    }
+
+    /* Copy the suffix and add the terminating zero. */
+    {
+      size_t	len = ccptn_len(suffix);
+
+      strncpy(ptr, suffix->ptr, len);
+      ptr += len;
+      *ptr = '\0';
+    }
+
+    /* Build and return the resulting pathname. */
+    {
+      /* Using  an ASCII  representation  will force  the  "ccptn_t" constructors  to
+	 duplicate the internal pathname representation using a dynamically allocated
+	 memory block. */
+      ccmem_ascii_t	R_block = {
+	.len	= R_len,
+	.ptr	= R_ptr
+      };
+
+      if (NULL != R) {
+	ccname_init(ccptn_t, ascii)(L, A, R, R_block);
+      } else {
+	R = (ccptn_t *)ccname_new(ccptn_t, ascii)(L, A, R_block);
+      }
+      R->absolute = ccptn_is_absolute(prefix);
+      return R;
+    }
+  }
+}
+#endif
 
 /* end of file */

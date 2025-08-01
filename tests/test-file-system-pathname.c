@@ -627,6 +627,144 @@ file_system_pathname_dirname (void)
 
 
 /** --------------------------------------------------------------------
+ ** Normalisation: normalise.
+ ** ----------------------------------------------------------------- */
+
+static void
+one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_normal_ptn_asciiz)
+{
+  mmux_libc_file_system_pathname_t	ptn, normal_ptn;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+    handle_error();
+  } else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn)) {
+    printf_error("normalising pathname '%s'", ptn_asciiz);
+    handle_error();
+  } else {
+    mmux_asciizcp_t	normal_ptn_asciiz;
+
+    if (mmux_libc_file_system_pathname_ptr_ref(&normal_ptn_asciiz, normal_ptn)) {
+      handle_error();
+    } else {
+      mmux_sint_t	result;
+
+      if (mmux_libc_strcmp(&result, expected_normal_ptn_asciiz, normal_ptn_asciiz)) {
+	handle_error();
+      } else if (0 == result) {
+	printf_message("the normalisation of '%s' is '%s'", ptn_asciiz, normal_ptn_asciiz);
+	mmux_libc_file_system_pathname_free(normal_ptn);
+      } else {
+	printf_error("invalid normalisation of '%s' got '%s'", ptn_asciiz, normal_ptn_asciiz);
+	mmux_libc_exit_failure();
+      }
+    }
+  }
+}
+static void
+one_normalisation_error_case (mmux_asciizcp_t ptn_asciiz)
+{
+  mmux_libc_file_system_pathname_t	ptn, normal_ptn;
+
+  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+    handle_error();
+  } else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn)) {
+    mmux_sint_t		errnum;
+
+    mmux_libc_errno_consume(&errnum);
+    if (MMUX_LIBC_EINVAL == errnum) {
+      printf_message("correctly got EINVAL error normalising pathname '%s'", ptn_asciiz);
+    } else {
+      printf_error("expected EINVAL error normalising pathname '%s'", ptn_asciiz);
+      mmux_libc_exit_failure();
+    }
+  } else {
+    printf_error("expected error normalising pathname of '%s'", ptn_asciiz);
+    mmux_libc_exit_failure();
+  }
+}
+static void
+file_system_pathname_normalisation (void)
+{
+  printf_message("running test: %s", __func__);
+
+  /* Absolute pathnames: already normalised pathnames. */
+  one_normalisation_case("/",				"/");
+  one_normalisation_case("/file.ext",			"/file.ext");
+  one_normalisation_case("/path/to/file.ext",		"/path/to/file.ext");
+
+  /* Relative pathnames: already normalised pathnames. */
+  one_normalisation_case(".",				".");
+  one_normalisation_case("file.ext",			"file.ext");
+  one_normalisation_case("path/to/file.ext",		"path/to/file.ext");
+
+  /* ------------------------------------------------------------------ */
+
+  /* Absolute pathnames: useless slashes removal. */
+  one_normalisation_case("/path///to////file.ext",	"/path/to/file.ext");
+  one_normalisation_case("/path/to/dir///",		"/path/to/dir/");
+
+  /* Relative pathnames: useless slashes removal. */
+  one_normalisation_case("path///to////file.ext",	"path/to/file.ext");
+  one_normalisation_case("path/to/dir///",		"path/to/dir/");
+
+  /* ------------------------------------------------------------------ */
+
+  /* Absolute pathnames: single-dot removal. */
+  one_normalisation_case("/path/./to/././file.ext",	"/path/to/file.ext");
+  one_normalisation_case("/path/to/dir/.",		"/path/to/dir/");
+  one_normalisation_case("/.",				"/");
+  one_normalisation_case("/./././.",			"/");
+
+  /* Relative pathnames: single-dot removal. */
+  one_normalisation_case("./",				".");
+  one_normalisation_case("./.",				".");
+  one_normalisation_case("./././.",			".");
+  one_normalisation_case("path/",			"path/");
+  one_normalisation_case("path/.",			"path/");
+  one_normalisation_case("./path",			"./path");
+  one_normalisation_case("./path/file.ext",		"path/file.ext");
+  one_normalisation_case("./file.ext",			"./file.ext");
+  one_normalisation_case("./path/to/file.ext",		"path/to/file.ext");
+  one_normalisation_case("./path///to////file.ext",	"path/to/file.ext");
+  one_normalisation_case("./path/to/dir///",		"path/to/dir/");
+  one_normalisation_case("~/.fvwmrc",			"~/.fvwmrc");
+  one_normalisation_case(".fvwmrc",			".fvwmrc");
+  one_normalisation_case("/path/to/.fvwmrc",		"/path/to/.fvwmrc");
+
+  /* ------------------------------------------------------------------ */
+
+  /* Absolute pathnames: double-dot removal. */
+  one_normalisation_case("/path/..",			"/");
+  one_normalisation_case("/path/to/../..",		"/");
+  one_normalisation_case("/path/to/../file.ext",	"/path/file.ext");
+  one_normalisation_case("/path/to/../../this/file.ext","/this/file.ext");
+
+  /* Relative pathnames: double-dot removal. */
+  one_normalisation_case("..",				"..");
+  one_normalisation_case("../",				"..");
+  one_normalisation_case("../path",			"../path");
+  one_normalisation_case("path/..",			".");
+  one_normalisation_case("./path/..",			".");
+  one_normalisation_case("path/to/../..",		".");
+  one_normalisation_case("./path/to/../..",		".");
+  one_normalisation_case("path/../file.ext",		"./file.ext");
+  one_normalisation_case("./path/../file.ext",		"./file.ext");
+  one_normalisation_case("path/to/../file.ext",		"path/file.ext");
+  one_normalisation_case("./path/to/../file.ext",	"path/file.ext");
+  one_normalisation_case("path/to/../../../file.ext",	"../file.ext");
+  one_normalisation_case("./path/to/../../../file.ext",	"../file.ext");
+  one_normalisation_case("path/../../../file.ext",	"../../file.ext");
+  one_normalisation_case("./path/../../../file.ext",	"../../file.ext");
+
+  /* ------------------------------------------------------------------ */
+
+  /* Invalid pathnames. */
+  one_normalisation_error_case("/..");
+  one_normalisation_error_case("/path/to/../../..");
+}
+
+
+/** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
 
@@ -985,6 +1123,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	file_system_pathname_dirname();		}
   if (1) {	file_system_pathname_tailname();	}
   if (1) {	file_system_pathname_filename();	}
+  if (1) {	file_system_pathname_normalisation();	}
 
   mmux_libc_exit_success();
 }
