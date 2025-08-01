@@ -37,8 +37,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Print the database. */
   {
     mmux_asciizcp_t		name = "root";
-    mmux_libc_group_t *	GR;
+    mmux_libc_group_t *		GR;
     mmux_libc_fd_t		fd;
+
+    mmux_libc_stder(&fd);
 
     if (mmux_libc_getgrnam(&GR, name)) {
       handle_error();
