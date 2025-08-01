@@ -5539,6 +5539,7 @@ a sequence dot, slash, segment can be normalised to the segment.
 * fs pathnames pathnames predicates::     Predicates on file system pathnames.
 * fs pathnames pathnames components::     Components of file system pathnames.
 * fs pathnames pathnames normalisation::  Components of file system pathnames.
+* fs pathnames pathnames operations::     Operations on file system pathnames.
 @end menu
 
 @c page
@@ -6010,6 +6011,41 @@ mmux_libc_ptn_t         ptn, normal_ptn;
 if (mmux_libc_make_file_system_pathname(&ptn, "/path///to/.//.//file.ext")) @{
   /* error */
 @} else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs pathnames pathnames operations
+@subsubsection Operations on file system pathnames
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_concat (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{prefix}, mmux_libc_ptn_t @var{suffix})
+Make a new file system pathname by concatenating the @var{prefix} with the @var{suffix}; the new
+pathname has memory allocated with @cfunc{mmux_libc_malloc}.  The new pathname is normalised using
+@cfunc{mmux_libc_make_file_system_pathname_normalised}.
+
+Examples of concatenation:
+
+@example
+/path/to   +   file.ext     @result{} /path/to/file.ext
+/path/to/  +   file.ext     @result{} /path/to/file.ext
+/path/to   +   /file.ext    @result{} /path/to/file.ext
+@end example
+
+@noindent
+the slash separator between prefix and suffix is inserted if needed.
+
+@example
+mmux_libc_file_system_pathname_t      prefix_ptn, suffix_ptn, result_ptn;
+
+if        (mmux_libc_make_file_system_pathname(&prefix_ptn, "/path/to")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname(&suffix_ptn, "this/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_make_file_system_pathname_concat(&result_ptn, prefix_ptn, suffix_ptn)) @{
+ printf_error("concatenating pathname prefix '%s' suffix '%s'", prefix_ptn_asciiz, suffix_ptn_asciiz);
   /* error */
 @}
 @end example

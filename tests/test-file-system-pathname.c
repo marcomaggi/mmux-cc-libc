@@ -627,7 +627,7 @@ file_system_pathname_dirname (void)
 
 
 /** --------------------------------------------------------------------
- ** Normalisation: normalise.
+ ** Normalisation.
  ** ----------------------------------------------------------------- */
 
 static void
@@ -761,6 +761,58 @@ file_system_pathname_normalisation (void)
   /* Invalid pathnames. */
   one_normalisation_error_case("/..");
   one_normalisation_error_case("/path/to/../../..");
+}
+
+
+/** --------------------------------------------------------------------
+ ** Concatenation.
+ ** ----------------------------------------------------------------- */
+
+static void
+one_concatenation_case (mmux_asciizcp_t prefix_ptn_asciiz, mmux_asciizcp_t suffix_ptn_asciiz,
+			mmux_asciizcp_t expected_result_ptn_asciiz)
+{
+  mmux_libc_file_system_pathname_t	prefix_ptn, suffix_ptn, result_ptn;
+
+  if        (mmux_libc_make_file_system_pathname(&prefix_ptn, prefix_ptn_asciiz)) {
+    handle_error();
+  } else if (mmux_libc_make_file_system_pathname(&suffix_ptn, suffix_ptn_asciiz)) {
+    handle_error();
+  } else if (mmux_libc_make_file_system_pathname_concat(&result_ptn, prefix_ptn, suffix_ptn)) {
+    printf_error("concatenating pathname prefix '%s' suffix '%s'", prefix_ptn_asciiz, suffix_ptn_asciiz);
+    handle_error();
+  } else {
+    mmux_asciizcp_t	result_ptn_asciiz;
+
+    if (mmux_libc_file_system_pathname_ptr_ref(&result_ptn_asciiz, result_ptn)) {
+      handle_error();
+    } else {
+      mmux_sint_t	cmpnum;
+
+      if (mmux_libc_strcmp(&cmpnum, expected_result_ptn_asciiz, result_ptn_asciiz)) {
+	handle_error();
+      } else if (0 == cmpnum) {
+	printf_message("the concatenation of '%s' and '%s' is '%s'",
+		       prefix_ptn_asciiz, suffix_ptn_asciiz, result_ptn_asciiz);
+	mmux_libc_file_system_pathname_free(result_ptn);
+      } else {
+	printf_error("invalid concatenation of '%s' and '%s' is '%s'",
+		     prefix_ptn_asciiz, suffix_ptn_asciiz, result_ptn_asciiz);
+	mmux_libc_exit_failure();
+      }
+    }
+  }
+}
+static void
+file_system_pathname_concatenation (void)
+{
+  printf_message("running test: %s", __func__);
+
+  one_concatenation_case("/path/to",	"file.ext",	"/path/to/file.ext");
+  one_concatenation_case("/path/to/",	"file.ext",	"/path/to/file.ext");
+  one_concatenation_case("/path/to",	"/file.ext",	"/path/to/file.ext");
+
+  one_concatenation_case("/path/to/.",	"./file.ext",	"/path/to/file.ext");
 }
 
 
@@ -1124,6 +1176,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	file_system_pathname_tailname();	}
   if (1) {	file_system_pathname_filename();	}
   if (1) {	file_system_pathname_normalisation();	}
+  if (1) {	file_system_pathname_concatenation();	}
 
   mmux_libc_exit_success();
 }

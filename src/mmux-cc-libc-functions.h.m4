@@ -1333,6 +1333,10 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_filename (mmux_libc_p
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_concat (mmux_libc_ptn_t * result_p,
+								   mmux_libc_ptn_t prefix, mmux_libc_ptn_t suffix)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p,

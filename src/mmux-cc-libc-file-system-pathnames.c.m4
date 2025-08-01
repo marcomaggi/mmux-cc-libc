@@ -1596,7 +1596,7 @@ mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * result_p, mmux
     } else if (normalisation_pass_remove_double_dot_segments(&one_len, one, two, two_len)) {
       goto error_invalid_input_pathname;
     } else if (mmux_libc_make_file_system_pathname_malloc_from_buffer(result_p, one, one_len)) {
-      goto error_invalid_input_pathname;
+      return true;
     } else {
       return false;
     }
@@ -1612,10 +1612,9 @@ mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * result_p, mmux
  ** Composition.
  ** ----------------------------------------------------------------- */
 
-#if 0
-static ccptn_t *
-ptn_concat (cce_destination_t L, ccmem_allocator_t const * const A, ccptn_t * R,
-	    ccptn_t const * const prefix, ccptn_t const * const suffix)
+bool
+mmux_libc_make_file_system_pathname_concat (mmux_libc_ptn_t * result_p,
+					    mmux_libc_ptn_t prefix, mmux_libc_ptn_t suffix)
 {
   /* The resulting length is the sum of  the original lengths, plus one for the slash
    * separator.
@@ -1626,61 +1625,51 @@ ptn_concat (cce_destination_t L, ccmem_allocator_t const * const A, ccptn_t * R,
    * If the suffix is relative: its first  octet is *not* the ASCII representation of
    * the slash separator; we will explicitly insert a separator.
    */
-  size_t	R_len = ccptn_len(prefix) + ccptn_len(suffix);
-  if (! ccptn_is_absolute(suffix)) {
-    ++R_len;
+  mmux_usize_t	prefix_len = strlen(prefix.value);
+  mmux_usize_t	suffix_len = strlen(suffix.value);
+  mmux_usize_t	result_len = prefix_len + suffix_len;
+
+  if (! (('/' == suffix.value[0]) || ('/' == prefix.value[prefix_len-1]))) {
+    ++result_len;
   }
 
-  if (CCPTN_PATH_MAX < R_len) {
-    cce_raise(L, ccptn_condition_new_exceeded_length(L));
-  } else {
-    /* This array must hold the whole pathname plus the terminating zero
-       octet. */
-    char	R_ptr[R_len + 1];
-    char *	ptr = R_ptr;
+  {
+    /* This array must hold the whole pathname plus the terminating zero octet. */
+    mmux_char_t		result_ptr[1 + result_len];
+    mmux_char_t *	ptr = result_ptr;
+    bool		separator_inserted = false;
 
     /* Copy the prefix. */
     {
-      size_t	len = ccptn_len(prefix);
-
-      strncpy(ptr, prefix->ptr, len);
-      ptr += len;
-    }
-
-    /* Insert a separator if needed. */
-    if (! ccptn_is_absolute(suffix)) {
-      *ptr++ = '/';
+      memcpy(ptr, prefix.value, prefix_len);
+      ptr += prefix_len;
+      if ('/' == prefix.value[prefix_len-1]) {
+	separator_inserted = true;
+      }
     }
 
     /* Copy the suffix and add the terminating zero. */
     {
-      size_t	len = ccptn_len(suffix);
-
-      strncpy(ptr, suffix->ptr, len);
-      ptr += len;
+      if ('/' == suffix.value[0]) {
+	separator_inserted = true;
+      } else if (! separator_inserted) {
+	*ptr++ = '/';
+      }
+      memcpy(ptr, suffix.value, suffix_len);
+      ptr += suffix_len;
       *ptr = '\0';
     }
 
-    /* Build and return the resulting pathname. */
     {
-      /* Using  an ASCII  representation  will force  the  "ccptn_t" constructors  to
-	 duplicate the internal pathname representation using a dynamically allocated
-	 memory block. */
-      ccmem_ascii_t	R_block = {
-	.len	= R_len,
-	.ptr	= R_ptr
-      };
+      mmux_libc_file_system_pathname_t	result_ptn;
 
-      if (NULL != R) {
-	ccname_init(ccptn_t, ascii)(L, A, R, R_block);
+      if (mmux_libc_make_file_system_pathname(&result_ptn, result_ptr)) {
+	return true;
       } else {
-	R = (ccptn_t *)ccname_new(ccptn_t, ascii)(L, A, R_block);
+	return mmux_libc_make_file_system_pathname_normalised(result_p, result_ptn);
       }
-      R->absolute = ccptn_is_absolute(prefix);
-      return R;
     }
   }
 }
-#endif
 
 /* end of file */
