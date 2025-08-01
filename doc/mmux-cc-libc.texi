@@ -5429,6 +5429,7 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 * fs pathnames pathnames::      File system full pathnames.
 * fs pathnames extensions::     Extensions of file system pathnames.
 * fs pathnames segments::       Extensions of file system pathnames.
+* fs pathnames examples::       Usage examples for file system pathnames.
 @end menu
 
 @c page
@@ -5530,6 +5531,20 @@ a sequence dot, slash, segment can be normalised to the segment.
 @subsection File system full pathnames
 
 
+@menu
+* fs pathnames pathnames types::        File system pathname types.
+* fs pathnames pathnames constructors:: Building file system pathnames.
+* fs pathnames pathnames inspection::   Inspecting file system pathnames.
+* fs pathnames pathnames comparison::   Comparing file system pathnames.
+* fs pathnames pathnames predicates::   Predicates on file system pathnames.
+* fs pathnames pathnames components::   Components of file system pathnames.
+@end menu
+
+@c page
+@node fs pathnames pathnames types
+@subsubsection File system pathname types
+
+
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
 @deftpx {Struct Typedef} mmux_libc_ptn_t
 Data type representing a file system pathname as a non--@cnull{} pointer to non--empty @asciiz{}
@@ -5540,103 +5555,6 @@ string.  It has a single field:
 Pointer to the first octet in the array of octets.
 @end table
 @end deftp
-
-@menu
-* fs pathnames pathnames examples::       Usage examples for file system pathnames.
-* fs pathnames pathnames constructors::   Building file system pathnames.
-* fs pathnames pathnames inspection::     Inspecting file system pathnames.
-* fs pathnames pathnames comparison::     Comparing file system pathnames.
-* fs pathnames pathnames predicates::     Predicates on file system pathnames.
-* fs pathnames pathnames components::     Components of file system pathnames.
-@end menu
-
-@c page
-@node fs pathnames pathnames examples
-@subsubsection Usage examples for file system pathnames
-
-
-Build a pathname from an @asciiz{} string, by allocating dynamic memory:
-
-@example
-mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t         ptn;
-
-if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) @{
-  /* error */
-@}
-@{
-  ...
-@}
-if (mmux_libc_file_system_pathname_free(ptn)) @{
-  /* error */
-@}
-@end example
-
-@c ------------------------------------------------------------------------
-
-@noindent
-Build a pathname from an @mmuxascii{} string, by allocating dynamic memory:
-
-@example
-//                                  012345678
-mmux_asciizcp_t         bufptr[] = "/path/to/file.ext";
-mmux_usize_t            buflen   = 8;
-mmux_libc_ptn_t         ptn;
-
-if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)) @{
-  /* error */
-@}
-@{
-  ...
-@}
-if (mmux_libc_file_system_pathname_free(ptn)) @{
-  /* error */
-@}
-@end example
-
-@c ------------------------------------------------------------------------
-
-@noindent
-Allocate a buffer containing the pathname, then store the buffer in the pathname object:
-
-@example
-mmux_asciizcp_t       ptn_asciiz = "/path/to/file.ext";
-mmux_usize_t          buflen;
-mmux_asciizp_t        bufptr;
-mmux_libc_ptn_t       ptn;
-
-mmux_libc_strlen(&buflen, ptn_asciiz);
-if (mmux_libc_malloc(&bufptr, 1 + buflen)) @{
-  /* error */
-@} else @{
-  bufptr[buflen]='\0';
-  mmux_libc_strncpy(bufptr, ptn_asciiz, buflen);
-  if (mmux_libc_make_file_system_pathname(&ptn, bufptr)) @{
-    /* error */
-  @}
-@}
-@end example
-
-@c ------------------------------------------------------------------------
-
-@noindent
-We can print a file system pathname to a file descriptor using the function
-@cfunc{mmux_libc_dprintf_libc_ptn}; @ref{mmux_libc_dprintf_libc_ptn} for details.
-
-@example
-mmux_libc_ptn_t         ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else @{
-  mmux_libc_fd_t        fd;
-
-  mmux_libc_stdou(&fd);
-  if (mmux_libc_dprintf_libc_ptn(fd, ptn)) @{
-    /* error */
-  @}
-@}
-@end example
 
 @c page
 @node fs pathnames pathnames constructors
@@ -6636,6 +6554,94 @@ Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represe
 Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the single slash
 segment @samp{/}; otherwise store @cfalse{}.
 @end deftypefun
+
+@c page
+@node fs pathnames examples
+@subsection Usage examples for file system pathnames
+
+
+Build a pathname from an @asciiz{} string, by allocating dynamic memory:
+
+@example
+mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) @{
+  /* error */
+@}
+@{
+  ...
+@}
+if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
+Build a pathname from an @mmuxascii{} string, by allocating dynamic memory:
+
+@example
+//                                  012345678
+mmux_asciizcp_t         bufptr[] = "/path/to/file.ext";
+mmux_usize_t            buflen   = 8;
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)) @{
+  /* error */
+@}
+@{
+  ...
+@}
+if (mmux_libc_file_system_pathname_free(ptn)) @{
+  /* error */
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
+Allocate a buffer containing the pathname, then store the buffer in the pathname object:
+
+@example
+mmux_asciizcp_t       ptn_asciiz = "/path/to/file.ext";
+mmux_usize_t          buflen;
+mmux_asciizp_t        bufptr;
+mmux_libc_ptn_t       ptn;
+
+mmux_libc_strlen(&buflen, ptn_asciiz);
+if (mmux_libc_malloc(&bufptr, 1 + buflen)) @{
+  /* error */
+@} else @{
+  bufptr[buflen]='\0';
+  mmux_libc_strncpy(bufptr, ptn_asciiz, buflen);
+  if (mmux_libc_make_file_system_pathname(&ptn, bufptr)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@noindent
+We can print a file system pathname to a file descriptor using the function
+@cfunc{mmux_libc_dprintf_libc_ptn}; @ref{mmux_libc_dprintf_libc_ptn} for details.
+
+@example
+mmux_libc_ptn_t         ptn;
+
+if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else @{
+  mmux_libc_fd_t        fd;
+
+  mmux_libc_stdou(&fd);
+  if (mmux_libc_dprintf_libc_ptn(fd, ptn)) @{
+    /* error */
+  @}
+@}
+@end example
 
 @c page
 @node fs directories
