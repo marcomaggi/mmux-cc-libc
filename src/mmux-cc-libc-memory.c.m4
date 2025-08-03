@@ -242,28 +242,28 @@ mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** re
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * allocator,
-				   mmux_pointer_t * result_p, mmux_usize_t len)
+mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * allocator,
+				    mmux_pointer_t * result_p, mmux_usize_t len)
 {
   return allocator->methods->malloc(allocator->context, result_p, len);
 }
 bool
-mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * allocator,
-				   mmux_pointer_t * result_p,
-				   mmux_usize_t item_num, mmux_usize_t item_len)
+mmux_libc_memory_allocator_calloc_ (mmux_libc_memory_allocator_t const * allocator,
+				    mmux_pointer_t * result_p,
+				    mmux_usize_t item_num, mmux_usize_t item_len)
 {
   return allocator->methods->calloc(allocator->context, result_p, item_num, item_len);
 }
 bool
-mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * allocator,
-				    mmux_pointer_t * result_p, mmux_usize_t newlen)
+mmux_libc_memory_allocator_realloc_ (mmux_libc_memory_allocator_t const * allocator,
+				     mmux_pointer_t * result_p, mmux_usize_t newlen)
 {
   return allocator->methods->realloc(allocator->context, result_p, newlen);
 }
 bool
-mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * allocator,
-					 mmux_pointer_t * result_p, mmux_usize_t item_num,
-					 mmux_usize_t item_len)
+mmux_libc_memory_allocator_reallocarray_ (mmux_libc_memory_allocator_t const * allocator,
+					  mmux_pointer_t * result_p, mmux_usize_t item_num,
+					  mmux_usize_t item_len)
 {
   return allocator->methods->reallocarray(allocator->context, result_p, item_num, item_len);
 }

@@ -1324,6 +1324,10 @@ Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_r
 @item mmux_libc_memory_allocator_free_fun_t * const free
 Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_free}.
 @end table
+
+If, for some reason, a custom memory allocator does not implement one or more of these operations:
+we should just define the corresponding functions to always set @code{errno} to
+@samp{MMUX_LIBC_ENOSYS} and always return @ctrue{}.
 @end deftp
 
 @c ------------------------------------------------------------------------
