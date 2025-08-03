@@ -1105,10 +1105,10 @@ Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Lib
 @section Memory allocation
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_malloc (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{len})
-@deftypefnx {Function} bool mmux_libc_malloc_ (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{len})
-@MmuxCInterface{malloc}.  The macro just casts a pointer @var{P_p} of any type to @code{mmux_pointer_t
-*}.  Upon successful return: the pointer variable referenced by @var{P_p} is set to the pointer
+@deftypefn {Preprocessor Macro} bool mmux_libc_malloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefnx {Function} bool mmux_libc_malloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@MmuxCInterface{malloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
+*}.  Upon successful return: the pointer variable referenced by @var{result_p} is set to the pointer
 referencing the newly allocated memory block.
 
 @example
@@ -1121,10 +1121,10 @@ if (mmux_libc_malloc(&tm, sizeof(mmux_libc_tm_t))) @{
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_calloc (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@deftypefnx Function bool mmux_libc_calloc_ (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@MmuxCInterface{calloc}.  The macro just casts a pointer @var{P_p} of any type to @code{mmux_pointer_t
-*}.  Upon successful return: the pointer variable referenced by @var{P_p} is set to the pointer
+@deftypefn {Preprocessor Macro} bool mmux_libc_calloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx Function bool mmux_libc_calloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@MmuxCInterface{calloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
+*}.  Upon successful return: the pointer variable referenced by @var{result_p} is set to the pointer
 referencing the newly allocated memory block.
 
 @example
@@ -1137,18 +1137,18 @@ if (mmux_libc_calloc(&P, 123, sizeof(mmux_double_t))) @{
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_realloc (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{newlen})
-@deftypefnx Function bool mmux_libc_realloc_ (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{newlen})
-@MmuxCInterface{realloc}.  The macro just casts a pointer @var{P_p} of any type to @code{mmux_pointer_t
+@deftypefn {Preprocessor Macro} bool mmux_libc_realloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefnx Function bool mmux_libc_realloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@MmuxCInterface{realloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
 *}.
 
 @itemize
 @item
-Upon calling this function: @var{P_p} must reference a pointer variable holding the pointer to the
+Upon calling this function: @var{result_p} must reference a pointer variable holding the pointer to the
 memory block to reallocate.
 
 @item
-Upon successfully returning from this function: the pointer variable referenced by @var{P_p} holds
+Upon successfully returning from this function: the pointer variable referenced by @var{result_p} holds
 the new pointer.
 @end itemize
 
@@ -1165,10 +1165,10 @@ if (mmux_libc_realloc(&tm, 4096)) @{
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_reallocarray (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@deftypefnx Function bool mmux_libc_reallocarray_ (mmux_pointer_t * @var{P_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@MmuxCInterface{reallocarray}.  The macro just casts a pointer @var{P_p} of any type to
-@code{mmux_pointer_t *}.  Upon successful return: the pointer variable referenced by @var{P_p} is
+@deftypefn {Preprocessor Macro} bool mmux_libc_reallocarray (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx Function bool mmux_libc_reallocarray_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@MmuxCInterface{reallocarray}.  The macro just casts a pointer @var{result_p} of any type to
+@code{mmux_pointer_t *}.  Upon successful return: the pointer variable referenced by @var{result_p} is
 set to the pointer referencing the newly allocated memory block.
 
 @example
@@ -1282,7 +1282,7 @@ this memory allocator.
 
 It is guaranteed that future versions of this @api{} will keep the definition of the object type
 @objtype{mmux_libc_memory_allocator_t} as a pair of pointers; being a small, immutable data
-structure, it is suggested to pass it by value.
+structure, it is suggested to pass it by value when appropriate.
 @end deftp
 
 @c ------------------------------------------------------------------------
@@ -1370,7 +1370,7 @@ mmux_pointer_t                          bufptr;
 
 mmux_libc_default_memory_allocator_ref(&AP);
 
-if (mmux_libc_memory_allocator_malloc(AP, &bufptr)) @{
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr, 4096)) @{
   /* error */
 @}
 
@@ -1381,25 +1381,99 @@ if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
 @}
 @end example
 
+@noindent
+while the standard @cfunc{free} function and its wrapper @cfunc{mmux_libc_free} will never return an
+error condition: the same cannot for said by custom memory allocators; so it is better to test the
+return value of @cfunc{mmux_libc_memory_allocator_free}.
 
-@deftypefun bool mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+For all the following definitions: the macro just casts a pointer @var{result_p} of any type to
+@code{mmux_pointer_t *}.
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefnx Function bool mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
 Call the function of the given memory allocator.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_calloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Call the function of the given memory allocator.
-@end deftypefun
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_pointer_t                          bufptr;
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_calloc(AP, &bufptr, 123, 4096)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_realloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
 Call the function of the given memory allocator.
-@end deftypefun
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_pointer_t                          bufptr;
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr, 4096)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_realloc(AP, &bufptr, 2 * 4096)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_reallocarray_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Call the function of the given memory allocator.
-@end deftypefun
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_pointer_t                          bufptr;
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_calloc(AP, &bufptr, 123, 4096)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_reallocarray(AP, &bufptr, 456, 4096)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
 
 
 @deftypefun bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t @var{p})
