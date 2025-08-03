@@ -1279,10 +1279,6 @@ Pointer to an instance of @objtype{mmux_libc_memory_allocator_context_t}.
 Pointer to an instance of @objtype{mmux_libc_memory_allocator_methods_t} representing the methods of
 this memory allocator.
 @end table
-
-It is guaranteed that future versions of this @api{} will keep the definition of the object type
-@objtype{mmux_libc_memory_allocator_t} as a pair of pointers; being a small, immutable data
-structure, it is suggested to pass it by value when appropriate.
 @end deftp
 
 @c ------------------------------------------------------------------------
