@@ -1260,6 +1260,7 @@ defined by @value{PACKAGE}.
 * memory allocator types::      Memory allocator type definitions.
 * memory allocator api::        Memory allocator programming interface.
 * memory allocator default::    Default memory allocator.
+* memory allocator example::    How to implement a memory allocator.
 @end menu
 
 @c page
@@ -1426,6 +1427,75 @@ and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
 Retrieve a pointer to the default memory allocator defined by @value{PACKAGE} and store it in the
 variable referenced by @var{result_p}.
 @end deftypefun
+
+@c page
+@node memory allocator example
+@subsection How to implement a memory allocator
+
+
+We can adapt the following implementation of the default allocator:
+
+@example
+static bool
+spiffy_memory_allocator_malloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+                                mmux_pointer_t * result_p, mmux_usize_t len)
+@{
+  return mmux_libc_malloc_(result_p, len);
+@}
+static bool
+spiffy_memory_allocator_calloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+                                mmux_pointer_t * result_p,
+                                mmux_usize_t item_num, mmux_usize_t item_len)
+@{
+  return mmux_libc_calloc_(result_p, item_num, item_len);
+@}
+static bool
+spiffy_memory_allocator_realloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+                                 mmux_pointer_t * result_p, mmux_usize_t newlen)
+@{
+  return mmux_libc_realloc_(result_p, newlen);
+@}
+static bool
+spiffy_memory_allocator_reallocarray (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+                                      mmux_pointer_t * result_p, mmux_usize_t item_num,
+                                      mmux_usize_t item_len)
+@{
+  return mmux_libc_reallocarray_(result_p, item_num, item_len);
+@}
+static bool
+spiffy_memory_allocator_free (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+                              mmux_pointer_t p)
+@{
+  return mmux_libc_free(p);
+@}
+
+static mmux_libc_memory_allocator_context_t const spiffy_memory_allocator_context = @{
+  .name                 = "MMUX CC Libc Spiffy Memory Allocator",
+  .version_major        = 1,
+  .version_minor        = 0,
+  .version_patchlevel   = 0,
+@};
+
+static mmux_libc_memory_allocator_methods_t const spiffy_memory_allocator_methods = @{
+  .malloc               = spiffy_memory_allocator_malloc,
+  .realloc              = spiffy_memory_allocator_realloc,
+  .calloc               = spiffy_memory_allocator_calloc,
+  .reallocarray         = spiffy_memory_allocator_reallocarray,
+  .free                 = spiffy_memory_allocator_free,
+@};
+
+static mmux_libc_memory_allocator_t const spiffy_memory_allocator = @{
+  .context      = (mmux_libc_memory_allocator_context_t *) &spiffy_memory_allocator_context,
+  .methods      = &spiffy_memory_allocator_methods,
+@};
+
+bool
+spiffy_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+@{
+  *result_p = &spiffy_memory_allocator;
+  return false;
+@}
+@end example
 
 @c page
 @node strings
