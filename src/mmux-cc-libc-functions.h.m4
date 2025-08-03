@@ -300,6 +300,33 @@ mmux_cc_libc_decl bool mmux_libc_memmem (mmux_pointer_t * result_p,
 					 mmux_pointer_t needle_ptr,   mmux_usize_t needle_len)
   __attribute__((__nonnull__(1,2,4)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * allocator,
+							  mmux_pointer_t * result_p, mmux_usize_t len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * allocator,
+							  mmux_pointer_t * result_p,
+							  mmux_usize_t item_num, mmux_usize_t item_len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * allocator,
+							   mmux_pointer_t * result_p, mmux_usize_t newlen)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * allocator,
+								mmux_pointer_t * result_p, mmux_usize_t item_num,
+								mmux_usize_t item_len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * allocator,
+							mmux_pointer_t p)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
 
 /** --------------------------------------------------------------------
  ** Times and dates: mmux_libc_timeval_t.

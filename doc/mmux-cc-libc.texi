@@ -1097,6 +1097,7 @@ Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Lib
 @menu
 * memory allocation::           Memory allocation.
 * memory operations::           Memory operations.
+* memory allocator::            Memory allocator.
 @end menu
 
 @c page
@@ -1244,6 +1245,182 @@ if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
 
 @deftypefun bool mmux_libc_memmem (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{haystack_ptr}, mmux_usize_t @var{haystack_len}, mmux_pointer_t @var{needle_ptr}, mmux_usize_t @var{needle_len})
 @MmuxCInterface{memmem}.
+@end deftypefun
+
+@c page
+@node memory allocator
+@section Memory allocator
+
+
+It is often useful to define special memory allocators for specific data types of for data that we
+know is short--lived or long--lived; the following definitions represent the memory allocator
+defined by @value{PACKAGE}.
+
+@menu
+* memory allocator types::      Memory allocator type definitions.
+* memory allocator api::        Memory allocator programming interface.
+* memory allocator default::    Default memory allocator.
+@end menu
+
+@c page
+@node memory allocator types
+@subsection Memory allocator type definitions
+
+
+@deftp {Struct Typedef} mmux_libc_memory_allocator_t
+Data structure representing a memory allocator.  It has the following fields:
+
+@table @code
+@item mmux_libc_memory_allocator_context_t * const context
+Pointer to an instance of @objtype{mmux_libc_memory_allocator_context_t}.
+
+@item mmux_libc_memory_allocator_methods_t const * const methods
+Pointer to an instance of @objtype{mmux_libc_memory_allocator_methods_t} representing the methods of
+this memory allocator.
+@end table
+
+It is guaranteed that future versions of this @api{} will keep the definition of the object type
+@objtype{mmux_libc_memory_allocator_t} as a pair of pointers; being a small, immutable data
+structure, it is suggested to pass it by value.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_memory_allocator_context_t
+Data structure representing the context of the memory allocator.  It has the following fields:
+
+@table @code
+@item mmux_asciizcp_t name
+Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
+memory allocator context.  The string can have any format.
+
+@item mmux_uint_t version_major
+@itemx mmux_uint_t version_minor
+@itemx mmux_uint_t version_patchlevel
+The major, minor, patchlevel version numbers of this memory allocator context; when in doubt: just
+set them to @samp{1}, @samp{0}, @samp{0}.
+@end table
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_memory_allocator_methods_t
+Data structure type representing the table of allocator--specific functions.  It has the following
+fields:
+
+@table @code
+@item mmux_libc_memory_allocator_malloc_fun_t * const malloc
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
+
+@item mmux_libc_memory_allocator_calloc_fun_t * const calloc
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_calloc}.
+
+@item mmux_libc_memory_allocator_realloc_fun_t * const realloc
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_realloc}.
+
+@item mmux_libc_memory_allocator_reallocarray_fun_t * const reallocarray
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_reallocarray}.
+
+@item mmux_libc_memory_allocator_free_fun_t * const free
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_free}.
+@end table
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+Allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+Allocator--specific function that behaves like @cfunc{mmux_libc_calloc}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+Allocator--specific function that behaves like @cfunc{mmux_libc_realloc}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+Allocator--specific function that behaves like @cfunc{mmux_libc_reallocarray}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t @var{p})
+Allocator--specific function that behaves like @cfunc{mmux_libc_free}.
+@end deftypefun
+
+@c page
+@node memory allocator api
+@subsection Memory allocator programming interface
+
+
+To allocate and release a memory block using the default memory allocator we do:
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_pointer_t                          bufptr;
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
+  /* error */
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+Call the function of the given memory allocator.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+Call the function of the given memory allocator.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+Call the function of the given memory allocator.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+Call the function of the given memory allocator.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t @var{p})
+Call the function of the given memory allocator.
+@end deftypefun
+
+@c page
+@node memory allocator default
+@subsection Default memory allocator
+
+
+@value{PACKAGE} defines a default memory allocator that just uses the standard memory allocation
+functions.  In the context of this data structure: the name of the allocator is set to the @asciiz{}
+string:
+
+@example
+"MMUX CC Libc Default Memory Allocator"
+@end example
+
+@noindent
+and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
+
+
+@deftypefun bool mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** @var{result_p})
+Retrieve a pointer to the default memory allocator defined by @value{PACKAGE} and store it in the
+variable referenced by @var{result_p}.
 @end deftypefun
 
 @c page

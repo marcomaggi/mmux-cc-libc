@@ -376,6 +376,50 @@ typedef mmux_libc_protoent_t *			mmux_libc_protoent_ptr_t;
 typedef mmux_libc_netent_t *			mmux_libc_netent_ptr_t;
 typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_memory_allocator_context_t {
+  mmux_asciizcp_t	name;
+  mmux_uint_t		version_major;
+  mmux_uint_t		version_minor;
+  mmux_uint_t		version_patchlevel;
+} mmux_libc_memory_allocator_context_t;
+
+typedef bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_context_t * context,
+						      mmux_pointer_t * P_p, mmux_usize_t len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_context_t * context,
+						      mmux_pointer_t * P_p,
+						      mmux_usize_t item_num, mmux_usize_t item_len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_context_t * context,
+						       mmux_pointer_t * P_p, mmux_usize_t newlen)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_context_t * context,
+							    mmux_pointer_t * P_p, mmux_usize_t item_num,
+							    mmux_usize_t item_len)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_context_t * context,
+						    mmux_pointer_t p)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef struct mmux_libc_memory_allocator_methods_t {
+  mmux_libc_memory_allocator_malloc_fun_t	* const	malloc;
+  mmux_libc_memory_allocator_calloc_fun_t	* const	calloc;
+  mmux_libc_memory_allocator_realloc_fun_t	* const	realloc;
+  mmux_libc_memory_allocator_reallocarray_fun_t	* const	reallocarray;
+  mmux_libc_memory_allocator_free_fun_t		* const	free;
+} mmux_libc_memory_allocator_methods_t;
+
+typedef struct mmux_libc_memory_allocator_t {
+  mmux_libc_memory_allocator_context_t		* const	context;
+  mmux_libc_memory_allocator_methods_t const	* const	methods;
+} mmux_libc_memory_allocator_t;
+
 
 /** --------------------------------------------------------------------
  ** Function type definitions.
