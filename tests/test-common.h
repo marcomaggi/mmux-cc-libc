@@ -182,7 +182,8 @@ cleanfiles (void)
   for (mmux_usize_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
     mmux_libc_ptn_t	ptn;
 
-    if (mmux_libc_make_file_system_pathname(&ptn, CLEANFILES_PATHNAMES_ASCIIZ[i])) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
+					    &ptn, CLEANFILES_PATHNAMES_ASCIIZ[i])) {
       continue;
     } else {
       bool	exists;
@@ -206,7 +207,7 @@ test_create_data_file (mmux_asciizcp_t pathname_asciiz)
 {
   mmux_libc_ptn_t	ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
     handle_error();
   }
 

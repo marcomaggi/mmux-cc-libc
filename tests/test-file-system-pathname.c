@@ -37,7 +37,7 @@ print_file_system_pathname (void)
 
   mmux_libc_strlen(&ptn_len, ptn_asciiz);
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_memfd(&fd)) {
     handle_error();
@@ -95,7 +95,7 @@ malloc_file_system_pathname (void)
     bufptr[buflen]='\0';
     if (mmux_libc_strncpy(bufptr, ptn_asciiz, buflen)) {
       handle_error();
-    } else if (mmux_libc_make_file_system_pathname(&ptn, bufptr)) {
+    } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, bufptr)) {
     handle_error();
     } else {
       mmux_libc_fd_t	er;
@@ -116,16 +116,16 @@ malloc_file_system_pathname (void)
 }
 
 static void
-test_mmux_libc_make_file_system_pathname_malloc (void)
+test_mmux_libc_make_file_system_pathname_dynami_alloc (void)
 /* Allocate        a       pathname        in       dynamic        memory       using
-   "mmux_libc_make_file_system_pathname_malloc()". */
+   "mmux_libc_make_file_system_pathname()". */
 {
   printf_message("running test: %s", __func__);
 
   mmux_asciizcp_t	ptn_asciiz = "/path/to/file.ext";
   mmux_libc_ptn_t	ptn;
 
-  if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     printf_error("error allocating");
     handle_error();
   } else {
@@ -146,9 +146,9 @@ test_mmux_libc_make_file_system_pathname_malloc (void)
 }
 
 static void
-test_mmux_libc_make_file_system_pathname_malloc_from_buffer (void)
+test_mmux_libc_make_file_system_pathname2 (void)
 /* Allocate        a       pathname        in       dynamic        memory       using
-   "mmux_libc_make_file_system_pathname_malloc_from_buffer()". */
+   "mmux_libc_make_file_system_pathname2()". */
 {
   printf_message("running test: %s", __func__);
 
@@ -157,7 +157,7 @@ test_mmux_libc_make_file_system_pathname_malloc_from_buffer (void)
   mmux_usize_t		ptn_len    = 8;
   mmux_libc_ptn_t	ptn;
 
-  if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, ptn_asciiz, ptn_len)) {
+  if (mmux_libc_make_file_system_pathname2(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz, ptn_len)) {
     printf_error("error allocating");
     handle_error();
   } else {
@@ -198,7 +198,7 @@ one_predicate (test_pathname_predicate_t * P)
   mmux_libc_file_system_pathname_t	ptn;
   bool					result;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, P->ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, P->ptn_asciiz)) {
     handle_error();
   }
 
@@ -351,9 +351,10 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 {
   mmux_libc_file_system_pathname_t	ptn, root_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_rootname(&root_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_rootname(&mmux_libc_file_system_pathname_dynami_class,
+							  &root_ptn, ptn)) {
     handle_error();
   } else {
     mmux_asciizcp_t	root_ptn_asciiz;
@@ -380,9 +381,9 @@ one_rootname_error_case (mmux_asciizcp_t ptn_asciiz)
 {
   mmux_libc_file_system_pathname_t	ptn, root_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_rootname(&root_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_rootname(&mmux_libc_file_system_pathname_dynami_class, &root_ptn, ptn)) {
     mmux_sint_t		errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -435,9 +436,10 @@ one_tailname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 {
   mmux_libc_file_system_pathname_t	ptn, root_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_tailname(&root_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_tailname(&mmux_libc_file_system_pathname_dynami_class,
+							  &root_ptn, ptn)) {
     handle_error();
   } else {
     mmux_asciizcp_t	root_ptn_asciiz;
@@ -494,9 +496,10 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 {
   mmux_libc_file_system_pathname_t	ptn, root_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_filename(&root_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_filename(&mmux_libc_file_system_pathname_dynami_class,
+							  &root_ptn, ptn)) {
     handle_error();
   } else {
     mmux_asciizcp_t	root_ptn_asciiz;
@@ -523,9 +526,9 @@ one_filename_error_case (mmux_asciizcp_t ptn_asciiz)
 {
   mmux_libc_file_system_pathname_t	ptn, file_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_filename(&file_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_filename(&mmux_libc_file_system_pathname_dynami_class, &file_ptn, ptn)) {
     mmux_sint_t		errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -575,9 +578,9 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn_
 {
   mmux_libc_file_system_pathname_t	ptn, root_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_dirname(&root_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_dirname(&mmux_libc_file_system_pathname_dynami_class, &root_ptn, ptn)) {
     printf_error("extracting the dirname from '%s'", ptn_asciiz);
     handle_error();
   } else {
@@ -635,9 +638,9 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
 {
   mmux_libc_file_system_pathname_t	ptn, normal_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_normalised(&mmux_libc_file_system_pathname_dynami_class, &normal_ptn, ptn)) {
     printf_error("normalising pathname '%s'", ptn_asciiz);
     handle_error();
   } else {
@@ -665,9 +668,9 @@ one_normalisation_error_case (mmux_asciizcp_t ptn_asciiz)
 {
   mmux_libc_file_system_pathname_t	ptn, normal_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_normalised(&mmux_libc_file_system_pathname_dynami_class, &normal_ptn, ptn)) {
     mmux_sint_t		errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -774,11 +777,11 @@ one_concatenation_case (mmux_asciizcp_t prefix_ptn_asciiz, mmux_asciizcp_t suffi
 {
   mmux_libc_file_system_pathname_t	prefix_ptn, suffix_ptn, result_ptn;
 
-  if        (mmux_libc_make_file_system_pathname(&prefix_ptn, prefix_ptn_asciiz)) {
+  if        (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &prefix_ptn, prefix_ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&suffix_ptn, suffix_ptn_asciiz)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &suffix_ptn, suffix_ptn_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname_concat(&result_ptn, prefix_ptn, suffix_ptn)) {
+  } else if (mmux_libc_make_file_system_pathname_concat(&mmux_libc_file_system_pathname_dynami_class, &result_ptn, prefix_ptn, suffix_ptn)) {
     printf_error("concatenating pathname prefix '%s' suffix '%s'", prefix_ptn_asciiz, suffix_ptn_asciiz);
     handle_error();
   } else {
@@ -832,8 +835,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	print_file_system_pathname();					}
   if (1) {	malloc_file_system_pathname();					}
 
-  if (1) {	test_mmux_libc_make_file_system_pathname_malloc();		}
-  if (1) {	test_mmux_libc_make_file_system_pathname_malloc_from_buffer();	}
+  if (1) {	test_mmux_libc_make_file_system_pathname_dynami_alloc();	}
+  if (1) {	test_mmux_libc_make_file_system_pathname2();			}
 
   /* Determine the length of a file system pathname. */
   if (1) {
@@ -841,7 +844,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_usize_t	len;
 
     //                                             012345678901234567
-    if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
       handle_error();
     } else if (mmux_libc_file_system_pathname_len_ref(&len, ptn)) {
       handle_error();
@@ -857,11 +860,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
-    if (mmux_libc_make_file_system_pathname(&ptn1, "/path/to/file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/file.ext")) {
       handle_error();
     }
 
-    if (mmux_libc_make_file_system_pathname(&ptn2, "/path/to/file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, "/path/to/file.ext")) {
       handle_error();
     }
 
@@ -963,11 +966,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
-    if (mmux_libc_make_file_system_pathname(&ptn1, "/path/to/file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/file.ext")) {
       handle_error();
     }
 
-    if (mmux_libc_make_file_system_pathname(&ptn2, "/path/to/other-file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, "/path/to/other-file.ext")) {
       handle_error();
     }
 
@@ -1069,11 +1072,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
-    if (mmux_libc_make_file_system_pathname(&ptn1, "/path/to/other-file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/other-file.ext")) {
       handle_error();
     }
 
-    if (mmux_libc_make_file_system_pathname(&ptn2, "/path/to/file.ext")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, "/path/to/file.ext")) {
       handle_error();
     }
 

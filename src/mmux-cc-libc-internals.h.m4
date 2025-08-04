@@ -463,6 +463,9 @@ typedef void mmux_libc_sighandler_t (mmux_sint_t signum);
 mmux_cc_libc_private_decl mmux_libc_memory_allocator_t const mmux_libc_default_memory_allocator;
 mmux_cc_libc_private_decl mmux_libc_memory_allocator_t const mmux_libc_fake_memory_allocator;
 
+mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_static_class;
+mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_dynami_class;
+
 
 /** --------------------------------------------------------------------
  ** Done.

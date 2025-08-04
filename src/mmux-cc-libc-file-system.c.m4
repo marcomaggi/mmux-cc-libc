@@ -63,7 +63,8 @@ mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
 
   if (mmux_libc_getcwd_malloc(&bufptr)) {
     return true;
-  } else if (mmux_libc_make_file_system_pathname(result_p, bufptr)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+						 result_p, bufptr)) {
     mmux_libc_free((mmux_pointer_t)bufptr);
     return true;
   } else {
@@ -307,7 +308,8 @@ mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
 	  return true;
 	};
 	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul);
-	if (mmux_libc_make_file_system_pathname(result_pathname_p, asciiz_pathname)) {
+	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+						result_pathname_p, asciiz_pathname)) {
 	  mmux_libc_free(asciiz_pathname);
 	  return true;
 	} else {
@@ -361,7 +363,8 @@ mmux_libc_readlinkat_malloc_pathname_asciiz (mmux_libc_file_system_pathname_t * 
 	  return true;
 	};
 	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul);
-	if (mmux_libc_make_file_system_pathname(result_pathname_p, asciiz_pathname)) {
+	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+						result_pathname_p, asciiz_pathname)) {
 	  mmux_libc_free(asciiz_pathname);
 	  return true;
 	} else {
@@ -405,7 +408,8 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
   mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(input_pathname.value);
 
   if (asciiz_output_pathname) {
-    if (mmux_libc_make_file_system_pathname(result_pathname_p, asciiz_output_pathname)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+					    result_pathname_p, asciiz_output_pathname)) {
       mmux_libc_free(asciiz_output_pathname);
       return true;
     } else {
@@ -422,7 +426,8 @@ mmux_libc_realpath (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_l
   mmux_asciizp_t	asciiz_output_pathname = realpath(input_pathname.value, NULL);
 
   if (asciiz_output_pathname) {
-    if (mmux_libc_make_file_system_pathname(result_pathname_p, asciiz_output_pathname)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+					    result_pathname_p, asciiz_output_pathname)) {
       mmux_libc_free(asciiz_output_pathname);
       return true;
     } else {

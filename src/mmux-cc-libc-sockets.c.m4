@@ -569,7 +569,8 @@ mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_file_system
 bool
 mmux_libc_sun_path_ref (mmux_libc_file_system_pathname_t * result_p, mmux_libc_sockaddr_un_t const * const P)
 {
-  return mmux_libc_make_file_system_pathname(result_p, P->sun_path);
+  return mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
+					     result_p, P->sun_path);
 }
 
 mmux_usize_t
