@@ -33,8 +33,6 @@
  ** Preprocessor macros.
  ** ----------------------------------------------------------------- */
 
-#define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
-
 /* Evaluate to true  if PTR references an array of  ASCII characters, of
    LEN octets, representing a single-dot segment. */
 #define IS_SINGLE_DOT(PTR,LEN)		\
@@ -219,7 +217,7 @@ segment_is_special_directory (mmux_libc_ptn_segment_t S)
  ** File system pathnames: pathname predicates.
  ** ----------------------------------------------------------------- */
 
-static inline bool
+static bool
 pathname_is_special_directory (mmux_libc_ptn_t ptn)
 /* If possible: we want  to avoid applying "strlen()" to the  pathname.  We know that
  * "ptn" cannot have  zero length and its  string of bytes is always  terminated by a

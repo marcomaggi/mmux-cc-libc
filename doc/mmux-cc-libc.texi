@@ -5767,8 +5767,12 @@ package a file system pathname is represented by the object type
 @objtype{mmux_libc_file_system_pathname_t}.
 
 Unless otherwise specified: in this package a file system pathname can have any length, it can be
-composed of any number of octets.  For security and efficiency reasons: some functions impose the
-arbitrary limit of @math{4095} octets plus the terminating zero octet; in total, @math{4096} octets.
+composed of any number of octets.
+
+@ignore
+For security and efficiency reasons: some functions impose the arbitrary limit of @math{4095} octets
+plus the terminating zero octet; in total, @math{4096} octets.
+@end ignore
 
 Most pathnames are composed of @dfn{segments} separated by the slash character @file{/}, examples:
 
