@@ -41,7 +41,7 @@ test_data_file (void)
     }
   }
 
-  if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
     handle_error();
   }
 

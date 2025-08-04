@@ -44,7 +44,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       mmux_sint_t	flags = MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_RDONLY;
       mmux_mode_t	mode  = 0;
 
-      if (mmux_libc_make_file_system_pathname(&dirptn, ".")) {
+      if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dirptn, ".")) {
 	handle_error();
       }
 

@@ -36,7 +36,7 @@ making_a_segment_from_raw_arguments (void)
 
   //                                             012345678901234567
   //                                                      ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -79,7 +79,7 @@ making_the_last_segment_from_pathname (void)
 
   //                                             012345678901234567
   //                                                      ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -124,7 +124,7 @@ segment_accessors (void)
 
   //                                             012345678901234567
   //                                                      ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -228,7 +228,7 @@ one_last_segment_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_seg_
 
   if (mmux_libc_make_file_system_pathname_segment_raw_asciiz(&expected_seg, expected_seg_asciiz)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
   } else if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
     handle_error();
@@ -299,9 +299,9 @@ one_comparison (mmux_sint_t expected_cmpnum, mmux_asciizcp_t ptn_asciiz_1, mmux_
   mmux_libc_ptn_segment_t	ext1, ext2;
   mmux_sint_t			cmpnum;
 
-  if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, ptn_asciiz_1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, ptn_asciiz_2)) {
     handle_error();
   } else if (mmux_libc_file_system_pathname_segment_find_last(&ext1, ptn1)) {
     handle_error();
@@ -340,9 +340,9 @@ one_comparison_predicate (bool expected_equal,
   mmux_libc_ptn_t		ptn1, ptn2;
   mmux_libc_ptn_segment_t	ext1, ext2;
 
-  if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, ptn_asciiz_1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, ptn_asciiz_2)) {
     handle_error();
   } else if (mmux_libc_file_system_pathname_segment_find_last(&ext1, ptn1)) {
     handle_error();

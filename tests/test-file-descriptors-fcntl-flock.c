@@ -39,7 +39,7 @@ play_parent (mmux_libc_pid_t child_pid)
     mmux_sint_t const	flags = MMUX_LIBC_O_RDWR;
     mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
-    if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
       handle_error();
     }
 
@@ -170,7 +170,7 @@ play_child (void)
   mmux_libc_ptn_t	ptn;
   mmux_libc_fd_t	fd;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, pathname_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
     handle_error();
   }
 

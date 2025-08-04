@@ -53,10 +53,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_libc_ptn_t	src_ptn, lnk_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&src_ptn, src_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_file_system_pathname(&lnk_ptn, lnk_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &lnk_ptn, lnk_pathname_asciiz)) {
       handle_error();
     }
 
@@ -75,10 +75,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_libc_ptn_t	src_ptn, lnk_ptn, rea_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&src_ptn, src_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_file_system_pathname(&lnk_ptn, lnk_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &lnk_ptn, lnk_pathname_asciiz)) {
       handle_error();
     }
 
@@ -96,7 +96,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	/* not enough bytes in the provided buffer */
 	handle_error();
       }
-      if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) {
+      if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class, &rea_ptn, bufptr)) {
 	handle_error();
       }
     }

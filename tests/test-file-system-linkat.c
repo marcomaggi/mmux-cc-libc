@@ -55,10 +55,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_fd_t	fd;
     mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_FOLLOW;
 
-    if (mmux_libc_make_file_system_pathname(&src_ptn, src_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_file_system_pathname(&dst_ptn, dst_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dst_ptn, dst_pathname_asciiz)) {
       handle_error();
     }
 

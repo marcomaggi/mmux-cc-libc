@@ -52,7 +52,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_ptn_t	ptn;
     mmux_libc_stat_t	ST[1];
 
-    if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
       handle_error();
     }
 

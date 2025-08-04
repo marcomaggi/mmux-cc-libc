@@ -38,7 +38,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_ptn_t         dirptn;
     mmux_libc_dirstream_t   dirstream;
 
-    if (mmux_libc_make_file_system_pathname(&dirptn, ".")) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dirptn, ".")) {
       handle_error();
     }
 

@@ -45,7 +45,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_fd_t	dirfd;
     mmux_mode_t		mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
 
-    if (mmux_libc_make_file_system_pathname(&src_ptn, src_pathname_asciiz)) {
+    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
       handle_error();
     }
 

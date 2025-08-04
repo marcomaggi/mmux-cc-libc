@@ -36,7 +36,7 @@ making_an_extension_from_raw_arguments (void)
 
   //                                             012345678901234567
   //                                                          ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -79,7 +79,7 @@ making_an_extension_from_pathname (void)
 
   //                                             012345678901234567
   //                                                          ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -124,7 +124,7 @@ extension_accessors (void)
 
   //                                             012345678901234567
   //                                                          ^
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -163,7 +163,7 @@ extension_predicates (void)
   mmux_libc_ptn_t		ptn;
   mmux_libc_ptn_extension_t	ext;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
     handle_error();
   }
 
@@ -201,7 +201,7 @@ one_common_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_asciiz)
 
   if (mmux_libc_make_file_system_pathname_extension_raw(&expected, expected_asciiz, expected_asciiz_len)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
     handle_error();
@@ -220,7 +220,7 @@ one_error_case (mmux_asciizcp_t ptn_asciiz)
   mmux_libc_ptn_t		ptn;
   mmux_libc_ptn_extension_t	ext;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
     mmux_sint_t		errnum;
@@ -292,9 +292,9 @@ one_comparison (mmux_sint_t expected_cmpnum, mmux_asciizcp_t ptn_asciiz_1, mmux_
   mmux_libc_ptn_extension_t	ext1, ext2;
   mmux_sint_t			cmpnum;
 
-  if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, ptn_asciiz_1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, ptn_asciiz_2)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname_extension(&ext1, ptn1)) {
     handle_error();
@@ -333,9 +333,9 @@ one_comparison_predicate (bool expected_equal,
   mmux_libc_ptn_t		ptn1, ptn2;
   mmux_libc_ptn_extension_t	ext1, ext2;
 
-  if (mmux_libc_make_file_system_pathname(&ptn1, ptn_asciiz_1)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, ptn_asciiz_1)) {
     handle_error();
-  } else if (mmux_libc_make_file_system_pathname(&ptn2, ptn_asciiz_2)) {
+  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn2, ptn_asciiz_2)) {
     handle_error();
   } else if (mmux_libc_make_file_system_pathname_extension(&ext1, ptn1)) {
     handle_error();
@@ -447,7 +447,7 @@ one_pathname_has_extension (bool expected_result, mmux_asciizcp_t ptn_asciiz, mm
 
   mmux_libc_strlen(&ext_len, ext_asciiz);
 
-  if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) {
+  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     handle_error();
   }
   if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ext_asciiz, ext_len)) {
