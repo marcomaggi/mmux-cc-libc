@@ -1310,36 +1310,36 @@ defined by @value{PACKAGE}.
 Data structure representing a memory allocator.  It has the following fields:
 
 @table @code
-@item mmux_libc_memory_allocator_context_t * const context
-Pointer to an instance of @objtype{mmux_libc_memory_allocator_context_t}.
+@item mmux_libc_memory_allocator_value_t * const value
+Pointer to an instance of @objtype{mmux_libc_memory_allocator_value_t}.
 
-@item mmux_libc_memory_allocator_methods_t const * const methods
-Pointer to an instance of @objtype{mmux_libc_memory_allocator_methods_t} representing the methods of
+@item mmux_libc_memory_allocator_class_t const * const class
+Pointer to an instance of @objtype{mmux_libc_memory_allocator_class_t} representing the class of
 this memory allocator.
 @end table
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Struct Typedef} mmux_libc_memory_allocator_context_t
-Data structure representing the context of the memory allocator.  It has the following fields:
+@deftp {Struct Typedef} mmux_libc_memory_allocator_value_t
+Data structure representing the value of the memory allocator.  It has the following fields:
 
 @table @code
 @item mmux_asciizcp_t name
 Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
-memory allocator context.  The string can have any format.
+memory allocator value.  The string can have any format.
 
 @item mmux_uint_t version_major
 @itemx mmux_uint_t version_minor
 @itemx mmux_uint_t version_patchlevel
-The major, minor, patchlevel version numbers of this memory allocator context; when in doubt: just
+The major, minor, patchlevel version numbers of this memory allocator value; when in doubt: just
 set them to @samp{1}, @samp{0}, @samp{0}.
 @end table
 @end deftp
 
 @c ------------------------------------------------------------------------
 
-@deftp {Struct Typedef} mmux_libc_memory_allocator_methods_t
+@deftp {Struct Typedef} mmux_libc_memory_allocator_class_t
 Data structure type representing the table of allocator--specific functions.  It has the following
 fields:
 
@@ -1553,7 +1553,7 @@ if (mmux_libc_memory_allocator_free(AP, dststr)) @{
 
 
 @value{PACKAGE} defines a default memory allocator that just uses the standard memory allocation
-functions.  In the context of this data structure: the name of the allocator is set to the @asciiz{}
+functions.  In the value of this data structure: the name of the allocator is set to the @asciiz{}
 string:
 
 @example
@@ -1575,7 +1575,7 @@ variable referenced by @var{result_p}.
 
 
 @value{PACKAGE} defines a fake memory allocator to be used to manage statically allocated data.  In
-the context of this data structure: the name of the allocator is set to the @asciiz{} string:
+the value of this data structure: the name of the allocator is set to the @asciiz{} string:
 
 @example
 "MMUX CC Libc Fake Memory Allocator For Statically Allocated Data"
@@ -1584,7 +1584,7 @@ the context of this data structure: the name of the allocator is set to the @asc
 @noindent
 and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
 
-Among the methods of a memory allocator of type @objtype{mmux_libc_memory_allocator_t} only the
+Among the class of a memory allocator of type @objtype{mmux_libc_memory_allocator_t} only the
 following functions are actually implemented:
 
 @table @code
@@ -1693,14 +1693,14 @@ spiffy_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * al
   return mmux_libc_malloc_and_copy_(dstptr_p, srcptr, srclen);
 @}
 
-static mmux_libc_memory_allocator_context_t const spiffy_memory_allocator_context = @{
+static mmux_libc_memory_allocator_value_t const spiffy_memory_allocator_value = @{
   .name                 = "MMUX CC Libc Spiffy Memory Allocator",
   .version_major        = 1,
   .version_minor        = 0,
   .version_patchlevel   = 0,
 @};
 
-static mmux_libc_memory_allocator_methods_t const spiffy_memory_allocator_methods = @{
+static mmux_libc_memory_allocator_class_t const spiffy_memory_allocator_class = @{
   .malloc               = spiffy_memory_allocator_malloc,
   .realloc              = spiffy_memory_allocator_realloc,
   .calloc               = spiffy_memory_allocator_calloc,
@@ -1710,8 +1710,8 @@ static mmux_libc_memory_allocator_methods_t const spiffy_memory_allocator_method
 @};
 
 static mmux_libc_memory_allocator_t const spiffy_memory_allocator = @{
-  .context      = (mmux_libc_memory_allocator_context_t *) &spiffy_memory_allocator_context,
-  .methods      = &spiffy_memory_allocator_methods,
+  .value      = (mmux_libc_memory_allocator_value_t *) &spiffy_memory_allocator_value,
+  .class      = &spiffy_memory_allocator_class,
 @};
 
 bool

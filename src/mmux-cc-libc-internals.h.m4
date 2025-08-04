@@ -369,12 +369,12 @@ typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 
 typedef struct mmux_libc_memory_allocator_t	mmux_libc_memory_allocator_t;
 
-typedef struct mmux_libc_memory_allocator_context_t {
+typedef struct mmux_libc_memory_allocator_value_t {
   mmux_asciizcp_t	name;
   mmux_uint_t		version_major;
   mmux_uint_t		version_minor;
   mmux_uint_t		version_patchlevel;
-} mmux_libc_memory_allocator_context_t;
+} mmux_libc_memory_allocator_value_t;
 
 typedef bool mmux_libc_memory_allocator_malloc_fun_t
     (mmux_libc_memory_allocator_t const * self,
@@ -406,18 +406,18 @@ typedef bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t
      mmux_pointer_t * dstptr_p, mmux_pointer_t srcptr, mmux_usize_t srclen)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-typedef struct mmux_libc_memory_allocator_methods_t {
+typedef struct mmux_libc_memory_allocator_class_t {
   mmux_libc_memory_allocator_malloc_fun_t			* const	malloc;
   mmux_libc_memory_allocator_calloc_fun_t			* const	calloc;
   mmux_libc_memory_allocator_realloc_fun_t			* const	realloc;
   mmux_libc_memory_allocator_reallocarray_fun_t			* const	reallocarray;
   mmux_libc_memory_allocator_free_fun_t				* const	free;
   mmux_libc_default_memory_allocator_malloc_and_copy_fun_t	* const malloc_and_copy;
-} mmux_libc_memory_allocator_methods_t;
+} mmux_libc_memory_allocator_class_t;
 
 struct mmux_libc_memory_allocator_t {
-  mmux_libc_memory_allocator_context_t		* const	context;
-  mmux_libc_memory_allocator_methods_t const	* const	methods;
+  mmux_libc_memory_allocator_value_t		* const	value;
+  mmux_libc_memory_allocator_class_t const	* const	class;
 };
 
 
