@@ -30,6 +30,19 @@
 
 
 /** --------------------------------------------------------------------
+ ** Global variables.
+ ** ----------------------------------------------------------------- */
+
+mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_statically_allocated = {
+  .memory_allocator	= &mmux_libc_fake_memory_allocator,
+};
+
+mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_dynamically_allocated = {
+  .memory_allocator	= &mmux_libc_default_memory_allocator,
+};
+
+
+/** --------------------------------------------------------------------
  ** Preprocessor macros.
  ** ----------------------------------------------------------------- */
 
@@ -299,19 +312,47 @@ pathname_is_relative (mmux_libc_ptn_t ptn)
  ** File system types: pathnames.
  ** ----------------------------------------------------------------- */
 
+#if 1
 bool
 mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * result_p, mmux_asciizcp_t ptn_asciiz)
 {
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
+_Pragma("GCC diagnostic push");
+_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
   if ((NULL != ptn_asciiz) && ('\0' != ptn_asciiz[0])) {
-_Pragma("GCC diagnostic pop")
+_Pragma("GCC diagnostic pop");
     result_p->value = ptn_asciiz;
     return false;
+  } else {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+}
+#else
+bool
+mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t const * class,
+				     mmux_libc_file_system_pathname_t * result_p, mmux_asciizcp_t src_ptn_asciiz)
+{
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
+  if ((NULL != src_ptn_asciiz) && ('\0' != src_ptn_asciiz[0])) {
+    _Pragma("GCC diagnostic pop");
+    mmux_asciizcp_t	dst_ptn_asciiz;
+    mmux_usize_t	dst_ptn_len = 1 + strlen(src_ptn_asciiz);
+
+    if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
+						   &dst_ptn_asciiz, src_ptn_asciiz, dst_ptn_len)) {
+      return true;
+    } else {
+      result_p->value = dst_ptn_asciiz;
+      result_p->class = class;
+      return false;
+    }
   } else {
     return true;
   }
 }
+#endif
+
 bool
 mmux_libc_make_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * pathname_p,
 					    mmux_asciizcp_t ptn_asciiz)

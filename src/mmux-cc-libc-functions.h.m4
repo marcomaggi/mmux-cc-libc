@@ -256,8 +256,14 @@ mmux_cc_libc_decl bool mmux_libc_toupper (mmux_schar_t * result_p, mmux_schar_t 
 #define mmux_libc_reallocarray(POINTERP,INUM,ILEN)	\
   mmux_libc_reallocarray_(((mmux_pointer_t *)(POINTERP)),(INUM),(ILEN))
 
+#define mmux_libc_malloc_and_copy(DSTPOINTERP,SRCPTR,SRCLEN)	\
+  (mmux_libc_malloc_and_copy_(((mmux_pointer_t *)(DSTPOINTERP)),((mmux_pointer_t)(SRCPTR)),(SRCLEN)))
+
 mmux_cc_libc_decl bool mmux_libc_malloc_ (mmux_pointer_t * P_p, mmux_usize_t len)
   __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_malloc_and_copy_ (mmux_pointer_t * dstptr_p, mmux_pointer_t srcptr, mmux_usize_t srclen)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_calloc_ (mmux_pointer_t * P_p, mmux_usize_t item_num, mmux_usize_t item_len)
   __attribute__((__nonnull__(1),__warn_unused_result__));
@@ -312,6 +318,11 @@ mmux_cc_libc_decl bool mmux_libc_memmem (mmux_pointer_t * result_p,
 mmux_cc_libc_decl bool mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_fake_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * allocator,
 							   mmux_pointer_t * result_p, mmux_usize_t len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
@@ -334,6 +345,13 @@ mmux_cc_libc_decl bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocat
 							mmux_pointer_t p)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_memory_allocator_t const * allocator,
+								    mmux_pointer_t * dstptr_p,
+								    mmux_pointer_t srcptr, mmux_usize_t srclen)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+
+/* ------------------------------------------------------------------ */
+
 #define mmux_libc_memory_allocator_malloc(ALLOCP,POINTERP,LEN)		\
   (mmux_libc_memory_allocator_malloc_((ALLOCP),((mmux_pointer_t *)(POINTERP)),(LEN)))
 
@@ -345,6 +363,10 @@ mmux_cc_libc_decl bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocat
 
 #define mmux_libc_memory_allocator_reallocarray(ALLOCP,POINTERP,INUM,ILEN)	\
   (mmux_libc_memory_allocator_reallocarray_((ALLOCP),((mmux_pointer_t *)(POINTERP)),(INUM),(ILEN)))
+
+#define mmux_libc_memory_allocator_malloc_and_copy(ALLOCP,DSTPOINTERP,SRCPTR,SRCLEN)	\
+  (mmux_libc_memory_allocator_malloc_and_copy_((ALLOCP),((mmux_pointer_t *)(DSTPOINTERP)), \
+					       ((mmux_pointer_t)(SRCPTR)),(SRCLEN)))
 
 
 /** --------------------------------------------------------------------
@@ -1276,6 +1298,11 @@ mmux_cc_libc_decl bool mmux_libc_getgrent (mmux_libc_group_t * * result_group_pp
 /** --------------------------------------------------------------------
  ** File system.
  ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_statically_allocated;
+mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_dynamically_allocated;
+
+/* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
   __attribute__((__nonnull__(1,2)));

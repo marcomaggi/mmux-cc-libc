@@ -1188,6 +1188,43 @@ if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
 @MmuxCInterface{free}.
 @end deftypefun
 
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_malloc_and_copy (mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+@deftypefnx {Function} bool mmux_libc_malloc_and_copy_ (mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+Allocate @var{srclen} bytes using @cfunc{mmux_libc_malloc}; then copy @var{srclen} bytes from
+@var{srcptr} to the newly allocated memory block; finally store the resulting pointer in the
+variable referenced by @var{result_p}.  The macro just: casts a pointer @var{result_p} of any type
+to @code{mmux_pointer_t *}; casts a pointer @var{srcptr} of any type to @code{mmux_pointer_t}.
+
+To copy bytes from a buffer we do:
+
+@example
+mmux_usize_t    srclen;
+mmux_byte_t     srcbuf[srclen];
+mmux_byte_t     dstbuf;
+
+/* Fill "srcbuf" with data. */
+
+/* Copy the data from "srcbuf" to "dstbuf". */
+if (mmux_libc_malloc_and_copy(&dstptr, srcbuf, srclen)) @{
+  /* error */
+@}
+@end example
+
+To copy an @asciiz{} string we do:
+
+@example
+mmux_asciizcp_t         srcstr = "/path/to/file.ext";
+mmux_usize_t            srclen_plus;
+mmux_asciizcp_t         dststr;
+
+mmux_libc_strlen_plus_nil(&srclen_plus, srcstr);
+if (mmux_libc_malloc_and_copy(&dstptr, srcstr, srclen_plus)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
 @c page
 @node memory operations
 @section Memory operations
@@ -1260,6 +1297,7 @@ defined by @value{PACKAGE}.
 * memory allocator types::      Memory allocator type definitions.
 * memory allocator api::        Memory allocator programming interface.
 * memory allocator default::    Default memory allocator.
+* memory allocator fake::       Fake memory allocator.
 * memory allocator example::    How to implement a memory allocator.
 @end menu
 
@@ -1320,6 +1358,9 @@ Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_r
 
 @item mmux_libc_memory_allocator_free_fun_t * const free
 Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_free}.
+
+@item mmux_libc_default_memory_allocator_alloc_and_copy * const alloc_and_copy
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_alloc_and_copy}.
 @end table
 
 If, for some reason, a custom memory allocator does not implement one or more of these operations:
@@ -1329,28 +1370,33 @@ we should just define the corresponding functions to always set @code{errno} to
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefun bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefun bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_calloc}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefun bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
 Allocator--specific function that behaves like @cfunc{mmux_libc_realloc}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefun bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_reallocarray}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_context_t * @var{context}, mmux_pointer_t @var{p})
+@deftypefun bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t @var{p})
 Allocator--specific function that behaves like @cfunc{mmux_libc_free}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+Allocator--specific function that behaves like @cfunc{mmux_libc_alloc_and_copy}.
 @end deftypefun
 
 @c page
@@ -1476,6 +1522,31 @@ if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
 Call the function of the given memory allocator.
 @end deftypefun
 
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+Call the function of the given memory allocator.
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_char_t     srcstr = "/path/to/file.ext";
+mmux_usize_t    srclen_plus;
+mmux_char_t *   dststr;
+
+mmux_libc_default_memory_allocator_ref(&AP);
+mmux_libc_strlen_plus_nil(&srclen_plus, srcstr)
+if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dststr, srcstr, srclen_plus)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, dststr)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
 @c page
 @node memory allocator default
 @subsection Default memory allocator
@@ -1499,6 +1570,82 @@ variable referenced by @var{result_p}.
 @end deftypefun
 
 @c page
+@node memory allocator fake
+@subsection Fake memory allocator
+
+
+@value{PACKAGE} defines a fake memory allocator to be used to manage statically allocated data.  In
+the context of this data structure: the name of the allocator is set to the @asciiz{} string:
+
+@example
+"MMUX CC Libc Fake Memory Allocator For Statically Allocated Data"
+@end example
+
+@noindent
+and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
+
+Among the methods of a memory allocator of type @objtype{mmux_libc_memory_allocator_t} only the
+following functions are actually implemented:
+
+@table @code
+@item malloc_and_copy
+just store the argument @var{srcptr} in the variable referenced by the argument @var{dstptr_p}, then
+return @cfalse{}.
+
+@item free
+does nothing and return @cfalse{};
+@end table
+
+@noindent
+all the other functions set @code{errno} to @samp{MMUX_LIBC_ENOSYS} then return @ctrue{} to report
+an error.
+
+Let's look at the following code:
+
+@example
+mmux_libc_memory_allocator_t const *    AP;
+mmux_char_t     srcstr = "/path/to/file.ext";
+mmux_usize_t    srclen_plus;
+mmux_char_t *   dststr;
+
+retrieve_a_memory_allocator(&AP);
+
+mmux_libc_strlen_plus_nil(&srclen_plus, srcstr)
+if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dststr, srcstr, srclen_plus)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, dststr)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+it will work with both the default and the fake allocators:
+
+@itemize
+@item
+with the default allocator: a new copy of the string is dynamically allocated with the method
+@code{malloc_and_copy} and then released with the method @code{free};
+
+@item
+with the fake allocator: @code{srcstr} is stored in @code{dststr} by the method
+@code{malloc_and_copy} and the method @code{free} just does nothing;
+@end itemize
+
+@noindent
+this way we can transparently use statically allocated data and dynamically allocated data.  It is
+responsibility of the caller to handle correctly mutable and immutable data.
+
+
+@deftypefun bool mmux_libc_fake_memory_allocator_ref (mmux_libc_memory_allocator_t const ** @var{result_p})
+Retrieve a pointer to the fake memory allocator defined by @value{PACKAGE} and store it in the
+variable referenced by @var{result_p}.
+@end deftypefun
+
+@c page
 @node memory allocator example
 @subsection How to implement a memory allocator
 
@@ -1507,36 +1654,43 @@ We can adapt the following implementation of the default allocator:
 
 @example
 static bool
-spiffy_memory_allocator_malloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+spiffy_memory_allocator_malloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
                                 mmux_pointer_t * result_p, mmux_usize_t len)
 @{
   return mmux_libc_malloc_(result_p, len);
 @}
 static bool
-spiffy_memory_allocator_calloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+spiffy_memory_allocator_calloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
                                 mmux_pointer_t * result_p,
                                 mmux_usize_t item_num, mmux_usize_t item_len)
 @{
   return mmux_libc_calloc_(result_p, item_num, item_len);
 @}
 static bool
-spiffy_memory_allocator_realloc (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+spiffy_memory_allocator_realloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
                                  mmux_pointer_t * result_p, mmux_usize_t newlen)
 @{
   return mmux_libc_realloc_(result_p, newlen);
 @}
 static bool
-spiffy_memory_allocator_reallocarray (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+spiffy_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
                                       mmux_pointer_t * result_p, mmux_usize_t item_num,
                                       mmux_usize_t item_len)
 @{
   return mmux_libc_reallocarray_(result_p, item_num, item_len);
 @}
 static bool
-spiffy_memory_allocator_free (mmux_libc_memory_allocator_context_t * context __attribute__((__unused__)),
+spiffy_memory_allocator_free (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
                               mmux_pointer_t p)
 @{
   return mmux_libc_free(p);
+@}
+bool
+spiffy_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+                                         mmux_pointer_t * dstptr_p,
+                                         mmux_pointer_t srcptr, mmux_usize_t srclen)
+@{
+  return mmux_libc_malloc_and_copy_(dstptr_p, srcptr, srclen);
 @}
 
 static mmux_libc_memory_allocator_context_t const spiffy_memory_allocator_context = @{
@@ -1552,6 +1706,7 @@ static mmux_libc_memory_allocator_methods_t const spiffy_memory_allocator_method
   .calloc               = spiffy_memory_allocator_calloc,
   .reallocarray         = spiffy_memory_allocator_reallocarray,
   .free                 = spiffy_memory_allocator_free,
+  .malloc_and_copy      = mmux_libc_default_memory_allocator_malloc_and_copy,
 @};
 
 static mmux_libc_memory_allocator_t const spiffy_memory_allocator = @{

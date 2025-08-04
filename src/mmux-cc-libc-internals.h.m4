@@ -298,27 +298,13 @@ typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t     value; } m
 typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t    value; } mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
 typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t     value; } mmux_libc_file_descriptor_t;
-typedef struct mmux_libc_file_system_pathname_t		{ mmux_asciizcp_t value; } mmux_libc_file_system_pathname_t;
 typedef struct mmux_libc_gid_t				{ mmux_gid_t      value; } mmux_libc_gid_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t     value; } mmux_libc_interprocess_signal_t;
 typedef struct mmux_libc_pid_t				{ mmux_pid_t      value; } mmux_libc_pid_t;
 typedef struct mmux_libc_uid_t				{ mmux_uid_t      value; } mmux_libc_uid_t;
 
-typedef struct mmux_libc_file_system_pathname_extension_t {
-  mmux_asciizcp_t	ptr;
-  mmux_usize_t		len;
-} mmux_libc_file_system_pathname_extension_t;
-
-typedef struct mmux_libc_file_system_pathname_segment_t {
-  mmux_asciicp_t	ptr;
-  mmux_usize_t		len;
-} mmux_libc_file_system_pathname_segment_t;
-
 typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
 typedef mmux_libc_file_descriptor_t			mmux_libc_network_socket_t;
-typedef mmux_libc_file_system_pathname_t		mmux_libc_ptn_t;
-typedef mmux_libc_file_system_pathname_extension_t	mmux_libc_ptn_extension_t;
-typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
 
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
@@ -376,7 +362,12 @@ typedef mmux_libc_protoent_t *			mmux_libc_protoent_ptr_t;
 typedef mmux_libc_netent_t *			mmux_libc_netent_ptr_t;
 typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** Memory allocators.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_memory_allocator_t	mmux_libc_memory_allocator_t;
 
 typedef struct mmux_libc_memory_allocator_context_t {
   mmux_asciizcp_t	name;
@@ -385,40 +376,77 @@ typedef struct mmux_libc_memory_allocator_context_t {
   mmux_uint_t		version_patchlevel;
 } mmux_libc_memory_allocator_context_t;
 
-typedef bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_context_t * context,
-						      mmux_pointer_t * P_p, mmux_usize_t len)
+typedef bool mmux_libc_memory_allocator_malloc_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t * result_p, mmux_usize_t len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-typedef bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_context_t * context,
-						      mmux_pointer_t * P_p,
-						      mmux_usize_t item_num, mmux_usize_t item_len)
+typedef bool mmux_libc_memory_allocator_calloc_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t * result_p, mmux_usize_t item_num, mmux_usize_t item_len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-typedef bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_context_t * context,
-						       mmux_pointer_t * P_p, mmux_usize_t newlen)
+typedef bool mmux_libc_memory_allocator_realloc_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t * result_p, mmux_usize_t newlen)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-typedef bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_context_t * context,
-							    mmux_pointer_t * P_p, mmux_usize_t item_num,
-							    mmux_usize_t item_len)
+typedef bool mmux_libc_memory_allocator_reallocarray_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t * result_p, mmux_usize_t item_num, mmux_usize_t item_len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-typedef bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_context_t * context,
-						    mmux_pointer_t p)
+typedef bool mmux_libc_memory_allocator_free_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t p)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+typedef bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t
+    (mmux_libc_memory_allocator_t const * self,
+     mmux_pointer_t * dstptr_p, mmux_pointer_t srcptr, mmux_usize_t srclen)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 typedef struct mmux_libc_memory_allocator_methods_t {
-  mmux_libc_memory_allocator_malloc_fun_t	* const	malloc;
-  mmux_libc_memory_allocator_calloc_fun_t	* const	calloc;
-  mmux_libc_memory_allocator_realloc_fun_t	* const	realloc;
-  mmux_libc_memory_allocator_reallocarray_fun_t	* const	reallocarray;
-  mmux_libc_memory_allocator_free_fun_t		* const	free;
+  mmux_libc_memory_allocator_malloc_fun_t			* const	malloc;
+  mmux_libc_memory_allocator_calloc_fun_t			* const	calloc;
+  mmux_libc_memory_allocator_realloc_fun_t			* const	realloc;
+  mmux_libc_memory_allocator_reallocarray_fun_t			* const	reallocarray;
+  mmux_libc_memory_allocator_free_fun_t				* const	free;
+  mmux_libc_default_memory_allocator_malloc_and_copy_fun_t	* const malloc_and_copy;
 } mmux_libc_memory_allocator_methods_t;
 
-typedef struct mmux_libc_memory_allocator_t {
+struct mmux_libc_memory_allocator_t {
   mmux_libc_memory_allocator_context_t		* const	context;
   mmux_libc_memory_allocator_methods_t const	* const	methods;
-} mmux_libc_memory_allocator_t;
+};
+
+
+/** --------------------------------------------------------------------
+ ** Type definitions: file system pathnames.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_file_system_pathname_class_t {
+  mmux_libc_memory_allocator_t const * const	memory_allocator;
+} mmux_libc_file_system_pathname_class_t;
+
+typedef struct mmux_libc_file_system_pathname_t {
+  mmux_asciizcp_t					value;
+  mmux_libc_file_system_pathname_class_t const *	class;
+} mmux_libc_file_system_pathname_t;
+
+typedef struct mmux_libc_file_system_pathname_extension_t {
+  mmux_asciizcp_t	ptr;
+  mmux_usize_t		len;
+} mmux_libc_file_system_pathname_extension_t;
+
+typedef struct mmux_libc_file_system_pathname_segment_t {
+  mmux_asciicp_t	ptr;
+  mmux_usize_t		len;
+} mmux_libc_file_system_pathname_segment_t;
+
+typedef mmux_libc_file_system_pathname_t		mmux_libc_ptn_t;
+typedef mmux_libc_file_system_pathname_extension_t	mmux_libc_ptn_extension_t;
+typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
 
 
 /** --------------------------------------------------------------------
@@ -426,6 +454,14 @@ typedef struct mmux_libc_memory_allocator_t {
  ** ----------------------------------------------------------------- */
 
 typedef void mmux_libc_sighandler_t (mmux_sint_t signum);
+
+
+/** --------------------------------------------------------------------
+ ** Global variables.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_private_decl mmux_libc_memory_allocator_t const mmux_libc_default_memory_allocator;
+mmux_cc_libc_private_decl mmux_libc_memory_allocator_t const mmux_libc_fake_memory_allocator;
 
 
 /** --------------------------------------------------------------------

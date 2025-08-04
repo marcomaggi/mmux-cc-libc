@@ -87,6 +87,19 @@ mmux_libc_free (mmux_pointer_t P)
   free(P);
   return false;
 }
+bool
+mmux_libc_malloc_and_copy_ (mmux_pointer_t * dstptr_p, mmux_pointer_t srcptr, mmux_usize_t srclen)
+{
+  mmux_pointer_t	dstptr;
+
+  if (mmux_libc_malloc(&dstptr, srclen)) {
+    return true;
+  } else {
+    memcpy(dstptr, srcptr, srclen);
+    *dstptr_p = dstptr;
+    return false;
+  }
+}
 
 
 /** --------------------------------------------------------------------
@@ -172,40 +185,47 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMMEM]]],[[[
 
 
 /** --------------------------------------------------------------------
- ** Memory allocator.
+ ** Memory allocators: default memory allocator implementation.
  ** ----------------------------------------------------------------- */
 
 static bool
-mmux_libc_default_memory_allocator_malloc (mmux_libc_memory_allocator_context_t * context MMUX_CC_LIBC_UNUSED,
+mmux_libc_default_memory_allocator_malloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
 					   mmux_pointer_t * result_p, mmux_usize_t len)
 {
   return mmux_libc_malloc_(result_p, len);
 }
 static bool
-mmux_libc_default_memory_allocator_calloc (mmux_libc_memory_allocator_context_t * context MMUX_CC_LIBC_UNUSED,
+mmux_libc_default_memory_allocator_calloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
 					   mmux_pointer_t * result_p,
 					   mmux_usize_t item_num, mmux_usize_t item_len)
 {
   return mmux_libc_calloc_(result_p, item_num, item_len);
 }
 static bool
-mmux_libc_default_memory_allocator_realloc (mmux_libc_memory_allocator_context_t * context MMUX_CC_LIBC_UNUSED,
+mmux_libc_default_memory_allocator_realloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
 					    mmux_pointer_t * result_p, mmux_usize_t newlen)
 {
   return mmux_libc_realloc_(result_p, newlen);
 }
 static bool
-mmux_libc_default_memory_allocator_reallocarray (mmux_libc_memory_allocator_context_t * context MMUX_CC_LIBC_UNUSED,
+mmux_libc_default_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
 						 mmux_pointer_t * result_p, mmux_usize_t item_num,
 						 mmux_usize_t item_len)
 {
   return mmux_libc_reallocarray_(result_p, item_num, item_len);
 }
 static bool
-mmux_libc_default_memory_allocator_free (mmux_libc_memory_allocator_context_t * context MMUX_CC_LIBC_UNUSED,
+mmux_libc_default_memory_allocator_free (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
 					 mmux_pointer_t p)
 {
   return mmux_libc_free(p);
+}
+bool
+mmux_libc_default_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+						    mmux_pointer_t * dstptr_p,
+						    mmux_pointer_t srcptr, mmux_usize_t srclen)
+{
+  return mmux_libc_malloc_and_copy_(dstptr_p, srcptr, srclen);
 }
 
 /* ------------------------------------------------------------------ */
@@ -223,9 +243,10 @@ static mmux_libc_memory_allocator_methods_t const mmux_libc_default_memory_alloc
   .calloc		= mmux_libc_default_memory_allocator_calloc,
   .reallocarray		= mmux_libc_default_memory_allocator_reallocarray,
   .free			= mmux_libc_default_memory_allocator_free,
+  .malloc_and_copy	= mmux_libc_default_memory_allocator_malloc_and_copy,
 };
 
-static mmux_libc_memory_allocator_t const mmux_libc_default_memory_allocator = {
+mmux_libc_memory_allocator_t const mmux_libc_default_memory_allocator = {
   .context	= (mmux_libc_memory_allocator_context_t *) &mmux_libc_default_memory_allocator_context,
   .methods	= &mmux_libc_default_memory_allocator_methods,
 };
@@ -239,39 +260,135 @@ mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** re
   return false;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Memory allocators: statically allocated memory fake memory allocator implementation.
+ ** ----------------------------------------------------------------- */
+
+static bool
+mmux_libc_fake_memory_allocator_malloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+					mmux_pointer_t * result_p MMUX_CC_LIBC_UNUSED,
+					mmux_usize_t len MMUX_CC_LIBC_UNUSED)
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
+  return true;
+}
+static bool
+mmux_libc_fake_memory_allocator_calloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+					mmux_pointer_t * result_p MMUX_CC_LIBC_UNUSED,
+					mmux_usize_t item_num MMUX_CC_LIBC_UNUSED,
+					mmux_usize_t item_len MMUX_CC_LIBC_UNUSED)
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
+  return true;
+}
+static bool
+mmux_libc_fake_memory_allocator_realloc (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+					 mmux_pointer_t * result_p MMUX_CC_LIBC_UNUSED,
+					 mmux_usize_t newlen MMUX_CC_LIBC_UNUSED)
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
+  return true;
+}
+static bool
+mmux_libc_fake_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+					      mmux_pointer_t * result_p MMUX_CC_LIBC_UNUSED,
+					      mmux_usize_t item_num MMUX_CC_LIBC_UNUSED,
+					      mmux_usize_t item_len MMUX_CC_LIBC_UNUSED)
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
+  return true;
+}
+static bool
+mmux_libc_fake_memory_allocator_free (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+				      mmux_pointer_t p MMUX_CC_LIBC_UNUSED)
+{
+  return false;
+}
+bool
+mmux_libc_fake_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * self MMUX_CC_LIBC_UNUSED,
+						 mmux_pointer_t * dstptr_p MMUX_CC_LIBC_UNUSED,
+						 mmux_pointer_t srcptr MMUX_CC_LIBC_UNUSED,
+						 mmux_usize_t srclen MMUX_CC_LIBC_UNUSED)
+{
+  *dstptr_p = srcptr;
+  return false;
+}
+
 /* ------------------------------------------------------------------ */
+
+static mmux_libc_memory_allocator_context_t const mmux_libc_fake_memory_allocator_context = {
+  .name			= "MMUX CC Libc Fake Memory Allocator For Statically Allocated Data",
+  .version_major	= 1,
+  .version_minor	= 0,
+  .version_patchlevel	= 0,
+};
+
+static mmux_libc_memory_allocator_methods_t const mmux_libc_fake_memory_allocator_methods = {
+  .malloc		= mmux_libc_fake_memory_allocator_malloc,
+  .realloc		= mmux_libc_fake_memory_allocator_realloc,
+  .calloc		= mmux_libc_fake_memory_allocator_calloc,
+  .reallocarray		= mmux_libc_fake_memory_allocator_reallocarray,
+  .free			= mmux_libc_fake_memory_allocator_free,
+  .malloc_and_copy	= mmux_libc_fake_memory_allocator_malloc_and_copy,
+};
+
+mmux_libc_memory_allocator_t const mmux_libc_fake_memory_allocator = {
+  .context	= (mmux_libc_memory_allocator_context_t *) &mmux_libc_fake_memory_allocator_context,
+  .methods	= &mmux_libc_fake_memory_allocator_methods,
+};
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_fake_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+{
+  *result_p = &mmux_libc_fake_memory_allocator;
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Memory allocators: API.
+ ** ----------------------------------------------------------------- */
 
 bool
 mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * allocator,
 				    mmux_pointer_t * result_p, mmux_usize_t len)
 {
-  return allocator->methods->malloc(allocator->context, result_p, len);
+  return allocator->methods->malloc(allocator, result_p, len);
 }
 bool
 mmux_libc_memory_allocator_calloc_ (mmux_libc_memory_allocator_t const * allocator,
 				    mmux_pointer_t * result_p,
 				    mmux_usize_t item_num, mmux_usize_t item_len)
 {
-  return allocator->methods->calloc(allocator->context, result_p, item_num, item_len);
+  return allocator->methods->calloc(allocator, result_p, item_num, item_len);
 }
 bool
 mmux_libc_memory_allocator_realloc_ (mmux_libc_memory_allocator_t const * allocator,
 				     mmux_pointer_t * result_p, mmux_usize_t newlen)
 {
-  return allocator->methods->realloc(allocator->context, result_p, newlen);
+  return allocator->methods->realloc(allocator, result_p, newlen);
 }
 bool
 mmux_libc_memory_allocator_reallocarray_ (mmux_libc_memory_allocator_t const * allocator,
 					  mmux_pointer_t * result_p, mmux_usize_t item_num,
 					  mmux_usize_t item_len)
 {
-  return allocator->methods->reallocarray(allocator->context, result_p, item_num, item_len);
+  return allocator->methods->reallocarray(allocator, result_p, item_num, item_len);
 }
 bool
 mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * allocator,
 				 mmux_pointer_t p)
 {
-  return allocator->methods->free(allocator->context, p);
+  return allocator->methods->free(allocator, p);
+}
+bool
+mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_memory_allocator_t const * allocator,
+					     mmux_pointer_t * dstptr_p, mmux_pointer_t srcptr, mmux_usize_t srclen)
+{
+  return allocator->methods->malloc_and_copy(allocator, dstptr_p, srcptr, srclen);
 }
 
 /* end of file */
