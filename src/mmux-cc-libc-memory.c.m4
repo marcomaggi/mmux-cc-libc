@@ -119,7 +119,7 @@ mmux_libc_memzero (mmux_pointer_t ptr, mmux_usize_t len)
   return false;
 }
 bool
-mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
+mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointerc_t src_ptr, mmux_usize_t nbytes)
 {
   memcpy(dst_ptr, src_ptr, nbytes);
   return false;

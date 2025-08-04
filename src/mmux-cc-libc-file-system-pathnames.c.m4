@@ -312,6 +312,9 @@ pathname_is_relative (mmux_libc_ptn_t ptn)
  ** File system types: pathnames.
  ** ----------------------------------------------------------------- */
 
+#undef  MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT
+#define MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT		4096
+
 bool
 mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t const * class,
 				     mmux_libc_file_system_pathname_t * result_p,
@@ -319,48 +322,60 @@ mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t cons
 {
   _Pragma("GCC diagnostic push");
   _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
-  if ((NULL != src_ptn_asciiz) && ('\0' != src_ptn_asciiz[0])) {
+  if ((NULL == src_ptn_asciiz) && ('\0' == src_ptn_asciiz[0]))  {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  } else {
     _Pragma("GCC diagnostic pop");
     mmux_asciizcp_t	dst_ptn_asciiz;
-    mmux_usize_t	dst_ptn_len;
+    mmux_usize_t	dst_ptn_len_plus;
 
-    mmux_libc_strlen_plus_nil(&dst_ptn_len, src_ptn_asciiz);
-    if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
-						   &dst_ptn_asciiz, src_ptn_asciiz, dst_ptn_len)) {
+    mmux_libc_strlen_plus_nil(&dst_ptn_len_plus, src_ptn_asciiz);
+    if (MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT < dst_ptn_len_plus) {
+      mmux_libc_errno_set(MMUX_LIBC_ERANGE);
+      return true;
+    } else if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
+							  &dst_ptn_asciiz, src_ptn_asciiz, dst_ptn_len_plus)) {
       return true;
     } else {
       result_p->value = dst_ptn_asciiz;
       result_p->class = class;
       return false;
     }
-  } else {
-    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
-    return true;
   }
 }
 bool
 mmux_libc_make_file_system_pathname2 (mmux_libc_file_system_pathname_class_t const * class,
 				      mmux_libc_file_system_pathname_t * result_p,
 				      mmux_asciizcp_t src_ptn_asciiz, mmux_usize_t src_ptn_len)
+/* We have to assume that it is forbidden to access "src_ptn_asciiz[src_ptn_len]". */
 {
   _Pragma("GCC diagnostic push");
   _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
-  if ((0 < src_ptn_len) && (NULL != src_ptn_asciiz) && ('\0' != src_ptn_asciiz[0])) {
+  if ((0 == src_ptn_len) || (NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
     _Pragma("GCC diagnostic pop");
-    mmux_asciizp_t	dst_ptn_asciiz;
-
-    if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
-						   &dst_ptn_asciiz, src_ptn_asciiz, src_ptn_len)) {
-      return true;
-    } else {
-      dst_ptn_asciiz[src_ptn_len] = '\0';
-      result_p->value = dst_ptn_asciiz;
-      result_p->class = class;
-      return false;
-    }
-  } else {
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
+  } else {
+    mmux_usize_t	dst_ptn_len_plus = 1 + src_ptn_len;
+
+    if (MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT < dst_ptn_len_plus) {
+      mmux_libc_errno_set(MMUX_LIBC_ERANGE);
+      return true;
+    } else {
+      mmux_asciizp_t	dst_ptn_asciiz;
+
+      if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &dst_ptn_asciiz, dst_ptn_len_plus)) {
+	return true;
+      } else if (mmux_libc_memcpy(dst_ptn_asciiz, src_ptn_asciiz, src_ptn_len)) {
+	return true;
+      } else {
+	dst_ptn_asciiz[src_ptn_len] = '\0';
+	result_p->value = dst_ptn_asciiz;
+	result_p->class = class;
+	return false;
+      }
+    }
   }
 }
 bool

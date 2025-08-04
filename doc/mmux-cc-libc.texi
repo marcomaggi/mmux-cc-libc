@@ -1240,7 +1240,7 @@ if (mmux_libc_malloc_and_copy(&dstptr, srcstr, srclen_plus)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memcpy (mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
+@deftypefun bool mmux_libc_memcpy (mmux_pointer_t @var{dst_ptr}, mmux_pointerc_t @var{src_ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memcpy}.
 @end deftypefun
 
@@ -5921,13 +5921,9 @@ Unix standards, is @code{char} which does not specify if they are signed or unsi
 package a file system pathname is represented by the object type
 @objtype{mmux_libc_file_system_pathname_t}.
 
-Unless otherwise specified: in this package a file system pathname can have any length, it can be
-composed of any number of octets.
-
-@ignore
-For security and efficiency reasons: some functions impose the arbitrary limit of @math{4095} octets
-plus the terminating zero octet; in total, @math{4096} octets.
-@end ignore
+For security and efficiency reasons: the constructors of the
+@objtype{mmux_libc_file_system_pathname_t} object type enforce the arbitrary pathname length limit
+of @math{4095} octets plus the terminating zero octet; in total, @math{4096} octets.
 
 Most pathnames are composed of @dfn{segments} separated by the slash character @file{/}, examples:
 
