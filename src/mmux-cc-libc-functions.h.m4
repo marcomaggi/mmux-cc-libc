@@ -1316,9 +1316,10 @@ mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_file_descriptor_t fd, mm
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * pathname_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t const * class,
+							    mmux_libc_file_system_pathname_t * pathname_p,
 							    mmux_asciizcp_t asciiz_pathname)
-  __attribute__((__nonnull__(1,2)));
+  __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcp_t * result_p,
 							       mmux_libc_file_system_pathname_t ptn)
