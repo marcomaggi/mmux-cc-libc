@@ -25,59 +25,8 @@
 #ifndef MMUX_CC_LIBC_INTERNALS_H
 #define MMUX_CC_LIBC_INTERNALS_H 1
 
-
-/** --------------------------------------------------------------------
- ** Preliminary definitions.
- ** ----------------------------------------------------------------- */
-
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/* The  macro MMUX_CC_LIBC_UNUSED  indicates that  a function,  function argument  or
-   variable may potentially be unused. Usage examples:
-
-   static int unused_function (char arg) MMUX_CC_LIBC_UNUSED;
-   int foo (char unused_argument MMUX_CC_LIBC_UNUSED);
-   int unused_variable MMUX_CC_LIBC_UNUSED;
-*/
-#ifdef __GNUC__
-#  define MMUX_CC_LIBC_UNUSED		__attribute__((__unused__))
-#else
-#  define MMUX_CC_LIBC_UNUSED		/* empty */
-#endif
-
-#ifndef __GNUC__
-#  define __attribute__(...)	/* empty */
-#endif
-
-#ifndef __GNUC__
-#  define __builtin_expect(...)	/* empty */
-#endif
-
-#if defined _WIN32 || defined __CYGWIN__
-#  ifdef BUILDING_DLL
-#    ifdef __GNUC__
-#      define mmux_cc_libc_decl		__attribute__((__dllexport__)) extern
-#    else
-#      define mmux_cc_libc_decl		__declspec(dllexport) extern
-#    endif
-#  else
-#    ifdef __GNUC__
-#      define mmux_cc_libc_decl		__attribute__((__dllimport__)) extern
-#    else
-#      define mmux_cc_libc_decl		__declspec(dllimport) extern
-#    endif
-#  endif
-#  define mmux_cc_libc_private_decl	extern
-#else
-#  if __GNUC__ >= 4
-#    define mmux_cc_libc_decl		__attribute__((__visibility__("default"))) extern
-#    define mmux_cc_libc_private_decl	__attribute__((__visibility__("hidden")))  extern
-#  else
-#    define mmux_cc_libc_decl		extern
-#    define mmux_cc_libc_private_decl	extern
-#  endif
 #endif
 
 
@@ -91,7 +40,6 @@ extern "C" {
 #  include <config.h>
 #endif
 
-#include <stdbool.h>
 #include <stdarg.h>
 #include <mmux-cc-types.h>
 #include <mmux-cc-libc-config.h>
@@ -294,14 +242,14 @@ typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
 typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
 typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
 
-typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t     value; } mmux_libc_completed_process_status_t;
-typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t    value; } mmux_libc_dirstream_position_t;
+typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
+typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
+typedef struct mmux_libc_gid_t				{ mmux_gid_t;	} mmux_libc_gid_t;
+typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
+typedef struct mmux_libc_pid_t				{ mmux_pid_t;	} mmux_libc_pid_t;
+typedef struct mmux_libc_uid_t				{ mmux_uid_t;	} mmux_libc_uid_t;
+typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
-typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t     value; } mmux_libc_file_descriptor_t;
-typedef struct mmux_libc_gid_t				{ mmux_gid_t      value; } mmux_libc_gid_t;
-typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t     value; } mmux_libc_interprocess_signal_t;
-typedef struct mmux_libc_pid_t				{ mmux_pid_t      value; } mmux_libc_pid_t;
-typedef struct mmux_libc_uid_t				{ mmux_uid_t      value; } mmux_libc_uid_t;
 
 typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
 typedef mmux_libc_file_descriptor_t			mmux_libc_network_socket_t;
@@ -314,9 +262,9 @@ typedef struct iovec		mmux_libc_iovec_t;
 typedef struct open_how		mmux_libc_open_how_t;
 #else
 typedef struct mmux_libc_open_how_t {
-  mmux_uint64_t		flags;
-  mmux_uint64_t		mode;
-  mmux_uint64_t		resolve;
+  mmux_standard_uint64_t	flags;
+  mmux_standard_uint64_t	mode;
+  mmux_standard_uint64_t	resolve;
 } mmux_libc_open_how_t;
 #endif
 typedef struct flock		mmux_libc_flock_t;
@@ -330,7 +278,7 @@ typedef struct dirent		mmux_libc_dirent_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;
-  mmux_usize_t		iova_len;
+  mmux_standard_usize_t	iova_len;
 } mmux_libc_iovec_array_t;
 
 typedef struct in_addr				mmux_libc_in_addr_t;
@@ -453,7 +401,7 @@ typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
  ** Function type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef void mmux_libc_sighandler_t (mmux_sint_t signum);
+typedef void mmux_libc_sighandler_t (mmux_standard_sint_t signum);
 
 
 /** --------------------------------------------------------------------

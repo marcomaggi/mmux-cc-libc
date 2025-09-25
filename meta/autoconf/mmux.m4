@@ -119,11 +119,11 @@ AC_DEFUN([MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING],
 #
 # Usage example:
 #
-#       MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_SLLONG],
+#       MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_SLLONG],
 #         [Always defined, set to 1 if MMUX support for type 'signed long long int' is enabled.],
 #         [...])
 #
-#       the name of the configuration variable is "MMUX_HAVE_CC_TYPE_SLLONG".
+#       the name of the configuration variable is "MMUX_CC_TYPES_HAS_SLLONG".
 #
 AC_DEFUN([MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE],
   [AS_VAR_SET([$1],[0])
@@ -148,21 +148,21 @@ AC_DEFUN([MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE],
 #               MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE
 #               MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY
 #
-#       If the variable  "MMUX_HAVE_CC_TYPE_TYPESTEM": is set to 1, the  message will state "support
+#       If the variable  "MMUX_CC_TYPES_HAS_TYPESTEM": is set to 1, the  message will state "support
 #       enabled";  is set  to 0,  the  message will  state  "support disabled".   "TYPESTEM" is  the
 #       uppercase translation of $1.
 #
 # Usage example:
 #
-#       MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_SLLONG],
+#       MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_SLLONG],
 #         [Always defined, set to 1 if MMUX support for type 'signed long long int' is enabled.],
 #         [...])
 #
-#       the name of the configuration variable is "MMUX_HAVE_CC_TYPE_SLLONG".
+#       the name of the configuration variable is "MMUX_CC_TYPES_HAS_SLLONG".
 #
 AC_DEFUN([MMUX_CC_TYPE_SUPPORT_MSG_CHECKING],
   [AC_MSG_CHECKING([for MMUX supporting '$2'])
-   AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_[]m4_toupper($1)])],
+   AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_[]m4_toupper($1)])],
          [AC_MSG_RESULT([yes])],
          [AC_MSG_RESULT([no])])])
 
@@ -570,9 +570,144 @@ AC_DEFUN([MMUX_LANG_C11],[
     [AS_VAR_IF(GCC,'yes',
       [AX_APPEND_COMPILE_FLAGS([-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict], [MMUX_CFLAGS], [-Werror])
        AX_APPEND_COMPILE_FLAGS([-Wnull-dereference -Wjump-misses-init -Wdouble-promotion -Wshadow], [MMUX_CFLAGS], [-Werror])
-       AX_APPEND_COMPILE_FLAGS([-Wformat=2 -Wmisleading-indentation], [MMUX_CFLAGS], [-Werror])])])
+       AX_APPEND_COMPILE_FLAGS([-Wformat=2 -Wmisleading-indentation -Wattributes], [MMUX_CFLAGS], [-Werror])])])
 
   MMUX_CC_CHECK_COMMON_HEADERS])
+
+
+# Synopsis:
+#
+#       MMUX_LANG_C23
+#
+# Description:
+#
+#       Define the appropriate flags  to use the C23 standard language.  Such  flags are appended to
+#       the current definition of the variable "CC".
+#
+#       This macro is meant to be used as:
+#
+#               AC_LANG([C])
+#               MMUX_LANG_C23
+#
+#       If the variable "GCC" is set to "yes": select additional warning flags to be handed to the C
+#       compiler.  Such flags are appended to the  variable MMUX_CFLAGS, which is also configured as
+#       substitution  (and so  it becomes  a Makefile  variable).  We  should use  such variable  to
+#       compile commands as follows, in "Makefile.am":
+#
+#               AM_CFLAGS = $(MMUX_CFLAGS)
+#
+AC_DEFUN([MMUX_LANG_C23],[
+  AX_REQUIRE_DEFINED([AX_CHECK_COMPILE_FLAG])
+  AX_REQUIRE_DEFINED([AX_APPEND_COMPILE_FLAGS])
+  AX_REQUIRE_DEFINED([AX_GCC_VERSION])
+  AC_REQUIRE([AX_IS_RELEASE])
+
+  AC_PROG_CC
+  AX_CHECK_COMPILE_FLAG([-std=c23],
+    [AX_APPEND_FLAG([-std=c23], [CC])],
+    [AC_MSG_ERROR([*** Compiler does not support -std=c23])],
+    [-pedantic])
+
+  AS_VAR_IF(GCC,'yes',
+    [AX_GCC_VERSION])
+
+  AC_SUBST([MMUX_CFLAGS])
+  AC_DEFINE([_ISOC11_SOURCE],[1],[Enable the ISO C11 features.])
+
+  # These flags are for every compiler.
+  AS_VAR_IF(ax_is_release,'no',
+    [AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -pedantic], [MMUX_CFLAGS], [-Werror])])
+
+  # These flags are for GCC only.
+  AS_VAR_IF(ax_is_release,'no',
+    [AS_VAR_IF(GCC,'yes',
+      [AX_APPEND_COMPILE_FLAGS([-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict], [MMUX_CFLAGS], [-Werror])
+       AX_APPEND_COMPILE_FLAGS([-Wnull-dereference -Wjump-misses-init -Wdouble-promotion -Wshadow], [MMUX_CFLAGS], [-Werror])
+       AX_APPEND_COMPILE_FLAGS([-Wformat=2 -Wmisleading-indentation -Wattributes], [MMUX_CFLAGS], [-Werror])])])
+
+  MMUX_CC_CHECK_COMMON_HEADERS])
+
+
+# Synopsis:
+#
+#       MMUX_LANG_GCC23
+#
+# Description:
+#
+#       Define the appropriate flags to use the C23 standard language with GCC "-fplan9-extensions".
+#       Such flags are appended to the current definition of the variable "CC".
+#
+#       This macro is meant to be used as:
+#
+#               AC_LANG([C])
+#               MMUX_LANG_GCC23
+#
+#       If the variable "GCC" is set to "yes": select additional warning flags to be handed to the C
+#       compiler.  Such flags are appended to the  variable MMUX_CFLAGS, which is also configured as
+#       substitution  (and so  it becomes  a Makefile  variable).  We  should use  such variable  to
+#       compile commands as follows, in "Makefile.am":
+#
+#               AM_CFLAGS = $(MMUX_CFLAGS)
+#
+AC_DEFUN([MMUX_LANG_GCC23],[
+  AX_REQUIRE_DEFINED([AX_CHECK_COMPILE_FLAG])
+  AX_REQUIRE_DEFINED([AX_APPEND_COMPILE_FLAGS])
+  AX_REQUIRE_DEFINED([AX_GCC_VERSION])
+  AC_REQUIRE([AX_IS_RELEASE])
+
+  AC_PROG_CC
+  AX_CHECK_COMPILE_FLAG([-std=c23],
+    [AX_APPEND_FLAG([-std=c23], [CC])],
+    [AC_MSG_ERROR([*** Compiler does not support -std=c23])],
+    [-pedantic])
+
+  AX_CHECK_COMPILE_FLAG([-fplan9-extensions],
+    [AX_APPEND_FLAG([-fplan9-extensions], [CC])],
+    [AC_MSG_ERROR([*** Compiler does not support -fplan9-extensions])])
+
+  AS_VAR_IF(GCC,'yes',
+    [AX_GCC_VERSION])
+
+  AC_SUBST([MMUX_CFLAGS])
+  AC_DEFINE([_ISOC11_SOURCE],[1],[Enable the ISO C11 features.])
+
+  # These flags are for every compiler.
+  AS_VAR_IF(ax_is_release,'no',
+    [AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -pedantic], [MMUX_CFLAGS], [-Werror])])
+
+  # These flags are for GCC only.
+  AS_VAR_IF(ax_is_release,'no',
+    [AS_VAR_IF(GCC,'yes',
+      [AX_APPEND_COMPILE_FLAGS([-Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict], [MMUX_CFLAGS], [-Werror])
+       AX_APPEND_COMPILE_FLAGS([-Wnull-dereference -Wjump-misses-init -Wdouble-promotion -Wshadow], [MMUX_CFLAGS], [-Werror])
+       AX_APPEND_COMPILE_FLAGS([-Wformat=2 -Wmisleading-indentation -Wattributes], [MMUX_CFLAGS], [-Werror])])])
+
+  MMUX_CC_CHECK_COMMON_HEADERS])
+
+
+# Synopsis:
+#
+#       MMUX_CC_CHAR_IS_UNSIGNED
+#
+# Description:
+#
+#       Check if "char" is defined as unsigned on the underlying platform.
+#
+#       If it is unsigned define "__CHAR_UNSIGNED__".
+#
+#       If it is unsigned define to 1 the subst symbol: MMUX_CC_TYPES_CHAR_IS_UNSIGNED.
+#
+AC_DEFUN([MMUX_CC_CHAR_IS_UNSIGNED],[
+  AC_C_CHAR_UNSIGNED
+  AC_MSG_CHECKING([MMUX char is unsigned])
+  AS_VAR_SET([MMUX_CC_TYPES_CHAR_IS_UNSIGNED],[0])
+  AS_IF(mmux_test_variable_is_yes([ac_cv_c_char_unsigned]),
+    [AS_VAR_SET([MMUX_CC_TYPES_CHAR_IS_UNSIGNED],[1])
+     AC_MSG_RESULT([yes])],
+    [AS_VAR_SET([MMUX_CC_TYPES_CHAR_IS_UNSIGNED],[0])
+     AC_MSG_RESULT([no])])
+  AC_SUBST([MMUX_CC_TYPES_CHAR_IS_UNSIGNED],[$MMUX_CC_TYPES_CHAR_IS_UNSIGNED])
+])
 
 
 # Synopsis:
@@ -959,6 +1094,7 @@ AC_DEFUN([MMUX_CC_INSPECT_STANDARD_TYPES],
 
    MMUX_CC_DETERMINE_TYPE_SIZEOF([POINTER],    [void *])
 
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([CHAR],       [char])
    MMUX_CC_DETERMINE_TYPE_SIZEOF([SCHAR],      [signed char])
    MMUX_CC_DETERMINE_TYPE_SIZEOF([UCHAR],      [unsigned char])
    MMUX_CC_DETERMINE_TYPE_SIZEOF([SSHORT],     [signed short int])
@@ -1189,24 +1325,28 @@ AC_DEFUN([MMUX_CC_INSPECT_STANDARD_FEATURE_TYPES],
    AC_REQUIRE([AC_TYPE_INTPTR_T])
    AC_REQUIRE([AC_TYPE_UID_T])
 
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([SSIZE],      [ssize_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([USIZE],      [size_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([SINTMAX],    [intmax_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([UINTMAX],    [uintmax_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([SINTPTR],    [intptr_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([UINTPTR],    [uintptr_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([SSIZE],       [ssize_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([USIZE],       [size_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([SINTMAX],     [intmax_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([UINTMAX],     [uintmax_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([SINTPTR],     [intptr_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([UINTPTR],     [uintptr_t])
 
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([PTRDIFF],    [ptrdiff_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([MODE],       [mode_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([OFF],        [off_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([UID],        [uid_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([PID],        [pid_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([GID],        [gid_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([WCHAR],      [wchar_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([WINT],       [wint_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([TIME],       [time_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([SOCKLEN],    [socklen_t])
-   MMUX_CC_DETERMINE_TYPE_SIZEOF([RLIM],       [rlim_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([PTRDIFF],     [ptrdiff_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([MODE],        [mode_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([OFF],         [off_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([UID],         [uid_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([PID],         [pid_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([GID],         [gid_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([WCHAR],       [wchar_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([WINT],        [wint_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([TIME],        [time_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([SOCKLEN],     [socklen_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([RLIM],        [rlim_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([INO],         [ino_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([DEV],         [dev_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([NLINK],       [nlink_t])
+   MMUX_CC_DETERMINE_TYPE_SIZEOF([BLKCNT],      [blkcnt_t])
 
    MMUX_CC_DETERMINE_SIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([SSIZE],        [ssize_t])
    MMUX_CC_DETERMINE_SIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([SINTMAX],      [intmax_t])
@@ -1225,7 +1365,11 @@ AC_DEFUN([MMUX_CC_INSPECT_STANDARD_FEATURE_TYPES],
    MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([GID],        [gid_t])
    MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([WINT],       [wint_t])
    MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([SOCKLEN],    [socklen_t])
-   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([RLIM],       [rlim_t])])
+   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([RLIM],       [rlim_t])
+   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([INO],        [ino_t])
+   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([DEV],        [dev_t])
+   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([NLINK],      [nlink_t])
+   MMUX_CC_DETERMINE_UNSIGNED_INTEGER_ALIAS_FOR_CUSTOM_TYPE([BLKCNT],     [blkcnt_t])])
 
 
 # Synopsis:
@@ -1286,21 +1430,21 @@ AC_DEFUN([MMUX_CC_CHECK_STANDARD_TYPE_EXTENSION_DECIMAL_FLOAT],
 #     Check if the underlying platform supports the standard C language type "signed long long int".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_SLLONG
+#     MMUX_CC_TYPES_HAS_SLLONG
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_SLLONG
+#     MMUX_CC_TYPES_HAS_SLLONG
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_SLLONG],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_SLLONG],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_SLLONG],
      [Always defined, set to 1 if MMUX support for type 'signed long long int' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([sllong],
         [AC_TYPE_LONG_LONG_INT
          AS_IF([mmux_test_variable_is_yes([ac_cv_type_long_long_int])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_SLLONG],[1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_SLLONG],[1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([sllong],[signed long long int])])])])
 
 
@@ -1313,21 +1457,21 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_SLLONG],
 #     Check if  the underlying platform  supports the standard C  language type "unsigned  long long
 #     int".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_ULLONG
+#     MMUX_CC_TYPES_HAS_ULLONG
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_ULLONG
+#     MMUX_CC_TYPES_HAS_ULLONG
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_ULLONG],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_ULLONG],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_ULLONG],
      [Always defined, set to 1 if MMUX support for type 'unsigned long long int' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([ullong],
         [AC_TYPE_UNSIGNED_LONG_LONG_INT
          AS_IF([test mmux_is_yes([ac_cv_type_unsigned_long_long_int])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_ULLONG],[1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_ULLONG],[1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([ullong],[unsigned long long int])])])])
 
 
@@ -1340,21 +1484,21 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_ULLONG],
 #     Check  if  the underlying  platform  supports  the standard  C  language  type "long  double".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_LDOUBLE
+#     MMUX_CC_TYPES_HAS_LDOUBLE
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_LDOUBLE
+#     MMUX_CC_TYPES_HAS_LDOUBLE
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_LDOUBLE],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_LDOUBLE],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_LDOUBLE],
      [Always defined, set to 1 if MMUX support for type 'long double' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([ldouble],
         [AC_TYPE_LONG_DOUBLE
          AS_IF([test mmux_is_yes([ac_cv_type_long_double])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_LDOUBLE], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_LDOUBLE], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([ldouble],[long double])])])])
 
 
@@ -1366,16 +1510,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_LDOUBLE],
 #
 #     Check if the underlying platform supports the standard C language type "_Float32".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT32
+#     MMUX_CC_TYPES_HAS_FLOAT32
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT32
+#     MMUX_CC_TYPES_HAS_FLOAT32
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT32],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT32],
      [Always defined, set to 1 if MMUX support for type '_Float32' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float32],
         [AC_CHECK_TYPE([_Float32])
@@ -1390,7 +1534,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32],
                                              ac_cv_func_fabsf32,
                                              ac_cv_func_fmaxf32,
                                              ac_cv_func_fminf32])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT32], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT32], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float32],[_Float32])])])])
 
 
@@ -1402,16 +1546,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32],
 #
 #     Check if the underlying platform supports the standard C language type "_Float64".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT64
+#     MMUX_CC_TYPES_HAS_FLOAT64
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT64
+#     MMUX_CC_TYPES_HAS_FLOAT64
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT64],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT64],
      [Always defined, set to 1 if MMUX support for type '_Float64' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float64],
         [AC_CHECK_TYPE([_Float64])
@@ -1426,7 +1570,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64],
                                              ac_cv_func_fabsf64,
                                              ac_cv_func_fmaxf64,
                                              ac_cv_func_fminf64])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT64], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT64], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float64],[_Float64])])])])
 
 
@@ -1438,16 +1582,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64],
 #
 #     Check if the underlying platform supports the standard C language type "_Float128".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT128
+#     MMUX_CC_TYPES_HAS_FLOAT128
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT128
+#     MMUX_CC_TYPES_HAS_FLOAT128
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT128],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT128],
      [Always defined, set to 1 if MMUX support for type '_Float128' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float128],
         [AC_CHECK_TYPE([_Float128])
@@ -1462,7 +1606,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128],
                                              ac_cv_func_fabsf128,
                                              ac_cv_func_fmaxf128,
                                              ac_cv_func_fminf128])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT128], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT128], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float128],[_Float128])])])])
 
 
@@ -1474,16 +1618,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128],
 #
 #     Check if the underlying platform supports the standard C language type "_Float32x".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT32X
+#     MMUX_CC_TYPES_HAS_FLOAT32X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT32X
+#     MMUX_CC_TYPES_HAS_FLOAT32X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32X],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT32X],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT32X],
      [Always defined, set to 1 if MMUX support for type '_Float32x' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float32x],
         [AC_CHECK_TYPE([_Float32x])
@@ -1498,7 +1642,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32X],
                                              ac_cv_func_fabsf32x,
                                              ac_cv_func_fmaxf32x,
                                              ac_cv_func_fminf32x])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT32X], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT32X], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float32x],[_Float32x])])])])
 
 
@@ -1510,16 +1654,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT32X],
 #
 #     Check if the underlying platform supports the standard C language type "_Float64x".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT64X
+#     MMUX_CC_TYPES_HAS_FLOAT64X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT64X
+#     MMUX_CC_TYPES_HAS_FLOAT64X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64X],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT64X],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT64X],
      [Always defined, set to 1 if MMUX support for type '_Float64x' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float64x],
         [AC_CHECK_TYPE([_Float64x])
@@ -1534,7 +1678,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64X],
                                              ac_cv_func_fabsf64x,
                                              ac_cv_func_fmaxf64x,
                                              ac_cv_func_fminf64x])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT64X], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT64X], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float64x],[_Float64x])])])])
 
 
@@ -1546,16 +1690,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT64X],
 #
 #     Check if the underlying platform supports the standard C language type "_Float128x".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT128X
+#     MMUX_CC_TYPES_HAS_FLOAT128X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_FLOAT128X
+#     MMUX_CC_TYPES_HAS_FLOAT128X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128X],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_FLOAT128X],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_FLOAT128X],
      [Always defined, set to 1 if MMUX support for type '_Float128x' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([float128x],
         [AC_CHECK_TYPE([_Float128x])
@@ -1570,7 +1714,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128X],
                                              ac_cv_func_fabsf128x,
                                              ac_cv_func_fmaxf128x,
                                              ac_cv_func_fminf128x])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_FLOAT128X], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_FLOAT128X], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([float128x],[_Float128x])])])])
 
 
@@ -1638,17 +1782,17 @@ AC_DEFUN([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES],
 #
 #     Check if the underlying platform supports the standard C language type "_Decimal32".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL32
+#     MMUX_CC_TYPES_HAS_DECIMAL32
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL32
+#     MMUX_CC_TYPES_HAS_DECIMAL32
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL32],
   [AC_REQUIRE([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_DECIMAL32],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL32],
      [Always defined, set to 1 if MMUX support for type '_Decimal32' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal32],
         [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
@@ -1666,7 +1810,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL32],
                                                     ac_cv_func_fabsd32,
                                                     ac_cv_func_fmaxd32,
                                                     ac_cv_func_fmind32])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_DECIMAL32], [1])])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_DECIMAL32], [1])])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([decimal32],[_Decimal32])])])
 
 
@@ -1678,17 +1822,17 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL32],
 #
 #     Check if the underlying platform supports the standard C language type "_Decimal64".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL64
+#     MMUX_CC_TYPES_HAS_DECIMAL64
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL64
+#     MMUX_CC_TYPES_HAS_DECIMAL64
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL64],
   [AC_REQUIRE([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_DECIMAL64],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL64],
      [Always defined, set to 1 if MMUX support for type '_Decimal64' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal64],
         [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
@@ -1706,7 +1850,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL64],
                                                     ac_cv_func_fabsd64,
                                                     ac_cv_func_fmaxd64,
                                                     ac_cv_func_fmind64])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_DECIMAL64], [1])])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_DECIMAL64], [1])])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([decimal64],[_Decimal64])])])
 
 
@@ -1718,17 +1862,17 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL64],
 #
 #     Check if the underlying platform supports the standard C language type "_Decimal128".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL128
+#     MMUX_CC_TYPES_HAS_DECIMAL128
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_DECIMAL128
+#     MMUX_CC_TYPES_HAS_DECIMAL128
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL128],
   [AC_REQUIRE([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_DECIMAL128],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL128],
      [Always defined, set to 1 if MMUX support for type '_Decimal128' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal128],
         [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
@@ -1746,7 +1890,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL128],
                                                     ac_cv_func_fabsd128,
                                                     ac_cv_func_fmaxd128,
                                                     ac_cv_func_fmind128])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_DECIMAL128], [1])])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_DECIMAL128], [1])])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([decimal128],[_Decimal128])])])
 
 
@@ -1759,16 +1903,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL128],
 #     Check  if the  underlying platform  supports  the standard  C language  type "float  complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF
+#     MMUX_CC_TYPES_HAS_COMPLEXF
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF
+#     MMUX_CC_TYPES_HAS_COMPLEXF
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF],
      [Always defined, set to 1 if MMUX support for type 'float complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf],
         [AC_CHECK_HEADER([complex.h])
@@ -1787,7 +1931,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF],
                                              ac_cv_func_cabsf,
                                              ac_cv_func_cargf,
                                              ac_cv_func_conjf])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf],[float complex])])])])
 
 
@@ -1800,16 +1944,16 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF],
 #     Check if the underlying  platform supports the standard C language  type "double complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD
+#     MMUX_CC_TYPES_HAS_COMPLEXD
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD
+#     MMUX_CC_TYPES_HAS_COMPLEXD
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD],
-  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXD],
+  [MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD],
      [Always defined, set to 1 if MMUX support for type 'double complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd],
         [AC_CHECK_HEADER([complex.h])
@@ -1828,7 +1972,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD],
                                              ac_cv_func_cabs,
                                              ac_cv_func_carg,
                                              ac_cv_func_conj])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXD], [1])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD], [1])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd],[double complex])])])])
 
 
@@ -1841,20 +1985,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD],
 #     Check if the underlying platform supports the  standard C language type "long double complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXLD
+#     MMUX_CC_TYPES_HAS_COMPLEXLD
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXLD
+#     MMUX_CC_TYPES_HAS_COMPLEXLD
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXLD],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_LDOUBLE])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXLD],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXLD],
      [Always defined, set to 1 if MMUX support for type 'long double complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexld],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_LDOUBLE])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_LDOUBLE])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([long double complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXL],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -1871,7 +2015,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXLD],
                                                     ac_cv_func_cabsl,
                                                     ac_cv_func_cargl,
                                                     ac_cv_func_conjl])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXLD], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXLD], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexld],[long double complex])])])])
 
 
@@ -1884,20 +2028,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXLD],
 #     Check if the underlying platform supports the standard C language type "_Float32 complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF32
+#     MMUX_CC_TYPES_HAS_COMPLEXF32
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF32
+#     MMUX_CC_TYPES_HAS_COMPLEXF32
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT32])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF32],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF32],
      [Always defined, set to 1 if MMUX support for type '_Float32 complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf32],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT32])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT32])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float32 complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF32],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -1914,7 +2058,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32],
                                                     ac_cv_func_cabsf32,
                                                     ac_cv_func_cargf32,
                                                     ac_cv_func_conjf32])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF32], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF32], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf32],[_Float32 complex])])])])
 
 
@@ -1927,20 +2071,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32],
 #     Check if the underlying platform supports the standard C language type "_Float64 complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF64
+#     MMUX_CC_TYPES_HAS_COMPLEXF64
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF64
+#     MMUX_CC_TYPES_HAS_COMPLEXF64
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT64])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF64],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF64],
      [Always defined, set to 1 if MMUX support for type '_Float64 complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf64],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT64])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT64])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float64 complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF64],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -1957,7 +2101,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64],
                                                     ac_cv_func_cabsf64,
                                                     ac_cv_func_cargf64,
                                                     ac_cv_func_conjf64])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF64], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF64], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf64],[_Float64 complex])])])])
 
 
@@ -1970,20 +2114,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64],
 #     Check if the underlying platform supports the standard C language type "_Float128 complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF128
+#     MMUX_CC_TYPES_HAS_COMPLEXF128
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF128
+#     MMUX_CC_TYPES_HAS_COMPLEXF128
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT128])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF128],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF128],
      [Always defined, set to 1 if MMUX support for type '_Float128 complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf128],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT128])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT128])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float128 complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF128],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -2000,7 +2144,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128],
                                                     ac_cv_func_cabsf128,
                                                     ac_cv_func_cargf128,
                                                     ac_cv_func_conjf128])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF128], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF128], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf128],[_Float128 complex])])])])
 
 
@@ -2013,20 +2157,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128],
 #     Check if the underlying platform supports the standard C language type "_Float32x complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF32X
+#     MMUX_CC_TYPES_HAS_COMPLEXF32X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF32X
+#     MMUX_CC_TYPES_HAS_COMPLEXF32X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32X],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT32X])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF32X],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF32X],
      [Always defined, set to 1 if MMUX support for type '_Float32x complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf32x],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT32X])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT32X])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float32x complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF32X],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -2043,7 +2187,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32X],
                                                     ac_cv_func_cabsf32x,
                                                     ac_cv_func_cargf32x,
                                                     ac_cv_func_conjf32x])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF32X], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF32X], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf32x],[_Float32x complex])])])])
 
 
@@ -2056,20 +2200,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF32X],
 #     Check if the underlying platform supports the standard C language type "_Float64x complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF64X
+#     MMUX_CC_TYPES_HAS_COMPLEXF64X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF64X
+#     MMUX_CC_TYPES_HAS_COMPLEXF64X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64X],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT64X])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF64X],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF64X],
      [Always defined, set to 1 if MMUX support for type '_Float64x complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf64x],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT64X])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT64X])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float64x complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF64X],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -2086,7 +2230,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64X],
                                                     ac_cv_func_cabsf64x,
                                                     ac_cv_func_cargf64x,
                                                     ac_cv_func_conjf64x])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF64X], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF64X], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf64x],[_Float64x complex])])])])
 
 
@@ -2099,20 +2243,20 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF64X],
 #     Check if the underlying platform supports the standard C language type "_Float128x complex".
 #     Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF128X
+#     MMUX_CC_TYPES_HAS_COMPLEXF128X
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXF128X
+#     MMUX_CC_TYPES_HAS_COMPLEXF128X
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128X],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_FLOAT128X])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXF128X],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXF128X],
      [Always defined, set to 1 if MMUX support for type '_Float128x complex' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexf128x],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_TYPE_FLOAT128X])],
+        [AS_IF([mmux_test_variable_is_one([MMUX_CC_TYPES_HAS_FLOAT128X])],
                [AC_CHECK_HEADER([complex.h])
                 AC_CHECK_TYPE([_Float128x complex],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
                 AC_CHECK_DECL([CMPLXF128X],[],[],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS])
@@ -2129,7 +2273,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128X],
                                                     ac_cv_func_cabsf128x,
                                                     ac_cv_func_cargf128x,
                                                     ac_cv_func_conjf128x])],
-                      [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXF128X], [1])])])
+                      [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXF128X], [1])])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexf128x],[_Float128x complex])])])])
 
 
@@ -2141,21 +2285,21 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXF128X],
 #
 #     Check if the underlying platform supports the standard C language type "complexd32".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD32"
+#     MMUX_CC_TYPES_HAS_COMPLEXD32"
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD32"
+#     MMUX_CC_TYPES_HAS_COMPLEXD32"
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD32],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_DECIMAL32])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXD32],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD32],
      [Always defined, set to 1 if MMUX support for type 'complexd32' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd32],
         [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXD32], [$MMUX_HAVE_CC_TYPE_DECIMAL32])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD32], [$MMUX_CC_TYPES_HAS_DECIMAL32])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd32],[complexd32])])])])
 
 
@@ -2167,21 +2311,21 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD32],
 #
 #     Check if the underlying platform supports the standard C language type "complexd64".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD64"
+#     MMUX_CC_TYPES_HAS_COMPLEXD64"
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD64"
+#     MMUX_CC_TYPES_HAS_COMPLEXD64"
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD64],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_DECIMAL64])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXD64],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD64],
      [Always defined, set to 1 if MMUX support for type 'complexd64' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd64],
         [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXD64], [$MMUX_HAVE_CC_TYPE_DECIMAL64])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD64], [$MMUX_CC_TYPES_HAS_DECIMAL64])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd64],[complexd64])])])])
 
 
@@ -2193,21 +2337,21 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD64],
 #
 #     Check if the underlying platform supports the standard C language type "complexd128".  Results:
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD128"
+#     MMUX_CC_TYPES_HAS_COMPLEXD128"
 #               C  language preprocessor  symbol defined  and set  to 1  if the  type is  supported;
 #               otherwise it is set to 0.
 #
-#     MMUX_HAVE_CC_TYPE_COMPLEXD128"
+#     MMUX_CC_TYPES_HAS_COMPLEXD128"
 #               GNU Autoconf  substitution symbol  defined and set  to 1 if  the type  is supported;
 #               otherwise it is set to 0.
 #
 AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD128],
   [AC_REQUIRE([MMUX_CC_CHECK_TYPE_DECIMAL128])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_TYPE_COMPLEXD128],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD128],
      [Always defined, set to 1 if MMUX support for type 'complexd128' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd128],
         [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
-               [AS_VAR_SET([MMUX_HAVE_CC_TYPE_COMPLEXD128], [$MMUX_HAVE_CC_TYPE_DECIMAL128])])
+               [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD128], [$MMUX_CC_TYPES_HAS_DECIMAL128])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd128],[complexd128])])])])
 
 

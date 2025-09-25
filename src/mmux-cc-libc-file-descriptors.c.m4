@@ -39,7 +39,7 @@
 
 m4_define([[[DUMP_OPEN_FLAGS_FLAG]]],[[[
 #if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
-  if (MMUX_LIBC_$1 & value) {
+  if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
     } else {
@@ -55,7 +55,7 @@ dump_open_flags (mmux_libc_fd_t fd, mmux_uint64_t value)
 {
   bool		not_first_flags = false;
 
-  if (0 != value) {
+  if (0 != value.value) {
 
   DUMP_OPEN_FLAGS_FLAG(O_ACCMODE)
   DUMP_OPEN_FLAGS_FLAG(O_APPEND)
@@ -101,7 +101,7 @@ dump_open_flags (mmux_libc_fd_t fd, mmux_uint64_t value)
 
 m4_define([[[DUMP_OPEN_MODE_FLAG]]],[[[
 #if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
-  if (MMUX_LIBC_$1 & value) {
+  if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
     } else {
@@ -117,7 +117,7 @@ dump_open_mode (mmux_libc_fd_t fd, mmux_uint64_t value)
 {
   bool		not_first_flags = false;
 
-  if (0 != value) {
+  if (0 != value.value) {
 
     DUMP_OPEN_MODE_FLAG(S_IRGRP)
     DUMP_OPEN_MODE_FLAG(S_IROTH)
@@ -147,7 +147,7 @@ dump_open_mode (mmux_libc_fd_t fd, mmux_uint64_t value)
 
 m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[
 #if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
-  if (MMUX_LIBC_$1 & value) {
+  if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
     } else {
@@ -164,7 +164,7 @@ dump_open_resolve (mmux_libc_fd_t fd, mmux_uint64_t value)
 {
   bool		not_first_flags = false;
 
-  if (0 != value) {
+  if (0 != value.value) {
 
     DUMP_OPEN_RESOLVE_FLAG(RESOLVE_BENEATH)
     DUMP_OPEN_RESOLVE_FLAG(RESOLVE_IN_ROOT)
@@ -186,10 +186,10 @@ dump_open_resolve (mmux_libc_fd_t fd, mmux_uint64_t value)
  ** Input/output: file descriptor core API.
  ** ----------------------------------------------------------------- */
 
-static const mmux_libc_file_descriptor_t stdin_fd = { .value = 0 };
-static const mmux_libc_file_descriptor_t stdou_fd = { .value = 1 };
-static const mmux_libc_file_descriptor_t stder_fd = { .value = 2 };
-static const mmux_libc_file_descriptor_t at_fdcwd_fd = { .value = MMUX_LIBC_AT_FDCWD };
+static const mmux_libc_file_descriptor_t stdin_fd = { { .value = 0 } };
+static const mmux_libc_file_descriptor_t stdou_fd = { { .value = 1 } };
+static const mmux_libc_file_descriptor_t stder_fd = { { .value = 2 } };
+static const mmux_libc_file_descriptor_t at_fdcwd_fd = { { .value = MMUX_LIBC_AT_FDCWD } };
 
 bool
 mmux_libc_stdin (mmux_libc_file_descriptor_t * result_p)
@@ -218,7 +218,7 @@ mmux_libc_at_fdcwd (mmux_libc_file_descriptor_t * result_p)
 bool
 mmux_libc_make_fd (mmux_libc_file_descriptor_t * result_p, mmux_sint_t fd_num)
 {
-  result_p->value = fd_num;
+  result_p->value = fd_num.value;
   return false;
 }
 
@@ -231,11 +231,11 @@ mmux_libc_fd_equal (mmux_libc_fd_t one, mmux_libc_fd_t two)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_fd_parse (mmux_libc_fd_t * p_value, char const * s_value, char const * who)
+mmux_libc_fd_parse (mmux_libc_fd_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
 {
   mmux_libc_fd_t	the_fd;
 
-  if (mmux_sint_parse(&the_fd.value, s_value, who)) {
+  if (mmux_sint_parse(&the_fd, s_value, who)) {
     return true;
   }
   *p_value = the_fd;
@@ -244,19 +244,19 @@ mmux_libc_fd_parse (mmux_libc_fd_t * p_value, char const * s_value, char const *
 bool
 mmux_libc_fd_sprint (char * ptr, mmux_usize_t len, mmux_libc_fd_t fd)
 {
-  if (MMUX_LIBC_FD_MAXIMUM_STRING_REPRESENTATION_LENGTH < len) {
+  if (MMUX_LIBC_FD_MAXIMUM_STRING_REPRESENTATION_LENGTH < len.value) {
     errno = MMUX_LIBC_EINVAL;
     return true;
   }
-  return mmux_sint_sprint(ptr, len, fd.value);
+  return mmux_sint_sprint(ptr, len, mmux_sint(fd.value));
 }
 bool
 mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_fd_t fd)
 {
-  mmux_sint_t	required_nchars = mmux_sint_sprint_size(fd.value);
+  mmux_usize_t	required_nchars;
 
-  if (0 <= required_nchars) {
-    *required_nchars_p = required_nchars;
+  if (mmux_sint_sprint_size(&required_nchars, mmux_sint(fd.value))) {
+    required_nchars_p->value = required_nchars.value;
     return false;
   } else {
     return true;
@@ -269,7 +269,7 @@ bool
 mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, ...)
 {
   va_list	ap;
-  mmux_sint_t	rv;
+  int		rv;
 
   va_start(ap, template);
   {
@@ -282,7 +282,7 @@ bool
 mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 {
   va_list	ap;
-  mmux_sint_t	rv;
+  int		rv;
 
   va_start(ap, template);
   {
@@ -295,7 +295,7 @@ bool
 mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 {
   va_list	ap;
-  mmux_sint_t	rv;
+  int		rv;
 
   va_start(ap, template);
   {
@@ -329,7 +329,7 @@ mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_li
 #pragma GCC diagnostic pop
     return true;
   } else {
-    mmux_char_t		bufptr[required_nbytes_including_nil];
+    char		bufptr[required_nbytes_including_nil.value];
     mmux_usize_t	required_nbytes_without_zero;
 
 #pragma GCC diagnostic push
@@ -348,19 +348,19 @@ mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_li
 bool
 mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
 {
-  mmux_sint_t	rv = vdprintf(fd.value, template, ap);
+  int	rv = vdprintf(fd.value, template, ap);
   return ((0 <= rv)? false : true);
 }
 bool
 mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list ap)
 {
-  mmux_sint_t	rv = vdprintf(stdou_fd.value, template, ap);
+  int	rv = vdprintf(stdou_fd.value, template, ap);
   return ((0 <= rv)? false : true);
 }
 bool
 mmux_libc_vdprintfer (mmux_asciizcp_t template, va_list ap)
 {
-  mmux_sint_t	rv = vdprintf(stder_fd.value, template, ap);
+  int	rv = vdprintf(stder_fd.value, template, ap);
   return ((0 <= rv)? false : true);
 }
 
@@ -385,9 +385,10 @@ mmux_libc_dprintfer_newline (void)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
+mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname,
+		mmux_sint_t flags, mmux_mode_t mode)
 {
-  mmux_sint_t	fdval = open(pathname.value, flags, mode);
+  int	fdval = open(pathname.value, flags.value, mode.value);
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -399,7 +400,7 @@ mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname
 bool
 mmux_libc_close (mmux_libc_file_descriptor_t fd)
 {
-  mmux_sint_t	rv = close(fd.value);
+  int	rv = close(fd.value);
 
   return ((-1 != rv)? false : true);
 }
@@ -407,7 +408,7 @@ bool
 mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
 		  mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
 {
-  mmux_sint_t	fdval = openat(dirfd.value, pathname.value, flags, mode);
+  int	fdval = openat(dirfd.value, pathname.value, flags.value, mode.value);
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -420,24 +421,25 @@ mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t 
 /* ------------------------------------------------------------------ */
 
 m4_define([[[DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER]]],[[[bool
-mmux_libc_open_how_$1_set (mmux_libc_open_how_t * const P, $2 value)
+mmux_libc_open_how_$1_set (mmux_libc_open_how_t * const P, mmux_$2_t value)
 {
-  P->$1 = value;
+  P->$1 = value.value;
   return false;
 }
 bool
-mmux_libc_open_how_$1_ref ($2 * result_p, mmux_libc_open_how_t const * const P)
+mmux_libc_open_how_$1_ref (mmux_$2_t * result_p, mmux_libc_open_how_t const * const P)
 {
-  *result_p = P->$1;
+  *result_p = mmux_$2(P->$1);
   return false;
 }]]])
 
-DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(flags,	mmux_uint64_t)
-DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(mode,	mmux_uint64_t)
-DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(resolve,	mmux_uint64_t)
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(flags,	uint64)
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(mode,	uint64)
+DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(resolve,	uint64)
 
 bool
-mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t const * const open_how_p, char const * struct_name)
+mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t const * const open_how_p,
+			 mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct open_how";
@@ -501,7 +503,7 @@ mmux_libc_openat2 (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t
 		   mmux_libc_file_system_pathname_t pathname, mmux_libc_open_how_t const * const how_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
-  mmux_slong_t	fdval = syscall(SYS_openat2, dirfd.value, pathname.value, how_p, sizeof(mmux_libc_open_how_t));
+  mmux_standard_slong_t	fdval = syscall(SYS_openat2, dirfd.value, pathname.value, how_p, sizeof(mmux_libc_open_how_t));
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -517,10 +519,10 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
 bool
 mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen)
 {
-  mmux_ssize_t	nbytes_done = read(fd.value, bufptr, buflen);
+  mmux_standard_ssize_t	nbytes_done = read(fd.value, bufptr, buflen.value);
 
   if (0 <= nbytes_done) {
-    *nbytes_done_p = nbytes_done;
+    *nbytes_done_p = mmux_usize(nbytes_done);
     return false;
   } else {
     return true;
@@ -529,10 +531,10 @@ mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mm
 bool
 mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
 {
-  mmux_ssize_t	nbytes_done = write(fd.value, bufptr, buflen);
+  mmux_standard_ssize_t	nbytes_done = write(fd.value, bufptr, buflen.value);
 
   if (0 <= nbytes_done) {
-    *nbytes_done_p = nbytes_done;
+    *nbytes_done_p = mmux_usize(nbytes_done);
     return false;
   } else {
     return true;
@@ -548,7 +550,7 @@ mmux_libc_write_buffer (mmux_libc_fd_t fd, mmux_pointerc_t bufptr, mmux_usize_t 
   bool		rv;
 
   rv = mmux_libc_write(&nbytes_done, fd, bufptr, buflen);
-  if (rv || (buflen != nbytes_done)) {
+  if (rv || (mmux_ctype_not_equal(buflen, nbytes_done))) {
     return true;
   } else {
     return false;
@@ -568,26 +570,28 @@ mmux_libc_write_buffer_to_stder (mmux_pointerc_t bufptr, mmux_usize_t buflen)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen,
+mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+		 mmux_pointer_t bufptr, mmux_usize_t buflen,
 		 mmux_off_t offset)
 {
-  mmux_ssize_t	nbytes_done = pread(fd.value, bufptr, buflen, offset);
+  mmux_standard_ssize_t	nbytes_done = pread(fd.value, bufptr, buflen.value, offset.value);
 
   if (0 <= nbytes_done) {
-    *nbytes_done_p = nbytes_done;
+    *nbytes_done_p = mmux_usize(nbytes_done);
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen,
+mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+		  mmux_pointerc_t bufptr, mmux_usize_t buflen,
 		  mmux_off_t offset)
 {
-  mmux_ssize_t	nbytes_done = pwrite(fd.value, bufptr, buflen, offset);
+  mmux_standard_ssize_t	nbytes_done = pwrite(fd.value, bufptr, buflen.value, offset.value);
 
   if (0 <= nbytes_done) {
-    *nbytes_done_p = nbytes_done;
+    *nbytes_done_p = mmux_usize(nbytes_done);
     return false;
   } else {
     return true;
@@ -599,10 +603,10 @@ mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd, 
 bool
 mmux_libc_lseek (mmux_libc_file_descriptor_t fd, mmux_off_t * offset_p, mmux_sint_t whence)
 {
-  mmux_off_t	offset = lseek(fd.value, *offset_p, whence);
+  mmux_standard_off_t	offset = lseek(fd.value, offset_p->value, whence.value);
 
   if (-1 != offset) {
-    *offset_p = offset;
+    *offset_p = mmux_off(offset);
     return false;
   } else {
     return true;
@@ -626,7 +630,7 @@ mmux_libc_dup (mmux_libc_file_descriptor_t * new_fd_p, mmux_libc_file_descriptor
 bool
 mmux_libc_dup2 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd)
 {
-  mmux_sint_t	rv = dup2(old_fd.value, new_fd.value);
+  int	rv = dup2(old_fd.value, new_fd.value);
 
   return ((-1 != rv)? false : true);
 }
@@ -634,7 +638,7 @@ bool
 mmux_libc_dup3 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd, mmux_sint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
-  mmux_sint_t	rv = dup3(old_fd.value, new_fd.value, flags);
+  int	rv = dup3(old_fd.value, new_fd.value, flags.value);
 
   return ((-1 != rv)? false : true);
 ]]])
@@ -645,8 +649,8 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
 bool
 mmux_libc_pipe (mmux_libc_file_descriptor_t fds[2])
 {
-  mmux_sint_t		fdvals[2];
-  mmux_sint_t		rv = pipe(fdvals);
+  int	fdvals[2];
+  int	rv = pipe(fdvals);
 
   if (-1 != rv) {
     fds[0].value = fdvals[0];
@@ -670,10 +674,65 @@ mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
  ** Input/output: file descriptor scatter-gather API.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_base,	mmux_pointer_t)
-DEFINE_STRUCT_SETTER_GETTER(iovec,		iov_len,	mmux_usize_t)
-DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_base,	mmux_libc_iovec_t *)
-DEFINE_STRUCT_SETTER_GETTER(iovec_array,	iova_len,	mmux_usize_t)
+bool
+mmux_libc_iov_base_set (mmux_libc_iovec_t * const P, mmux_pointer_t value)
+{
+  P->iov_base = value;
+  return false;
+}
+bool
+mmux_libc_iov_base_ref (mmux_pointer_t * result_p, mmux_libc_iovec_t const * const P)
+{
+  *result_p = mmux_pointer(P->iov_base);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_iov_len_set (mmux_libc_iovec_t * const P, mmux_usize_t value)
+{
+  P->iov_len = value.value;
+  return false;
+}
+bool
+mmux_libc_iov_len_ref (mmux_usize_t * result_p, mmux_libc_iovec_t const * const P)
+{
+  *result_p = mmux_usize(P->iov_len);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_iova_base_set (mmux_libc_iovec_array_t * const P, mmux_libc_iovec_t * value)
+{
+  P->iova_base = value;
+  return false;
+}
+bool
+mmux_libc_iova_base_ref (mmux_libc_iovec_t ** result_p, mmux_libc_iovec_array_t const * const P)
+{
+  *result_p = P->iova_base;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_iova_len_set (mmux_libc_iovec_array_t * const P, mmux_usize_t value)
+{
+  P->iova_len = value.value;
+  return false;
+}
+bool
+mmux_libc_iova_len_ref (mmux_usize_t * result_p, mmux_libc_iovec_array_t const * const P)
+{
+  *result_p = mmux_usize(P->iova_len);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
 mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * const iovec_p, char const * struct_name)
@@ -685,14 +744,22 @@ mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * 
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iovec_p);
   DPRINTF(fd, "%s->iov_base = %p\n", struct_name, iovec_p->iov_base);
   {
-    mmux_sint_t		len = mmux_usize_sprint_size(iovec_p->iov_len);
-    mmux_char_t		str[len];
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_usize(iovec_p->iov_len);
 
-    mmux_usize_sprint(str, len, iovec_p->iov_len);
-    DPRINTF(fd, "%s->iov_len = %s\n", struct_name, str);
+    if (mmux_usize_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      if (mmux_usize_sprint(str, required_nbytes, val)) {
+	return true;
+      } else {
+	DPRINTF(fd, "%s->iov_len = %s\n", struct_name, str);
+	return false;
+      }
+    }
   }
-
-  return false;
 }
 
 bool
@@ -705,39 +772,42 @@ mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_arra
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)iova_p);
   DPRINTF(fd, "%s->iova_base = %p\n", struct_name, (mmux_pointer_t)iova_p->iova_base);
   {
-    mmux_sint_t		len = mmux_usize_sprint_size(iova_p->iova_len);
-    mmux_char_t		str[len];
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_usize(iova_p->iova_len);
 
-    if (mmux_usize_sprint(str, len, iova_p->iova_len)) {
+    if (mmux_usize_sprint_size(&required_nbytes, val)) {
       return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      if (mmux_usize_sprint(str, required_nbytes, val)) {
+	return true;
+      } else {
+	DPRINTF(fd, "%s->iova_len = %s\n", struct_name, str);
+      }
     }
-    DPRINTF(fd, "%s->iova_len = %s\n", struct_name, str);
   }
 
-  for (mmux_usize_t i=0; i<iova_p->iova_len; ++i) {
+  for (mmux_standard_usize_t i=0; i<iova_p->iova_len; ++i) {
     mmux_libc_fd_t	mfd;
 
     if (mmux_libc_make_memfd(&mfd)) {
       return true;
-    };
-    {
+    } else {
       if (mmux_libc_dprintf(mfd, "%s->iova_base[%lu]", struct_name, i)) {
 	return true;
-      }
-      {
+      } else {
 	mmux_usize_t	buflen;
 
 	if (mmux_libc_memfd_length(&buflen, mfd)) {
 	  return true;
-	}
-	{
-	  mmux_char_t	bufptr[1+buflen];
+	} else {
+	  char	bufptr[1+buflen.value];
 
-	  bufptr[buflen] = '\0';
+	  bufptr[buflen.value] = '\0';
 	  if (mmux_libc_memfd_read_buffer(mfd, bufptr, buflen)) {
 	    return true;
-	  }
-	  if (mmux_libc_iovec_dump(fd, &(iova_p->iova_base[i]), bufptr)) {
+	  } else if (mmux_libc_iovec_dump(fd, &(iova_p->iova_base[i]), bufptr)) {
 	    return true;
 	  }
 	}
@@ -756,10 +826,10 @@ mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_arra
 bool
 mmux_libc_readv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p)
 {
-  mmux_ssize_t	rv = readv(fd.value, iova_p->iova_base, iova_p->iova_len);
+  mmux_standard_ssize_t	rv = readv(fd.value, iova_p->iova_base, iova_p->iova_len);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
@@ -768,10 +838,10 @@ mmux_libc_readv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descripto
 bool
 mmux_libc_writev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p)
 {
-  mmux_ssize_t	rv = writev(fd.value, iova_p->iova_base, iova_p->iova_len);
+  mmux_standard_ssize_t	rv = writev(fd.value, iova_p->iova_base, iova_p->iova_len);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
@@ -781,26 +851,26 @@ mmux_libc_writev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descript
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_preadv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p,
-		  mmux_off_t offset)
+mmux_libc_preadv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd,
+		  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
 {
-  mmux_ssize_t	rv = preadv(fd.value, iova_p->iova_base, iova_p->iova_len, offset);
+  mmux_standard_ssize_t	rv = preadv(fd.value, iova_p->iova_base, iova_p->iova_len, offset.value);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p,
-		   mmux_off_t offset)
+mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd,
+		   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
 {
-  mmux_ssize_t	rv = pwritev(fd.value, iova_p->iova_base, iova_p->iova_len, offset);
+  mmux_standard_ssize_t	rv = pwritev(fd.value, iova_p->iova_base, iova_p->iova_len, offset.value);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
@@ -810,26 +880,28 @@ mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descrip
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p,
+mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd,
+		   mmux_libc_iovec_array_t * iova_p,
 		   mmux_off_t offset, mmux_sint_t flags)
 {
-  mmux_ssize_t	rv = preadv2(fd.value, iova_p->iova_base, iova_p->iova_len, offset, flags);
+  mmux_standard_ssize_t	rv = preadv2(fd.value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t * iova_p,
+mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descriptor_t fd,
+		    mmux_libc_iovec_array_t * iova_p,
 		    mmux_off_t offset, mmux_sint_t flags)
 {
-  mmux_ssize_t	rv = pwritev2(fd.value, iova_p->iova_base, iova_p->iova_len, offset, flags);
+  mmux_standard_ssize_t	rv = pwritev2(fd.value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 
-  if (-1 != rv) {
-    *number_of_bytes_read_p = rv;
+  if (-1 < rv) {
+    *number_of_bytes_read_p = mmux_usize(rv);
     return false;
   } else {
     return true;
@@ -841,10 +913,10 @@ mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_file_descri
  ** Input/output: file locking.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_type,		mmux_sshort_t)
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_whence,	mmux_sshort_t)
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_start,	mmux_off_t)
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_len,		mmux_off_t)
+DEFINE_STRUCT_SETTER_GETTER(flock,	l_type,		sshort)
+DEFINE_STRUCT_SETTER_GETTER(flock,	l_whence,	sshort)
+DEFINE_STRUCT_SETTER_GETTER(flock,	l_start,	off)
+DEFINE_STRUCT_SETTER_GETTER(flock,	l_len,		off)
 
 bool
 mmux_libc_l_pid_set (mmux_libc_flock_t * const P, mmux_libc_pid_t value)
@@ -861,17 +933,17 @@ mmux_libc_l_pid_ref (mmux_libc_pid_t * result_p, mmux_libc_flock_t const * const
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_flag_to_symbol_struct_flock_l_type (char const * * const str_p, mmux_sint_t flag)
+mmux_libc_flag_to_symbol_struct_flock_l_type (char const * * const str_p, mmux_sshort_t flag)
 {
   /* We use the if statement, rather than  the switch statement, because there may be
      duplicates in the symbols. */
-  if (F_RDLCK == flag) {
+  if (F_RDLCK == flag.value) {
     *str_p = "F_RDLCK";
     return false;
-  } else if (F_WRLCK == flag) {
+  } else if (F_WRLCK == flag.value) {
     *str_p = "F_WRLCK";
     return false;
-  } else if (F_UNLCK == flag) {
+  } else if (F_UNLCK == flag.value) {
     *str_p = "F_UNLCK";
     return false;
   } else {
@@ -890,21 +962,21 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 
   /* Print l_type. */
   {
-    mmux_sint_t	required_nbytes = mmux_sshort_sprint_size(flock_p->l_type);
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_sshort(flock_p->l_type);
 
-    if (0 > required_nbytes) {
+    if (mmux_sshort_sprint_size(&required_nbytes, val)) {
       return true;
     } else {
-      char	str[required_nbytes];
-      bool	error_when_true = mmux_sshort_sprint(str, required_nbytes, flock_p->l_type);
+      char	str[required_nbytes.value];
 
-      if (error_when_true) {
+      if (mmux_sshort_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_type\" to string\n", __func__)) {;}
 	return true;
       } else {
-	char const *	symstr;
+	mmux_asciizcp_t		symstr;
 
-	if (mmux_libc_flag_to_symbol_struct_flock_l_type(&symstr, flock_p->l_type)) {
+	if (mmux_libc_flag_to_symbol_struct_flock_l_type(&symstr, val)) {
 	  return true;
 	}
 	DPRINTF(fd, "%s.l_type = \"%s\" (%s)\n", struct_name, str, symstr);
@@ -914,20 +986,20 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 
   /* Print l_whence. */
   {
-    mmux_sint_t	required_nbytes = mmux_sshort_sprint_size(flock_p->l_whence);
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_sshort(flock_p->l_whence);
 
-    if (0 > required_nbytes) {
+    if (mmux_sshort_sprint_size(&required_nbytes, val)) {
       if (mmux_libc_dprintfer("%s: error converting \"l_whence\" to string\n", __func__)) {;};
       return true;
     } else {
-      char	str[required_nbytes];
-      bool	error_when_true = mmux_sshort_sprint(str, required_nbytes, flock_p->l_whence);
+      char	str[required_nbytes.value];
 
-      if (error_when_true) {
+      if (mmux_sshort_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_whence\" to string\n", __func__)) {;};
 	return true;
       } else {
-	char const *	symstr;
+	mmux_asciizcp_t		symstr;
 
 	switch (flock_p->l_whence) {
 	case MMUX_VALUEOF_SEEK_SET:
@@ -951,16 +1023,16 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 
   /* Print l_start. */
   {
-    mmux_sint_t	required_nbytes = mmux_off_sprint_size(flock_p->l_start);
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_off(flock_p->l_start);
 
-    if (0 > required_nbytes) {
+    if (mmux_off_sprint_size(&required_nbytes, val)) {
       if (mmux_libc_dprintfer("%s: error converting \"l_start\" to string\n", __func__)) {;};
       return true;
     } else {
-      char	str[required_nbytes];
-      bool	error_when_true = mmux_off_sprint(str, required_nbytes, flock_p->l_start);
+      char	str[required_nbytes.value];
 
-      if (error_when_true) {
+      if (mmux_off_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_start\" to string\n", __func__)) {;};
 	return true;
       } else {
@@ -971,16 +1043,16 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 
   /* Print l_len. */
   {
-    mmux_sint_t	required_nbytes = mmux_off_sprint_size(flock_p->l_len);
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_off(flock_p->l_len);
 
-    if (0 > required_nbytes) {
+    if (mmux_off_sprint_size(&required_nbytes, val)) {
       if (mmux_libc_dprintfer("%s: error converting \"l_len\" to string\n", __func__)) {;};
       return true;
     } else {
-      char	str[required_nbytes];
-      bool	error_when_true = mmux_off_sprint(str, required_nbytes, flock_p->l_len);
+      char	str[required_nbytes.value];
 
-      if (error_when_true) {
+      if (mmux_off_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_len\" to string\n", __func__)) {;};
 	return true;
       } else {
@@ -991,16 +1063,16 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 
   /* Print l_pid. */
   {
-    mmux_sint_t	required_nbytes = mmux_pid_sprint_size(flock_p->l_pid);
+    mmux_usize_t	required_nbytes;
+    auto		val = mmux_pid(flock_p->l_pid);
 
-    if (0 > required_nbytes) {
+    if (mmux_pid_sprint_size(&required_nbytes, val)) {
       if (mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__)) {;};
       return true;
     } else {
-      char	str[required_nbytes];
-      bool	error_when_true = mmux_pid_sprint(str, required_nbytes, flock_p->l_pid);
+      char	str[required_nbytes.value];
 
-      if (error_when_true) {
+      if (mmux_pid_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__)) {;};
 	return true;
       } else {
@@ -1020,27 +1092,28 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
 bool
 mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
 {
-  switch (command) {
+  switch (command.value) {
 
 #ifdef MMUX_HAVE_LIBC_F_DUPFD
   case MMUX_LIBC_F_DUPFD: {
     mmux_libc_file_descriptor_t *	new_fd_p = parameter_p;
-    mmux_sint_t				rv = fcntl(fd.value, command, new_fd_p->value);
+    mmux_standard_sint_t		rv = fcntl(fd.value, command.value, new_fd_p->value);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
 #ifdef MMUX_HAVE_LIBC_F_GETFD
   case MMUX_LIBC_F_GETFD: {
-    mmux_sint_t	rv = fcntl(fd.value, command);
+    /* Acquire the flags associated to the file descriptor. */
+    mmux_standard_sint_t	rv = fcntl(fd.value, command.value);
 
     if (-1 != rv) {
-      mmux_sint_t *	flags_p = parameter_p;
+      mmux_sint_t *	flags_parameter_p = parameter_p;
 
-      *flags_p = rv;
+      *flags_parameter_p = mmux_sint(rv);
       return false;
     } else {
       return true;
@@ -1051,22 +1124,23 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_SETFD
   case MMUX_LIBC_F_SETFD: {
     mmux_sint_t *	flags_p = parameter_p;
-    mmux_sint_t		rv = fcntl(fd.value, command, *flags_p);
+    int			rv = fcntl(fd.value, command.value, flags_p->value);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
 #ifdef MMUX_HAVE_LIBC_F_GETFL
   case MMUX_LIBC_F_GETFL: {
-    mmux_sint_t	rv = fcntl(fd.value, command);
+    /* Acquire the flags associated to the open file. */
+    mmux_standard_sint_t	rv = fcntl(fd.value, command.value);
 
     if (-1 != rv) {
       mmux_sint_t *	flags_p = parameter_p;
 
-      *flags_p = rv;
+      *flags_p = mmux_sint(rv);
       return false;
     } else {
       return true;
@@ -1077,18 +1151,18 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_SETFL
   case MMUX_LIBC_F_SETFL: {
     mmux_sint_t *	flags_p = parameter_p;
-    mmux_sint_t		rv = fcntl(fd.value, command, *flags_p);
+    int			rv = fcntl(fd.value, command.value, flags_p->value);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
 #ifdef MMUX_HAVE_LIBC_F_GETLK
   case MMUX_LIBC_F_GETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
@@ -1097,7 +1171,7 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_SETLK
   case MMUX_LIBC_F_SETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
@@ -1106,18 +1180,18 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_SETLKW
   case MMUX_LIBC_F_SETLKW: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
 #ifdef MMUX_HAVE_LIBC_F_OFD_GETLK
   case MMUX_LIBC_F_OFD_GETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
@@ -1126,7 +1200,7 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_OFD_SETLK
   case MMUX_LIBC_F_OFD_SETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
@@ -1135,23 +1209,22 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_OFD_SETLKW
   case MMUX_LIBC_F_OFD_SETLKW: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
-    mmux_sint_t			rv = fcntl(fd.value, command, flock_pointer);
+    int				rv = fcntl(fd.value, command.value, flock_pointer);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
 #ifdef MMUX_HAVE_LIBC_F_GETOWN
   case MMUX_LIBC_F_GETOWN: {
-    mmux_pid_t	rv = fcntl(fd.value, command);
+    mmux_standard_pid_t		rv = fcntl(fd.value, command.value);
 
     if (-1 != rv) {
       mmux_libc_pid_t *	pid_p = parameter_p;
 
-      pid_p->value = rv;
-      return false;
+      return mmux_libc_make_pid(pid_p, rv);
     } else {
       return true;
     }
@@ -1161,13 +1234,13 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 #ifdef MMUX_HAVE_LIBC_F_SETOWN
   case MMUX_LIBC_F_SETOWN: {
     mmux_libc_pid_t *	pid_p = parameter_p;
-    mmux_sint_t		rv = fcntl(fd.value, command, pid_p->value);
+    int			rv = fcntl(fd.value, command.value, pid_p->value);
 
     return ((-1 != rv)? false : true);
   }
 #endif
 
-/* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
 
   default:
     errno = MMUX_LIBC_EINVAL;
@@ -1180,34 +1253,34 @@ mmux_libc_fcntl_command_flag_to_symbol (char const ** str_p, mmux_sint_t flag)
 {
   /* We use the if statement, rather than  the switch statement, because there may be
      duplicates in the symbols. */
-  if (F_DUPFD == flag) {
+  if (F_DUPFD == flag.value) {
     *str_p = "F_DUPFD";
     return false;
-  } else if (F_GETFD == flag) {
+  } else if (F_GETFD == flag.value) {
     *str_p = "F_GETFD";
     return false;
-  } else if (F_GETFL == flag) {
+  } else if (F_GETFL == flag.value) {
     *str_p = "F_GETFL";
     return false;
-  } else if (F_GETLK == flag) {
+  } else if (F_GETLK == flag.value) {
     *str_p = "F_GETLK";
     return false;
-  } else if (F_GETOWN == flag) {
+  } else if (F_GETOWN == flag.value) {
     *str_p = "F_GETOWN";
     return false;
-  } else if (F_SETFD == flag) {
+  } else if (F_SETFD == flag.value) {
     *str_p = "F_SETFD";
     return false;
-  } else if (F_SETFL == flag) {
+  } else if (F_SETFL == flag.value) {
     *str_p = "F_SETFL";
     return false;
-  } else if (F_SETLKW == flag) {
+  } else if (F_SETLKW == flag.value) {
     *str_p = "F_SETLKW";
     return false;
-  } else if (F_SETLK == flag) {
+  } else if (F_SETLK == flag.value) {
     *str_p = "F_SETLK";
     return false;
-  } else if (F_SETOWN == flag) {
+  } else if (F_SETOWN == flag.value) {
     *str_p = "F_SETOWN";
     return false;
   } else {
@@ -1224,12 +1297,12 @@ mmux_libc_fcntl_command_flag_to_symbol (char const ** str_p, mmux_sint_t flag)
 bool
 mmux_libc_ioctl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
 {
-  switch (command) {
+  switch (command.value) {
 
 #ifdef MMUX_HAVE_LIBC_SIOCATMARK
   case MMUX_LIBC_SIOCATMARK: { /* synopsis: mmux_libc_ioctl FD SIOCATMARK ATMARK_POINTER */
     mmux_sint_t *	atmark_p = parameter_p;
-    mmux_sint_t		rv = ioctl(fd.value, command, atmark_p);
+    int			rv = ioctl(fd.value, command.value, atmark_p->value);
 
     return ((-1 != rv)? false : true);
   }
@@ -1277,10 +1350,12 @@ mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
 		  mmux_libc_fd_set_t * read_fd_set_p, mmux_libc_fd_set_t * write_fd_set_p, mmux_libc_fd_set_t * except_fd_set_p,
 		  mmux_libc_timeval_t * timeout_p)
 {
-  mmux_sint_t		rv = select(maximum_nfds_to_check, read_fd_set_p, write_fd_set_p, except_fd_set_p, timeout_p);
+  mmux_standard_sint_t	rv = select(maximum_nfds_to_check.value,
+				    read_fd_set_p, write_fd_set_p, except_fd_set_p,
+				    timeout_p);
 
   if (-1 < rv) {
-    *nfds_ready = rv;
+    *nfds_ready = mmux_uint(rv);
     return false;
   } else {
     return true;
@@ -1289,15 +1364,16 @@ mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
 bool
 mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
 {
+  auto			nfds_ready		= mmux_uint_constant_zero();
+  auto			maximum_nfds_to_check	= mmux_uint(1 + fd.value);
   mmux_libc_fd_set_t	the_fd_set[1];
-  mmux_uint_t		nfds_ready = 0;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, 1+fd.value, the_fd_set, NULL, NULL, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check, the_fd_set, NULL, NULL, timeout_p)) {
     return true;
-  } else if (0 == nfds_ready) {
+  } else if (mmux_ctype_is_zero(nfds_ready)) {
     *result_p = false;
     return false;
   } else {
@@ -1308,38 +1384,42 @@ mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_file_descriptor_t fd
 bool
 mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
 {
+  auto			nfds_ready		= mmux_uint_constant_zero();
+  auto			maximum_nfds_to_check	= mmux_uint(1 + fd.value);
   mmux_libc_fd_set_t	the_fd_set[1];
-  mmux_uint_t		nfds_ready;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, 1+fd.value, NULL, the_fd_set, NULL, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check, NULL, the_fd_set, NULL, timeout_p)) {
     return true;
-  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
-    *result_p = true;
-    return false;
   } else {
-    *result_p = false;
+    if ((1 == nfds_ready.value) && (FD_ISSET(fd.value, the_fd_set))) {
+      *result_p = true;
+    } else {
+      *result_p = false;
+    }
     return false;
   }
 }
 bool
 mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
 {
+  auto			nfds_ready		= mmux_uint_constant_zero();
+  auto			maximum_nfds_to_check	= mmux_uint(1 + fd.value);
   mmux_libc_fd_set_t	the_fd_set[1];
-  mmux_uint_t		nfds_ready;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
 
-  if (mmux_libc_select(&nfds_ready, 1+fd.value, NULL, NULL, the_fd_set, timeout_p)) {
+  if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check, NULL, NULL, the_fd_set, timeout_p)) {
     return true;
-  } else if ((1 == nfds_ready)  && (FD_ISSET(fd.value, the_fd_set))) {
-    *result_p = true;
-    return false;
   } else {
-    *result_p = false;
+    if ((1 == nfds_ready.value) && (FD_ISSET(fd.value, the_fd_set))) {
+      *result_p = true;
+    } else {
+      *result_p = false;
+    }
     return false;
   }
 }
@@ -1356,12 +1436,13 @@ mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes_copied_p,
 			   mmux_usize_t number_of_bytes_to_copy, mmux_sint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_COPY_FILE_RANGE]]],[[[
-  mmux_ssize_t	number_of_bytes_copied = copy_file_range(input_fd.value, input_position_p,
-							 ouput_fd.value, ouput_position_p,
-							 number_of_bytes_to_copy, flags);
+  mmux_standard_ssize_t	number_of_bytes_copied = copy_file_range(input_fd.value, &(input_position_p->value),
+								 ouput_fd.value, &(ouput_position_p->value),
+								 number_of_bytes_to_copy.value,
+								 flags.value);
 
   if (0 <= number_of_bytes_copied) {
-    *number_of_bytes_copied_p = number_of_bytes_copied;
+    *number_of_bytes_copied_p = mmux_usize(number_of_bytes_copied);
     return false;
   } else {
     return true;
@@ -1378,48 +1459,45 @@ bool
 mmux_libc_memfd_create (mmux_libc_file_descriptor_t * fd_p, mmux_asciizcp_t name, mmux_sint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMFD_CREATE]]],[[[
-  mmux_sint_t	rv = memfd_create(name, flags);
+  mmux_standard_sint_t	rv = memfd_create(name, flags.value);
 
   if (-1 == rv) {
     return true;
   } else {
-    fd_p->value = rv;
-    return false;
+    return mmux_libc_make_fd(fd_p, mmux_sint(rv));
   }
 ]]])
 }
 bool
 mmux_libc_make_memfd (mmux_libc_file_descriptor_t * fd_p)
 {
-  return mmux_libc_memfd_create(fd_p, "mmux-cc-libs-memfd-buffer", 0);
+  return mmux_libc_memfd_create(fd_p, "mmux-cc-libs-memfd-buffer", mmux_sint_constant_zero());
 }
 bool
 mmux_libc_memfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
 {
-  mmux_off_t	current_offset = 0, size_offset = 0;
+  auto	current_offset	= mmux_off_constant_zero();
+  auto	size_offset	= mmux_off_constant_zero();
 
   /* Retrieve the current position. */
   if (mmux_libc_lseek(fd, &current_offset, MMUX_LIBC_SEEK_CUR)) {
     return true;
-  } else /* Retrieve the file size. */
-    if (mmux_libc_lseek(fd, &size_offset, MMUX_LIBC_SEEK_END)) {
-      return true;
-    } else
-      /* Reset the original position. */
-      if (mmux_libc_lseek(fd, &current_offset, MMUX_LIBC_SEEK_SET)) {
-	return true;
-      } else if (size_offset >= 0) {
-	*len_p = (mmux_usize_t)size_offset;
-	return false;
-      } else {
-	return true;
-      }
+  } else if (mmux_libc_lseek(fd, &size_offset, MMUX_LIBC_SEEK_END)) { /* Retrieve the file size. */
+    return true;
+  } else if (mmux_libc_lseek(fd, &current_offset, MMUX_LIBC_SEEK_SET)) { /* Reset the original position. */
+    return true;
+  } else if (mmux_ctype_is_non_negative(size_offset)) {
+    *len_p = mmux_usize(size_offset.value);
+    return false;
+  } else {
+    return true;
+  }
 }
 bool
 mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd)
 {
   bool		rv			= false;
-  mmux_off_t	original_position	= 0;
+  auto		original_position	= mmux_off_constant_zero();
 
   /* Acquire the original position. */
   if (mmux_libc_lseek(mfd, &original_position, MMUX_LIBC_SEEK_SET)) {
@@ -1428,7 +1506,7 @@ mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_
 
   /* Seek to the beginning. */
   {
-    mmux_off_t	position = 0;
+    auto	position = mmux_off_constant_zero();
 
     if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
       rv = true;
@@ -1438,8 +1516,8 @@ mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_
 
   /* Read from input, write to output. */
   {
-    static mmux_usize_t const	read_buflen = 1024;
-    mmux_octet_t		read_bufptr[read_buflen];
+    auto const			read_buflen = mmux_usize_literal(1024);
+    mmux_standard_octet_t	read_bufptr[read_buflen.value];
     mmux_usize_t		nbytes_read;
 
     /* Loop reading while the number of bytes read is positive. */
@@ -1449,10 +1527,10 @@ mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_
 	goto end_of_function;
       }
 
-      if (nbytes_read > 0) {
-	mmux_octet_t *	write_bufptr	= read_bufptr;
-	mmux_usize_t	write_buflen	= nbytes_read;
-	mmux_usize_t	nbytes_written	= 0;
+      if (mmux_ctype_is_positive(nbytes_read)) {
+	mmux_standard_octet_t *	write_bufptr	= read_bufptr;
+	auto			write_buflen	= nbytes_read;
+	auto			nbytes_written	= mmux_usize_constant_zero();
 
 	/* Loop writing until we have written all the bytes from the buffer. */
 	do {
@@ -1461,13 +1539,13 @@ mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_
 	    goto end_of_function;
 	  }
 
-	  if (nbytes_written < write_buflen) {
-	    write_bufptr += nbytes_written;
-	    write_buflen -= nbytes_written;
+	  if (mmux_ctype_less(nbytes_written, write_buflen)) {
+	    write_bufptr += nbytes_written.value;
+	    write_buflen  = mmux_ctype_add(write_buflen, nbytes_written);
 	  }
-	} while (nbytes_written < write_buflen);
+	} while (mmux_ctype_less(nbytes_written, write_buflen));
       }
-    } while (nbytes_read > 0);
+    } while (mmux_ctype_is_positive(nbytes_read));
   }
 
  end_of_function:
@@ -1495,7 +1573,7 @@ mmux_libc_memfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t b
 
   if (mmux_libc_write(&nbytes_done, mfd, bufptr, buflen)) {
     return true;
-  } else if (buflen != nbytes_done) {
+  } else if (mmux_ctype_not_equal(buflen, nbytes_done)) {
     return true;
   } else {
     return false;
@@ -1531,32 +1609,28 @@ mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
 bool
 mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen)
 {
-#if (1)
-  mmux_off_t	offset = 0;
-  mmux_usize_t	nbytes_done;
+  if (1) {
+    auto		offset = mmux_off_constant_zero();
+    mmux_usize_t	nbytes_done;
 
-  if (mmux_libc_pread(&nbytes_done, mfd, bufptr, maximum_buflen, offset)) {
-    return true;
+    return mmux_libc_pread(&nbytes_done, mfd, bufptr, maximum_buflen, offset);
   } else {
+    auto		position = mmux_off_constant_zero();
+    mmux_usize_t	nbytes_done;
+
+    /* Seek to the beginning. */
+    if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
+      return true;
+    }
+    if (mmux_libc_read(&nbytes_done, mfd, bufptr, maximum_buflen)) {
+      return true;
+    }
+    /* Restore the original position. */
+    if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
+      return true;
+    }
     return false;
   }
-#else
-  mmux_usize_t	nbytes_done;
-  mmux_off_t	position = 0;
-
-  /* Seek to the beginning. */
-  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
-    return true;
-  }
-  if (mmux_libc_read(&nbytes_done, mfd, bufptr, maximum_buflen)) {
-    return true;
-  }
-  /* Restore the original position. */
-  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) {
-    return true;
-  }
-  return false;
-#endif
 }
 
 
@@ -1564,27 +1638,23 @@ mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usi
  ** Printing types.
  ** ----------------------------------------------------------------- */
 
-m4_define([[[DEFINE_PRINTER]]],[[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[
-bool
+m4_define([[[DEFINE_PRINTER]]],[[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[bool
 mmux_libc_dprintf_$1 (mmux_libc_file_descriptor_t fd, mmux_$1_t value)
 {
-  int		rv, required_nbytes;
+  mmux_usize_t	required_nbytes;
 
-  required_nbytes = mmux_$1_sprint_size(value);
-  if (0 > required_nbytes) {
+  if (mmux_$1_sprint_size(&required_nbytes, value)) {
     return true;
   } else {
-    char	s_value[required_nbytes];
+    char	s_value[required_nbytes.value];
 
-    rv = mmux_$1_sprint(s_value, required_nbytes, value);
-    if (false == rv) {
-      return mmux_libc_dprintf(fd, "%s", s_value);
-    } else {
+    if (mmux_$1_sprint(s_value, required_nbytes, value)) {
       return true;
+    } else {
+      return mmux_libc_dprintf(fd, "%s", s_value);
     }
   }
-}
-]]])]]])
+}]]])]]])
 
 DEFINE_PRINTER([[[pointer]]])
 
@@ -1608,37 +1678,37 @@ DEFINE_PRINTER([[[uint32]]])
 DEFINE_PRINTER([[[sint64]]])
 DEFINE_PRINTER([[[uint64]]])
 
-DEFINE_PRINTER([[[float]]])
-DEFINE_PRINTER([[[double]]])
-DEFINE_PRINTER([[[ldouble]]],		[[[MMUX_HAVE_CC_TYPE_LDOUBLE]]])
+DEFINE_PRINTER([[[flonumfl]]])
+DEFINE_PRINTER([[[flonumdb]]])
+DEFINE_PRINTER([[[flonumldb]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMLDB]]])
 
-DEFINE_PRINTER([[[float32]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT32]]])
-DEFINE_PRINTER([[[float64]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT64]]])
-DEFINE_PRINTER([[[float128]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT128]]])
+DEFINE_PRINTER([[[flonumf32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF32]]])
+DEFINE_PRINTER([[[flonumf64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF64]]])
+DEFINE_PRINTER([[[flonumf128]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMF128]]])
 
-DEFINE_PRINTER([[[float32x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT32X]]])
-DEFINE_PRINTER([[[float64x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT64X]]])
-DEFINE_PRINTER([[[float128x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT128X]]])
+DEFINE_PRINTER([[[flonumf32x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMF32X]]])
+DEFINE_PRINTER([[[flonumf64x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMF64X]]])
+DEFINE_PRINTER([[[flonumf128x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMF128X]]])
 
-DEFINE_PRINTER([[[decimal32]]],		[[[MMUX_HAVE_CC_TYPE_DECIMAL32]]])
-DEFINE_PRINTER([[[decimal64]]],		[[[MMUX_HAVE_CC_TYPE_DECIMAL64]]])
-DEFINE_PRINTER([[[decimal128]]],	[[[MMUX_HAVE_CC_TYPE_DECIMAL128]]])
+DEFINE_PRINTER([[[flonumd32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMD32]]])
+DEFINE_PRINTER([[[flonumd64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMD64]]])
+DEFINE_PRINTER([[[flonumd128]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMD128]]])
 
-DEFINE_PRINTER([[[complexf]]])
-DEFINE_PRINTER([[[complexd]]])
-DEFINE_PRINTER([[[complexld]]],		[[[MMUX_HAVE_CC_TYPE_COMPLEXLD]]])
+DEFINE_PRINTER([[[flonumcfl]]])
+DEFINE_PRINTER([[[flonumcdb]]])
+DEFINE_PRINTER([[[flonumcldb]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCLDB]]])
 
-DEFINE_PRINTER([[[complexf32]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF32]]])
-DEFINE_PRINTER([[[complexf64]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF64]]])
-DEFINE_PRINTER([[[complexf128]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF128]]])
+DEFINE_PRINTER([[[flonumcf32]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF32]]])
+DEFINE_PRINTER([[[flonumcf64]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF64]]])
+DEFINE_PRINTER([[[flonumcf128]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF128]]])
 
-DEFINE_PRINTER([[[complexf32x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF32X]]])
-DEFINE_PRINTER([[[complexf64x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF64X]]])
-DEFINE_PRINTER([[[complexf128x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF128X]]])
+DEFINE_PRINTER([[[flonumcf32x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF32X]]])
+DEFINE_PRINTER([[[flonumcf64x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF64X]]])
+DEFINE_PRINTER([[[flonumcf128x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF128X]]])
 
-DEFINE_PRINTER([[[complexd32]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD32]]])
-DEFINE_PRINTER([[[complexd64]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD64]]])
-DEFINE_PRINTER([[[complexd128]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD128]]])
+DEFINE_PRINTER([[[flonumcd32]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCD32]]])
+DEFINE_PRINTER([[[flonumcd64]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCD64]]])
+DEFINE_PRINTER([[[flonumcd128]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCD128]]])
 
 DEFINE_PRINTER([[[usize]]])
 DEFINE_PRINTER([[[ssize]]])
@@ -1658,26 +1728,30 @@ DEFINE_PRINTER([[[wint]]])
 DEFINE_PRINTER([[[time]]])
 DEFINE_PRINTER([[[socklen]]])
 DEFINE_PRINTER([[[rlim]]])
+DEFINE_PRINTER([[[ino]]])
+DEFINE_PRINTER([[[dev]]])
+DEFINE_PRINTER([[[nlink]]])
+DEFINE_PRINTER([[[blkcnt]]])
 
 bool
 mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
 }
 bool
 mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_pid_dprintf(fd.value, mmux_pid(value.value));
 }
 bool
 mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_uid_dprintf(fd.value, mmux_uid(value.value));
 }
 bool
 mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_gid_dprintf(fd.value, mmux_gid(value.value));
 }
 bool
 mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value)
@@ -1687,12 +1761,12 @@ mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t fd, mmux_libc_file_syste
 bool
 mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t fd, mmux_libc_completed_process_status_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
 }
 bool
 mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t fd, mmux_libc_interprocess_signal_t value)
 {
-  return mmux_libc_dprintf_sint(fd, value.value);
+  return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
 }
 bool
 mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_t fd, mmux_libc_ptn_extension_t E)
@@ -1701,7 +1775,7 @@ mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_t fd, mmux_libc_ptn_extension
 
   if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
     return true;
-  } else if (nbytes_done != E.len) {
+  } else if (mmux_ctype_not_equal(nbytes_done, E.len)) {
     return true;
   } else {
     return false;
@@ -1714,7 +1788,7 @@ mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_t fd, mmux_libc_ptn_segment_t E
 
   if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
     return true;
-  } else if (nbytes_done != E.len) {
+  } else if (mmux_ctype_not_equal(nbytes_done, E.len)) {
     return true;
   } else {
     return false;

@@ -7,7 +7,7 @@
 
 	This module implements the characters API.
 
-  Copyright (C) 2024 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -34,9 +34,9 @@
  ** ----------------------------------------------------------------- */
 
 m4_define([[[DEFINE_CHARACTER_PREDICATE]]],[[[bool
-mmux_libc_$1 (bool * result_p, mmux_schar_t ch)
+mmux_libc_$1 (bool * result_p, mmux_char_t ch)
 {
-  int	rv = $1(ch);
+  int	rv = $1(ch.value);
 
   *result_p = ((rv)? true : false);
   return false;
@@ -63,15 +63,15 @@ DEFINE_CHARACTER_PREDICATE([[[isascii]]])
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_tolower (mmux_schar_t * result_p, mmux_schar_t ch)
+mmux_libc_tolower (mmux_char_t * result_p, mmux_char_t ch)
 {
-  *result_p = tolower(ch);
+  *result_p = mmux_char(tolower(ch.value));
   return false;
 }
 bool
-mmux_libc_toupper (mmux_schar_t * result_p, mmux_schar_t ch)
+mmux_libc_toupper (mmux_char_t * result_p, mmux_char_t ch)
 {
-  *result_p = toupper(ch);
+  *result_p = mmux_char(toupper(ch.value));
   return false;
 }
 

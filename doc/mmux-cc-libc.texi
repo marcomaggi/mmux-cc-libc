@@ -1945,67 +1945,67 @@ if (mmux_libc_strnlen(&buflen, bufptr, 4096)) @{
 @section Character classes
 
 
-@deftypefun bool mmux_libc_islower (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_islower (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{islower}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isupper (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isupper (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isupper}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isalpha (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isalpha (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isalpha}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isdigit (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isdigit (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isdigit}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isalnum (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isalnum (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isalnum}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isxdigit (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isxdigit (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isxdigit}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_ispunct (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_ispunct (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{ispunct}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isspace (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isspace (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isspace}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isblank (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isblank (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isblank}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isgraph (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isgraph (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isgraph}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isprint (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isprint (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isprint}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_iscntrl (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_iscntrl (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{iscntrl}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_isascii (bool * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_isascii (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isascii}.
 @end deftypefun
 
@@ -2014,12 +2014,12 @@ if (mmux_libc_strnlen(&buflen, bufptr, 4096)) @{
 @section Character capitalisation
 
 
-@deftypefun bool mmux_libc_tolower (mmux_schar_t * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_tolower (mmux_char_t * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{tolower}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_toupper (mmux_schar_t * @var{result_p}, mmux_schar_t @var{ch})
+@deftypefun bool mmux_libc_toupper (mmux_char_t * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{toupper}.
 @end deftypefun
 
@@ -4165,6 +4165,10 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{time}
 @MmuxDefineTypePrinterFunc{socklen}
 @MmuxDefineTypePrinterFunc{rlim}
+@MmuxDefineTypePrinterFunc{ino}
+@MmuxDefineTypePrinterFunc{dev}
+@MmuxDefineTypePrinterFunc{nlink}
+@MmuxDefineTypePrinterFunc{blkcnt}
 
 @anchor{mmux_libc_dprintf_libc_fd}
 @deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_descriptor_t @var{value})
@@ -5181,7 +5185,7 @@ struct flock.l_pid = "0"
 @MmuxSetterGetter{flock, l_pid,    mmux_libc_pid_t}
 @MmuxStructDumper{flock}
 
-@deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* @var{str_p}, mmux_sint_t @var{flag})
+@deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* @var{str_p}, mmux_sshort_t @var{flag})
 Identify @var{flag} as a value for the field @code{l_type} of @objtype{mmux_libc_flock_t}; store in
 the variable referenced by @var{str_p} a pointer to a statically allocated @asciiz{} string
 representing the name of the value.

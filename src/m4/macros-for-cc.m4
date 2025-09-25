@@ -43,18 +43,18 @@ m4_dnl $3 - field type
 m4_dnl
 m4_dnl Usage example:
 m4_dnl
-m4_dnl   DEFINE_STRUCT_SETTER_GETTER(flock, l_type, mmux_sshort_t)
+m4_dnl   DEFINE_STRUCT_SETTER_GETTER(flock, l_type, sshort)
 m4_dnl
 m4_define([[[DEFINE_STRUCT_SETTER_GETTER]]],[[[bool
-mmux_libc_$2_set (mmux_libc_$1_t * const P, $3 value)
+mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_$3_t value)
 {
-  P->$2 = value;
+  P->$2 = mmux_ctype_value(value);
   return false;
 }
 bool
-mmux_libc_$2_ref ($3 * result_p, mmux_libc_$1_t const * const P)
+mmux_libc_$2_ref (mmux_$3_t * result_p, mmux_libc_$1_t const * const P)
 {
-  *result_p = P->$2;
+  *result_p = mmux_$3(P->$2);
   return false;
 }]]])
 
@@ -65,18 +65,18 @@ m4_dnl $4 - functionstem
 m4_dnl
 m4_dnl Usage example:
 m4_dnl
-m4_dnl   DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family, mmux_sshort_t, sinsix_family)
+m4_dnl   DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family, sshort, sinsix_family)
 m4_dnl
 m4_define([[[DEFINE_STRUCT_SETTER_GETTER_SPLIT]]],[[[bool
-mmux_libc_$4_set (mmux_libc_$1_t * const P, $3 value)
+mmux_libc_$4_set (mmux_libc_$1_t * const P, mmux_$3_t value)
 {
-  P->$2 = value;
+  P->$2 = mmux_ctype_value(value);
   return false;
 }
 bool
-mmux_libc_$4_ref ($3 * result_p, mmux_libc_$1_t const * const P)
+mmux_libc_$4_ref (mmux_$3_t * result_p, mmux_libc_$1_t const * const P)
 {
-  *result_p = P->$2;
+  *result_p = mmux_$4(P->$2);
   return false;
 }]]])
 

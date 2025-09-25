@@ -192,51 +192,51 @@ mmux_cc_libc_decl bool mmux_libc_dirname (mmux_asciizcp_t * result_p, mmux_ascii
  ** Characters.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_islower (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_islower (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isupper (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isupper (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isalpha (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isalpha (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isdigit (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isdigit (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isalnum (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isalnum (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isxdigit (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isxdigit (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_ispunct (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_ispunct (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isspace (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isspace (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isblank (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isblank (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isgraph (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isgraph (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isprint (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isprint (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_iscntrl (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_iscntrl (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_isascii (bool * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_isascii (bool * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_tolower (mmux_schar_t * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_tolower (mmux_char_t * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_toupper (mmux_schar_t * result_p, mmux_schar_t ch)
+mmux_cc_libc_decl bool mmux_libc_toupper (mmux_char_t * result_p, mmux_char_t ch)
   __attribute__((__nonnull__(1)));
 
 
@@ -733,7 +733,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_pid,		mmux_libc_pid_t)
 mmux_cc_libc_decl bool mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * flock_p, mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* str_p, mmux_sint_t flag)
+mmux_cc_libc_decl bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* str_p, mmux_sshort_t flag)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 
@@ -829,37 +829,37 @@ DEFINE_PRINTER_PROTO([[[uint32]]])
 DEFINE_PRINTER_PROTO([[[sint64]]])
 DEFINE_PRINTER_PROTO([[[uint64]]])
 
-DEFINE_PRINTER_PROTO([[[float]]])
-DEFINE_PRINTER_PROTO([[[double]]])
-DEFINE_PRINTER_PROTO([[[ldouble]]],		[[[MMUX_HAVE_CC_TYPE_LDOUBLE]]])
+DEFINE_PRINTER_PROTO([[[flonumfl]]])
+DEFINE_PRINTER_PROTO([[[flonumdb]]])
+DEFINE_PRINTER_PROTO([[[flonumldb]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMLDB]]])
 
-DEFINE_PRINTER_PROTO([[[float32]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT32]]])
-DEFINE_PRINTER_PROTO([[[float64]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT64]]])
-DEFINE_PRINTER_PROTO([[[float128]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT128]]])
+DEFINE_PRINTER_PROTO([[[flonumf32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF32]]])
+DEFINE_PRINTER_PROTO([[[flonumf64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF64]]])
+DEFINE_PRINTER_PROTO([[[flonumf128]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF128]]])
 
-DEFINE_PRINTER_PROTO([[[float32x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT32X]]])
-DEFINE_PRINTER_PROTO([[[float64x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT64X]]])
-DEFINE_PRINTER_PROTO([[[float128x]]],		[[[MMUX_HAVE_CC_TYPE_FLOAT128X]]])
+DEFINE_PRINTER_PROTO([[[flonumf32x]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF32X]]])
+DEFINE_PRINTER_PROTO([[[flonumf64x]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF64X]]])
+DEFINE_PRINTER_PROTO([[[flonumf128x]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMF128X]]])
 
-DEFINE_PRINTER_PROTO([[[decimal32]]],		[[[MMUX_HAVE_CC_TYPE_DECIMAL32]]])
-DEFINE_PRINTER_PROTO([[[decimal64]]],		[[[MMUX_HAVE_CC_TYPE_DECIMAL64]]])
-DEFINE_PRINTER_PROTO([[[decimal128]]],	[[[MMUX_HAVE_CC_TYPE_DECIMAL128]]])
+DEFINE_PRINTER_PROTO([[[flonumd32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMD32]]])
+DEFINE_PRINTER_PROTO([[[flonumd64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMD64]]])
+DEFINE_PRINTER_PROTO([[[flonumd128]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMD128]]])
 
-DEFINE_PRINTER_PROTO([[[complexf]]])
-DEFINE_PRINTER_PROTO([[[complexd]]])
-DEFINE_PRINTER_PROTO([[[complexld]]],		[[[MMUX_HAVE_CC_TYPE_COMPLEXLD]]])
+DEFINE_PRINTER_PROTO([[[flonumcfl]]])
+DEFINE_PRINTER_PROTO([[[flonumcdb]]])
+DEFINE_PRINTER_PROTO([[[flonumcldb]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCLDB]]])
 
-DEFINE_PRINTER_PROTO([[[complexf32]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF32]]])
-DEFINE_PRINTER_PROTO([[[complexf64]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF64]]])
-DEFINE_PRINTER_PROTO([[[complexf128]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF128]]])
+DEFINE_PRINTER_PROTO([[[flonumcf32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCF32]]])
+DEFINE_PRINTER_PROTO([[[flonumcf64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCF64]]])
+DEFINE_PRINTER_PROTO([[[flonumcf128]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCF128]]])
 
-DEFINE_PRINTER_PROTO([[[complexf32x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF32X]]])
-DEFINE_PRINTER_PROTO([[[complexf64x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF64X]]])
-DEFINE_PRINTER_PROTO([[[complexf128x]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXF128X]]])
+DEFINE_PRINTER_PROTO([[[flonumcf32x]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCF32X]]])
+DEFINE_PRINTER_PROTO([[[flonumcf64x]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCF64X]]])
+DEFINE_PRINTER_PROTO([[[flonumcf128x]]],	[[[MMUX_HAVE_CC_TYPE_FLONUMCF128X]]])
 
-DEFINE_PRINTER_PROTO([[[complexd32]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD32]]])
-DEFINE_PRINTER_PROTO([[[complexd64]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD64]]])
-DEFINE_PRINTER_PROTO([[[complexd128]]],	[[[MMUX_HAVE_CC_TYPE_COMPLEXD128]]])
+DEFINE_PRINTER_PROTO([[[flonumcd32]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCD32]]])
+DEFINE_PRINTER_PROTO([[[flonumcd64]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCD64]]])
+DEFINE_PRINTER_PROTO([[[flonumcd128]]],		[[[MMUX_HAVE_CC_TYPE_FLONUMCD128]]])
 
 DEFINE_PRINTER_PROTO([[[usize]]])
 DEFINE_PRINTER_PROTO([[[ssize]]])
@@ -951,7 +951,7 @@ mmux_cc_libc_decl bool mmux_libc_prlimit (mmux_libc_pid_t pid, mmux_sint_t resou
  ** Processes.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_pid_t pid_num)
+mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_standard_pid_t pid_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_make_pid_zero (mmux_libc_pid_t * result_p)
