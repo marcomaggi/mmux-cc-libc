@@ -95,6 +95,7 @@ EXTRA_DIST	+= \
 	src/mmux-cc-libc-internals.h.m4			\
 	src/mmux-cc-libc-constants.h.m4			\
 	src/mmux-cc-libc-functions.h.m4			\
+	src/mmux-cc-libc-generics.h.m4			\
 	src/mmux-cc-libc-characters.c.m4		\
 	src/mmux-cc-libc-errors.c.m4			\
 	src/mmux-cc-libc-file-descriptors.c.m4		\
@@ -115,6 +116,7 @@ MMUX_CC_LIBC_BUILT_SOURCES	= \
 	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-constants.h			\
 	src/mmux-cc-libc-functions.h			\
+	src/mmux-cc-libc-generics.h			\
 	src/mmux-cc-libc-characters.c			\
 	src/mmux-cc-libc-errors.c			\
 	src/mmux-cc-libc-file-descriptors.c		\
@@ -156,6 +158,7 @@ libmmux_cc_libc_la_SOURCES	= \
 	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-constants.h			\
 	src/mmux-cc-libc-functions.h			\
+	src/mmux-cc-libc-generics.h			\
 	src/mmux-cc-libc-characters.c			\
 	src/mmux-cc-libc-errors.c			\
 	src/mmux-cc-libc-file-descriptors.c		\
@@ -185,6 +188,7 @@ src/%.$(OBJEXT): \
 	src/mmux-cc-libc-internals.h		\
 	src/mmux-cc-libc-constants.h		\
 	src/mmux-cc-libc-functions.h		\
+	src/mmux-cc-libc-generics.h		\
 	src/mmux-cc-libc-config.h
 
 
@@ -653,7 +657,7 @@ tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 
 check_PROGRAMS	+= \
-	tests/test-time-time					\
+	tests/test-time-current_time				\
 	tests/test-time-localtime				\
 	tests/test-time-gmtime					\
 	tests/test-time-asctime					\
@@ -663,8 +667,8 @@ check_PROGRAMS	+= \
 	tests/test-time-strftime				\
 	tests/test-time-strptime
 
-tests_test_time_time_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-tests_test_time_time_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_time_current_time_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_curernt_time_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_localtime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_localtime_LDADD				= $(mmux_cc_libc_tests_ldadd)

@@ -245,7 +245,7 @@ bool
 mmux_libc_fd_sprint (char * ptr, mmux_usize_t len, mmux_libc_fd_t fd)
 {
   if (MMUX_LIBC_FD_MAXIMUM_STRING_REPRESENTATION_LENGTH < len.value) {
-    errno = MMUX_LIBC_EINVAL;
+    mmux_libc_errno_set_to_einval();
     return true;
   }
   return mmux_sint_sprint(ptr, len, mmux_sint(fd.value));
@@ -306,7 +306,7 @@ mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 }
 
 bool
-mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum)
+mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_libc_errno_t errnum)
 {
   mmux_asciizcp_t	errmsg;
 
@@ -386,7 +386,7 @@ mmux_libc_dprintfer_newline (void)
 
 bool
 mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname,
-		mmux_sint_t flags, mmux_mode_t mode)
+		mmux_sint_t flags, mmux_libc_mode_t mode)
 {
   int	fdval = open(pathname.value, flags.value, mode.value);
 
@@ -406,7 +406,7 @@ mmux_libc_close (mmux_libc_file_descriptor_t fd)
 }
 bool
 mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
-		  mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
+		  mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_libc_mode_t mode)
 {
   int	fdval = openat(dirfd.value, pathname.value, flags.value, mode.value);
 
@@ -1064,15 +1064,15 @@ mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * 
   /* Print l_pid. */
   {
     mmux_usize_t	required_nbytes;
-    auto		val = mmux_pid(flock_p->l_pid);
+    auto		val = mmux_libc_pid(flock_p->l_pid);
 
-    if (mmux_pid_sprint_size(&required_nbytes, val)) {
+    if (mmux_libc_pid_sprint_size(&required_nbytes, val)) {
       if (mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__)) {;};
       return true;
     } else {
       char	str[required_nbytes.value];
 
-      if (mmux_pid_sprint(str, required_nbytes, val)) {
+      if (mmux_libc_pid_sprint(str, required_nbytes, val)) {
 	if (mmux_libc_dprintfer("%s: error converting \"l_pid\" to string\n", __func__)) {;};
 	return true;
       } else {
@@ -1219,7 +1219,7 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
 
 #ifdef MMUX_HAVE_LIBC_F_GETOWN
   case MMUX_LIBC_F_GETOWN: {
-    mmux_standard_pid_t		rv = fcntl(fd.value, command.value);
+    mmux_standard_libc_pid_t	rv = fcntl(fd.value, command.value);
 
     if (-1 != rv) {
       mmux_libc_pid_t *	pid_p = parameter_p;
@@ -1243,7 +1243,7 @@ mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
     /* ------------------------------------------------------------------ */
 
   default:
-    errno = MMUX_LIBC_EINVAL;
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -1311,7 +1311,7 @@ mmux_libc_ioctl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_point
     /* ------------------------------------------------------------------ */
 
   default:
-    errno = MMUX_LIBC_EINVAL;
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -1593,7 +1593,7 @@ mmux_libc_memfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t b
   }
 }
 bool
-mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
+mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_libc_errno_t errnum)
 {
   mmux_asciizcp_t	errmsg;
 
@@ -1718,40 +1718,25 @@ DEFINE_PRINTER([[[uintmax]]])
 DEFINE_PRINTER([[[sintptr]]])
 DEFINE_PRINTER([[[uintptr]]])
 DEFINE_PRINTER([[[ptrdiff]]])
-DEFINE_PRINTER([[[mode]]])
 DEFINE_PRINTER([[[off]]])
-DEFINE_PRINTER([[[pid]]])
-DEFINE_PRINTER([[[uid]]])
-DEFINE_PRINTER([[[gid]]])
 DEFINE_PRINTER([[[wchar]]])
 DEFINE_PRINTER([[[wint]]])
 DEFINE_PRINTER([[[time]]])
-DEFINE_PRINTER([[[socklen]]])
-DEFINE_PRINTER([[[rlim]]])
-DEFINE_PRINTER([[[ino]]])
-DEFINE_PRINTER([[[dev]]])
-DEFINE_PRINTER([[[nlink]]])
-DEFINE_PRINTER([[[blkcnt]]])
+DEFINE_PRINTER([[[libc_mode]]])
+DEFINE_PRINTER([[[libc_pid]]])
+DEFINE_PRINTER([[[libc_uid]]])
+DEFINE_PRINTER([[[libc_gid]]])
+DEFINE_PRINTER([[[libc_socklen]]])
+DEFINE_PRINTER([[[libc_rlim]]])
+DEFINE_PRINTER([[[libc_ino]]])
+DEFINE_PRINTER([[[libc_dev]]])
+DEFINE_PRINTER([[[libc_nlink]]])
+DEFINE_PRINTER([[[libc_blkcnt]]])
 
 bool
 mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value)
 {
   return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
-}
-bool
-mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value)
-{
-  return mmux_pid_dprintf(fd.value, mmux_pid(value.value));
-}
-bool
-mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value)
-{
-  return mmux_uid_dprintf(fd.value, mmux_uid(value.value));
-}
-bool
-mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value)
-{
-  return mmux_gid_dprintf(fd.value, mmux_gid(value.value));
 }
 bool
 mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value)

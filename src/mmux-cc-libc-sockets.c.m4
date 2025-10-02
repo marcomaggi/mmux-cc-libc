@@ -36,126 +36,126 @@
  ** ----------------------------------------------------------------- */
 
 static void
-sa_family_to_asciiz_name(mmux_asciizcp_t * name_p, int sa_family)
+sa_family_to_asciiz_name(mmux_asciizcp_t * name_p, mmux_libc_socket_address_family_t sa_family)
 {
-  switch (sa_family) {
+  switch (sa_family.value) {
 #if (defined MMUX_HAVE_LIBC_AF_ALG)
-  case MMUX_LIBC_AF_ALG:
+  case MMUX_LIBC_VALUEOF_AF_ALG:
     *name_p = "AF_ALG";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_APPLETALK)
-  case MMUX_LIBC_AF_APPLETALK:
+  case MMUX_LIBC_VALUEOF_AF_APPLETALK:
     *name_p = "AF_APPLETALK";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_AX25)
-  case MMUX_LIBC_AF_AX25:
+  case MMUX_LIBC_VALUEOF_AF_AX25:
     *name_p = "AF_AX25";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_BLUETOOTH)
-  case MMUX_LIBC_AF_BLUETOOTH:
+  case MMUX_LIBC_VALUEOF_AF_BLUETOOTH:
     *name_p = "AF_BLUETOOTH";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_CAN)
-  case MMUX_LIBC_AF_CAN:
+  case MMUX_LIBC_VALUEOF_AF_CAN:
     *name_p = "AF_CAN";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_DECnet)
-  case MMUX_LIBC_AF_DECnet:
+  case MMUX_LIBC_VALUEOF_AF_DECnet:
     *name_p = "AF_DECnet";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_IB)
-  case MMUX_LIBC_AF_IB:
+  case MMUX_LIBC_VALUEOF_AF_IB:
     *name_p = "AF_IB";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_INET6)
-  case MMUX_LIBC_AF_INET6:
+  case MMUX_LIBC_VALUEOF_AF_INET6:
     *name_p = "AF_INET6";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_INET)
-  case MMUX_LIBC_AF_INET:
+  case MMUX_LIBC_VALUEOF_AF_INET:
     *name_p = "AF_INET";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_IPX)
-  case MMUX_LIBC_AF_IPX:
+  case MMUX_LIBC_VALUEOF_AF_IPX:
     *name_p = "AF_IPX";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_KCM)
-  case MMUX_LIBC_AF_KCM:
+  case MMUX_LIBC_VALUEOF_AF_KCM:
     *name_p = "AF_KCM";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_KEY)
-  case MMUX_LIBC_AF_KEY:
+  case MMUX_LIBC_VALUEOF_AF_KEY:
     *name_p = "AF_KEY";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_LLC)
-  case MMUX_LIBC_AF_LLC:
+  case MMUX_LIBC_VALUEOF_AF_LLC:
     *name_p = "AF_LLC";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_LOCAL)
-  case MMUX_LIBC_AF_LOCAL:
+  case MMUX_LIBC_VALUEOF_AF_LOCAL:
     *name_p = "AF_LOCAL";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_MPLS)
-  case MMUX_LIBC_AF_MPLS:
+  case MMUX_LIBC_VALUEOF_AF_MPLS:
     *name_p = "AF_MPLS";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_NETLINK)
-  case MMUX_LIBC_AF_NETLINK:
+  case MMUX_LIBC_VALUEOF_AF_NETLINK:
     *name_p = "AF_NETLINK";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_PACKET)
-  case MMUX_LIBC_AF_PACKET:
+  case MMUX_LIBC_VALUEOF_AF_PACKET:
     *name_p = "AF_PACKET";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_PPPOX)
-  case MMUX_LIBC_AF_PPPOX:
+  case MMUX_LIBC_VALUEOF_AF_PPPOX:
     *name_p = "AF_PPPOX";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_RDS)
-  case MMUX_LIBC_AF_RDS:
+  case MMUX_LIBC_VALUEOF_AF_RDS:
     *name_p = "AF_RDS";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_TIPC)
-  case MMUX_LIBC_AF_TIPC:
+  case MMUX_LIBC_VALUEOF_AF_TIPC:
     *name_p = "AF_TIPC";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_UNSPEC)
-  case MMUX_LIBC_AF_UNSPEC:
+  case MMUX_LIBC_VALUEOF_AF_UNSPEC:
     *name_p = "AF_UNSPEC";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_VSOCK)
-  case MMUX_LIBC_AF_VSOCK:
+  case MMUX_LIBC_VALUEOF_AF_VSOCK:
     *name_p = "AF_VSOCK";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_X25)
-  case MMUX_LIBC_AF_X25:
+  case MMUX_LIBC_VALUEOF_AF_X25:
     *name_p = "AF_X25";
     break;
 #endif
 #if (defined MMUX_HAVE_LIBC_AF_XDP)
-  case MMUX_LIBC_AF_XDP:
+  case MMUX_LIBC_VALUEOF_AF_XDP:
     *name_p = "AF_XDP";
     break;
 #endif
@@ -224,163 +224,163 @@ sa_ipproto_to_asciiz_name(mmux_asciizcp_t* name_p, int sa_ipproto)
 {
   switch (sa_ipproto) {
 #if (defined MMUX_HAVE_LIBC_IPPROTO_AH)
-  case MMUX_LIBC_IPPROTO_AH:
+  case MMUX_LIBC_VALUEOF_IPPROTO_AH:
     *name_p = "IPPROTO_AH";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_BEETPH)
-  case MMUX_LIBC_IPPROTO_BEETPH:
+  case MMUX_LIBC_VALUEOF_IPPROTO_BEETPH:
     *name_p = "IPPROTO_BEETPH";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_COMP)
-  case MMUX_LIBC_IPPROTO_COMP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_COMP:
     *name_p = "IPPROTO_COMP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_DCCP)
-  case MMUX_LIBC_IPPROTO_DCCP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_DCCP:
     *name_p = "IPPROTO_DCCP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_EGP)
-  case MMUX_LIBC_IPPROTO_EGP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_EGP:
     *name_p = "IPPROTO_EGP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_ENCAP)
-  case MMUX_LIBC_IPPROTO_ENCAP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_ENCAP:
     *name_p = "IPPROTO_ENCAP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_ESP)
-  case MMUX_LIBC_IPPROTO_ESP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_ESP:
     *name_p = "IPPROTO_ESP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_ETHERNET)
-  case MMUX_LIBC_IPPROTO_ETHERNET:
+  case MMUX_LIBC_VALUEOF_IPPROTO_ETHERNET:
     *name_p = "IPPROTO_ETHERNET";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_GRE)
-  case MMUX_LIBC_IPPROTO_GRE:
+  case MMUX_LIBC_VALUEOF_IPPROTO_GRE:
     *name_p = "IPPROTO_GRE";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_ICMP)
-  case MMUX_LIBC_IPPROTO_ICMP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_ICMP:
     *name_p = "IPPROTO_ICMP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_IDP)
-  case MMUX_LIBC_IPPROTO_IDP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_IDP:
     *name_p = "IPPROTO_IDP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_IGMP)
-  case MMUX_LIBC_IPPROTO_IGMP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_IGMP:
     *name_p = "IPPROTO_IGMP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_IP)
-  case MMUX_LIBC_IPPROTO_IP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_IP:
     *name_p = "IPPROTO_IP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_IPIP)
-  case MMUX_LIBC_IPPROTO_IPIP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_IPIP:
     *name_p = "IPPROTO_IPIP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_IPV6)
-  case MMUX_LIBC_IPPROTO_IPV6:
+  case MMUX_LIBC_VALUEOF_IPPROTO_IPV6:
     *name_p = "IPPROTO_IPV6";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_MPLS)
-  case MMUX_LIBC_IPPROTO_MPLS:
+  case MMUX_LIBC_VALUEOF_IPPROTO_MPLS:
     *name_p = "IPPROTO_MPLS";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_MPTCP)
-  case MMUX_LIBC_IPPROTO_MPTCP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_MPTCP:
     *name_p = "IPPROTO_MPTCP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_MTP)
-  case MMUX_LIBC_IPPROTO_MTP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_MTP:
     *name_p = "IPPROTO_MTP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_PIM)
-  case MMUX_LIBC_IPPROTO_PIM:
+  case MMUX_LIBC_VALUEOF_IPPROTO_PIM:
     *name_p = "IPPROTO_PIM";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_PUP)
-  case MMUX_LIBC_IPPROTO_PUP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_PUP:
     *name_p = "IPPROTO_PUP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_RAW)
-  case MMUX_LIBC_IPPROTO_RAW:
+  case MMUX_LIBC_VALUEOF_IPPROTO_RAW:
     *name_p = "IPPROTO_RAW";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_RSVP)
-  case MMUX_LIBC_IPPROTO_RSVP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_RSVP:
     *name_p = "IPPROTO_RSVP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_SCTP)
-  case MMUX_LIBC_IPPROTO_SCTP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_SCTP:
     *name_p = "IPPROTO_SCTP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_TCP)
-  case MMUX_LIBC_IPPROTO_TCP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_TCP:
     *name_p = "IPPROTO_TCP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_TP)
-  case MMUX_LIBC_IPPROTO_TP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_TP:
     *name_p = "IPPROTO_TP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_UDP)
-  case MMUX_LIBC_IPPROTO_UDP:
+  case MMUX_LIBC_VALUEOF_IPPROTO_UDP:
     *name_p = "IPPROTO_UDP";
     break;
 #endif
 
 #if (defined MMUX_HAVE_LIBC_IPPROTO_UDPLITE)
-  case MMUX_LIBC_IPPROTO_UDPLITE:
+  case MMUX_LIBC_VALUEOF_IPPROTO_UDPLITE:
     *name_p = "IPPROTO_UDPLITE";
     break;
 #endif
@@ -395,7 +395,18 @@ sa_ipproto_to_asciiz_name(mmux_asciizcp_t* name_p, int sa_ipproto)
  ** Struct in_addr.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(in_addr, s_addr,	mmux_uint32_t)
+bool
+mmux_libc_s_addr_set (mmux_libc_in_addr_t * const P, mmux_uint32_t value)
+{
+  P->value.s_addr = mmux_libc_ctype_value(value);
+  return false;
+}
+bool
+mmux_libc_s_addr_ref (mmux_uint32_t * result_p, mmux_libc_in_addr_t const * const P)
+{
+  *result_p = mmux_uint32(P->value.s_addr);
+  return false;
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -403,42 +414,43 @@ bool
 mmux_libc_make_in_addr (mmux_libc_in_addr_t * in_addr_p, mmux_uint32_t network_byteorder_value)
 {
   /* Stored in network byte order. */
-  in_addr_p->s_addr = network_byteorder_value;
+  in_addr_p->value.s_addr = network_byteorder_value.value;
   return false;
 }
 bool
 mmux_libc_make_in_addr_none (mmux_libc_in_addr_t * in_addr_p)
 {
   /* Stored in network byte order. */
-  in_addr_p->s_addr = INADDR_NONE;
+  in_addr_p->value.s_addr = INADDR_NONE;
   return false;
 }
 bool
 mmux_libc_make_in_addr_any (mmux_libc_in_addr_t * in_addr_p)
 {
   /* Stored in network byte order. */
-  in_addr_p->s_addr = INADDR_ANY;
+  in_addr_p->value.s_addr = INADDR_ANY;
   return false;
 }
 bool
 mmux_libc_make_in_addr_broadcast (mmux_libc_in_addr_t * in_addr_p)
 {
   /* Stored in network byte order. */
-  in_addr_p->s_addr = INADDR_BROADCAST;
+  in_addr_p->value.s_addr = INADDR_BROADCAST;
   return false;
 }
 bool
 mmux_libc_make_in_addr_loopback (mmux_libc_in_addr_t * in_addr_p)
 {
   /* Stored in network byte order. */
-  in_addr_p->s_addr = INADDR_LOOPBACK;
+  in_addr_p->value.s_addr = INADDR_LOOPBACK;
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t const * in_addr_p, mmux_asciizcp_t struct_name)
+mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t const * in_addr_p,
+			mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct in_addr";
@@ -453,14 +465,11 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
     DPRINTF(fd, "%s.s_addr = ", struct_name);
     if (mmux_libc_dprintf_uint32(fd, raw_number)) {
       return true;
-    };
+    } else {
+      auto const	provided_nchars = mmux_usize_literal(512);
+      char		str[provided_nchars.value];
 
-    {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-      char	str[IS_THIS_ENOUGH_QUESTION_MARK];
-
-      if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET, (mmux_pointer_t)in_addr_p)) {
+      if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET, (mmux_pointer_t)in_addr_p)) {
 	return true;
       }
       DPRINTF(fd, " (%s)\n", str);
@@ -478,13 +487,13 @@ mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t cons
 bool
 mmux_libc_make_insix_addr_loopback (mmux_libc_insix_addr_t * insix_addr_p)
 {
-  *insix_addr_p = in6addr_loopback;
+  insix_addr_p->value = in6addr_loopback;
   return false;
 }
 bool
 mmux_libc_make_insix_addr_any (mmux_libc_insix_addr_t * insix_addr_p)
 {
-  *insix_addr_p = in6addr_any;
+  insix_addr_p->value = in6addr_any;
   return false;
 }
 
@@ -498,11 +507,10 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
   DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)insix_addr_p);
 
   {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	256
-    char	str[IS_THIS_ENOUGH_QUESTION_MARK];
+    auto const	provided_nchars = mmux_usize_literal(512);
+    char	str[provided_nchars.value];
 
-    if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET6, (mmux_pointer_t)insix_addr_p)) {
+    if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET6, (mmux_pointer_t)insix_addr_p)) {
       return true;
     }
     DPRINTF(fd, "%s = (%s)\n", struct_name, str);
@@ -516,18 +524,19 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
  ** Struct sockaddr.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	mmux_sshort_t)
+DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	libc_socket_address_family)
 
 bool
-mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_t const * sockaddr_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd,
+			 mmux_libc_sockaddr_t const * sockaddr_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct sockaddr";
   }
 
   {
-    mmux_sshort_t	sa_family;
-    mmux_asciizcp_t	family_name = "unknown";
+    mmux_libc_socket_address_family_t	sa_family;
+    mmux_asciizcp_t			family_name = "unknown";
 
     mmux_libc_sa_family_ref(&sa_family, sockaddr_p);
     sa_family_to_asciiz_name(&family_name, sa_family);
@@ -535,9 +544,12 @@ mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_t co
   }
 
   switch (sockaddr_p->sa_family) {
-  case MMUX_LIBC_AF_INET:	return mmux_libc_sockaddr_in_dump   (fd, (mmux_libc_sockaddr_in_t    const *) sockaddr_p, struct_name);
-  case MMUX_LIBC_AF_INET6:	return mmux_libc_sockaddr_insix_dump(fd, (mmux_libc_sockaddr_insix_t const *) sockaddr_p, struct_name);
-  case MMUX_LIBC_AF_LOCAL:	return mmux_libc_sockaddr_un_dump   (fd, (mmux_libc_sockaddr_un_t    const *) sockaddr_p, struct_name);
+  case MMUX_LIBC_VALUEOF_AF_INET:
+    return mmux_libc_sockaddr_in_dump   (fd, (mmux_libc_sockaddr_in_t    const *) sockaddr_p, struct_name);
+  case MMUX_LIBC_VALUEOF_AF_INET6:
+    return mmux_libc_sockaddr_insix_dump(fd, (mmux_libc_sockaddr_insix_t const *) sockaddr_p, struct_name);
+  case MMUX_LIBC_VALUEOF_AF_LOCAL:
+    return mmux_libc_sockaddr_un_dump   (fd, (mmux_libc_sockaddr_un_t    const *) sockaddr_p, struct_name);
   default:
     return false;
   }
@@ -548,7 +560,7 @@ mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_t co
  ** Struct sockaddr_un.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_un, sun_family,	mmux_sshort_t)
+DEFINE_STRUCT_SETTER_GETTER(sockaddr_un, sun_family,	libc_socket_address_family)
 
 bool
 mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_file_system_pathname_t pathname)
@@ -580,7 +592,7 @@ mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * P)
      computation; at least this is what I observe.  Notice that the length we pass to
      functions like "bind()" must be the  one returned by "SUN_LEN()".  (Marco Maggi;
      Dec 23, 2024) */
-  return (mmux_usize_t)(SUN_LEN(P));
+  return mmux_usize(SUN_LEN(P));
 }
 
 bool
@@ -591,10 +603,12 @@ mmux_libc_sockaddr_un_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_u
   }
 
   {
-    mmux_asciizcp_t	sun_name = "unknown";
+    mmux_asciizcp_t			sun_name = "unknown";
+    mmux_libc_socket_address_family_t	family;
 
-    sa_family_to_asciiz_name(&sun_name, sockaddr_un_p->sun_family);
-    DPRINTF(fd, "%s.sun_family = \"%d\" (%s)\n", struct_name, sockaddr_un_p->sun_family, sun_name);
+    mmux_libc_sun_family_ref(&family, sockaddr_un_p);
+    sa_family_to_asciiz_name(&sun_name, family);
+    DPRINTF(fd, "%s.sun_family = \"%d\" (%s)\n", struct_name, (int)family.value, sun_name);
   }
 
   DPRINTF(fd, "%s.sun_path = \"%s\"\n", struct_name, sockaddr_un_p->sun_path);
@@ -606,8 +620,8 @@ mmux_libc_sockaddr_un_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_u
  ** Struct sockaddr_in.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_family,	mmux_sshort_t)
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_addr,	mmux_libc_in_addr_t)
+DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_family,	libc_socket_address_family)
+DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_addr,	libc_in_addr)
 
 bool
 mmux_libc_sin_port_set (mmux_libc_sockaddr_in_t * const P, mmux_host_byteorder_ushort_t host_byteorder_value)
@@ -651,12 +665,11 @@ mmux_libc_sockaddr_in_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_i
   }
 
   {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-    char	presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK];
+    auto const	provided_nchars = mmux_usize_literal(512);
+    char	presentation_buf[provided_nchars.value];
 
-    inet_ntop(sockaddr_in_p->sin_family, &(sockaddr_in_p->sin_addr), presentation_buf, IS_THIS_ENOUGH_QUESTION_MARK);
-    presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK-1] = '\0';
+    inet_ntop(sockaddr_in_p->sin_family, &(sockaddr_in_p->sin_addr), presentation_buf, provided_nchars.value);
+    presentation_buf[provided_nchars.value - 1] = '\0';
     DPRINTF(fd, "%s.sin_addr = \"%s\"\n", struct_name, presentation_buf);
   }
 
@@ -669,7 +682,7 @@ mmux_libc_sockaddr_in_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_i
  ** Struct sockaddr_in6.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family,   mmux_sshort_t,          sinsix_family)
+DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family,   libc_socket_address_family, sinsix_family)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_addr,     mmux_libc_insix_addr_t, sinsix_addr)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_flowinfo, mmux_uint32_t,          sinsix_flowinfo)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_scope_id, mmux_uint32_t,          sinsix_scope_id)
@@ -723,12 +736,11 @@ mmux_libc_sockaddr_insix_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockadd
   }
 
   {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-    char	presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK];
+    auto const	provided_nchars = mmux_usize_literal(512);
+    char	presentation_buf[provided_nchars.value];
 
-    inet_ntop(sockaddr_in6_p->sin6_family, &(sockaddr_in6_p->sin6_addr), presentation_buf, IS_THIS_ENOUGH_QUESTION_MARK);
-    presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK-1] = '\0';
+    inet_ntop(sockaddr_in6_p->sin6_family, &(sockaddr_in6_p->sin6_addr), presentation_buf, provided_nchars);
+    presentation_buf[provided_nchars.value - 1] = '\0';
     DPRINTF(fd, "%s.sin6_addr = \"%s\"\n", struct_name, presentation_buf);
   }
 
@@ -909,11 +921,11 @@ mmux_libc_addrinfo_dump (mmux_libc_file_descriptor_t fd, mmux_libc_addrinfo_t co
 
   /* Inspect the field: ai_addr, it is a pointer to "struct sockaddr" */
   {
-    size_t	buflen = 1024;
-    char	bufstr[buflen];
+    auto const	provided_nchars = mmux_usize_literal(512);
+    char	bufstr[provided_nchars];
 
-    memset(bufstr, '\0', buflen);
-    inet_ntop(addrinfo_p->ai_family, &(addrinfo_p->ai_addr), bufstr, buflen);
+    mmux_libc_memzero(bufstr, provided_nchars);
+    inet_ntop(addrinfo_p->ai_family, &(addrinfo_p->ai_addr), bufstr, provided_nchars);
 
     DPRINTF(fd, "%s.ai_addr = \"%p\" (%s)\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_addr), bufstr);
   }
@@ -987,13 +999,13 @@ mmux_libc_hostent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_hostent_t cons
   DPRINTF(fd, "%s.h_length = \"%d\"\n", struct_name, hostent_p->h_length);
 
   if (NULL != hostent_p->h_addr_list) {
-    for (; hostent_p->h_addr_list[addr_list_idx]; ++addr_list_idx) {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-      char	presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK];
+    auto const	provided_nchars = mmux_usize_literal(512);
 
-      inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr_list[addr_list_idx], presentation_buf, IS_THIS_ENOUGH_QUESTION_MARK);
-      presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK-1] = '\0';
+    for (; hostent_p->h_addr_list[addr_list_idx]; ++addr_list_idx) {
+      char	presentation_buf[provided_nchars.value];
+
+      inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr_list[addr_list_idx], presentation_buf, provided_nchars);
+      presentation_buf[provided_nchars.value - 1] = '\0';
       DPRINTF(fd, "%s.h_addr_list[%d] = \"%s\"\n", struct_name, addr_list_idx, presentation_buf);
     }
   }
@@ -1212,18 +1224,17 @@ mmux_libc_inet_pton (mmux_pointer_t ouput_addr_p,
 }
 bool
 mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-		     mmux_sint_t input_af_family, mmux_pointer_t input_addr_p)
+		     mmux_libc_socket_address_family_t input_af_family, mmux_pointer_t input_addr_p)
 {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	128
-  char			presentation[IS_THIS_ENOUGH_QUESTION_MARK];
-  mmux_asciizcp_t	rv = inet_ntop(input_af_family, input_addr_p, presentation, IS_THIS_ENOUGH_QUESTION_MARK);
+  auto const		provided_nchars = mmux_usize_literal(512);
+  char			presentation[provided_nchars.value];
+  mmux_asciizcp_t	rv = inet_ntop(input_af_family.value, input_addr_p, presentation, provided_nchars.value);
 
   if (NULL != rv) {
-    mmux_usize_t	presentation_len = strlen(presentation);
+    auto	presentation_generated_nchars = mmux_usize_strlen(presentation);
 
-    if (ouput_presentation_provided_nchars > presentation_len) {
-      strncpy(ouput_presentation_p, presentation, ouput_presentation_provided_nchars);
+    if (mmux_ctype_greater(ouput_presentation_provided_nchars, presentation_generated_nchars)) {
+      mmux_libc_strncpy(ouput_presentation_p, presentation, ouput_presentation_provided_nchars);
       return false;
     }
   }

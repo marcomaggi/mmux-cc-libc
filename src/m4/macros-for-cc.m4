@@ -48,7 +48,7 @@ m4_dnl
 m4_define([[[DEFINE_STRUCT_SETTER_GETTER]]],[[[bool
 mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_$3_t value)
 {
-  P->$2 = mmux_ctype_value(value);
+  P->$2 = mmux_libc_ctype_value(value);
   return false;
 }
 bool

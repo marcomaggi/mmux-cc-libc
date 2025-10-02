@@ -51,12 +51,15 @@ typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
 typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
 typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
 
+typedef struct mmux_libc_errno_t			{ mmux_sint_t;  } mmux_libc_errno_t;
+typedef struct mmux_libc_process_exit_status_t		{ mmux_sint_t;  } mmux_libc_process_exit_status_t;
+typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;  } mmux_libc_socket_address_family_t;
+typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
+typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
+
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
 typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
-typedef struct mmux_libc_gid_t				{ mmux_gid_t;	} mmux_libc_gid_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
-typedef struct mmux_libc_pid_t				{ mmux_pid_t;	} mmux_libc_pid_t;
-typedef struct mmux_libc_uid_t				{ mmux_uid_t;	} mmux_libc_uid_t;
 typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t; } mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirstream_t			{ mmux_pointer_t  value; } mmux_libc_dirstream_t;
 
@@ -219,6 +222,7 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc-functions.h>
+#include <mmux-cc-libc-generics.h>
 
 #ifdef __cplusplus
 } // extern "C"

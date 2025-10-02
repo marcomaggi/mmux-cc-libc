@@ -34,7 +34,7 @@
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p, mmux_sint_t signum)
+mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p, mmux_standard_sint_t signum)
 {
   if (0 <= signum) {
     result_p->value = signum;
@@ -53,11 +53,11 @@ mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t one, mmux_l
   }
 }
 bool
-mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * p_value, char const * s_value, char const * who)
+mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
 {
   mmux_libc_interprocess_signal_t	signum;
 
-  if (mmux_sint_parse(&signum.value, s_value, who)) {
+  if (mmux_sint_parse(&signum, s_value, who)) {
     return true;
   }
   *p_value = signum;
@@ -66,23 +66,17 @@ mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * p_value, 
 bool
 mmux_libc_interprocess_signal_sprint (char * ptr, mmux_usize_t len, mmux_libc_interprocess_signal_t ipxsignal)
 {
-  if (MMUX_LIBC_INTERPROCESS_SIGNAL_MAXIMUM_STRING_REPRESENTATION_LENGTH < len) {
-    errno = MMUX_LIBC_EINVAL;
+  if (MMUX_LIBC_INTERPROCESS_SIGNAL_MAXIMUM_STRING_REPRESENTATION_LENGTH < len.value) {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
+  } else {
+    return mmux_sint_sprint(ptr, len, mmux_sint(ipxsignal.value));
   }
-  return mmux_sint_sprint(ptr, len, ipxsignal.value);
 }
 bool
 mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_interprocess_signal_t ipxsig MMUX_CC_LIBC_UNUSED)
 {
-  mmux_sint_t	required_nchars = mmux_sint_sprint_size(ipxsig.value);
-
-  if (0 <= required_nchars) {
-    *required_nchars_p = required_nchars;
-    return false;
-  } else {
-    return true;
-  }
+  return mmux_sint_sprint_size(required_nchars_p, mmux_sint(ipxsig.value));
 }
 
 
@@ -93,7 +87,7 @@ mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * required_nchars_p, mmu
 bool
 mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal)
 {
-  mmux_sint_t	rv = raise(ipxsignal.value);
+  mmux_standard_sint_t	rv = raise(ipxsignal.value);
 
   if (rv) {
     return true;
@@ -105,9 +99,9 @@ mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal)
 /* ------------------------------------------------------------------ */
 
 static bool
-mmux_p_libc_kill (mmux_sint_t pidnum, mmux_libc_interprocess_signal_t ipxsignal)
+mmux_p_libc_kill (mmux_standard_sint_t pidnum, mmux_libc_interprocess_signal_t ipxsignal)
 {
-  mmux_sint_t	rv = kill(pidnum, ipxsignal.value);
+  mmux_standard_sint_t	rv = kill(pidnum, ipxsignal.value);
 
   if (-1 == rv) {
     return true;
@@ -143,7 +137,7 @@ mmux_libc_tgkill (mmux_libc_pid_t pid, mmux_libc_pid_t tid, mmux_libc_interproce
 /* This is Linux-specific. */
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_TGKILL]]],[[[
-  mmux_sint_t	rv = tgkill(pid.value, tid.value, ipxsignal.value);
+  mmux_standard_sint_t	rv = tgkill(pid.value, tid.value, ipxsignal.value);
 
   if (-1 == rv) {
     return true;
@@ -281,7 +275,7 @@ mmux_libc_signal (mmux_libc_sighandler_t ** result_p, mmux_libc_interprocess_sig
 bool
 mmux_libc_pause (void)
 {
-  mmux_sint_t	rv = pause();
+  mmux_standard_sint_t	rv = pause();
 
   if (-1 == rv) {
     return true;

@@ -28,7 +28,7 @@
 
 #include <mmux-cc-libc-internals.h>
 
-typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
+typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_libc_mode_t mode);
 
 #define DPRINTF(TEMPLATE,...)	if (mmux_libc_dprintf(TEMPLATE,__VA_ARGS__)) { return true; }
 
@@ -40,7 +40,7 @@ typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_mode_t mode);
 bool
 mmux_libc_getcwd (mmux_asciizp_t bufptr, mmux_usize_t buflen)
 {
-  mmux_asciizp_t	rv = getcwd(bufptr, buflen);
+  mmux_asciizp_t	rv = getcwd(bufptr, buflen.value);
 
   return (rv)? false : true;
 }
@@ -74,14 +74,14 @@ mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
 bool
 mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
 {
-  mmux_sint_t	rv = chdir(dirptn.value);
+  int	rv = chdir(dirptn.value);
 
   return (rv)? true : false;
 }
 bool
 mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
 {
-  mmux_sint_t	rv = fchdir(fd.value);
+  int	rv = fchdir(fd.value);
 
   return (rv)? true : false;
 }
@@ -94,14 +94,14 @@ mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
 bool
 mmux_libc_chroot (mmux_libc_file_system_pathname_t ptn)
 {
-  mmux_sint_t	rv = chroot(ptn.value);
+  int	rv = chroot(ptn.value);
 
   return (rv)? true : false;
 }
 bool
 mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
 {
-  mmux_sint_t	rv = syscall(SYS_pivot_root, new_root_ptn, put_old_ptn.value);
+  int	rv = syscall(SYS_pivot_root, new_root_ptn, put_old_ptn.value);
 
   return (rv)? true : false;
 }
@@ -120,7 +120,7 @@ mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
 bool
 mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
 {
-  *result_p = (mmux_uintmax_t)(DE->d_fileno);
+  *result_p = mmux_uintmax(DE->d_fileno);
   return false;
 }
 bool
@@ -140,7 +140,11 @@ mmux_libc_dirent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_dirent_t const 
     mmux_libc_d_fileno_ref (&fileno, dirent_p);
 
     DPRINTF(fd, "%s->d_name   = %s\n",  struct_name, name);
-    DPRINTF(fd, "%s->d_fileno = %lu\n", struct_name, (mmux_usize_t)fileno);
+    DPRINTF(fd, "%s->d_fileno = ", struct_name);
+    if (mmux_ctype_dprintf(2, fileno)) {
+      return true;
+    }
+    DPRINTF(fd, "\n")
   }
   return false;
 }
@@ -174,7 +178,7 @@ mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_descriptor
 bool
 mmux_libc_closedir (mmux_libc_dirstream_t DS)
 {
-  mmux_sint_t	rv = closedir(DS.value);
+  int	rv = closedir(DS.value);
 
   return (0 == rv)? false : true;
 }
@@ -205,7 +209,7 @@ mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
 bool
 mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t dirstream)
 {
-  mmux_sint_t	rv = dirfd(dirstream.value);
+  int	rv = dirfd(dirstream.value);
 
   if (-1 == rv) {
     return true;
@@ -223,7 +227,7 @@ mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream)
 bool
 mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
 {
-  mmux_slong_t	rv = telldir(dirstream.value);
+  mmux_standard_slong_t	rv = telldir(dirstream.value);
 
   result_p->value = rv;
   return false;
@@ -252,7 +256,7 @@ mmux_libc_linkat (mmux_libc_file_descriptor_t oldfd, mmux_libc_file_system_pathn
 		  mmux_libc_file_descriptor_t newfd, mmux_libc_file_system_pathname_t newname,
 		  mmux_sint_t flags)
 {
-  int	rv = linkat(oldfd.value, oldname.value, newfd.value, newname.value, flags);
+  int	rv = linkat(oldfd.value, oldname.value, newfd.value, newname.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -270,15 +274,15 @@ bool
 mmux_libc_readlink (mmux_usize_t * required_nbytes_p, mmux_libc_file_system_pathname_t linkname,
 		    mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
 {
-  mmux_ssize_t	required_nbytes = readlink(linkname.value, buffer, provided_nbytes);
+  mmux_standard_ssize_t	required_nbytes = readlink(linkname.value, buffer, provided_nbytes.value);
 
   if (required_nbytes < 0) {
     return true;
   } else {
-    mmux_usize_t	required_nbytes1 = required_nbytes;
+    mmux_standard_usize_t	required_nbytes1 = required_nbytes;
 
-    if (required_nbytes1 == provided_nbytes) {
-      *required_nbytes_p = required_nbytes1;
+    if (required_nbytes1 == provided_nbytes.value) {
+      *required_nbytes_p = mmux_usize(required_nbytes1);
       return false;
     } else {
       return false;
@@ -288,26 +292,27 @@ mmux_libc_readlink (mmux_usize_t * required_nbytes_p, mmux_libc_file_system_path
 bool
 mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t linkname)
 {
-  mmux_usize_t	provided_nbytes_with_nul = 0;
+  auto	provided_nbytes_with_nul = mmux_usize_constant_zero();
 
   while (true) {
-    provided_nbytes_with_nul += 1024;
+    provided_nbytes_with_nul = mmux_ctype_add(provided_nbytes_with_nul, mmux_usize_literal(1024));
     {
-      char		buffer[provided_nbytes_with_nul];
+      char		buffer[provided_nbytes_with_nul.value];
+      auto		provided_nbytes_no_nul = mmux_ctype_sub(provided_nbytes_with_nul, mmux_usize_constant_one());
       mmux_usize_t	nbytes_done_no_nul;
 
       mmux_libc_memzero(buffer, provided_nbytes_with_nul);
-      if (mmux_libc_readlink(&nbytes_done_no_nul, linkname, buffer, provided_nbytes_with_nul-1)) {
+      if (mmux_libc_readlink(&nbytes_done_no_nul, linkname, buffer, provided_nbytes_no_nul)) {
 	return true;
-      } else if (nbytes_done_no_nul == provided_nbytes_with_nul) {
+      } else if (mmux_ctype_equal(nbytes_done_no_nul, provided_nbytes_with_nul)) {
 	continue;
       } else {
 	mmux_asciizp_t	asciiz_pathname;
 
 	if (mmux_libc_malloc(&asciiz_pathname, provided_nbytes_with_nul)) {
 	  return true;
-	};
-	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul);
+	}
+	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul.value);
 	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
 						result_pathname_p, asciiz_pathname)) {
 	  mmux_libc_free(asciiz_pathname);
@@ -324,15 +329,15 @@ mmux_libc_readlinkat_pathname_asciiz (mmux_usize_t * required_nbytes_p, mmux_lib
 				      mmux_asciizcp_t linkname_asciiz,
 				      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
 {
-  mmux_ssize_t	required_nbytes = readlinkat(dirfd.value, linkname_asciiz, buffer, provided_nbytes);
+  mmux_standard_ssize_t	required_nbytes = readlinkat(dirfd.value, linkname_asciiz, buffer, provided_nbytes.value);
 
   if (required_nbytes < 0) {
     return true;
   } else {
-    mmux_usize_t	required_nbytes1 = required_nbytes;
+    auto	required_nbytes_unsigned = mmux_usize(required_nbytes);
 
-    if (required_nbytes1 == provided_nbytes) {
-      *required_nbytes_p = required_nbytes1;
+    if (mmux_ctype_equal(required_nbytes_unsigned, provided_nbytes)) {
+      *required_nbytes_p = required_nbytes_unsigned;
       return false;
     } else {
       return false;
@@ -343,18 +348,20 @@ static bool
 mmux_libc_readlinkat_malloc_pathname_asciiz (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_descriptor_t dirfd,
 					     mmux_asciizcp_t linkname_asciiz)
 {
-  mmux_usize_t	provided_nbytes_with_nul = 0;
+  auto	provided_nbytes_with_nul = mmux_usize_constant_zero();
 
   while (true) {
-    provided_nbytes_with_nul += 1024;
+    provided_nbytes_with_nul = mmux_ctype_add(provided_nbytes_with_nul, mmux_usize_literal(1024));
     {
-      char		buffer[provided_nbytes_with_nul];
+      auto		provided_nbytes_no_nul = mmux_ctype_decr(provided_nbytes_with_nul);
       mmux_usize_t	required_nbytes_no_nul;
+      char		buffer[provided_nbytes_with_nul.value];
 
-      memset(buffer, '\0', provided_nbytes_with_nul);
-      if (mmux_libc_readlinkat_pathname_asciiz(&required_nbytes_no_nul, dirfd, linkname_asciiz, buffer, provided_nbytes_with_nul-1)) {
+      mmux_libc_memzero(buffer, provided_nbytes_with_nul);
+      if (mmux_libc_readlinkat_pathname_asciiz(&required_nbytes_no_nul, dirfd, linkname_asciiz, buffer,
+					       provided_nbytes_no_nul)) {
 	return true;
-      } else if (required_nbytes_no_nul == provided_nbytes_with_nul) {
+      } else if (mmux_ctype_equal(required_nbytes_no_nul, provided_nbytes_with_nul)) {
 	continue;
       } else {
 	mmux_asciizp_t	asciiz_pathname;
@@ -362,7 +369,7 @@ mmux_libc_readlinkat_malloc_pathname_asciiz (mmux_libc_file_system_pathname_t * 
 	if (mmux_libc_malloc(&asciiz_pathname, provided_nbytes_with_nul)) {
 	  return true;
 	};
-	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul);
+	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul.value);
 	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
 						result_pathname_p, asciiz_pathname)) {
 	  mmux_libc_free(asciiz_pathname);
@@ -448,7 +455,7 @@ mmux_libc_unlink (mmux_libc_file_system_pathname_t pathname)
 bool
 mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags)
 {
-  int	rv = unlinkat(dirfd.value, pathname.value, flags);
+  int	rv = unlinkat(dirfd.value, pathname.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -488,7 +495,7 @@ mmux_libc_renameat2 (mmux_libc_file_descriptor_t olddirfd, mmux_libc_file_system
 		     mmux_uint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
-  int	rv = renameat2(olddirfd.value, oldname.value, newdirfd.value, newname.value, flags);
+  int	rv = renameat2(olddirfd.value, oldname.value, newdirfd.value, newname.value, flags.value);
 
   return ((0 == rv)? false : true);
 ]]])
@@ -500,16 +507,16 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = mkdir(pathname.value, mode);
+  int	rv = mkdir(pathname.value, mode.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = mkdirat(dirfd.value, pathname.value, mode);
+  int	rv = mkdirat(dirfd.value, pathname.value, mode.value);
 
   return ((0 == rv)? false : true);
 }
@@ -544,17 +551,17 @@ bool
 mmux_libc_fchownat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
 		    mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
 {
-  int	rv = fchownat(dirfd.value, pathname.value, uid.value, gid.value, flags);
+  int	rv = fchownat(dirfd.value, pathname.value, uid.value, gid.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
 {
-  mmux_sint_t	rv;
+  int	rv;
 
-  flags |= MMUX_LIBC_AT_EMPTY_PATH;
-  rv = fchownat(fd.value, "", uid.value, gid.value, flags);
+  flags.value |= MMUX_LIBC_AT_EMPTY_PATH;
+  rv = fchownat(fd.value, "", uid.value, gid.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -565,59 +572,59 @@ mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_lib
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_umask (mmux_mode_t * old_mask_p, mmux_mode_t new_mask)
+mmux_libc_umask (mmux_libc_mode_t * old_mask_p, mmux_libc_mode_t new_mask)
 {
-  *old_mask_p = umask(new_mask);
+  *old_mask_p = mmux_libc_mode(umask(new_mask.value));
   return false;
 }
 bool
-mmux_libc_getumask (mmux_mode_t * current_mask_p)
+mmux_libc_getumask (mmux_libc_mode_t * current_mask_p)
 {
-  mmux_mode_t		current_mask = umask(0);
+  auto		current_mask = mmux_libc_mode(umask(0));
 
-  umask(current_mask);
+  umask(current_mask.value);
   *current_mask_p = current_mask;
   return false;
 }
 bool
-mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = chmod(pathname.value, mode);
+  int	rv = chmod(pathname.value, mode.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fchmod (mmux_libc_file_descriptor_t fd, mmux_mode_t mode)
+mmux_libc_fchmod (mmux_libc_file_descriptor_t fd, mmux_libc_mode_t mode)
 {
-  int	rv = fchmod(fd.value, mode);
+  int	rv = fchmod(fd.value, mode.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode, mmux_sint_t flags)
+mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
+		    mmux_libc_mode_t mode, mmux_sint_t flags)
 {
-  int	rv = fchmodat(dirfd.value, pathname.value, mode, flags);
+  int	rv = fchmodat(dirfd.value, pathname.value, mode.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
 {
-  mmux_sint_t	rv;
+  int	rv;
 
-  mmux_libc_errno_set(0);
-  rv = access(pathname.value, how);
+  mmux_libc_errno_clear();
+  rv = access(pathname.value, how.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
     return false;
   } else {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t		errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (MMUX_LIBC_EACCES == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_EACCES, errnum)) {
       /* The specified access is NOT permitted. */
-      mmux_libc_errno_set(0);
       *access_is_permitted_p = false;
       return false;
     } else {
@@ -630,21 +637,20 @@ bool
 mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
 		     mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
 {
-  mmux_sint_t	rv;
+  int	rv;
 
-  mmux_libc_errno_set(0);
-  rv = faccessat(dirfd.value, pathname.value, how, flags);
+  mmux_libc_errno_clear();
+  rv = faccessat(dirfd.value, pathname.value, how.value, flags.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
     return false;
   } else {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t	errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (MMUX_LIBC_EACCES == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_EACCES, errnum)) {
       /* The specified access is NOT permitted. */
-      mmux_libc_errno_set(0);
       *access_is_permitted_p = false;
       return false;
     } else {
@@ -657,21 +663,20 @@ bool
 mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
 		      mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
 {
-  mmux_sint_t	rv;
+  int	rv;
 
-  mmux_libc_errno_set(0);
-  rv = syscall(SYS_faccessat2, dirfd.value, pathname.value, how, flags);
+  mmux_libc_errno_clear();
+  rv = syscall(SYS_faccessat2, dirfd.value, pathname.value, how.value, flags.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
     return false;
   } else {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t	errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (MMUX_LIBC_EACCES == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_EACCES, errnum)) {
       /* The specified access is NOT permitted. */
-      mmux_libc_errno_set(0);
       *access_is_permitted_p = false;
       return false;
     } else {
@@ -689,14 +694,14 @@ mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_file_descriptor_t 
 bool
 mmux_libc_truncate (mmux_libc_file_system_pathname_t pathname, mmux_off_t len)
 {
-  int	rv = truncate(pathname.value, len);
+  int	rv = truncate(pathname.value, len.value);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux_off_t len)
 {
-  int	rv = ftruncate(fd.value, len);
+  int	rv = ftruncate(fd.value, len.value);
 
   return ((0 == rv)? false : true);
 }
@@ -707,27 +712,27 @@ mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux_off_t len)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_st_mode_set (mmux_libc_stat_t * stat_p, mmux_mode_t value)
+mmux_libc_st_mode_set (mmux_libc_stat_t * stat_p, mmux_libc_mode_t value)
 {
-  stat_p->st_mode = value;
+  stat_p->st_mode = value.value;
   return false;
 }
 bool
-mmux_libc_st_ino_set (mmux_libc_stat_t * stat_p, mmux_uintmax_t value)
+mmux_libc_st_ino_set (mmux_libc_stat_t * stat_p, mmux_libc_ino_t value)
 {
-  stat_p->st_ino = (ino_t)value;
+  stat_p->st_ino = value.value;
   return false;
 }
 bool
-mmux_libc_st_dev_set (mmux_libc_stat_t * stat_p, mmux_uintmax_t value)
+mmux_libc_st_dev_set (mmux_libc_stat_t * stat_p, mmux_libc_dev_t value)
 {
-  stat_p->st_dev = (dev_t)value;
+  stat_p->st_dev = value.value;
   return false;
 }
 bool
-mmux_libc_st_nlink_set (mmux_libc_stat_t * stat_p, mmux_uintmax_t value)
+mmux_libc_st_nlink_set (mmux_libc_stat_t * stat_p, mmux_libc_nlink_t value)
 {
-  stat_p->st_nlink = (nlink_t)value;
+  stat_p->st_nlink = value.value;
   return false;
 }
 bool
@@ -745,82 +750,82 @@ mmux_libc_st_gid_set (mmux_libc_stat_t * stat_p, mmux_libc_gid_t value)
 bool
 mmux_libc_st_size_set (mmux_libc_stat_t * stat_p, mmux_off_t value)
 {
-  stat_p->st_size = value;
+  stat_p->st_size = value.value;
   return false;
 }
 bool
 mmux_libc_st_atime_sec_set (mmux_libc_stat_t * stat_p, mmux_time_t value)
 {
-  stat_p->st_atim.tv_sec = value;
+  stat_p->st_atim.tv_sec = value.value;
   return false;
 }
 bool
 mmux_libc_st_atime_nsec_set (mmux_libc_stat_t * stat_p, mmux_slong_t value)
 {
-  stat_p->st_atim.tv_nsec = value;
+  stat_p->st_atim.tv_nsec = value.value;
   return false;
 }
 bool
 mmux_libc_st_mtime_sec_set (mmux_libc_stat_t * stat_p, mmux_time_t value)
 {
-  stat_p->st_atim.tv_sec = value;
+  stat_p->st_atim.tv_sec = value.value;
   return false;
 }
 bool
 mmux_libc_st_mtime_nsec_set (mmux_libc_stat_t * stat_p, mmux_slong_t value)
 {
-  stat_p->st_atim.tv_nsec = value;
+  stat_p->st_atim.tv_nsec = value.value;
   return false;
 }
 bool
 mmux_libc_st_ctime_sec_set (mmux_libc_stat_t * stat_p, mmux_time_t value)
 {
-  stat_p->st_atim.tv_sec = value;
+  stat_p->st_atim.tv_sec = value.value;
   return false;
 }
 bool
 mmux_libc_st_ctime_nsec_set (mmux_libc_stat_t * stat_p, mmux_slong_t value)
 {
-  stat_p->st_atim.tv_nsec = value;
+  stat_p->st_atim.tv_nsec = value.value;
   return false;
 }
 bool
-mmux_libc_st_blocks_set (mmux_libc_stat_t * stat_p, mmux_uintmax_t value)
+mmux_libc_st_blocks_set (mmux_libc_stat_t * stat_p, mmux_libc_blkcnt_t value)
 {
-  stat_p->st_blocks = (blkcnt_t)value;
+  stat_p->st_blocks = value.value;
   return false;
 }
 bool
 mmux_libc_st_blksize_set (mmux_libc_stat_t * stat_p, mmux_uint_t value)
 {
-  stat_p->st_blksize = value;
+  stat_p->st_blksize = value.value;
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_st_mode_ref (mmux_mode_t * value_p,  mmux_libc_stat_t const * stat_p)
+mmux_libc_st_mode_ref (mmux_libc_mode_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_mode;
+  *value_p = mmux_libc_mode(stat_p->st_mode);
   return false;
 }
 bool
-mmux_libc_st_ino_ref (mmux_uintmax_t * value_p,  mmux_libc_stat_t const * stat_p)
+mmux_libc_st_ino_ref (mmux_libc_ino_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = (mmux_uintmax_t)(stat_p->st_ino);
+  *value_p = mmux_libc_ino(stat_p->st_ino);
   return false;
 }
 bool
-mmux_libc_st_dev_ref (mmux_uintmax_t * value_p,  mmux_libc_stat_t const * stat_p)
+mmux_libc_st_dev_ref (mmux_libc_dev_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = (mmux_uintmax_t)(stat_p->st_dev);
+  *value_p = mmux_libc_dev(stat_p->st_dev);
   return false;
 }
 bool
-mmux_libc_st_nlink_ref (mmux_uintmax_t * value_p,  mmux_libc_stat_t const * stat_p)
+mmux_libc_st_nlink_ref (mmux_libc_nlink_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = (mmux_uintmax_t)(stat_p->st_nlink);
+  *value_p = mmux_libc_nlink(stat_p->st_nlink);
   return false;
 }
 bool
@@ -836,55 +841,55 @@ mmux_libc_st_gid_ref (mmux_libc_gid_t * value_p,  mmux_libc_stat_t const * stat_
 bool
 mmux_libc_st_size_ref (mmux_off_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_size;
+  *value_p = mmux_off(stat_p->st_size);
   return false;
 }
 bool
 mmux_libc_st_atime_sec_ref (mmux_time_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_sec;
+  *value_p = mmux_time(stat_p->st_atim.tv_sec);
   return false;
 }
 bool
 mmux_libc_st_atime_nsec_ref (mmux_slong_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_nsec;
+  *value_p = mmux_slong(stat_p->st_atim.tv_nsec);
   return false;
 }
 bool
 mmux_libc_st_mtime_sec_ref (mmux_time_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_sec;
+  *value_p = mmux_time(stat_p->st_atim.tv_sec);
   return false;
 }
 bool
 mmux_libc_st_mtime_nsec_ref (mmux_slong_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_nsec;
+  *value_p = mmux_slong(stat_p->st_atim.tv_nsec);
   return false;
 }
 bool
 mmux_libc_st_ctime_sec_ref (mmux_time_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_sec;
+  *value_p = mmux_time(stat_p->st_atim.tv_sec);
   return false;
 }
 bool
 mmux_libc_st_ctime_nsec_ref (mmux_slong_t * value_p,  mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_atim.tv_nsec;
+  *value_p = mmux_slong(stat_p->st_atim.tv_nsec);
   return false;
 }
 bool
-mmux_libc_st_blocks_ref (mmux_uintmax_t * value_p, mmux_libc_stat_t const * stat_p)
+mmux_libc_st_blocks_ref (mmux_libc_blkcnt_t * value_p, mmux_libc_stat_t const * stat_p)
 {
-  *value_p = (mmux_uintmax_t)(stat_p->st_blocks);
+  *value_p = mmux_libc_blkcnt(stat_p->st_blocks);
   return false;
 }
 bool
 mmux_libc_st_blksize_ref (mmux_uint_t * value_p, mmux_libc_stat_t const * stat_p)
 {
-  *value_p = stat_p->st_blksize;
+  *value_p = mmux_uint(stat_p->st_blksize);
   return false;
 }
 
@@ -904,7 +909,7 @@ _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
 _Pragma("GCC diagnostic pop")
     return true;
   } else {
-    mmux_char_t		bufptr[required_nbytes_including_nil];
+    char		bufptr[required_nbytes_including_nil.value];
     mmux_usize_t	required_nbytes_without_zero;
 
 _Pragma("GCC diagnostic push")
@@ -927,169 +932,257 @@ mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * co
 
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)stat_p);
 
+  /* Dump the field st_mode. */
   {
-    int		len = mmux_mode_sprint_size(stat_p->st_mode);
-    char	str[len];
+    auto		val = mmux_libc_mode(stat_p->st_mode);
+    mmux_usize_t	required_nbytes;
 
-    mmux_mode_sprint(str, len, stat_p->st_mode);
-    DPRINTF(fd, "%s->st_mode = %s", struct_name, str);
-    {
-      mmux_asciizcp_t	type;
+    if (mmux_libc_mode_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
 
-      if (S_ISDIR(stat_p->st_mode)) {
-	type = "directory";
-      } else if (S_ISCHR(stat_p->st_mode)) {
-	type = "character special device";
-      } else if (S_ISBLK(stat_p->st_mode)) {
-	type = "block special device";
-      } else if (S_ISREG(stat_p->st_mode)) {
-	type = "regular file";
-      } else if (S_ISLNK(stat_p->st_mode)) {
-	type = "symbolic link";
-      } else if (S_ISSOCK(stat_p->st_mode)) {
-	type = "socket";
-      } else if (S_ISFIFO(stat_p->st_mode)) {
-	type = "FIFO";
-      } else if (S_TYPEISMQ(stat_p)) {
-	type = "message queue";
-      } else if (S_TYPEISSEM(stat_p)) {
-	type = "semaphore object";
-      } else if (S_TYPEISSHM(stat_p)) {
-	type = "shared memory object";
-      } else {
-	type = "unknown device";
+      mmux_libc_mode_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_mode = %s", struct_name, str);
+      {
+	mmux_asciizcp_t	type;
+
+	if (S_ISDIR(stat_p->st_mode)) {
+	  type = "directory";
+	} else if (S_ISCHR(stat_p->st_mode)) {
+	  type = "character special device";
+	} else if (S_ISBLK(stat_p->st_mode)) {
+	  type = "block special device";
+	} else if (S_ISREG(stat_p->st_mode)) {
+	  type = "regular file";
+	} else if (S_ISLNK(stat_p->st_mode)) {
+	  type = "symbolic link";
+	} else if (S_ISSOCK(stat_p->st_mode)) {
+	  type = "socket";
+	} else if (S_ISFIFO(stat_p->st_mode)) {
+	  type = "FIFO";
+	} else if (S_TYPEISMQ(stat_p)) {
+	  type = "message queue";
+	} else if (S_TYPEISSEM(stat_p)) {
+	  type = "semaphore object";
+	} else if (S_TYPEISSHM(stat_p)) {
+	  type = "shared memory object";
+	} else {
+	  type = "unknown device";
+	}
+	DPRINTF(fd, " (%s)\n", type);
       }
-      DPRINTF(fd, " (%s)\n", type);
     }
   }
 
+  /* Dump the field st_ino. */
   {
-    int		len = mmux_uintmax_sprint_size((mmux_uintmax_t)(stat_p->st_ino));
-    char	str[len];
+    auto		val = mmux_libc_ino(stat_p->st_ino);
+    mmux_usize_t	required_nbytes;
 
-    mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_ino));
-    DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_uintmax_sprint_size((mmux_uintmax_t)(stat_p->st_dev));
-    char	str[len];
-
-    mmux_uintmax_sprint(str, len, stat_p->st_dev);
-    DPRINTF(fd, "%s->st_dev = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_uintmax_sprint_size((mmux_uintmax_t)(stat_p->st_nlink));
-    char	str[len];
-
-    mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_nlink));
-    DPRINTF(fd, "%s->st_nlink = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_uintmax_sprint_size((mmux_uintmax_t)(stat_p->st_ino));
-    char	str[len];
-
-    mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_ino));
-    DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_uid_sprint_size(stat_p->st_uid);
-    char	str[len];
-
-    mmux_uid_sprint(str, len, stat_p->st_uid);
-    DPRINTF(fd, "%s->st_uid = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_gid_sprint_size(stat_p->st_gid);
-    char	str[len];
-
-    mmux_gid_sprint(str, len, stat_p->st_gid);
-    DPRINTF(fd, "%s->st_gid = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_off_sprint_size(stat_p->st_size);
-    char	str[len];
-
-    mmux_off_sprint(str, len, stat_p->st_size);
-    DPRINTF(fd, "%s->st_size = %s\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_time_sprint_size(stat_p->st_atim.tv_sec);
-    char	str[len];
-
-    mmux_time_sprint(str, len, stat_p->st_atim.tv_sec);
-    DPRINTF(fd, "%s->st_atime_sec = %s [seconds]", struct_name, str);
-    if (mmux_libc_stat_dump_time(fd, stat_p->st_atim.tv_sec)) {
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
       return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
     }
   }
 
+  /* Dump the field st_dev. */
   {
-    int		len = mmux_slong_sprint_size(stat_p->st_atim.tv_nsec);
-    char	str[len];
+    auto		val = mmux_libc_dev(stat_p->st_dev);
+    mmux_usize_t	required_nbytes;
 
-    mmux_slong_sprint(str, len, stat_p->st_atim.tv_nsec);
-    DPRINTF(fd, "%s->st_atime_nsec = %s [nanoseconds]\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_time_sprint_size(stat_p->st_mtim.tv_sec);
-    char	str[len];
-
-    mmux_time_sprint(str, len, stat_p->st_mtim.tv_sec);
-    DPRINTF(fd, "%s->st_mtime_sec = %s [seconds]", struct_name, str);
-    if (mmux_libc_stat_dump_time(fd, stat_p->st_mtim.tv_sec)) {
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
       return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_dev = %s\n", struct_name, str);
     }
   }
 
+  /* Dump the field st_nlink. */
   {
-    int		len = mmux_slong_sprint_size(stat_p->st_mtim.tv_nsec);
-    char	str[len];
+    auto		val = mmux_libc_nlink(stat_p->st_nlink);
+    mmux_usize_t	required_nbytes;
 
-    mmux_slong_sprint(str, len, stat_p->st_mtim.tv_nsec);
-    DPRINTF(fd, "%s->st_mtime_nsec = %s [nanoseconds]\n", struct_name, str);
-  }
-
-  {
-    int		len = mmux_time_sprint_size(stat_p->st_ctim.tv_sec);
-    char	str[len];
-
-    mmux_time_sprint(str, len, stat_p->st_ctim.tv_sec);
-    DPRINTF(fd, "%s->st_ctime_sec = %s [seconds]", struct_name, str);
-    if (mmux_libc_stat_dump_time(fd, stat_p->st_ctim.tv_sec)) {
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
       return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_nlink = %s\n", struct_name, str);
     }
   }
 
+  /* Dump the field st_uid. */
   {
-    int		len = mmux_slong_sprint_size(stat_p->st_ctim.tv_nsec);
-    char	str[len];
+    auto		val = mmux_libc_uid(stat_p->st_uid);
+    mmux_usize_t	required_nbytes;
 
-    mmux_slong_sprint(str, len, stat_p->st_ctim.tv_nsec);
-    DPRINTF(fd, "%s->st_ctime_nsec = %s [nanoseconds]\n", struct_name, str);
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_uid = %s\n", struct_name, str);
+    }
   }
 
+  /* Dump the field st_gid. */
   {
-    int		len = mmux_uintmax_sprint_size((mmux_uintmax_t)(stat_p->st_blocks));
-    char	str[len];
+    auto		val = mmux_libc_gid(stat_p->st_gid);
+    mmux_usize_t	required_nbytes;
 
-    mmux_uintmax_sprint(str, len, (mmux_uintmax_t)(stat_p->st_blocks));
-    DPRINTF(fd, "%s->st_blocks = %s\n", struct_name, str);
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_gid = %s\n", struct_name, str);
+    }
   }
 
+  /* Dump the field st_size. */
   {
-    int		len = mmux_uint_sprint_size(stat_p->st_blksize);
-    char	str[len];
+    auto		val = mmux_off(stat_p->st_size);
+    mmux_usize_t	required_nbytes;
 
-    mmux_uint_sprint(str, len, stat_p->st_blksize);
-    DPRINTF(fd, "%s->st_blksize = %s\n", struct_name, str);
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_size = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_atim.tv_sec. */
+  {
+    auto		val = mmux_time(stat_p->st_atim.tv_sec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_atim.tv_sec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_atim.tv_nsec. */
+  {
+    auto		val = mmux_slong(stat_p->st_atim.tv_nsec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_atim.tv_nsec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_mtim.tv_sec. */
+  {
+    auto		val = mmux_time(stat_p->st_mtim.tv_sec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_mtim.tv_sec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_mtim.tv_nsec. */
+  {
+    auto		val = mmux_slong(stat_p->st_mtim.tv_nsec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_mtim.tv_nsec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_ctim.tv_sec. */
+  {
+    auto		val = mmux_time(stat_p->st_ctim.tv_sec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_ctim.tv_sec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_ctim.tv_nsec. */
+  {
+    auto		val = mmux_slong(stat_p->st_ctim.tv_nsec);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_ctim.tv_nsec = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_blocks. */
+  {
+    auto		val = mmux_libc_blkcnt(stat_p->st_blocks);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_blocks = %s\n", struct_name, str);
+    }
+  }
+
+  /* Dump the field st_blksize. */
+  {
+    auto		val = mmux_uint(stat_p->st_blksize);
+    mmux_usize_t	required_nbytes;
+
+    if (mmux_ctype_sprint_size(&required_nbytes, val)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_ctype_sprint(str, required_nbytes, val);
+      DPRINTF(fd, "%s->st_blksize = %s\n", struct_name, str);
+    }
   }
 
   return false;
@@ -1122,17 +1215,17 @@ bool
 mmux_libc_fstatat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
 		   mmux_libc_stat_t * stat_p, mmux_sint_t flags)
 {
-  int	rv = fstatat(dirfd.value, pathname.value, stat_p, flags);
+  int	rv = fstatat(dirfd.value, pathname.value, stat_p, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_statfd (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
 {
-  mmux_sint_t	rv;
+  int	rv;
 
-  flags |= MMUX_LIBC_AT_EMPTY_PATH;
-  rv = fstatat(fd.value, "", stat_p, flags);
+  flags.value |= MMUX_LIBC_AT_EMPTY_PATH;
+  rv = fstatat(fd.value, "", stat_p, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -1151,9 +1244,9 @@ DEFINE_STAT_PTR_PREDICATE([[[S_TYPEISSEM]]])
 DEFINE_STAT_PTR_PREDICATE([[[S_TYPEISSHM]]])
 
 m4_define([[[DEFINE_STAT_MODE_PREDICATE]]],[[[bool
-mmux_libc_$1 (bool * result_p, mmux_mode_t mode)
+mmux_libc_$1 (bool * result_p, mmux_libc_mode_t mode)
 {
-  *result_p = ($1(mode))? true : false;
+  *result_p = ($1(mode.value))? true : false;
   return false;
 }]]])
 
@@ -1175,12 +1268,11 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pa
   /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
      symlinks. */
   if (mmux_libc_lstat(ptn, &stru)) {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t		errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (ENOENT == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_ENOENT, errnum)) {
       /* The directory entry does not exist.  This function was successful. */
-      mmux_libc_errno_set(0);
       *result_p = false;
       return false;
     } else {
@@ -1210,12 +1302,11 @@ mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_sys
   /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
      symlinks. */
   if (mmux_libc_lstat(ptn, &stru)) {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t		errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (ENOENT == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_ENOENT, errnum)) {
       /* The directory entry does not exist.  This function was successful. */
-      mmux_libc_errno_set(0);
       *result_p = false;
       return false;
     } else {
@@ -1223,7 +1314,7 @@ mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_sys
       return true;
     }
   } else {
-    mmux_mode_t		mode;
+    mmux_libc_mode_t		mode;
 
     if (mmux_libc_st_mode_ref(&mode, &stru)) {
       return true;
@@ -1257,12 +1348,11 @@ mmux_libc_file_descriptor_is_predicate (bool * result_p, mmux_libc_file_descript
   mmux_libc_stat_t	stru;
 
   if (mmux_libc_fstat(fd, &stru)) {
-    mmux_sint_t		errnum;
+    mmux_libc_errno_t		errnum;
 
-    mmux_libc_errno_ref(&errnum);
-    if (ENOENT == errnum) {
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_equal(MMUX_LIBC_ENOENT, errnum)) {
       /* The directory entry does not exist.  This function was successful. */
-      mmux_libc_errno_set(0);
       *result_p = false;
       return false;
     } else {
@@ -1270,7 +1360,7 @@ mmux_libc_file_descriptor_is_predicate (bool * result_p, mmux_libc_file_descript
       return true;
     }
   } else {
-    mmux_mode_t		mode;
+    mmux_libc_mode_t		mode;
 
     if (mmux_libc_st_mode_ref(&mode, &stru)) {
       return true;
@@ -1302,7 +1392,7 @@ bool
 mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t dirfd, mmux_libc_file_system_pathname_t ptn)
 {
   mmux_libc_stat_t	ST[1];
-  mmux_sint_t		flags = 0;
+  auto			flags = mmux_sint_constant_zero();
 
   if (mmux_libc_fstatat(dirfd, ptn, ST, flags)) {
     return true;
@@ -1310,7 +1400,7 @@ mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc
     mmux_off_t		result;
 
     mmux_libc_st_size_ref(&result, ST);
-    *result_p = (mmux_usize_t) result;
+    *result_p = mmux_usize(result.value);
     return false;
   }
 }
@@ -1325,7 +1415,7 @@ mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t
     mmux_off_t		result;
 
     mmux_libc_st_size_ref(&result, ST);
-    *result_p = (mmux_usize_t) result;
+    *result_p = mmux_usize(result.value);
     return false;
   }
 }
@@ -1335,8 +1425,8 @@ mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t
  ** File times.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(utimbuf, actime,  mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER(utimbuf, modtime, mmux_time_t)
+DEFINE_STRUCT_SETTER_GETTER(utimbuf, actime,  time)
+DEFINE_STRUCT_SETTER_GETTER(utimbuf, modtime, time)
 
 /* ------------------------------------------------------------------ */
 
@@ -1350,24 +1440,44 @@ mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t cons
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)utimbuf_p);
 
   {
-    int		len = mmux_time_sprint_size(utimbuf_p->actime);
-    char	str[len];
+    mmux_time_t	actime;
 
-    mmux_time_sprint(str, len, utimbuf_p->actime);
-    DPRINTF(fd, "%s->st_actime  = %s", struct_name, str);
-    if (mmux_libc_stat_dump_time(fd, utimbuf_p->actime)) {
-      return true;
+    mmux_libc_actime_ref(&actime, utimbuf_p);
+    {
+      mmux_usize_t	required_nbytes;
+
+      if (mmux_time_sprint_size(&required_nbytes, actime)) {
+	return true;
+      } else {
+	char	str[required_nbytes.value];
+
+	mmux_time_sprint(str, required_nbytes, actime);
+	DPRINTF(fd, "%s->st_actime  = %s", struct_name, str);
+	if (mmux_libc_stat_dump_time(fd, actime)) {
+	  return true;
+	}
+      }
     }
   }
 
   {
-    int		len = mmux_time_sprint_size(utimbuf_p->modtime);
-    char	str[len];
+    mmux_time_t	modtime;
 
-    mmux_time_sprint(str, len, utimbuf_p->modtime);
-    DPRINTF(fd, "%s->st_modtime = %s", struct_name, str);
-    if (mmux_libc_stat_dump_time(fd, utimbuf_p->modtime)) {
-      return true;
+    mmux_libc_modtime_ref(&modtime, utimbuf_p);
+    {
+      mmux_usize_t	required_nbytes;
+
+      if (mmux_time_sprint_size(&required_nbytes, modtime)) {
+	return true;
+      } else {
+	char	str[required_nbytes.value];
+
+	mmux_time_sprint(str, required_nbytes, modtime);
+	DPRINTF(fd, "%s->st_modtime  = %s", struct_name, str);
+	if (mmux_libc_stat_dump_time(fd, modtime)) {
+	  return true;
+	}
+      }
     }
   }
 
@@ -1425,7 +1535,7 @@ mmux_libc_utimensat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pa
 		     mmux_sint_t flags)
 {
   mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
-  int			rv   = utimensat(dirfd.value, ptn.value, T, flags);
+  int			rv   = utimensat(dirfd.value, ptn.value, T, flags.value);
 
   return ((0 == rv)? false : true);
 }

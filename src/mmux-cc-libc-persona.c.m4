@@ -49,45 +49,25 @@ mmux_libc_$2_ref (mmux_asciizcp_t * result_p, mmux_libc_$1_t const * const P)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_uid_t uid_num)
+mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_standard_libc_uid_t uid_num)
 {
   result_p->value = uid_num;
   return false;
 }
 bool
-mmux_libc_uid_parse (mmux_libc_uid_t * p_value, char const * s_value, char const * who)
+mmux_libc_uid_parse (mmux_libc_uid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
 {
   mmux_libc_uid_t	the_uid;
 
-  if (mmux_uid_parse(&the_uid.value, s_value, who)) {
+  if (mmux_libc_uid_parse(&the_uid, s_value, who)) {
     return true;
-  }
-  *p_value = the_uid;
-  return false;
-}
-bool
-mmux_libc_uid_sprint (char * ptr, mmux_usize_t len, mmux_libc_uid_t uid)
-{
-  if (MMUX_LIBC_UID_MAXIMUM_STRING_REPRESENTATION_LENGTH < len) {
-    errno = MMUX_LIBC_EINVAL;
-    return true;
-  }
-  return mmux_uid_sprint(ptr, len, uid.value);
-}
-bool
-mmux_libc_uid_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_uid_t uid)
-{
-  mmux_sint_t	required_nchars = mmux_uid_sprint_size(uid.value);
-
-  if (0 <= required_nchars) {
-    *required_nchars_p = required_nchars;
-    return false;
   } else {
-    return true;
+    *p_value = the_uid;
+    return false;
   }
 }
 bool
-mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const * passwd_p, char const * struct_name)
+mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const * passwd_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct passwd";
@@ -103,7 +83,7 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
     if (mmux_libc_uid_sprint_size(&required_nchars, uid)) {
       return true;
     } else {
-      char	str[required_nchars];
+      char	str[required_nchars.value];
 
       if (mmux_libc_uid_sprint(str, required_nchars, uid)) {
 	return true;
@@ -120,7 +100,7 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
     if (mmux_libc_gid_sprint_size(&required_nchars, gid)) {
       return true;
     } else {
-      char	str[required_nchars];
+      char	str[required_nchars.value];
 
       if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
 	return true;
@@ -142,46 +122,13 @@ mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const 
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_gid_t gid_num)
+mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_standard_libc_gid_t gid_num)
 {
   result_p->value = gid_num;
   return false;
 }
 bool
-mmux_libc_gid_parse (mmux_libc_gid_t * p_value, char const * s_value, char const * who)
-{
-  mmux_libc_gid_t	the_gid;
-
-  if (mmux_gid_parse(&the_gid.value, s_value, who)) {
-    return true;
-  }
-  *p_value = the_gid;
-  return false;
-}
-bool
-mmux_libc_gid_sprint (char * ptr, mmux_usize_t len, mmux_libc_gid_t gid)
-{
-  if (MMUX_LIBC_GID_MAXIMUM_STRING_REPRESENTATION_LENGTH < len) {
-    errno = MMUX_LIBC_EINVAL;
-    return true;
-  }
-  return mmux_gid_sprint(ptr, len, gid.value);
-}
-bool
-mmux_libc_gid_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_gid_t gid)
-{
-  mmux_sint_t	required_nchars = mmux_gid_sprint_size(gid.value);
-
-  if (0 <= required_nchars) {
-    *required_nchars_p = required_nchars;
-    return false;
-  } else {
-    return true;
-  }
-}
-
-bool
-mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * group_p, char const * struct_name)
+mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * group_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct group";
@@ -195,7 +142,7 @@ mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * 
     if (mmux_libc_gid_sprint_size(&required_nchars, gid)) {
       return true;
     } else {
-      char	str[required_nchars];
+      char	str[required_nchars.value];
 
       if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
 	return true;
@@ -205,11 +152,10 @@ mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * 
     }
   }
   {
-    char const **	mem;
-    mmux_sint_t		i = 0;
+    mmux_asciizcpp_t	mem;
 
     mmux_libc_gr_mem_ref(&mem, group_p);
-    for (; *mem; ++mem, ++i) {
+    for (int i = 0; *mem; ++mem, ++i) {
       DPRINTF(fd, "%s.gr_mem[%d] = %s\n", struct_name, i, *mem);
     }
   }
@@ -248,10 +194,10 @@ mmux_libc_getegid (mmux_libc_gid_t * result_p)
 bool
 mmux_libc_getgroups_size (mmux_usize_t * ngroups_p)
 {
-  mmux_sint_t	ngroups = getgroups(0, NULL);
+  mmux_standard_sint_t	ngroups = getgroups(0, NULL);
 
   if (0 <= ngroups) {
-    *ngroups_p = ngroups;
+    *ngroups_p = mmux_usize(ngroups);
     return false;
   } else {
     return true;
@@ -260,15 +206,15 @@ mmux_libc_getgroups_size (mmux_usize_t * ngroups_p)
 bool
 mmux_libc_getgroups (mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
 {
-  mmux_sint_t	ngroups1 = *ngroups_p;
-  mmux_gid_t	gids[ngroups1];
-  mmux_sint_t	ngroups2 = getgroups(ngroups1, gids);
+  auto				ngroups1 = (mmux_standard_sint_t)ngroups_p->value;
+  mmux_standard_libc_gid_t	gids[ngroups1];
+  mmux_standard_sint_t		ngroups2 = getgroups(ngroups1, gids);
 
   if (0 <= ngroups2) {
-    for (mmux_sint_t i=0; i<ngroups1; ++i) {
+    for (int i=0; i<ngroups1; ++i) {
       mmux_libc_make_gid(&(groups_p[i]), gids[i]);
     }
-    *ngroups_p = ngroups2;
+    *ngroups_p = mmux_usize(ngroups2);
     return false;
   } else {
     return true;
@@ -278,34 +224,34 @@ mmux_libc_getgroups (mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_getgrouplist_size (mmux_usize_t * result_ngroups_p, char const * username, mmux_libc_gid_t gid)
+mmux_libc_getgrouplist_size (mmux_usize_t * result_ngroups_p, mmux_asciizcp_t username, mmux_libc_gid_t gid)
 {
-  mmux_sint_t		ngroups = 0;
+  mmux_standard_sint_t	ngroups = 0;
 
   getgrouplist(username, gid.value, NULL, &ngroups);
   if ((0 <= ngroups) && (ngroups <= MMUX_LIBC_GETGROUPLIST_MAXIMUM_GROUPS_NUMBER)) {
-    *result_ngroups_p = ngroups;
+    *result_ngroups_p = mmux_usize(ngroups);
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_getgrouplist (char const * username, mmux_libc_gid_t gid, mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
+mmux_libc_getgrouplist (mmux_asciizcp_t username, mmux_libc_gid_t gid, mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
 {
-  if (MMUX_LIBC_GETGROUPLIST_MAXIMUM_GROUPS_NUMBER < *ngroups_p) {
+  if (MMUX_LIBC_GETGROUPLIST_MAXIMUM_GROUPS_NUMBER < ngroups_p->value) {
     return true;
   } else {
-    mmux_sint_t		ngroups1 = *ngroups_p;
-    mmux_gid_t		gids[ngroups1];
-    mmux_sint_t		ngroups2;
+    auto			ngroups1 = (mmux_standard_sint_t)(ngroups_p->value);
+    mmux_standard_libc_gid_t	gids[ngroups1];
+    mmux_standard_sint_t	ngroups2;
 
     ngroups2 = getgrouplist(username, gid.value, gids, &ngroups1);
     if (0 <= ngroups2) {
-      for (mmux_sint_t i=0; i<ngroups1; ++i) {
+      for (mmux_standard_sint_t i=0; i<ngroups1; ++i) {
 	mmux_libc_make_gid(&(groups_p[i]), gids[i]);
       }
-      *ngroups_p = ngroups2;
+      *ngroups_p = mmux_usize(ngroups2);
       return false;
     } else {
       return true;
@@ -417,7 +363,7 @@ mmux_libc_getpwuid (mmux_libc_passwd_t * * result_passwd_pp, mmux_libc_uid_t uid
   }
 }
 bool
-mmux_libc_getpwnam (mmux_libc_passwd_t * * result_passwd_pp, char const * username)
+mmux_libc_getpwnam (mmux_libc_passwd_t * * result_passwd_pp, mmux_asciizcp_t username)
 {
   mmux_libc_passwd_t *	passwd_p = getpwnam(username);
 
@@ -497,7 +443,7 @@ mmux_libc_getgrgid (mmux_libc_group_t * * result_group_pp, mmux_libc_gid_t gid)
   }
 }
 bool
-mmux_libc_getgrnam (mmux_libc_group_t * * result_group_pp, char const * username)
+mmux_libc_getgrnam (mmux_libc_group_t * * result_group_pp, mmux_asciizcp_t username)
 {
   mmux_libc_group_t *	group_p = getgrnam(username);
 
@@ -512,7 +458,7 @@ bool
 mmux_libc_group_member (bool * is_member_p, mmux_libc_gid_t gid)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_GROUP_MEMBER]]],[[[
-  mmux_sint_t	is_member = group_member(gid.value);
+  mmux_standard_sint_t	is_member = group_member(gid.value);
 
   *is_member_p = ((0 != is_member)? true : false);
   return false;
@@ -560,7 +506,7 @@ mmux_libc_getlogin (mmux_asciizcpp_t username_p)
 bool
 mmux_libc_getlogin_r (mmux_asciizp_t bufptr, mmux_usize_t buflen)
 {
-  mmux_sint_t	rv = getlogin_r(bufptr, buflen);
+  mmux_standard_sint_t	rv = getlogin_r(bufptr, buflen.value);
 
   return (rv)? true : false;
 }

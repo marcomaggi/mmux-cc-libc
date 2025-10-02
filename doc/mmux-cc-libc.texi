@@ -924,17 +924,17 @@ number.
 @end deftypefun
 
 
-@deftypefun int mmux_cc_libc_version_interface_current (void)
+@deftypefun mmux_sint_t mmux_cc_libc_version_interface_current (void)
 Return an integer representing the library interface current number.
 @end deftypefun
 
 
-@deftypefun int mmux_cc_libc_version_interface_revision (void)
+@deftypefun mmux_sint_t mmux_cc_libc_version_interface_revision (void)
 Return an integer representing the library interface current revision number.
 @end deftypefun
 
 
-@deftypefun int mmux_cc_libc_version_interface_age (void)
+@deftypefun mmux_sint_t mmux_cc_libc_version_interface_age (void)
 Return an integer representing the library interface current age.
 @end deftypefun
 
@@ -959,18 +959,39 @@ successful return @cfalse{}; otherwise return @ctrue{}.
 @cindex Handling errors
 
 
-@deftypefun bool mmux_libc_errno_set (mmux_sint_t @var{errnum})
+@deftp {Struct Typedef} mmux_libc_errno_t
+Data structure type representing the constants of @code{errno}.  All the known standard constants
+like @samp{EINVAL} are available as preprocessor symbols like @samp{MMUX_LIBC_EINVAL}, which expand
+to an expression evaluating to an instance of this data type.
+@end deftp
+
+
+@deftypefun bool mmux_libc_errno_equal (mmux_libc_errno_t @vari{errnum}, mmux_libc_errno_t @varii{errnum})
+Return @ctrue{} if @vari{errnum} equal @varii{errnum}, otherwise return @cfalse{}.
+
+@example
+mmux_libc_errno_t       errnum;
+
+mmux_libc_errno_consume(&errno);
+if (mmux_libc_errno_equal(MMUX_LIBC_EINVAL, errno)) @{
+  ...
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_errno_set (mmux_libc_errno_t @var{errnum})
 Setter for the standard @code{errno} variable.  The return value is always @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_errno_ref (mmux_sint_t * @var{result_errnum_p})
+@deftypefun bool mmux_libc_errno_ref (mmux_libc_errno_t * @var{result_errnum_p})
 Getter for the standard @code{errno} variable: always store the current value of @code{errno} in the
 location referenced by @var{result_errnum_p}.  When @code{errno} is zero: the return value is
 @ctrue{}, there is no reason to query @code{errno}; otherwise it is @cfalse{}.
 
 @example
-mmux_sint_t     errnum;
+mmux_libc_errno_t     errnum;
 
 if (mmux_libc_errno_ref(&errnum)) @{
   ... /* there was no error: why are we querying "errno"? */
@@ -984,14 +1005,19 @@ if (mmux_libc_errno_ref(&errnum)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_errno_consume (mmux_sint_t * @var{result_errnum_p})
+@deftypefun bool mmux_libc_errno_clear (void)
+Set @code{errno} to zero.  Always return @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_errno_consume (mmux_libc_errno_t * @var{result_errnum_p})
 Getter--and--resetter for the standard @code{errno} variable: always store the current value of
 @code{errno} in the location referenced by @var{result_errnum_p}, then reset @code{errno} to zero.
 Upon calling this function, when @code{errno} is zero: the return value is @ctrue{}, there is no
 reason to query @code{errno}; otherwise it is @cfalse{}.
 
 @example
-mmux_sint_t     errnum;
+mmux_libc_errno_t     errnum;
 
 if (mmux_libc_errno_consume(&errnum)) @{
   ... /* there was no error: why are we querying "errno"? */
@@ -1005,7 +1031,7 @@ if (mmux_libc_errno_consume(&errnum)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strerror (mmux_asciizcp_t * @var{result_error_message_p}, mmux_sint_t @var{errnum})
+@deftypefun bool mmux_libc_strerror (mmux_asciizcp_t * @var{result_error_message_p}, mmux_libc_errno_t @var{errnum})
 @MmuxCInterface{strerror}.  The return value is always @cfalse{}.
 
 Often we want to compose strings using a memory--mapped file descriptor, so we call
@@ -1016,7 +1042,7 @@ for details.
 @end deftypefun
 
 
-@deftypefn {@gnu{} Function} bool mmux_libc_strerror_r (mmux_asciizcpp_t @var{result_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{errnum})
+@deftypefn {@gnu{} Function} bool mmux_libc_strerror_r (mmux_asciizcpp_t @var{result_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_libc_errno_t @var{errnum})
 @MmuxCInterface{strerror_r}.  This is the @gnu{} variant of this function.
 
 We must use the arguments @var{bufptr} and @var{buflen} to provide a buffer in which the string
@@ -1040,7 +1066,7 @@ if (mmux_libc_dprintfer("strerror_r result: %s\n", result)) @{
 @end deftypefn
 
 
-@deftypefn {@gnu{} Function} bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+@deftypefn {@gnu{} Function} bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
 @MmuxCInterface{strerrorname_np}.  This is the @gnu{} variant of this function.
 
 The following code example should print @samp{EINVAL}:
@@ -1059,7 +1085,7 @@ if (mmux_libc_dprintfer("strerrorname_np result: %s", result)) @{
 @end deftypefn
 
 
-@deftypefn {@gnu{} Function} bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+@deftypefn {@gnu{} Function} bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
 @MmuxCInterface{strerrordesc_np}.  This is the @gnu{} variant of this function.
 
 The following code example should print @samp{Invalid argument}:
@@ -1329,9 +1355,9 @@ Data structure representing the value of the memory allocator.  It has the follo
 Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
 memory allocator value.  The string can have any format.
 
-@item mmux_uint_t version_major
-@itemx mmux_uint_t version_minor
-@itemx mmux_uint_t version_patchlevel
+@item mmux_standard_uint_t version_major
+@itemx mmux_standard_uint_t version_minor
+@itemx mmux_standard_uint_t version_patchlevel
 The major, minor, patchlevel version numbers of this memory allocator value; when in doubt: just
 set them to @samp{1}, @samp{0}, @samp{0}.
 @end table
@@ -2117,13 +2143,13 @@ tm_zone   = NULL
 @section Acquiring the current time
 
 
-@deftypefun bool mmux_libc_time (mmuc_time_t * @var{result_p})
+@deftypefun bool mmux_libc_current_time (mmuc_time_t * @var{result_p})
 @MmuxCInterface{time}.
 
 @example
 mmux_time_t         T;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 @{
   mmux_libc_fd_t    fd;
 
@@ -2149,7 +2175,7 @@ functions; we should just use @cfunc{mmux_libc_localtime_r}.
 mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_localtime(&BT, T);
 @{
   mmux_libc_fd_t        fd;
@@ -2170,7 +2196,7 @@ mmux_libc_localtime(&BT, T);
 mmux_time_t             T;
 mmux_libc_tm_t          BT[1];
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_localtime_r(BT, T);
 @{
   mmux_libc_fd_t        fd;
@@ -2193,7 +2219,7 @@ functions; we should just use @cfunc{mmux_libc_gmtime_r}.
 mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_gmtime(&BT, T);
 @{
   mmux_libc_fd_t        fd;
@@ -2214,7 +2240,7 @@ mmux_libc_gmtime(&BT, T);
 mmux_time_t             T;
 mmux_libc_tm_t          BT[1];
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_gmtime_r(BT, T);
 @{
   mmux_libc_fd_t        fd;
@@ -2237,7 +2263,7 @@ just use @cfunc{mmux_libc_ctime_r}.
 mmux_time_t         T;
 mmux_asciizcp_t     bufptr;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_asctime(&bufptr, T);
 if (mmux_libc_dprintfer("the timestamp from ctime is: \"%s\"\n", bufptr)) @{
   /* error */
@@ -2255,7 +2281,7 @@ mmux_time_t         T;
 #define IS_THIS_ENOUGH_QUESTION_MARK            512
 mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_asctime_r(bufptr, T);
 if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
   /* error */
@@ -2275,7 +2301,7 @@ if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
 mmux_time_t     T1, T2;
 mmux_libc_tm_t  BT[1];
 
-mmux_libc_time(&T1);
+mmux_libc_current_time(&T1);
 mmux_libc_localtime_r(BT, T1);
 mmux_libc_mktime(&T2, BT);
 @{
@@ -2297,7 +2323,7 @@ mmux_libc_mktime(&T2, BT);
 mmux_time_t     T1, T2;
 mmux_libc_tm_t  BT[1];
 
-mmux_libc_time(&T1);
+mmux_libc_current_time(&T1);
 mmux_libc_localtime_r(BT, T1);
 mmux_libc_timegm(&T2, BT);
 @{
@@ -2322,7 +2348,7 @@ mmux_time_t         T;
 mmux_libc_tm_t      BT[1];
 mmux_asciizcp_t     bufptr;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_localtime_r(BT, T);
 mmux_libc_asctime(&bufptr, BT);
 if (mmux_libc_dprintfer("the timestamp from asctime is: \"%s\"\n", bufptr)) @{
@@ -2342,7 +2368,7 @@ mmux_libc_tm_t      BT[1];
 #define IS_THIS_ENOUGH_QUESTION_MARK            512
 mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_localtime_r(BT, T);
 mmux_libc_asctime_r(bufptr, BT);
 if (mmux_libc_dprintfer("the timestamp from asctime_r is: \"%s\"\n", bufptr)) @{
@@ -2382,7 +2408,7 @@ mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 mmux_usize_t            required_nbytes_including_nil;
 
-mmux_libc_time(&T);
+mmux_libc_current_time(&T);
 mmux_libc_localtime(&BT, T);
 
 if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT) @{
@@ -2583,7 +2609,7 @@ Type of data structure containing a value of type @objtype{mmux_uid_t}.
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_uid (mmux_libc_uid_t * @var{result_p}, mmux_uid_t @var{uid_num})
+@deftypefun bool mmux_libc_make_uid (mmux_libc_uid_t * @var{result_p}, mmux_standard_libc_uid_t @var{uid_num})
 Build a new value of type @objtype{mmux_libc_uid_t}.
 @end deftypefun
 
@@ -2639,7 +2665,7 @@ Type of data structure containing a value of type @objtype{mmux_gid_t}.
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_gid (mmux_libc_gid_t * @var{result_p}, mmux_gid_t @var{gid_num})
+@deftypefun bool mmux_libc_make_gid (mmux_libc_gid_t * @var{result_p}, mmux_standard_libc_gid_t @var{gid_num})
 Build a new value of type @objtype{mmux_libc_gid_t}.
 @end deftypefun
 
@@ -3154,11 +3180,6 @@ File Description Locks, Open File Description Locks}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pid_equal (mmux_libc_pid_t @vari{pid}, mmux_libc_pid_t @varii{pid})
-Return true if @vari{pid} and  @varii{pid} are equal.
-@end deftypefun
-
-
 To convert a file descriptor to string we can do:
 
 @example
@@ -3170,7 +3191,7 @@ mmux_libc_getpid (&the_pid);
 if (mmux_libc_pid_sprint_size(&required_nchars, the_pid) @{
   /* error */
 @} else @{
-  char  str[required_nchars];
+  char  str[required_nchars.value];
 
   if (mmux_libc_pid_sprint(str, required_nchars, the_pid) @{
     /* error */
@@ -3568,7 +3589,12 @@ if (mmux_libc_wait(&completed_process_status_available, &completed_process_pid, 
 @section Exiting processes
 
 
-@deftypefun bool mmux_libc_exit (mmux_sint_t @var{status})
+@deftp {Struct Typedef} mmux_libc_process_exit_status_t
+Type of the exit status constants.
+@end deftp
+
+
+@deftypefun bool mmux_libc_exit (mmux_libc_process_exit_status_t @var{status})
 @MmuxCInterface{exit}.
 @end deftypefun
 
@@ -3580,7 +3606,7 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc__exit (mmux_sint_t @var{status})
+@deftypefun bool mmux_libc__exit (mmux_libc_process_exit_status_t @var{status})
 @MmuxCInterface{_exit}.
 @end deftypefun
 
@@ -8588,9 +8614,9 @@ struct stat->st_blksize = 4096
 
 @MmuxCStructOpaqueTypedef{stat}
 @MmuxSetterGetter{stat, st_mode,        mmux_mode_t}
-@MmuxSetterGetter{stat,	st_ino,		mmux_uintmax_t}
-@MmuxSetterGetter{stat,	st_dev,		mmux_uintmax_t}
-@MmuxSetterGetter{stat,	st_nlink,	mmux_uintmax_t}
+@MmuxSetterGetter{stat,	st_ino,		mmux_ino_t}
+@MmuxSetterGetter{stat,	st_dev,		mmux_dev_t}
+@MmuxSetterGetter{stat,	st_nlink,	mmux_nlink_t}
 @MmuxSetterGetter{stat,	st_uid,		mmux_libc_uid_t}
 @MmuxSetterGetter{stat,	st_gid,		mmux_libc_gid_t}
 @MmuxSetterGetter{stat,	st_size,	mmux_off_t}
@@ -8600,7 +8626,7 @@ struct stat->st_blksize = 4096
 @MmuxSetterGetter{stat,	st_mtime_nsec,	mmux_slong_t}
 @MmuxSetterGetter{stat,	st_ctime_sec,	mmux_time_t}
 @MmuxSetterGetter{stat,	st_ctime_nsec,	mmux_slong_t}
-@MmuxSetterGetter{stat,	st_blocks,	mmux_uintmax_t}
+@MmuxSetterGetter{stat,	st_blocks,	mmux_blkcnt_t}
 @MmuxSetterGetter{stat,	st_blksize,	mmux_uint_t}
 @MmuxStructDumper{stat}
 
@@ -9093,8 +9119,8 @@ If we want to toy with a @objtype{mmux_libc_utimbuf_t} objects, we do:
 mmux_libc_utimbuf_t   UTB[1];
 mmux_time_t           T1, T2;
 
-mmux_libc_time(&T1);
-mmux_libc_time(&T2);
+mmux_libc_current_time(&T1);
+mmux_libc_current_time(&T2);
 
 mmux_libc_actime_set  (UTB, T1);
 mmux_libc_modtime_set (UTB, T2);
@@ -9135,8 +9161,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_utimbuf_t UTB;
   mmux_time_t         T1, T2;
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   mmux_libc_actime_set  (&UTB, T1);
   mmux_libc_modtime_set (&UTB, T2);
@@ -9165,8 +9191,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -9197,8 +9223,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -9241,8 +9267,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -9285,8 +9311,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                nanosecs1, nanosecs2;
   mmux_libc_timespec_t        access_timespec, modification_timespec;
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   nanosecs1 = 123;
   nanosecs2 = 456;
@@ -9322,8 +9348,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
 
   mmux_libc_at_fdcwd(&dirfd);
 
-  mmux_libc_time(&T1);
-  mmux_libc_time(&T2);
+  mmux_libc_current_time(&T1);
+  mmux_libc_current_time(&T2);
 
   nanosecs1 = 123;
   nanosecs2 = 456;

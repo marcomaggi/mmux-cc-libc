@@ -55,26 +55,43 @@ mmux_cc_libc_decl mmux_sint_t		mmux_cc_libc_version_interface_age	(void);
  ** Errors.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_errno_ref (mmux_sint_t * result_errnum_p)
+mmux_cc_libc_inline_decl mmux_libc_errno_t
+mmux_libc_errno (mmux_standard_sint_t errnum)
+{
+  return (mmux_libc_errno_t){ .value = errnum };
+}
+mmux_cc_libc_inline_decl bool
+mmux_libc_errno_equal (mmux_libc_errno_t errnum1, mmux_libc_errno_t errnum2)
+{
+  return (errnum1.value == errnum2.value)? true : false;
+}
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_errno_ref (mmux_libc_errno_t * result_errnum_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_errno_set (mmux_sint_t errnum);
+mmux_cc_libc_decl bool mmux_libc_errno_set (mmux_libc_errno_t errnum);
 
-mmux_cc_libc_decl bool mmux_libc_errno_consume (mmux_sint_t * result_errnum_p)
+mmux_cc_libc_decl bool mmux_libc_errno_set_to_einval (void);
+
+mmux_cc_libc_decl bool mmux_libc_errno_clear (void);
+
+mmux_cc_libc_decl bool mmux_libc_errno_consume (mmux_libc_errno_t * result_errnum_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_strerror (mmux_asciizcp_t * result_error_message_p, mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_strerror_r (mmux_asciizcpp_t result_p,
 					     mmux_asciizp_t bufptr, mmux_usize_t buflen,
-					     mmux_sint_t errnum)
+					     mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_program_invocation_name (mmux_asciizcpp_t result_p)
@@ -152,13 +169,13 @@ mmux_cc_libc_decl bool mmux_libc_strxfrm (mmux_usize_t * result_size_p, mmux_asc
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_strchr (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_schar_t schar)
+mmux_cc_libc_decl bool mmux_libc_strchr (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_char_t schar)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_strchrnul (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_schar_t schar)
+mmux_cc_libc_decl bool mmux_libc_strchrnul (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_char_t schar)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_strrchr (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_schar_t schar)
+mmux_cc_libc_decl bool mmux_libc_strrchr (mmux_asciizcp_t * result_p, mmux_asciizcp_t ptr, mmux_char_t schar)
   __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_strstr (mmux_asciizcp_t * result_p, mmux_asciizcp_t haystack, mmux_asciizcp_t needle)
@@ -277,7 +294,7 @@ mmux_cc_libc_decl bool mmux_libc_reallocarray_ (mmux_pointer_t * P_p, mmux_usize
 mmux_cc_libc_decl bool mmux_libc_free (mmux_pointer_t p)
   __attribute__((__nonnull__));
 
-mmux_cc_libc_decl bool mmux_libc_memset (mmux_pointer_t ptr, mmux_uint8_t octet, mmux_usize_t len)
+mmux_cc_libc_decl bool mmux_libc_memset (mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t len)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_memzero (mmux_pointer_t ptr, mmux_usize_t len)
@@ -290,7 +307,7 @@ mmux_cc_libc_decl bool mmux_libc_mempcpy (mmux_pointer_t * result_p, mmux_pointe
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_memccpy (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr,
-					  mmux_uint8_t octet, mmux_usize_t nbytes)
+					  mmux_octet_t octet, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_memmove (mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
@@ -427,7 +444,7 @@ mmux_cc_libc_decl bool mmux_libc_tm_reset (mmux_libc_tm_t * tm_p)
  ** Times and dates: functions.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_time      (mmux_time_t * result_p)
+mmux_cc_libc_decl bool mmux_libc_time (mmux_time_t * result_p)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
@@ -533,7 +550,7 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(1),__format__(__printf__,1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_libc_errno_t errnum)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
@@ -558,11 +575,11 @@ mmux_cc_libc_decl bool mmux_libc_dprintfer_newline (void)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname,
-				       mmux_sint_t flags, mmux_mode_t mode)
+				       mmux_sint_t flags, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
-					 mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_mode_t mode)
+					 mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -792,7 +809,7 @@ mmux_cc_libc_decl bool mmux_libc_memfd_copyou (mmux_libc_file_descriptor_t mfd)
 mmux_cc_libc_decl bool mmux_libc_memfd_copyer (mmux_libc_file_descriptor_t mfd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_libc_errno_t errnum)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen)
@@ -869,16 +886,16 @@ DEFINE_PRINTER_PROTO([[[uintmax]]])
 DEFINE_PRINTER_PROTO([[[sintptr]]])
 DEFINE_PRINTER_PROTO([[[uintptr]]])
 DEFINE_PRINTER_PROTO([[[ptrdiff]]])
-DEFINE_PRINTER_PROTO([[[mode]]])
 DEFINE_PRINTER_PROTO([[[off]]])
-DEFINE_PRINTER_PROTO([[[pid]]])
-DEFINE_PRINTER_PROTO([[[uid]]])
-DEFINE_PRINTER_PROTO([[[gid]]])
 DEFINE_PRINTER_PROTO([[[wchar]]])
 DEFINE_PRINTER_PROTO([[[wint]]])
 DEFINE_PRINTER_PROTO([[[time]]])
-DEFINE_PRINTER_PROTO([[[socklen]]])
-DEFINE_PRINTER_PROTO([[[rlim]]])
+DEFINE_PRINTER_PROTO([[[libc_mode]]])
+DEFINE_PRINTER_PROTO([[[libc_pid]]])
+DEFINE_PRINTER_PROTO([[[libc_uid]]])
+DEFINE_PRINTER_PROTO([[[libc_gid]]])
+DEFINE_PRINTER_PROTO([[[libc_socklen]]])
+DEFINE_PRINTER_PROTO([[[libc_rlim]]])
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value)
   __attribute__((__warn_unused_result__));
@@ -929,8 +946,8 @@ mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_f
 
 /* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_cur,	mmux_rlim_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_max,	mmux_rlim_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_cur,	mmux_libc_rlim_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_max,	mmux_libc_rlim_t)
 
 mmux_cc_libc_decl bool mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlimit_pointer,
 					      mmux_asciizcp_t struct_name)
@@ -951,7 +968,7 @@ mmux_cc_libc_decl bool mmux_libc_prlimit (mmux_libc_pid_t pid, mmux_sint_t resou
  ** Processes.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_standard_pid_t pid_num)
+mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_standard_libc_pid_t pid_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_make_pid_zero (mmux_libc_pid_t * result_p)
@@ -960,20 +977,10 @@ mmux_cc_libc_decl bool mmux_libc_make_pid_zero (mmux_libc_pid_t * result_p)
 mmux_cc_libc_decl bool mmux_libc_make_pid_minus_one (mmux_libc_pid_t * result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_pid_equal (mmux_libc_pid_t one, mmux_libc_pid_t two);
-
-mmux_cc_libc_decl bool mmux_libc_pid_parse (mmux_libc_pid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
-  __attribute__((__nonnull__(1,2)));
-
-mmux_cc_libc_decl bool mmux_libc_pid_sprint (char * ptr, mmux_usize_t len, mmux_libc_pid_t pid)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_pid_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_pid_t pid)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
-
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * result_p, mmux_sint_t status)
+mmux_cc_libc_decl bool mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * result_p,
+								mmux_standard_sint_t status)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_completed_process_status_equal (mmux_libc_completed_process_status_t one,
@@ -1069,14 +1076,14 @@ mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (bool * result_p,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_exit (mmux_sint_t status)
+mmux_cc_libc_decl bool mmux_libc_exit (mmux_libc_process_exit_status_t status)
   __attribute__((__noreturn__));
 mmux_cc_libc_decl bool mmux_libc_exit_success (void)
   __attribute__((__noreturn__));
 mmux_cc_libc_decl bool mmux_libc_exit_failure (void)
   __attribute__((__noreturn__));
 
-mmux_cc_libc_decl bool mmux_libc__exit (mmux_sint_t status)
+mmux_cc_libc_decl bool mmux_libc__exit (mmux_libc_process_exit_status_t status)
   __attribute__((__noreturn__));
 
 mmux_cc_libc_decl bool mmux_libc_atexit (void (*function_pointer) (void));
@@ -1089,7 +1096,8 @@ mmux_cc_libc_decl bool mmux_libc_abort (void)
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p, mmux_sint_t signal_num)
+mmux_cc_libc_decl bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p,
+							   mmux_standard_sint_t signal_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t one, mmux_libc_interprocess_signal_t two);
@@ -1187,7 +1195,7 @@ mmux_cc_libc_decl bool mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmu
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_uid_t uid_num)
+mmux_cc_libc_decl bool mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_standard_libc_uid_t uid_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_uid_parse (mmux_libc_uid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
@@ -1201,7 +1209,7 @@ mmux_cc_libc_decl bool mmux_libc_uid_sprint_size (mmux_usize_t * required_nchars
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_gid_t gid_num)
+mmux_cc_libc_decl bool mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_standard_libc_gid_t gid_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_gid_parse (mmux_libc_gid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
@@ -1654,10 +1662,10 @@ mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t olddirfd
 					    mmux_uint_t flags)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1680,20 +1688,20 @@ mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_l
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_umask (mmux_mode_t * old_mask_p, mmux_mode_t new_mask)
+mmux_cc_libc_decl bool mmux_libc_umask (mmux_libc_mode_t * old_mask_p, mmux_libc_mode_t new_mask)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_getumask (mmux_mode_t * current_mask_p)
+mmux_cc_libc_decl bool mmux_libc_getumask (mmux_libc_mode_t * current_mask_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchmod (mmux_libc_file_descriptor_t fd, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_fchmod (mmux_libc_file_descriptor_t fd, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
-					   mmux_mode_t mode, mmux_sint_t flags)
+					   mmux_libc_mode_t mode, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
@@ -1717,10 +1725,10 @@ mmux_cc_libc_decl bool mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux
 
 /* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mode,	mmux_mode_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ino,		mmux_uintmax_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_dev,		mmux_uintmax_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_nlink,	mmux_uintmax_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mode,	mmux_libc_mode_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ino,		mmux_libc_ino_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_dev,		mmux_libc_dev_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_nlink,	mmux_libc_nlink_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_uid,		mmux_libc_uid_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_gid,		mmux_libc_gid_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_size,	mmux_off_t)
@@ -1730,7 +1738,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mtime_sec,	mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mtime_nsec,	mmux_slong_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ctime_sec,	mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ctime_nsec,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blocks,	mmux_uintmax_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blocks,	mmux_libc_blkcnt_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blksize,	mmux_uint_t)
 
 mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * stat_p,
@@ -1766,25 +1774,25 @@ mmux_cc_libc_decl bool mmux_libc_S_TYPEISSHM (bool * result_p, mmux_libc_stat_t 
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_S_ISDIR (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISDIR (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISCHR (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISCHR (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISBLK (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISBLK (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISREG (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISREG (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISFIFO (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISFIFO (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISLNK (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISLNK (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_S_ISSOCK (bool * result_p, mmux_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_S_ISSOCK (bool * result_p, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
@@ -1883,24 +1891,42 @@ mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_file_descriptor_t dirfd, m
  ** Sockets.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(in_addr, s_addr,	mmux_uint32_t)
+mmux_cc_libc_inline_decl mmux_libc_socket_address_family_t
+mmux_libc_socket_address_family (mmux_standard_sshort_t value)
+{
+  return (mmux_libc_socket_address_family_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_socket_protocol_family_t
+mmux_libc_socket_protocol_family (mmux_standard_sshort_t value)
+{
+  return (mmux_libc_socket_protocol_family_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_socket_internet_protocol_t
+mmux_libc_socket_internet_protocol (mmux_standard_sshort_t value)
+{
+  return (mmux_libc_socket_internet_protocol_t) { .value = value };
+}
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(if_nameindex, if_index,	mmux_uint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(if_nameindex, if_name,	mmux_asciizcp_t)
+/* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr, sa_family,	mmux_sshort_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(in_addr,		s_addr,		mmux_uint32_t)
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_un, sun_family,	mmux_sshort_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_un, sun_path,	mmux_libc_file_system_pathname_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(if_nameindex,	if_index,	mmux_uint_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(if_nameindex,	if_name,	mmux_asciizcp_t)
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in, sin_family,	mmux_sshort_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in, sin_addr,	mmux_libc_in_addr_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in, sin_port,	mmux_host_byteorder_ushort_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr,		sa_family,	mmux_libc_socket_address_family_t)
+
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_un,		sun_family,	mmux_libc_socket_address_family_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_un,		sun_path,	mmux_libc_file_system_pathname_t)
+
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_family,	mmux_libc_socket_address_family_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_addr,	mmux_libc_in_addr_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_port,	mmux_host_byteorder_ushort_t)
 
 mmux_cc_libc_decl bool mmux_libc_sin_addr_p_ref (mmux_libc_in_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
   __attribute__((__nonnull__(1,2)));
 
-DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_family,   mmux_sshort_t,          sinsix_family)
+DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_family,   mmux_libc_socket_address_family_t, sinsix_family)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_addr,     mmux_libc_insix_addr_t, sinsix_addr)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_flowinfo, mmux_uint32_t,          sinsix_flowinfo)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_scope_id, mmux_uint32_t,          sinsix_scope_id)
@@ -1913,7 +1939,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_flags,		mmux_sint_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_family,		mmux_sint_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_socktype,	mmux_sint_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_protocol,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_addrlen,	mmux_socklen_t)
+DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_addrlen,	mmux_libc_socklen_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_addr,		mmux_libc_sockaddr_t *)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_canonname,	mmux_asciizcp_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(addrinfo, ai_next,		mmux_libc_addrinfo_t *)
@@ -2052,7 +2078,8 @@ mmux_cc_libc_decl bool mmux_libc_inet_pton (mmux_pointer_t ouput_addr_p,
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-					    mmux_sint_t input_af_family, mmux_pointer_t input_addr_p)
+					    mmux_libc_socket_address_family_t input_af_family,
+					    mmux_pointer_t input_addr_p)
   __attribute__((__nonnull__(1,4)));
 
 mmux_cc_libc_decl bool mmux_libc_inet_addr (mmux_libc_in_addr_ptr_t result_in_addr_p, mmux_asciizcp_t presentation_in_addr_p)
@@ -2084,10 +2111,10 @@ mmux_cc_libc_decl bool mmux_libc_freeaddrinfo (mmux_libc_addrinfo_ptr_t addrinfo
 mmux_cc_libc_decl bool mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_socklen_t provided_hostname_len,
-					      mmux_asciizcp_t result_servname_p, mmux_socklen_t provided_servname_len,
+mmux_cc_libc_decl bool mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t provided_hostname_len,
+					      mmux_asciizcp_t result_servname_p, mmux_libc_socklen_t provided_servname_len,
 					      mmux_sint_t * result_error_code_p,
-					      mmux_libc_sockaddr_ptr_t input_sockaddr_p, mmux_socklen_t input_sockaddr_size,
+					      mmux_libc_sockaddr_ptr_t input_sockaddr_p, mmux_libc_socklen_t input_sockaddr_size,
 					      mmux_sint_t flags)
   __attribute__((__nonnull__(1,3,5,6),__warn_unused_result__));
 
@@ -2182,32 +2209,32 @@ mmux_cc_libc_decl bool mmux_libc_socketpair (mmux_libc_network_socket_t * result
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_connect (mmux_libc_network_socket_t sock,
-					  mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_socklen_t sockaddr_size)
+					  mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_bind (mmux_libc_network_socket_t sock,
-				       mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_socklen_t sockaddr_size)
+				       mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_listen (mmux_libc_network_socket_t sock, mmux_uint_t pending_connections_queue_length)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_accept (mmux_libc_network_socket_t * result_connected_sock_p,
-					 mmux_libc_sockaddr_ptr_t result_client_sockaddr_p, mmux_socklen_t * result_client_sockaddr_size_p,
+					 mmux_libc_sockaddr_ptr_t result_client_sockaddr_p, mmux_libc_socklen_t * result_client_sockaddr_size_p,
 					 mmux_libc_network_socket_t server_sock)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_accept4 (mmux_libc_network_socket_t * result_connected_sock_p,
-					  mmux_libc_sockaddr_ptr_t result_client_sockaddr_p, mmux_socklen_t * result_client_sockaddr_size_p,
+					  mmux_libc_sockaddr_ptr_t result_client_sockaddr_p, mmux_libc_socklen_t * result_client_sockaddr_size_p,
 					  mmux_libc_network_socket_t server_sock, mmux_sint_t flags)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_getpeername (mmux_libc_network_socket_t sock, mmux_libc_sockaddr_ptr_t sockaddr_all,
-					      mmux_socklen_t * sockaddr_all_size)
+					      mmux_libc_socklen_t * sockaddr_all_size)
   __attribute__((__nonnull__(2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_getsockname (mmux_libc_network_socket_t sock, mmux_libc_sockaddr_ptr_t sockaddr_all,
-					      mmux_socklen_t * sockaddr_all_size)
+					      mmux_libc_socklen_t * sockaddr_all_size)
   __attribute__((__nonnull__(2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -2222,26 +2249,26 @@ mmux_cc_libc_decl bool mmux_libc_recv (mmux_usize_t * result_number_of_bytes_rec
 
 mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
 					 mmux_libc_network_socket_t sock, mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags,
-					 mmux_libc_sockaddr_ptr_t destination_sockaddr_p, mmux_socklen_t destination_sockaddr_size)
+					 mmux_libc_sockaddr_ptr_t destination_sockaddr_p, mmux_libc_socklen_t destination_sockaddr_size)
   __attribute__((__nonnull__(1,3,6),__warn_unused_result__));
 
 /* The arguments  "result_sender_sockaddr_p" and  "result_sender_sockaddr_size_p" can
    be NULL if we are not interested in retrieving the sender address. */
 mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
 					   mmux_libc_sockaddr_ptr_t result_sender_sockaddr_p,
-					   mmux_socklen_t *         result_sender_sockaddr_size_p,
+					   mmux_libc_socklen_t *         result_sender_sockaddr_size_p,
 					   mmux_libc_network_socket_t sock,
 					   mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags)
   __attribute__((__nonnull__(1,5),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_socklen_t * result_optlen_p,
+mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
 					     mmux_libc_network_socket_t sock, mmux_sint_t level, mmux_sint_t optname)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_setsockopt (mmux_libc_network_socket_t sock, mmux_sint_t level, mmux_sint_t optname,
-					     mmux_pointer_t optval_p, mmux_socklen_t optlen)
+					     mmux_pointer_t optval_p, mmux_libc_socklen_t optlen)
   __attribute__((__nonnull__(4),__warn_unused_result__));
 
 

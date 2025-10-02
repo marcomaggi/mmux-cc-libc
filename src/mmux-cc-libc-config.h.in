@@ -34,17 +34,17 @@
 
 /* ------------------------------------------------------------------ */
 
-/* The macro  MMUX_CC_TYPES_UNUSED indicates  that a  function, function  argument or
+/* The  macro MMUX_CC_LIBC_UNUSED  indicates that  a function,  function argument  or
    variable may potentially be unused. Usage examples:
 
-   static int unused_function (char arg) MMUX_CC_TYPES_UNUSED;
-   int foo (char unused_argument MMUX_CC_TYPES_UNUSED);
-   int unused_variable MMUX_CC_TYPES_UNUSED;
+   static int unused_function (char arg) MMUX_CC_LIBC_UNUSED;
+   int foo (char unused_argument MMUX_CC_LIBC_UNUSED);
+   int unused_variable MMUX_CC_LIBC_UNUSED;
 */
 #ifdef __GNUC__
-#  define MMUX_CC_TYPES_UNUSED		__attribute__((__unused__))
+#  define MMUX_CC_LIBC_UNUSED		__attribute__((__unused__))
 #else
-#  define MMUX_CC_TYPES_UNUSED		/* empty */
+#  define MMUX_CC_LIBC_UNUSED		/* empty */
 #endif
 
 #ifndef __GNUC__

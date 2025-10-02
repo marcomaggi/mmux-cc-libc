@@ -1,13 +1,13 @@
 /*
   Part of: MMUX CC Libc
-  Contents: core functions
-  Date: Dec  8, 2024
+  Contents: public header file
+  Date: Sep 27, 2025
 
   Abstract
 
-	This module implements core functions.
+	This header file declares generic preprocessor macros.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -21,48 +21,37 @@
   program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-/** --------------------------------------------------------------------
- ** Headers.
- ** ----------------------------------------------------------------- */
-
-#include <mmux-cc-libc-internals.h>
+#ifndef MMUX_CC_LIBC_GENERICS_H
+#define MMUX_CC_LIBC_GENERICS_H 1
 
 
 /** --------------------------------------------------------------------
- ** Version functions.
+ ** Comparison.
  ** ----------------------------------------------------------------- */
 
-char const *
-mmux_cc_libc_version_string (void)
-{
-  return mmux_cc_libc_VERSION_INTERFACE_STRING;
-}
-mmux_sint_t
-mmux_cc_libc_version_interface_current (void)
-{
-  return mmux_sint(mmux_cc_libc_VERSION_INTERFACE_CURRENT);
-}
-mmux_sint_t
-mmux_cc_libc_version_interface_revision (void)
-{
-  return mmux_sint(mmux_cc_libc_VERSION_INTERFACE_REVISION);
-}
-mmux_sint_t
-mmux_cc_libc_version_interface_age (void)
-{
-  return mmux_sint(mmux_cc_libc_VERSION_INTERFACE_AGE);
-}
+m4_divert(-1)
+m4_define([[[DEFINE_COMPARISON]]],[[[m4_dnl
+#define mmux_libc_$1(VALUE1,VALUE2)					\
+  (_Generic((VALUE1),							\
+     mmux_libc_errno_t:		mmux_libc_errno_$1,			\
+     mmux_libc_fd_t:		mmux_libc_fd_$1)((VALUE1),(VALUE2)))
+]]])m4_dnl
+m4_divert(0)m4_dnl
+DEFINE_COMPARISON([[[equal]]])
+
+#define mmux_libc_ctype_value(VALUE)							\
+  (_Generic((VALUE),									\
+	    mmux_libc_socket_address_family_t:		((VALUE).value),		\
+	    mmux_libc_socket_protocol_family_t:		((VALUE).value),		\
+            mmux_libc_insix_addr_t:			((VALUE).value),		\
+            mmux_libc_in_addr_t:			((VALUE).value),		\
+	    default:					mmux_ctype_value(VALUE)))
 
 
 /** --------------------------------------------------------------------
- ** Library initialisation.
+ ** Done.
  ** ----------------------------------------------------------------- */
 
-bool
-mmux_cc_libc_init (void)
-{
-  return false;
-}
+#endif /* MMUX_CC_LIBC_GENERICS_H */
 
 /* end of file */

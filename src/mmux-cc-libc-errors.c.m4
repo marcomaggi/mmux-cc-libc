@@ -34,33 +34,45 @@
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_errno_ref (mmux_sint_t * result_errnum_p)
+mmux_libc_errno_ref (mmux_libc_errno_t * result_errnum_p)
 {
-  *result_errnum_p = mmux_sint(errno);
+  *result_errnum_p = mmux_libc_errno(errno);
   return (errno)? false : true;
 }
 bool
-mmux_libc_errno_set (mmux_sint_t errnum)
+mmux_libc_errno_set (mmux_libc_errno_t errnum)
 {
   errno = errnum.value;
   return false;
 }
 bool
-mmux_libc_errno_consume (mmux_sint_t * result_errnum_p)
+mmux_libc_errno_set_to_einval (void)
 {
-  *result_errnum_p = mmux_sint(errno);
+  errno = EINVAL;
+  return false;
+}
+bool
+mmux_libc_errno_clear (void)
+{
+  errno = 0;
+  return false;
+}
+bool
+mmux_libc_errno_consume (mmux_libc_errno_t * result_errnum_p)
+{
+  *result_errnum_p = mmux_libc_errno(errno);
   errno            = 0;
   return (result_errnum_p->value)? false : true;
 }
 bool
-mmux_libc_strerror (mmux_asciizcpp_t result_error_message_p, mmux_sint_t errnum)
+mmux_libc_strerror (mmux_asciizcpp_t result_error_message_p, mmux_libc_errno_t errnum)
 {
   *result_error_message_p = strerror(errnum.value);
   return false;
 }
 
 bool
-mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+mmux_libc_strerrorname_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERRORNAME_NP]]],[[[
   *result_p = strerrorname_np(errnum.value);
@@ -68,7 +80,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERRORNAME_NP]]],[[[
 ]]])
 }
 bool
-mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_sint_t errnum)
+mmux_libc_strerrordesc_np (mmux_asciizcpp_t result_p, mmux_libc_errno_t errnum)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERRORDESC_NP]]],[[[
   *result_p = strerrordesc_np(errnum.value);
@@ -76,7 +88,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERRORDESC_NP]]],[[[
 ]]])
 }
 bool
-mmux_libc_strerror_r (mmux_asciizcpp_t result_p, mmux_asciizp_t bufptr, mmux_usize_t buflen, mmux_sint_t errnum)
+mmux_libc_strerror_r (mmux_asciizcpp_t result_p, mmux_asciizp_t bufptr, mmux_usize_t buflen, mmux_libc_errno_t errnum)
 /* This is the GNU version of this function. */
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERROR_R]]],[[[
@@ -95,7 +107,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERROR_R]]],[[[
 
 #if 0 /* To be implemented in the future, maybe. */
 bool
-mmux_libc_strerror_l (mmux_asciizp_t result_p, mmux_sint_t errnum, mmux_libc_locale_t loc)
+mmux_libc_strerror_l (mmux_asciizp_t result_p, mmux_libc_errno_t errnum, mmux_libc_locale_t loc)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRERROR_L]]],[[[
   mmux_asciizcp_t	rv = strerror_l(errnum.value, loc.value);

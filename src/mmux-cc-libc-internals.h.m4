@@ -45,6 +45,7 @@ extern "C" {
 #include <mmux-cc-libc-config.h>
 #include <mmux-cc-libc-constants.h>
 /* at the end we include mmux-cc-libc-functions.h */
+/* at the end we include mmux-cc-libc-generics.h */
 
 #ifdef HAVE_INTTYPES_H
 #  include <inttypes.h>
@@ -242,12 +243,15 @@ typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
 typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
 typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
 
+typedef struct mmux_libc_errno_t			{ mmux_sint_t;  } mmux_libc_errno_t;
+typedef struct mmux_libc_process_exit_status_t		{ mmux_sint_t;  } mmux_libc_process_exit_status_t;
+typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;  } mmux_libc_socket_address_family_t;
+typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
+typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
+
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
 typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
-typedef struct mmux_libc_gid_t				{ mmux_gid_t;	} mmux_libc_gid_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
-typedef struct mmux_libc_pid_t				{ mmux_pid_t;	} mmux_libc_pid_t;
-typedef struct mmux_libc_uid_t				{ mmux_uid_t;	} mmux_libc_uid_t;
 typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
 
@@ -281,8 +285,9 @@ typedef struct mmux_libc_iovec_array_t {
   mmux_standard_usize_t	iova_len;
 } mmux_libc_iovec_array_t;
 
-typedef struct in_addr				mmux_libc_in_addr_t;
-typedef struct in6_addr				mmux_libc_insix_addr_t;
+typedef struct mmux_libc_in_addr_t	{ struct in_addr  value; } mmux_libc_in_addr_t;
+typedef struct mmux_libc_insix_addr_t	{ struct in6_addr value; } mmux_libc_insix_addr_t;
+
 typedef struct if_nameindex			mmux_libc_if_nameindex_t;
 typedef struct addrinfo				mmux_libc_addrinfo_t;
 typedef struct sockaddr				mmux_libc_sockaddr_t;
@@ -318,10 +323,10 @@ typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 typedef struct mmux_libc_memory_allocator_t	mmux_libc_memory_allocator_t;
 
 typedef struct mmux_libc_memory_allocator_value_t {
-  mmux_asciizcp_t	name;
-  mmux_uint_t		version_major;
-  mmux_uint_t		version_minor;
-  mmux_uint_t		version_patchlevel;
+  mmux_asciizcp_t		name;
+  mmux_standard_uint_t		version_major;
+  mmux_standard_uint_t		version_minor;
+  mmux_standard_uint_t		version_patchlevel;
 } mmux_libc_memory_allocator_value_t;
 
 typedef bool mmux_libc_memory_allocator_malloc_fun_t
@@ -416,10 +421,29 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
 
 
 /** --------------------------------------------------------------------
+ ** Helper macros and functions.
+ ** ----------------------------------------------------------------- */
+
+#define mmux_usize_strlen(STRPTR)	(mmux_usize(strlen(STRPTR)))
+
+mmux_cc_libc_inline_decl mmux_libc_in_addr_t
+mmux_libc_in_addr (struct in_addr value)
+{
+  return (mmux_libc_in_addr_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_insix_addr_t
+mmux_libc_insix_addr (struct in6_addr value)
+{
+  return (mmux_libc_insix_addr_t) { .value = value };
+}
+
+
+/** --------------------------------------------------------------------
  ** Done.
  ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc-functions.h>
+#include <mmux-cc-libc-generics.h>
 
 #ifdef __cplusplus
 } // extern "C"

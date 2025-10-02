@@ -33,14 +33,14 @@
  ** Struct timeval.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_sec,		mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_usec,	mmux_slong_t)
+DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_sec,		time)
+DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_usec,	slong)
 
 bool
 mmux_libc_timeval_set (mmux_libc_timeval_t * timeval_p, mmux_time_t seconds, mmux_slong_t microseconds)
 {
-  timeval_p->tv_sec  = seconds;
-  timeval_p->tv_usec = microseconds;
+  timeval_p->tv_sec  = seconds.value;
+  timeval_p->tv_usec = microseconds.value;
   return false;
 }
 bool
@@ -58,21 +58,35 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
   }
 
   {
-    int		len = mmux_time_sprint_size(timeval_p->tv_sec);
-    char	str[len];
+    mmux_time_t		field_value;
+    mmux_usize_t	required_nbytes;
 
-    mmux_time_sprint(str, len, timeval_p->tv_sec);
-    rv = dprintf(fd.value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
-    if (0 > rv) { return true; }
+    mmux_libc_tv_sec_ref(&field_value, timeval_p);
+    if (mmux_time_sprint_size(&required_nbytes, field_value)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_time_sprint(str, required_nbytes, field_value);
+      rv = dprintf(fd.value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
+      if (0 > rv) { return true; }
+    }
   }
 
   {
-    int		len = mmux_time_sprint_size(timeval_p->tv_usec);
-    char	str[len];
+    mmux_slong_t	field_value;
+    mmux_usize_t	required_nbytes;
 
-    mmux_time_sprint(str, len, timeval_p->tv_usec);
-    rv = dprintf(fd.value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
-    if (0 > rv) { return true; }
+    mmux_libc_tv_usec_ref(&field_value, timeval_p);
+    if (mmux_slong_sprint_size(&required_nbytes, field_value)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_slong_sprint(str, required_nbytes, field_value);
+      rv = dprintf(fd.value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
+      if (0 > rv) { return true; }
+    }
   }
 
   return false;
@@ -86,32 +100,32 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
 bool
 mmux_libc_ts_sec_set (mmux_libc_timespec_t * const P, mmux_time_t value)
 {
-  P->tv_sec = value;
+  P->tv_sec = value.value;
   return false;
 }
 bool
 mmux_libc_ts_sec_ref (mmux_time_t * result_p, mmux_libc_timespec_t const * const P)
 {
-  *result_p = P->tv_sec;
+  *result_p = mmux_time(P->tv_sec);
   return false;
 }
 bool
 mmux_libc_ts_nsec_set (mmux_libc_timespec_t * const P, mmux_slong_t value)
 {
-  P->tv_nsec = value;
+  P->tv_nsec = value.value;
   return false;
 }
 bool
 mmux_libc_ts_nsec_ref (mmux_slong_t * result_p, mmux_libc_timespec_t const * const P)
 {
-  *result_p = P->tv_nsec;
+  *result_p = mmux_slong(P->tv_nsec);
   return false;
 }
 bool
 mmux_libc_timespec_set (mmux_libc_timespec_t * timespec_p, mmux_time_t seconds, mmux_slong_t nanoseconds)
 {
-  timespec_p->tv_sec  = seconds;
-  timespec_p->tv_nsec = nanoseconds;
+  timespec_p->tv_sec  = seconds.value;
+  timespec_p->tv_nsec = nanoseconds.value;
   return false;
 }
 bool
@@ -129,21 +143,35 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
   }
 
   {
-    int		len = mmux_time_sprint_size(timespec_p->tv_sec);
-    char	str[len];
+    mmux_time_t		field_value;
+    mmux_usize_t	required_nbytes;
 
-    mmux_time_sprint(str, len, timespec_p->tv_sec);
-    rv = dprintf(fd.value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
-    if (0 > rv) { return true; }
+    mmux_libc_ts_sec_ref(&field_value, timespec_p);
+    if (mmux_time_sprint_size(&required_nbytes, field_value)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_time_sprint(str, required_nbytes, field_value);
+      rv = dprintf(fd.value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
+      if (0 > rv) { return true; }
+    }
   }
 
   {
-    int		len = mmux_time_sprint_size(timespec_p->tv_nsec);
-    char	str[len];
+    mmux_slong_t	field_value;
+    mmux_usize_t	required_nbytes;
 
-    mmux_time_sprint(str, len, timespec_p->tv_nsec);
-    rv = dprintf(fd.value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
-    if (0 > rv) { return true; }
+    mmux_libc_ts_nsec_ref(&field_value, timespec_p);
+    if (mmux_slong_sprint_size(&required_nbytes, field_value)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_slong_sprint(str, required_nbytes, field_value);
+      rv = dprintf(fd.value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
+      if (0 > rv) { return true; }
+    }
   }
 
   return false;
@@ -154,17 +182,30 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
  ** Struct tm.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_sec,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_min,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_hour,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_mday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_mon,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_year,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_wday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_yday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_isdst,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_gmtoff,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER(tm,	tm_zone,	char const *)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_sec,		sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_min,		sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_hour,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_mday,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_mon,		sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_year,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_wday,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_yday,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_isdst,	sint)
+DEFINE_STRUCT_SETTER_GETTER(tm,	tm_gmtoff,	slong)
+bool
+mmux_libc_tm_zone_set (mmux_libc_tm_t * const P, mmux_asciizcp_t value)
+{
+  P->tm_zone = value;
+  return false;
+}
+bool
+mmux_libc_tm_zone_ref (mmux_asciizcp_t * result_p, mmux_libc_tm_t const * const P)
+{
+  *result_p = P->tm_zone;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
 mmux_libc_tm_dump (mmux_libc_file_descriptor_t fd, mmux_libc_tm_t const * tm_p, char const * struct_name)
@@ -183,12 +224,19 @@ mmux_libc_tm_dump (mmux_libc_file_descriptor_t fd, mmux_libc_tm_t const * tm_p, 
 
 m4_define([[[DEFINE_TM_FIELD_DUMPER]]],[[[
   {
-    int		len = mmux_$2_sprint_size(tm_p->$1);
-    char	str[len];
+    mmux_$2_t		field_value;
+    mmux_usize_t	required_nbytes;
 
-    mmux_$2_sprint(str, len, tm_p->$1);
-    rv = dprintf(fd.value, "%s->$1 = %s\n", struct_name, str);
-    if (0 > rv) { return true; }
+    mmux_libc_$1_ref(&field_value, tm_p);
+    if (mmux_$2_sprint_size(&required_nbytes, field_value)) {
+      return true;
+    } else {
+      char	str[required_nbytes.value];
+
+      mmux_$2_sprint(str, required_nbytes, field_value);
+      rv = dprintf(fd.value, "%s->$1 = %s\n", struct_name, str);
+      if (0 > rv) { return true; }
+    }
   }
 ]]])
 DEFINE_TM_FIELD_DUMPER(tm_sec,		sint)
@@ -235,7 +283,7 @@ mmux_libc_tm_reset (mmux_libc_tm_t * tm_p)
 bool
 mmux_libc_time (mmux_time_t * result_p)
 {
-  *result_p = time(NULL);
+  *result_p = mmux_time(time(NULL));
   return false;
 }
 bool
@@ -243,41 +291,41 @@ mmux_libc_localtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
 {
   /* A call to "localtime()" returns a  pointer to a "struct tm" statically allocated
      by the C library. */
-  *result_p = localtime(&T);
+  *result_p = localtime(&T.value);
   return false;
 }
 bool
 mmux_libc_localtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
 {
-  localtime_r(&T, result_p);
+  localtime_r(&T.value, result_p);
   return false;
 }
 bool
 mmux_libc_gmtime (mmux_libc_tm_t * * result_p, mmux_time_t T)
 {
-  *result_p = gmtime(&T);
+  *result_p = gmtime(&T.value);
   return false;
 }
 bool
 mmux_libc_gmtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
 {
-  gmtime_r(&T, result_p);
+  gmtime_r(&T.value, result_p);
   return false;
 }
 bool
 mmux_libc_mktime (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
 {
-  *result_p = mktime(tm_p);
+  *result_p = mmux_time(mktime(tm_p));
   return false;
 }
 bool
 mmux_libc_timegm (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
 {
-  *result_p = timegm(tm_p);
+  *result_p = mmux_time(timegm(tm_p));
   return false;
 }
 bool
-mmux_libc_asctime (char const * * result_p, mmux_libc_tm_t * tm_p)
+mmux_libc_asctime (mmux_asciizcp_t * result_p, mmux_libc_tm_t * tm_p)
 {
   *result_p = asctime(tm_p);
   return false;
@@ -296,13 +344,13 @@ mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_t * tm_p)
 bool
 mmux_libc_ctime (mmux_asciizcpp_t result_p, mmux_time_t T)
 {
-  *result_p = ctime(&T);
+  *result_p = ctime(&T.value);
   return false;
 }
 bool
 mmux_libc_ctime_r (mmux_asciizp_t result_p, mmux_time_t T)
 {
-  mmux_asciizcp_t	rv = ctime_r(&T, result_p);
+  mmux_asciizcp_t	rv = ctime_r(&T.value, result_p);
 
   if (NULL == rv) {
     return true;
@@ -314,19 +362,19 @@ bool
 mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
 						  mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
 {
-  for (mmux_usize_t buflen=1024; buflen; buflen+=1024) {
+  for (mmux_standard_usize_t buflen=1024; buflen; buflen+=1024) {
 _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
-    mmux_usize_t required_nbytes_excluding_nil = strftime(NULL, buflen, template, tm_p);
+    mmux_usize_t required_nbytes_excluding_nil = mmux_usize(strftime(NULL, buflen, template, tm_p));
 _Pragma("GCC diagnostic pop")
 
-    if (0 == required_nbytes_excluding_nil) {
+    if (mmux_ctype_is_zero(required_nbytes_excluding_nil)) {
       /* The numbe of bytes "buflen" is not big enough. */
       continue;
-    } else if (required_nbytes_excluding_nil == mmux_usize_maximum()) {
+    } else if (mmux_ctype_equal(required_nbytes_excluding_nil, mmux_usize_constant_maximum())) {
       return true;
     } else {
-      *required_nbytes_including_nil_p = 1 + required_nbytes_excluding_nil;
+      required_nbytes_including_nil_p->value = 1 + required_nbytes_excluding_nil.value;
       return false;
     }
   }
@@ -337,7 +385,7 @@ mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
 		    mmux_asciizp_t bufptr, mmux_usize_t buflen,
 		    mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
 {
-  if (0 < buflen) {
+  if (0 < buflen.value) {
     mmux_usize_t	required_nbytes_without_zero;
 
     /* See the documentation  of "strftime()" in the GLIBC manual  for an explanation
@@ -345,9 +393,9 @@ mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
     bufptr[0]       = '\1';
 _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
-    required_nbytes_without_zero = strftime(bufptr, buflen, template, tm_p);
+    required_nbytes_without_zero.value = strftime(bufptr, buflen.value, template, tm_p);
 _Pragma("GCC diagnostic pop")
-    if ((0 == required_nbytes_without_zero) && ('\0' != bufptr[0])) {
+    if ((0 == required_nbytes_without_zero.value) && ('\0' != bufptr[0])) {
       return true;
     } else {
       *required_nbytes_without_zero_p = required_nbytes_without_zero;
@@ -359,7 +407,7 @@ _Pragma("GCC diagnostic pop")
 }
 bool
 mmux_libc_strptime (char ** first_unprocessed_after_timestamp_p,
-		    char const * input_string, char const * template, mmux_libc_tm_t * tm_p)
+		    mmux_asciizcp_t input_string, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
 {
   char *	first_unprocessed_after_timestamp = strptime(input_string, template, tm_p);
 
@@ -381,13 +429,13 @@ mmux_libc_strptime (char ** first_unprocessed_after_timestamp_p,
 bool
 mmux_libc_sleep (mmux_uint_t * result_p, mmux_uint_t seconds)
 {
-  *result_p = sleep(seconds);
+  *result_p = mmux_uint(sleep(seconds.value));
   return false;
 }
 bool
 mmux_libc_nanosleep (mmux_libc_timespec_t * requested_time, mmux_libc_timespec_t * remaining_time)
 {
-  mmux_sint_t	rv = nanosleep(requested_time, remaining_time);
+  int	rv = nanosleep(requested_time, remaining_time);
 
   return ((-1 == rv)? true : false);
 }

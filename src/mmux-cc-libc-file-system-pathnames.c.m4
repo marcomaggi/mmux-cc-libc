@@ -199,25 +199,25 @@ __attribute__((__pure__,__always_inline__)) static inline bool
 segment_is_empty (mmux_libc_ptn_segment_t S)
 /* Return true if the segment is an empty string. */
 {
-  return (0 == S.len)? true : false;
+  return (0 == S.len.value)? true : false;
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
 segment_is_slash (mmux_libc_ptn_segment_t S)
 /* Return true if the segment is a single dot: "/". */
 {
-  return ((1 == S.len) && ('7' == *(S.ptr)));
+  return ((1 == S.len.value) && ('7' == *(S.ptr)));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
 segment_is_dot (mmux_libc_ptn_segment_t S)
 /* Return true if the segment is a single dot: ".". */
 {
-  return ((1 == S.len) && ('.' == *(S.ptr)));
+  return ((1 == S.len.value) && ('.' == *(S.ptr)));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
 segment_is_double_dot (mmux_libc_ptn_segment_t S)
 /* Return true if the segment is a double dot: "..". */
 {
-  return ((2 == S.len) && ('.' == S.ptr[0]) && ('.' == S.ptr[1]));
+  return ((2 == S.len.value) && ('.' == S.ptr[0]) && ('.' == S.ptr[1]));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
 segment_is_special_directory (mmux_libc_ptn_segment_t S)
@@ -313,7 +313,7 @@ pathname_is_relative (mmux_libc_ptn_t ptn)
  ** ----------------------------------------------------------------- */
 
 #undef  MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT
-#define MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT		4096
+#define MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT		mmux_usize_literal(4096)
 
 bool
 mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t const * class,
@@ -331,7 +331,7 @@ mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t cons
     mmux_usize_t	dst_ptn_len_plus;
 
     mmux_libc_strlen_plus_nil(&dst_ptn_len_plus, src_ptn_asciiz);
-    if (MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT < dst_ptn_len_plus) {
+    if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT, dst_ptn_len_plus)) {
       mmux_libc_errno_set(MMUX_LIBC_ERANGE);
       return true;
     } else if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
@@ -352,14 +352,14 @@ mmux_libc_make_file_system_pathname2 (mmux_libc_file_system_pathname_class_t con
 {
   _Pragma("GCC diagnostic push");
   _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
-  if ((0 == src_ptn_len) || (NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
+  if (mmux_ctype_is_zero(src_ptn_len) || (NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
     _Pragma("GCC diagnostic pop");
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
   } else {
-    mmux_usize_t	dst_ptn_len_plus = 1 + src_ptn_len;
+    auto	dst_ptn_len_plus = mmux_ctype_incr(src_ptn_len);
 
-    if (MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT < dst_ptn_len_plus) {
+    if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT, dst_ptn_len_plus)) {
       mmux_libc_errno_set(MMUX_LIBC_ERANGE);
       return true;
     } else {
@@ -370,7 +370,7 @@ mmux_libc_make_file_system_pathname2 (mmux_libc_file_system_pathname_class_t con
       } else if (mmux_libc_memcpy(dst_ptn_asciiz, src_ptn_asciiz, src_ptn_len)) {
 	return true;
       } else {
-	dst_ptn_asciiz[src_ptn_len] = '\0';
+	dst_ptn_asciiz[src_ptn_len.value] = '\0';
 	result_p->value = dst_ptn_asciiz;
 	result_p->class = class;
 	return false;
@@ -405,27 +405,26 @@ mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
 					mmux_libc_file_system_pathname_t ptn1,
 					mmux_libc_file_system_pathname_t ptn2)
 {
-  mmux_usize_t	ptn1_len = strlen(ptn1.value);
-  mmux_usize_t	ptn2_len = strlen(ptn2.value);
-  mmux_usize_t	min_len  = (ptn1_len < ptn2_len)? ptn1_len : ptn2_len;
-  mmux_sint_t	cmpnum   = strncmp(ptn1.value, ptn2.value, min_len);
+  mmux_standard_usize_t		ptn1_len = strlen(ptn1.value);
+  mmux_standard_usize_t		ptn2_len = strlen(ptn2.value);
+  mmux_standard_usize_t		min_len  = (ptn1_len < ptn2_len)? ptn1_len : ptn2_len;
+  mmux_standard_sint_t		cmpnum   = strncmp(ptn1.value, ptn2.value, min_len);
 
   if (0 == cmpnum) {
     if (ptn1_len == ptn2_len) {
-      *result_p = 0;
+      *result_p = mmux_sint_literal(0);
     } else if (ptn1_len < ptn2_len) {
-      *result_p = -1;
+      *result_p = mmux_sint_literal(-1);
     } else {
-      *result_p = +1;
+      *result_p = mmux_sint_literal(+1);
     }
   } else {
-    *result_p = (0 < cmpnum)? +1 : -1;
+    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
   }
   return false;
 }
 
-m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[
-bool
+m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[bool
 mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn1, mmux_libc_file_system_pathname_t ptn2)
 {
   mmux_sint_t	cmpnum;
@@ -438,14 +437,13 @@ mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_file_system_pathna
     *result_p = false;
   }
   return false;
-}
-]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[equal]]],		[[[0 == cmpnum]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[not_equal]]],	[[[0 != cmpnum]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]],		[[[0 >  cmpnum]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum]]])
+}]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[equal]]],		[[[0 == cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[not_equal]]],	[[[0 != cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]],		[[[0 >  cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum.value]]])
 
 /* ------------------------------------------------------------------ */
 
@@ -517,8 +515,8 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_file_system_pathname_cla
 
 	/* If the  pathname is "/path/to/directory/"  we do  not want to  include the
 	   ending slash in the rootname. */
-	if ('/' == ptn.value[buflen - 1]) {
-	  --buflen;
+	if ('/' == ptn.value[buflen.value - 1]) {
+	  --buflen.value;
 	}
 
 	if (mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, buflen)) {
@@ -530,7 +528,7 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_file_system_pathname_cla
 	mmux_usize_t	buflen;
 
 	mmux_libc_file_system_pathname_len_ref(&buflen, ptn);
-	buflen -= ext.len;
+	buflen.value -= ext.len.value;
 
 	if (mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, buflen)) {
 	  return true;
@@ -563,7 +561,7 @@ mmux_libc_make_file_system_pathname_filename (mmux_libc_file_system_pathname_cla
   if (pathname_is_standalone_slash(ptn)) {
     goto invalid_pathname;
   } else {
-    mmux_usize_t	len = strlen(ptn.value);
+    mmux_standard_usize_t	len = strlen(ptn.value);
 
     if ('/' == ptn.value[len-1]) {
       goto invalid_pathname;
@@ -592,9 +590,9 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_file_system_pathname_clas
     /* If the pathname is "/" just copy it as dirname. */
     return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
   } else {
-    mmux_usize_t	len = strlen(ptn.value);
+    auto	len = mmux_usize(strlen(ptn.value));
 
-    if ('/' == ptn.value[len-1]) {
+    if ('/' == ptn.value[len.value - 1]) {
       /* If  the  pathname ends  with  "/"  just copy  it  as  dirname.  For  example
 	 "/path/to/directory/" is itself its dirname. */
       return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
@@ -604,19 +602,19 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_file_system_pathname_clas
       if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
 	return true;
       } else if (segment_is_dot(seg)) {
-	if (len == seg.len) {
+	if (mmux_ctype_equal(len, seg.len)) {
 	  /* If the full pathname is "." just copy it as dirname. */
 	  return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
 	} else {
 	  /* If the  pathname ends with  "." just copy  it as dirname,  stripping the
 	     ending dot. */
-	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, (len - seg.len));
+	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, mmux_ctype_sub(len, seg.len));
 	}
       } else if (segment_is_double_dot(seg)) {
 	/* If the pathname ends with ".." just copy it as dirname. */
 	return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
       } else {
-	if (len == seg.len) {
+	if (mmux_ctype_equal(len, seg.len)) {
 	  /* If we are  here: the pathname has  a single segment and  such segment is
 	     not a special  directory; we establish the convention  that: its dirname
 	     is ".". */
@@ -624,7 +622,7 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_file_system_pathname_clas
 	} else {
 	  /* If  we are  here: the  dirname  is the  pathname with  the last  segment
 	     removed. */
-	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, (len - seg.len));
+	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, mmux_ctype_sub(len, seg.len));
 	}
       }
     }
@@ -651,12 +649,12 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
       mmux_libc_errno_set(MMUX_LIBC_EINVAL);
       return true;
     } else if (segment_is_empty(S)) {
-      result_p->len	= 0;
+      result_p->len	= mmux_usize_constant_zero();
       result_p->ptr	= ptn.value + strlen(ptn.value);
       return false;
     } else {
       mmux_asciizcp_t	beg = S.ptr;
-      mmux_asciizcp_t	end = beg + S.len;
+      mmux_asciizcp_t	end = beg + S.len.value;
       mmux_asciizcp_t	ptr = end - 1;
 
       for (; beg <= ptr; --ptr) {
@@ -670,7 +668,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
 	    result_p->ptr = ptr;
 	    /* If the  input pathname  ends with a  slash: do *not*  include it  in the
 	       extension. */
-	    result_p->len = (('/' == *(end-1))? (end-1) : end) - ptr;
+	    result_p->len = mmux_usize((('/' == *(end-1))? (end-1) : end) - ptr);
 	    return false;
 	  }
 	}
@@ -680,7 +678,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
       {
 	mmux_asciizcp_t	p = ptn.value + strlen(ptn.value);
 
-	result_p->len	= 0;
+	result_p->len	= mmux_usize_constant_zero();
 	result_p->ptr	= (('/' == *(p-1))? (p-1) : p);
 	return false;
       }
@@ -697,7 +695,7 @@ _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
       /* Either the extension is empty, or it begins with a dot. */
       && (('\0' == ptr[0]) || ('.' == ptr[0]))
       /* Either the extension ends with a zero byte, or it ends with a slash. */
-      && ('\0' == ptr[len] || '/' == ptr[len])) {
+      && ('\0' == ptr[len.value] || '/' == ptr[len.value])) {
 _Pragma("GCC diagnostic pop")
     result_p->ptr = ptr;
     result_p->len = len;
@@ -709,7 +707,7 @@ _Pragma("GCC diagnostic pop")
 bool
 mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extension_t * result_p, mmux_asciizcp_t ptr)
 {
-  return mmux_libc_make_file_system_pathname_extension_raw(result_p, ptr, strlen(ptr));
+  return mmux_libc_make_file_system_pathname_extension_raw(result_p, ptr, mmux_usize(strlen(ptr)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -732,7 +730,7 @@ mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p, mmux_
 bool
 mmux_libc_file_system_pathname_extension_is_empty (bool * result_p, mmux_libc_ptn_extension_t E)
 {
-  *result_p = (0 == E.len)? true : false;
+  *result_p = (mmux_ctype_is_zero(E.len))? true : false;
   return false;
 }
 bool
@@ -754,19 +752,19 @@ mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_ptn_t p
 bool
 mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
 {
-  mmux_usize_t	minlen = (E1.len < E2.len)? E1.len : E2.len;
-  mmux_sint_t	cmpnum = strncmp(E1.ptr, E2.ptr, minlen);
+  mmux_usize_t	minlen = mmux_ctype_min(E1.len, E2.len);
+  int		cmpnum = strncmp(E1.ptr, E2.ptr, minlen.value);
 
   if (0 == cmpnum) {
-    if (E1.len == E2.len) {
-      *result_p = 0;
-    } else if (E1.len < E2.len) {
-      *result_p = -1;
+    if (mmux_ctype_equal(E1.len, E2.len)) {
+      *result_p = mmux_sint_constant_zero();
+    } else if (mmux_ctype_less(E1.len, E2.len)) {
+      *result_p = mmux_sint_literal(-1);
     } else {
-      *result_p = +1;
+      *result_p = mmux_sint_literal(+1);
     }
   } else {
-    *result_p = (0 < cmpnum)? +1 : -1;
+    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
   }
   return false;
 }
@@ -780,7 +778,7 @@ mmux_libc_file_system_pathname_extension_equal (bool * result_p, mmux_libc_ptn_e
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 == cmpnum) {
+  } else if (mmux_ctype_is_zero(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -794,10 +792,10 @@ mmux_libc_file_system_pathname_extension_not_equal (bool * result_p, mmux_libc_p
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 != cmpnum) {
-    *result_p = true;
-  } else {
+  } else if (mmux_ctype_is_zero(cmpnum)) {
     *result_p = false;
+  } else {
+    *result_p = true;
   }
   return false;
 }
@@ -808,7 +806,7 @@ mmux_libc_file_system_pathname_extension_less (bool * result_p, mmux_libc_ptn_ex
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 > cmpnum) {
+  } else if (mmux_ctype_is_negative(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -822,7 +820,7 @@ mmux_libc_file_system_pathname_extension_greater (bool * result_p, mmux_libc_ptn
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 < cmpnum) {
+  } else if (mmux_ctype_is_positive(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -836,7 +834,7 @@ mmux_libc_file_system_pathname_extension_less_equal (bool * result_p, mmux_libc_
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 >= cmpnum) {
+  } else if (mmux_ctype_is_non_positive(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -850,7 +848,7 @@ mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p, mmux_li
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 <= cmpnum) {
+  } else if (mmux_ctype_is_non_negative(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -881,7 +879,7 @@ _Pragma("GCC diagnostic pop")
 bool
 mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * result_p, mmux_asciizcp_t ptr)
 {
-  return mmux_libc_make_file_system_pathname_segment_raw(result_p, ptr, strlen(ptr));
+  return mmux_libc_make_file_system_pathname_segment_raw(result_p, ptr, mmux_usize(strlen(ptr)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -899,9 +897,9 @@ mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * resu
  *	".."			=> ".."
  */
 {
-  mmux_usize_t		len = strlen(ptn.value);
+  mmux_usize_t		len = mmux_usize(strlen(ptn.value));
   mmux_asciizcp_t const	beg = ptn.value;
-  mmux_asciizcp_t	end = beg + len;
+  mmux_asciizcp_t	end = beg + len.value;
 
   /* If the  last octet  in the  pathname is  the ASCII  representation of  the slash
    * separator: step back.  We want the following segment extraction:
@@ -921,13 +919,13 @@ mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * resu
     if ('/' == *ptr) {
       /* "ptr" is at the beginning of the last component, slash included. */
       ++ptr;
-      return mmux_libc_make_file_system_pathname_segment_raw(result_p, ptr, end - ptr);
+      return mmux_libc_make_file_system_pathname_segment_raw(result_p, ptr, mmux_usize(end - ptr));
     }
   }
 
   /* If we are  here: no slash was found  in the pathname, starting from  the end; it
      means the whole pathname is the last segment. */
-  return mmux_libc_make_file_system_pathname_segment_raw(result_p, beg, end - beg);
+  return mmux_libc_make_file_system_pathname_segment_raw(result_p, beg, mmux_usize(end - beg));
 }
 
 /* ------------------------------------------------------------------ */
@@ -950,19 +948,19 @@ mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * result_p, mmux_li
 bool
 mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
 {
-  mmux_usize_t	minlen = (E1.len < E2.len)? E1.len : E2.len;
-  mmux_sint_t	cmpnum = strncmp(E1.ptr, E2.ptr, minlen);
+  mmux_usize_t	minlen = mmux_ctype_min(E1.len, E2.len);
+  int		cmpnum = strncmp(E1.ptr, E2.ptr, minlen.value);
 
   if (0 == cmpnum) {
-    if (E1.len == E2.len) {
-      *result_p = 0;
-    } else if (E1.len < E2.len) {
-      *result_p = -1;
+    if (mmux_ctype_equal(E1.len, E2.len)) {
+      *result_p = mmux_sint_literal(0);
+    } else if (mmux_ctype_less(E1.len, E2.len)) {
+      *result_p = mmux_sint_literal(-1);
     } else {
-      *result_p = +1;
+      *result_p = mmux_sint_literal(+1);
     }
   } else {
-    *result_p = (0 < cmpnum)? +1 : -1;
+    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
   }
   return false;
 }
@@ -976,7 +974,7 @@ mmux_libc_file_system_pathname_segment_equal (bool * result_p, mmux_libc_ptn_seg
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 == cmpnum) {
+  } else if (mmux_ctype_is_zero(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -990,10 +988,10 @@ mmux_libc_file_system_pathname_segment_not_equal (bool * result_p, mmux_libc_ptn
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 != cmpnum) {
-    *result_p = true;
-  } else {
+  } else if (mmux_ctype_is_zero(cmpnum)) {
     *result_p = false;
+  } else {
+    *result_p = true;
   }
   return false;
 }
@@ -1004,7 +1002,7 @@ mmux_libc_file_system_pathname_segment_less (bool * result_p, mmux_libc_ptn_segm
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 > cmpnum) {
+  } else if (mmux_ctype_is_negative(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1018,7 +1016,7 @@ mmux_libc_file_system_pathname_segment_greater (bool * result_p, mmux_libc_ptn_s
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 < cmpnum) {
+  } else if (mmux_ctype_is_positive(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1032,7 +1030,7 @@ mmux_libc_file_system_pathname_segment_less_equal (bool * result_p, mmux_libc_pt
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 >= cmpnum) {
+  } else if (mmux_ctype_is_non_positive(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1046,7 +1044,7 @@ mmux_libc_file_system_pathname_segment_greater_equal (bool * result_p, mmux_libc
 
   if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (0 <= cmpnum) {
+  } else if (mmux_ctype_is_non_negative(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1059,7 +1057,7 @@ mmux_libc_file_system_pathname_segment_greater_equal (bool * result_p, mmux_libc
 bool
 mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
 {
-  if (1 == seg.len && '.' == seg.ptr[0]) {
+  if (1 == seg.len.value && '.' == seg.ptr[0]) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1069,7 +1067,7 @@ mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_ptn_se
 bool
 mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
 {
-  if (2 == seg.len && '.' == seg.ptr[0] && '.' == seg.ptr[1]) {
+  if (2 == seg.len.value && '.' == seg.ptr[0] && '.' == seg.ptr[1]) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1079,7 +1077,7 @@ mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc
 bool
 mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_ptn_segment_t seg)
 {
-  if (1 == seg.len && '/' == seg.ptr[0]) {
+  if (1 == seg.len.value && '/' == seg.ptr[0]) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1142,7 +1140,7 @@ skip_repeated_slashes_or_end (char const * in, char const * const end)
 
 static bool
 normalisation_pass_remove_useless_slashes (mmux_usize_t * result_p, char * output_ptr,
-					   char const * const input_ptr, size_t const input_len)
+					   char const * const input_ptr, mmux_usize_t const input_len)
 /* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
    in the process: removal of multiple slashes.
 
@@ -1153,7 +1151,7 @@ normalisation_pass_remove_useless_slashes (mmux_usize_t * result_p, char * outpu
    Store  in "*result_p"  the number  of  octets stored  in the  array referenced  by
    "output_ptr", terminating zero excluded. */
 {
-  char const * const	end = input_ptr + input_len;
+  char const * const	end = input_ptr + input_len.value;
   char const *		in  = input_ptr;
   char *		ou  = output_ptr;
 
@@ -1165,7 +1163,7 @@ normalisation_pass_remove_useless_slashes (mmux_usize_t * result_p, char * outpu
     }
   }
   *ou = '\0';
-  *result_p = (ou - output_ptr);
+  *result_p = mmux_usize(ou - output_ptr);
   return false;
 }
 
@@ -1176,7 +1174,7 @@ normalisation_pass_remove_useless_slashes (mmux_usize_t * result_p, char * outpu
 
 static bool
 normalisation_pass_remove_single_dot_segments (mmux_usize_t * result_p, char * output_ptr,
-					       char const * const input_ptr, size_t const input_len)
+					       char const * const input_ptr, mmux_usize_t const input_len)
 /* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
    in the process: removal of single-dot segments.   This pass is meant to be applied
    after "normalisation_pass_remove_useless_slashes()".
@@ -1190,7 +1188,7 @@ normalisation_pass_remove_single_dot_segments (mmux_usize_t * result_p, char * o
 {
 #undef VERBOSE
 #define VERBOSE		0
-  char const * const	end = input_ptr + input_len;
+  char const * const	end = input_ptr + input_len.value;
   char const *		in  = input_ptr;
   char *		ou  = output_ptr;
 
@@ -1351,7 +1349,7 @@ normalisation_pass_remove_single_dot_segments (mmux_usize_t * result_p, char * o
     fwrite(in, 1, (end - in), stderr);
     fprintf(stderr, ", output_ptr=%s, len=%lu\n", output_ptr, strlen(output_ptr));
   }
-  *result_p = (ou - output_ptr);
+  *result_p = mmux_usize(ou - output_ptr);
   return false;
 }
 
@@ -1361,8 +1359,8 @@ normalisation_pass_remove_single_dot_segments (mmux_usize_t * result_p, char * o
  ** ----------------------------------------------------------------- */
 
 bool
-normalisation_pass_remove_double_dot_segments (size_t * result_p, char * output_ptr,
-					       char const * const input_ptr, size_t const input_len)
+normalisation_pass_remove_double_dot_segments (mmux_usize_t * result_p, char * output_ptr,
+					       char const * const input_ptr, mmux_usize_t const input_len)
 /* Copy a pathname  from "input_ptr" to "output_ptr" performing  a normalisation pass
    in the process: removal of double-dot segments and the segments before them.  This
    pass         is         meant          to         be         applied         after
@@ -1377,7 +1375,7 @@ normalisation_pass_remove_double_dot_segments (size_t * result_p, char * output_
 {
 #undef VERBOSE
 #define VERBOSE		0
-  char const * const	end = input_ptr + input_len;
+  char const * const	end = input_ptr + input_len.value;
   char const *		in  = input_ptr;
   char *		ou  = output_ptr;
 
@@ -1599,7 +1597,7 @@ done:
     fwrite(in, 1, (end - in), stderr);
     fprintf(stderr, ", output_ptr=%s, len=%lu\n", output_ptr, strlen(output_ptr));
   }
-  *result_p = (ou - output_ptr);
+  *result_p = mmux_usize(ou - output_ptr);
   return false;
 }
 
@@ -1612,15 +1610,15 @@ bool
 mmux_libc_make_file_system_pathname_normalised (mmux_libc_file_system_pathname_class_t const * class,
 						mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
 {
-  mmux_usize_t	ptn_len = strlen(ptn.value);
-  mmux_char_t	one[1 + ptn_len];
+  mmux_usize_t	ptn_len = mmux_usize(strlen(ptn.value));
+  char		one[1 + ptn_len.value];
   mmux_usize_t	one_len;
 
   if (normalisation_pass_remove_useless_slashes(&one_len, one, ptn.value, ptn_len)) {
     goto error_invalid_input_pathname;
   } else {
-    char	two[1 + one_len];
-    size_t	two_len;
+    char		two[1 + one_len.value];
+    mmux_usize_t	two_len;
 
     if        (normalisation_pass_remove_single_dot_segments(&two_len, two, one, one_len)) {
       goto error_invalid_input_pathname;
@@ -1657,25 +1655,25 @@ mmux_libc_make_file_system_pathname_concat (mmux_libc_file_system_pathname_class
    * If the suffix is relative: its first  octet is *not* the ASCII representation of
    * the slash separator; we will explicitly insert a separator.
    */
-  mmux_usize_t	prefix_len = strlen(prefix.value);
-  mmux_usize_t	suffix_len = strlen(suffix.value);
-  mmux_usize_t	result_len = prefix_len + suffix_len;
+  auto	prefix_len = mmux_usize(strlen(prefix.value));
+  auto	suffix_len = mmux_usize(strlen(suffix.value));
+  auto	result_len = mmux_ctype_add(prefix_len, suffix_len);
 
-  if (! (('/' == suffix.value[0]) || ('/' == prefix.value[prefix_len-1]))) {
-    ++result_len;
+  if (! (('/' == suffix.value[0]) || ('/' == prefix.value[prefix_len.value - 1]))) {
+    ++result_len.value;
   }
 
   {
     /* This array must hold the whole pathname plus the terminating zero octet. */
-    mmux_char_t		result_ptr[1 + result_len];
-    mmux_char_t *	ptr = result_ptr;
-    bool		separator_inserted = false;
+    char	result_ptr[1 + result_len.value];
+    char *	ptr = result_ptr;
+    bool	separator_inserted = false;
 
     /* Copy the prefix. */
     {
-      memcpy(ptr, prefix.value, prefix_len);
-      ptr += prefix_len;
-      if ('/' == prefix.value[prefix_len-1]) {
+      memcpy(ptr, prefix.value, prefix_len.value);
+      ptr += prefix_len.value;
+      if ('/' == prefix.value[prefix_len.value-1]) {
 	separator_inserted = true;
       }
     }
@@ -1687,8 +1685,8 @@ mmux_libc_make_file_system_pathname_concat (mmux_libc_file_system_pathname_class
       } else if (! separator_inserted) {
 	*ptr++ = '/';
       }
-      memcpy(ptr, suffix.value, suffix_len);
-      ptr += suffix_len;
+      memcpy(ptr, suffix.value, suffix_len.value);
+      ptr += suffix_len.value;
       *ptr = '\0';
     }
 
