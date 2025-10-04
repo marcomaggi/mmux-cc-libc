@@ -45,17 +45,19 @@ extern "C" {
  ** Type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef mmux_ushort_t			mmux_host_byteorder_ushort_t;
-typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
-
-typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
-typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
+typedef struct mmux_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_host_byteorder_uint16_t;
+typedef struct mmux_network_byteorder_uint16_t { mmux_uint16_t; } mmux_network_byteorder_uint16_t;
+typedef struct mmux_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_host_byteorder_uint32_t;
+typedef struct mmux_network_byteorder_uint32_t { mmux_uint32_t; } mmux_network_byteorder_uint32_t;
 
 typedef struct mmux_libc_errno_t			{ mmux_sint_t;  } mmux_libc_errno_t;
 typedef struct mmux_libc_process_exit_status_t		{ mmux_sint_t;  } mmux_libc_process_exit_status_t;
 typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;  } mmux_libc_socket_address_family_t;
 typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
 typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
+typedef struct mmux_libc_socket_communication_style_t	{ mmux_sint_t;  } mmux_libc_socket_communication_style_t;
+typedef struct mmux_libc_socket_shutdown_mode_t		{ mmux_sint_t;  } mmux_libc_socket_shutdown_mode_t;
+typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_network_interface_index_t;
 
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
 typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;

@@ -55,7 +55,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_address_family_t){ .value = mmux_libc_VALUEOF_$1})]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_socket_address_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_ALG)
 MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_APPLETALK)
@@ -94,7 +94,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_protocol_family_t){ .value = mmux_libc_VALUEOF_$1})]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_socket_protocol_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT(PF_FILE)
 MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT(PF_INET6)
@@ -114,7 +114,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_internet_protocol_t){ .value = mmux_libc_VALUEOF_$1})]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_socket_internet_protocol_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_AH)
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_BEETPH)
@@ -143,6 +143,83 @@ MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_TCP)
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_TP)
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_UDP)
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_UDPLITE)
+
+
+/** --------------------------------------------------------------------
+ ** Socket communication styles.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	((mmux_libc_socket_communication_style_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_DCCP)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_DGRAM)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_PACKET)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_RAW)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_RDM)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_SEQPACKET)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_STREAM)
+
+/* These are Linux-specific flags that can be bitwise ORed to the style constant, see
+   socket(2). */
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_CLOEXEC)
+MMUX_LIBC_DEFINE_SOCKET_STYLE_CONSTANT(SOCK_NONBLOCK)
+
+
+/** --------------------------------------------------------------------
+ ** Socket shutdown modes.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	((mmux_libc_socket_shutdown_mode_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_RDWR)
+MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_RD)
+MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_WR)
+
+
+/** --------------------------------------------------------------------
+ ** Sockets IPv4 addresses.
+ ** ----------------------------------------------------------------- */
+
+/* The standard defines:
+ *
+ *    struct in_addr { uint32_t s_addr; };
+ *
+ * the "INADDR_*"  constants are the  32-bit values of  the "s_addr" field.   MMUX CC
+ * Libc defines:
+ *
+ *    typedef struct mmux_libc_in_addr_t {
+ *      struct in_addr value;
+ *    } mmux_libc_in_addr_t;
+ *
+ * and we want the "MMUX_LIBC_INADDR_*" constants  to be expressions evaluating to an
+ * instance of "mmux_libc_in_addr_t".
+ *
+ */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	((mmux_libc_in_addr_t){ .value.s_addr = mmux_libc_VALUEOF_$1})]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_ANY)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_BROADCAST)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_LOOPBACK)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_NONE)
 
 
 /** --------------------------------------------------------------------
@@ -412,9 +489,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_NOWAIT)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_SYNC)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(IFNAMSIZ)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SHUT_RDWR)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SHUT_RD)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SHUT_WR)
 #define MMUX_HAVE_LIBC_MSG_ZERO		1
   MMUX_LIBC_MSG_ZERO = 0,
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MSG_CONFIRM)
@@ -479,16 +553,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(IPPORT_TTYLINK)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(IPPORT_USERRESERVED)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(IPPORT_WHOIS)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(IPPORT_WHOSERVER)
-
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_CLOEXEC)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_DCCP)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_DGRAM)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_NONBLOCK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_PACKET)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_RAW)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_RDM)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_SEQPACKET)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SOCK_STREAM)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(P_ALL)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(P_PID)
@@ -791,10 +855,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(SIGINFO)
 } mmux_libc_constant_t;
 
 MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT(RLIM_INFINITY)
-MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT(INADDR_ANY)
-MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT(INADDR_BROADCAST)
-MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT(INADDR_LOOPBACK)
-MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT(INADDR_NONE)
 
 
 /** --------------------------------------------------------------------

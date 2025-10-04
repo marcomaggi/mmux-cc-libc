@@ -9669,7 +9669,7 @@ type as alias for @MmuxCStruct{sockaddr}.
 @MmuxStructDumper{hostent}
 
 
-@deftypefun bool mmux_libc_sethostent (mmux_sint_t @var{stayopen})
+@deftypefun bool mmux_libc_sethostent (bool @var{stayopen})
 @MmuxCInterface{sethostent}.
 @end deftypefun
 
@@ -9697,7 +9697,7 @@ type as alias for @MmuxCStruct{sockaddr}.
 @MmuxStructDumper{servent}
 
 
-@deftypefun bool mmux_libc_setservent (mmux_sint_t @var{stayopen})
+@deftypefun bool mmux_libc_setservent (bool @var{stayopen})
 @MmuxCInterface{setservent}.
 @end deftypefun
 
@@ -9758,7 +9758,7 @@ if (mmux_libc_getservbyport(&servent_p, host_byteorder_port, protocol_name_p)) @
 @MmuxStructDumper{protoent}
 
 
-@deftypefun bool mmux_libc_setprotoent (mmux_sint_t @var{stayopen})
+@deftypefun bool mmux_libc_setprotoent (bool @var{stayopen})
 @MmuxCInterface{setprotoent}.
 @end deftypefun
 
@@ -9817,7 +9817,7 @@ if (mmux_libc_getprotobyname(&protoent_p, MMUX_LIBC_IPPROTO_TCP)) @{
 @MmuxStructDumper{netent}
 
 
-@deftypefun bool mmux_libc_setnetent (mmux_sint_t @var{stayopen})
+@deftypefun bool mmux_libc_setnetent (bool @var{stayopen})
 @MmuxCInterface{setnetent}.
 @end deftypefun
 

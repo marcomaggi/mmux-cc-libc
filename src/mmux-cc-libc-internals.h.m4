@@ -237,17 +237,20 @@ extern "C" {
  ** Type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef mmux_ushort_t			mmux_host_byteorder_ushort_t;
-typedef mmux_ushort_t			mmux_network_byteorder_ushort_t;
+typedef struct mmux_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_host_byteorder_uint16_t;
+typedef struct mmux_network_byteorder_uint16_t { mmux_uint16_t; } mmux_network_byteorder_uint16_t;
 
-typedef mmux_uint16_t			mmux_host_byteorder_uint16_t;
-typedef mmux_uint16_t			mmux_network_byteorder_uint16_t;
+typedef struct mmux_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_host_byteorder_uint32_t;
+typedef struct mmux_network_byteorder_uint32_t { mmux_uint32_t; } mmux_network_byteorder_uint32_t;
 
 typedef struct mmux_libc_errno_t			{ mmux_sint_t;  } mmux_libc_errno_t;
 typedef struct mmux_libc_process_exit_status_t		{ mmux_sint_t;  } mmux_libc_process_exit_status_t;
 typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;  } mmux_libc_socket_address_family_t;
 typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
 typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
+typedef struct mmux_libc_socket_communication_style_t	{ mmux_sint_t;  } mmux_libc_socket_communication_style_t;
+typedef struct mmux_libc_socket_shutdown_mode_t		{ mmux_sint_t;  } mmux_libc_socket_shutdown_mode_t;
+typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_network_interface_index_t;
 
 typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
 typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
@@ -256,7 +259,7 @@ typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t;	} mmux_libc_dirst
 typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
 
 typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
-typedef mmux_libc_file_descriptor_t			mmux_libc_network_socket_t;
+typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
 
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
@@ -425,6 +428,7 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
  ** ----------------------------------------------------------------- */
 
 #define mmux_usize_strlen(STRPTR)	(mmux_usize(strlen(STRPTR)))
+#define mmux_libc_char_array(BUFPTR,BUFLEN)	  char BUFPTR[(BUFLEN).value]
 
 mmux_cc_libc_inline_decl mmux_libc_in_addr_t
 mmux_libc_in_addr (struct in_addr value)
@@ -436,6 +440,8 @@ mmux_libc_insix_addr (struct in6_addr value)
 {
   return (mmux_libc_insix_addr_t) { .value = value };
 }
+
+#define MMUX_LIBC_CALL(EXPR)	{ if (EXPR) { return true; } }
 
 
 /** --------------------------------------------------------------------

@@ -58,6 +58,8 @@ mmux_libc_$2_ref (mmux_$3_t * result_p, mmux_libc_$1_t const * const P)
   return false;
 }]]])
 
+m4_dnl This is to be used when the standard field name is not equal to the MMUX CC Libc name.
+m4_dnl
 m4_dnl $1 - data structure name
 m4_dnl $2 - field name
 m4_dnl $3 - field type
@@ -70,13 +72,53 @@ m4_dnl
 m4_define([[[DEFINE_STRUCT_SETTER_GETTER_SPLIT]]],[[[bool
 mmux_libc_$4_set (mmux_libc_$1_t * const P, mmux_$3_t value)
 {
-  P->$2 = mmux_ctype_value(value);
+  P->$2 = mmux_libc_ctype_value(value);
   return false;
 }
 bool
 mmux_libc_$4_ref (mmux_$3_t * result_p, mmux_libc_$1_t const * const P)
 {
-  *result_p = mmux_$4(P->$2);
+  *result_p = mmux_$3(P->$2);
+  return false;
+}]]])
+
+m4_dnl $1 - data structure name
+m4_dnl $2 - field name
+m4_dnl
+m4_dnl Usage example:
+m4_dnl
+m4_dnl   DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(protoent, p_name)
+m4_dnl
+m4_define([[[DEFINE_STRUCT_ASCIIZP_SETTER_GETTER]]],[[[bool
+mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_asciizp_t value)
+{
+  P->$2 = value;
+  return false;
+}
+bool
+mmux_libc_$2_ref (mmux_asciizp_t * result_p, mmux_libc_$1_t const * const P)
+{
+  *result_p = P->$2;
+  return false;
+}]]])
+
+m4_dnl $1 - data structure name
+m4_dnl $2 - field name
+m4_dnl
+m4_dnl Usage example:
+m4_dnl
+m4_dnl   DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent, p_aliases)
+m4_dnl
+m4_define([[[DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER]]],[[[bool
+mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_asciizp_t * value)
+{
+  P->$2 = value;
+  return false;
+}
+bool
+mmux_libc_$2_ref (mmux_asciizp_t ** result_p, mmux_libc_$1_t const * const P)
+{
+  *result_p = P->$2;
   return false;
 }]]])
 

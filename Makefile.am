@@ -657,7 +657,7 @@ tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 
 check_PROGRAMS	+= \
-	tests/test-time-current_time				\
+	tests/test-time-time					\
 	tests/test-time-localtime				\
 	tests/test-time-gmtime					\
 	tests/test-time-asctime					\
@@ -667,8 +667,8 @@ check_PROGRAMS	+= \
 	tests/test-time-strftime				\
 	tests/test-time-strptime
 
-tests_test_time_current_time_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-tests_test_time_curernt_time_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_time_time_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_time_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_localtime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_localtime_LDADD				= $(mmux_cc_libc_tests_ldadd)
