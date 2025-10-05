@@ -65,6 +65,8 @@ typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_inter
 typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t; } mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirstream_t			{ mmux_pointer_t  value; } mmux_libc_dirstream_t;
 
+typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
+
 typedef struct mmux_libc_timeval_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVAL];  } mmux_libc_timeval_t;
 typedef struct mmux_libc_timespec_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC]; } mmux_libc_timespec_t;
 typedef struct mmux_libc_tm_t       { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM];       } mmux_libc_tm_t;
@@ -84,8 +86,27 @@ typedef struct mmux_libc_iovec_array_t {
   mmux_standard_usize_t	iova_len;
 } mmux_libc_iovec_array_t;
 
-typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
-typedef mmux_libc_file_descriptor_t			mmux_libc_network_socket_t;
+typedef struct mmux_libc_directory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_directory_file_descriptor_t;
+
+typedef struct mmux_libc_memory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_memory_file_descriptor_t;
+
+typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
+
+typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t[1];
+typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
+typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
+typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];
+
+typedef mmux_libc_file_descriptor_t const		mmux_libc_fd_arg_t[1];
+typedef mmux_libc_memory_file_descriptor_t const	mmux_libc_memfd_arg_t[1];
+typedef mmux_libc_directory_file_descriptor_t const	mmux_libc_dirfd_arg_t[1];
+typedef mmux_libc_network_socket_t  const		mmux_libc_sock_arg_t[1];
+
+typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
 
 /* This must be big enough to contain any "struct sockaddr_*" value. */
 typedef struct mmux_libc_sockaddr_t		{ mmux_uint8_t value[256];                             } mmux_libc_sockaddr_t;

@@ -80,6 +80,8 @@
 
 * Add functions interfacing "ftw(3)"?
 
+* Add functions interfacing Linux-specific "io_uring(7)"?
+
 ### end of file
 # Local Variables:
 # mode: text

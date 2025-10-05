@@ -4515,34 +4515,34 @@ if (mmux_libc_lseek(fd, &offset, whence)) @{
 @section Duplicating file descriptors
 
 
-@deftypefun bool mmux_libc_dup (mmux_libc_file_descriptor_t * @var{new_fd_p}, mmux_libc_file_descriptor_t @var{old_fd})
+@deftypefun bool mmux_libc_dup (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
 @MmuxCInterface{dup}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dup2 (mmux_libc_file_descriptor_t @var{old_fd}, mmux_libc_file_descriptor_t @var{new_fd})
+@deftypefun bool mmux_libc_dup2 (mmux_libc_fd_arg_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
 @MmuxCInterface{dup2}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dup3 (mmux_libc_file_descriptor_t @var{old_fd}, mmux_libc_file_descriptor_t @var{new_fd}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_dup3 (mmux_libc_fd_arg_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd}, mmux_sint_t @var{flags})
 @MmuxCInterface{dup3}.
 
 @example
-mmux_asciizcp_t    pathname = "/path/to/file.ext";
-mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+mmux_asciizcp_t pathname = "/path/to/file.ext";
+auto            flags    = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+auto            mode     = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
 mmux_libc_fd_t  fd1, fd2;
 
-if (mmux_libc_open(&fd1, pathname, flags, mode)) @{
+if (mmux_libc_open(fd1, pathname, flags, mode)) @{
   /* error */
 @}
 
 /* I'm so dirty. */
-mmux_libc_make_fd(&fd2, 5);
+mmux_libc_make_fd(fd2, 5);
 
-if (mmux_libc_dup3(fd1, fd2, MMUX_LIBC_O_CLOEXEC)) @{
+if (mmux_libc_dup3(fd2, fd1, mmux_libc_open_flags(MMUX_LIBC_O_CLOEXEC))) @{
   /* error */
 @}
 @end example

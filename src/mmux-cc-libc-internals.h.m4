@@ -258,8 +258,27 @@ typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_inter
 typedef struct mmux_libc_dirstream_position_t		{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
 typedef struct mmux_libc_dirtream_t			{ DIR *           value; } mmux_libc_dirstream_t;
 
-typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t;
+typedef struct mmux_libc_directory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_directory_file_descriptor_t;
+
+typedef struct mmux_libc_memory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_memory_file_descriptor_t;
+
 typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
+
+typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t[1];
+typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
+typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
+typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];
+
+typedef mmux_libc_file_descriptor_t const		mmux_libc_fd_arg_t[1];
+typedef mmux_libc_memory_file_descriptor_t const	mmux_libc_memfd_arg_t[1];
+typedef mmux_libc_directory_file_descriptor_t const	mmux_libc_dirfd_arg_t[1];
+typedef mmux_libc_network_socket_t  const		mmux_libc_sock_arg_t[1];
+
+typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
 
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
@@ -427,8 +446,8 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
  ** Helper macros and functions.
  ** ----------------------------------------------------------------- */
 
-#define mmux_usize_strlen(STRPTR)	(mmux_usize(strlen(STRPTR)))
-#define mmux_libc_char_array(BUFPTR,BUFLEN)	  char BUFPTR[(BUFLEN).value]
+#define mmux_usize_strlen(STRPTR)		(mmux_usize(strlen(STRPTR)))
+#define mmux_libc_char_array(BUFPTR,BUFLEN)	char BUFPTR[(BUFLEN).value]
 
 mmux_cc_libc_inline_decl mmux_libc_in_addr_t
 mmux_libc_in_addr (struct in_addr value)

@@ -38,14 +38,18 @@
  ** Initialisation functions.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_cc_libc_init (void);
+mmux_cc_libc_decl bool mmux_cc_libc_init (void)
+  __attribute__((__constructor__));
+
+mmux_cc_libc_decl bool mmux_cc_libc_final (void)
+  __attribute__((__destructor__));
 
 
 /** --------------------------------------------------------------------
  ** Version functions.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl mmux_asciizcp_t	 mmux_cc_libc_version_string		(void);
+mmux_cc_libc_decl mmux_asciizcp_t	mmux_cc_libc_version_string		(void);
 mmux_cc_libc_decl mmux_sint_t		mmux_cc_libc_version_interface_current	(void);
 mmux_cc_libc_decl mmux_sint_t		mmux_cc_libc_version_interface_revision	(void);
 mmux_cc_libc_decl mmux_sint_t		mmux_cc_libc_version_interface_age	(void);
@@ -396,7 +400,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(timeval,	tv_usec,	mmux_slong_t)
 mmux_cc_libc_decl bool mmux_libc_timeval_set (mmux_libc_timeval_t * timeval_p, mmux_time_t seconds, mmux_slong_t microseconds)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t const * timeval_p,
+mmux_cc_libc_decl bool mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_t const * timeval_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -411,7 +415,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(timespec,	ts_nsec,	mmux_slong_t)
 mmux_cc_libc_decl bool mmux_libc_timespec_set (mmux_libc_timespec_t * timespec_p, mmux_time_t seconds, mmux_slong_t nanoseconds)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t const * timespec_p,
+mmux_cc_libc_decl bool mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_t const * timespec_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -432,7 +436,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_isdst,	mmux_sint_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_gmtoff,	mmux_slong_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_zone,	mmux_asciizcp_t)
 
-mmux_cc_libc_decl bool mmux_libc_tm_dump (mmux_libc_file_descriptor_t fd, mmux_libc_tm_t const * tm_p,
+mmux_cc_libc_decl bool mmux_libc_tm_dump (mmux_libc_fd_arg_t fd, mmux_libc_tm_t const * tm_p,
 					  mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -511,37 +515,48 @@ mmux_cc_libc_decl bool mmux_libc_nanosleep (mmux_libc_timespec_t * requested_tim
  ** Input/output: file descriptor core API.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_fd (mmux_libc_file_descriptor_t * result_p, mmux_sint_t fd_num)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_file_descriptor_t * result_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_stdou (mmux_libc_file_descriptor_t * result_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_stder (mmux_libc_file_descriptor_t * result_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_at_fdcwd (mmux_libc_file_descriptor_t * result_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_fd_equal (mmux_libc_fd_t one, mmux_libc_fd_t two);
+mmux_cc_libc_inline_decl mmux_libc_open_flags_t
+mmux_libc_open_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_open_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_fd_parse (mmux_libc_fd_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
+mmux_cc_libc_decl bool mmux_libc_make_fd (mmux_libc_fd_t result_p, mmux_standard_sint_t fd_num)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t result_p, mmux_standard_sint_t fd_num)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_fd_t result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_stdou (mmux_libc_fd_t result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_stder (mmux_libc_fd_t result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t result_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_fd_equal (mmux_libc_fd_arg_t one, mmux_libc_fd_arg_t two);
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_fd_parse (mmux_libc_fd_t p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fd_sprint (char * ptr, mmux_usize_t len, mmux_libc_fd_t fd)
+mmux_cc_libc_decl bool mmux_libc_fd_sprint (char * ptr, mmux_usize_t len, mmux_libc_fd_arg_t fd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_fd_t fd)
+mmux_cc_libc_decl bool mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_fd_arg_t fd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_dprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, ...)
+mmux_cc_libc_decl bool mmux_libc_dprintf (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(2),__format__(__printf__,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
@@ -550,13 +565,13 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(1),__format__(__printf__,1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_t fd, mmux_libc_errno_t errnum)
+mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
+mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
   __attribute__((__nonnull__(2,3),__warn_unused_result__,__format__(__strftime__,2,0)));
 
-mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t fd, mmux_asciizcp_t template, va_list ap)
+mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, va_list ap)
   __attribute__((__nonnull__(2),__format__(__printf__,2,0),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list ap)
@@ -565,7 +580,7 @@ mmux_cc_libc_decl bool mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list a
 mmux_cc_libc_decl bool mmux_libc_vdprintfer (mmux_asciizcp_t template, va_list ap)
   __attribute__((__nonnull__(1),__format__(__printf__,1,0),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_newline   (mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_dprintf_newline   (mmux_libc_fd_arg_t fd)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintfou_newline (void)
@@ -574,12 +589,13 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou_newline (void)
 mmux_cc_libc_decl bool mmux_libc_dprintfer_newline (void)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_open (mmux_libc_file_descriptor_t * fd, mmux_libc_file_system_pathname_t pathname,
-				       mmux_sint_t flags, mmux_libc_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_open (mmux_libc_fd_t fd, mmux_libc_file_system_pathname_t pathname,
+				       mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_openat (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
-					 mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags, mmux_libc_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_openat (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
+					 mmux_libc_file_system_pathname_t pathname,
+					 mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -599,28 +615,29 @@ mmux_cc_libc_decl bool mmux_libc_open_how_resolve_set (mmux_libc_open_how_t * co
 mmux_cc_libc_decl bool mmux_libc_open_how_resolve_ref (mmux_uint64_t * result_p, mmux_libc_open_how_t const * const P)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_open_how_dump (mmux_libc_file_descriptor_t fd, mmux_libc_open_how_t const * const open_how_p,
+mmux_cc_libc_decl bool mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_t const * const open_how_p,
 						char const * struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * fd, mmux_libc_file_descriptor_t dirfd,
-					  mmux_libc_file_system_pathname_t pathname, mmux_libc_open_how_t const * const how_p)
+mmux_cc_libc_decl bool mmux_libc_openat2 (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
+					  mmux_libc_file_system_pathname_t pathname,
+					  mmux_libc_open_how_t const * const how_p)
   __attribute__((__nonnull__(1,4),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_close (mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_close (mmux_libc_fd_arg_t fd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 				       mmux_pointer_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 					mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_write_buffer (mmux_libc_fd_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+mmux_cc_libc_decl bool mmux_libc_write_buffer (mmux_libc_fd_arg_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_write_buffer_to_stdou (mmux_pointerc_t bufptr, mmux_usize_t buflen)
@@ -629,30 +646,30 @@ mmux_cc_libc_decl bool mmux_libc_write_buffer_to_stdou (mmux_pointerc_t bufptr, 
 mmux_cc_libc_decl bool mmux_libc_write_buffer_to_stder (mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 					mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_off_t offset)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 					 mmux_pointerc_t bufptr, mmux_usize_t buflen, mmux_off_t offset)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_lseek (mmux_libc_file_descriptor_t fd, mmux_off_t * offset_p, mmux_sint_t whence)
+mmux_cc_libc_decl bool mmux_libc_lseek (mmux_libc_fd_arg_t fd, mmux_off_t * offset_p, mmux_sint_t whence)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dup (mmux_libc_file_descriptor_t * new_fd_p, mmux_libc_file_descriptor_t old_fd)
+mmux_cc_libc_decl bool mmux_libc_dup (mmux_libc_fd_t new_fd_p, mmux_libc_fd_arg_t old_fd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dup2 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd)
+mmux_cc_libc_decl bool mmux_libc_dup2 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dup3 (mmux_libc_file_descriptor_t old_fd, mmux_libc_file_descriptor_t new_fd, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_dup3 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_file_descriptor_t fds[2])
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
+mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_file_descriptor_t const fds[2])
   __attribute__((__warn_unused_result__));
 
 
@@ -663,13 +680,13 @@ mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_file_descriptor_t fds[2])
 mmux_cc_libc_decl bool mmux_libc_FD_ZERO  (mmux_libc_fd_set_t * fd_set_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_SET   (mmux_libc_file_descriptor_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_SET   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_CLR   (mmux_libc_file_descriptor_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_CLR   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_ISSET (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_fd_set_t const * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_ISSET (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t const * fd_set_p)
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_select (mmux_uint_t * nfds_ready,
@@ -680,13 +697,13 @@ mmux_cc_libc_decl bool mmux_libc_select (mmux_uint_t * nfds_ready,
 					 mmux_libc_timeval_t * timeout_p)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
 
@@ -697,7 +714,7 @@ mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec,	iov_base,	mmux_pointer_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec,	iov_len,	mmux_usize_t)
 
-mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_t const * iovec_p,
+mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_fd_arg_t fd, mmux_libc_iovec_t const * iovec_p,
 					     mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -706,33 +723,33 @@ mmux_cc_libc_decl bool mmux_libc_iovec_dump (mmux_libc_file_descriptor_t fd, mmu
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_base,	mmux_libc_iovec_t *)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(iovec_array,	iova_len,	mmux_usize_t)
 
-mmux_cc_libc_decl bool mmux_libc_iovec_array_dump (mmux_libc_file_descriptor_t fd, mmux_libc_iovec_array_t const * iova_p,
+mmux_cc_libc_decl bool mmux_libc_iovec_array_dump (mmux_libc_fd_arg_t fd, mmux_libc_iovec_array_t const * iova_p,
 						   mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_readv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_readv (mmux_usize_t * nbytes_read_p, mmux_libc_fd_arg_t fd,
 					mmux_libc_iovec_array_t * iova_p)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_writev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_writev (mmux_usize_t * nbytes_written_p, mmux_libc_fd_arg_t fd,
 					 mmux_libc_iovec_array_t * iova_p)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_preadv (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_preadv (mmux_usize_t * nbytes_read_p, mmux_libc_fd_arg_t fd,
 					 mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pwritev (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_pwritev (mmux_usize_t * nbytes_written_p, mmux_libc_fd_arg_t fd,
 					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_preadv2 (mmux_usize_t * nbytes_read_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_preadv2 (mmux_usize_t * nbytes_read_p, mmux_libc_fd_arg_t fd,
 					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux_libc_fd_arg_t fd,
 					   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
@@ -747,7 +764,8 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_start,	mmux_off_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_len,		mmux_off_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_pid,		mmux_libc_pid_t)
 
-mmux_cc_libc_decl bool mmux_libc_flock_dump (mmux_libc_file_descriptor_t fd, mmux_libc_flock_t const * flock_p, mmux_asciizcp_t struct_name)
+mmux_cc_libc_decl bool mmux_libc_flock_dump (mmux_libc_fd_arg_t fd, mmux_libc_flock_t const * flock_p,
+					     mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
 mmux_cc_libc_decl bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* str_p, mmux_sshort_t flag)
@@ -759,8 +777,8 @@ mmux_cc_libc_decl bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciiz
  ** ----------------------------------------------------------------- */
 
 mmux_cc_libc_decl bool mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes_copied_p,
-						  mmux_libc_file_descriptor_t input_fd, mmux_sint64_t * input_position_p,
-						  mmux_libc_file_descriptor_t ouput_fd, mmux_sint64_t * ouput_position_p,
+						  mmux_libc_fd_arg_t input_fd, mmux_sint64_t * input_position_p,
+						  mmux_libc_fd_arg_t ouput_fd, mmux_sint64_t * ouput_position_p,
 						  mmux_usize_t number_of_bytes_to_copy, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
@@ -769,13 +787,13 @@ mmux_cc_libc_decl bool mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes
  ** Input/output: control.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_fcntl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
+mmux_cc_libc_decl bool mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* str_p, mmux_sint_t flag)
+mmux_cc_libc_decl bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t * str_p, mmux_sint_t flag)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_file_descriptor_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
+mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
   __attribute__((__warn_unused_result__));
 
 
@@ -783,36 +801,37 @@ mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_file_descriptor_t fd, mmux_sin
  ** Memfd buffers.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_memfd_create (mmux_libc_file_descriptor_t * fd_p, mmux_asciizcp_t name, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_memfd_create (mmux_libc_memfd_t mfd, mmux_asciizcp_t name, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_memfd (mmux_libc_file_descriptor_t * fd_p)
+mmux_cc_libc_decl bool mmux_libc_make_memfd (mmux_libc_memfd_t mfd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_length (mmux_usize_t * len_p, mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_memfd_length (mmux_usize_t * len_p, mmux_libc_memfd_arg_t mfd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_write_buffer (mmux_libc_file_descriptor_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
+mmux_cc_libc_decl bool mmux_libc_memfd_write_buffer (mmux_libc_memfd_arg_t mfd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_write_asciiz (mmux_libc_file_descriptor_t mfd, mmux_asciizcp_t bufptr)
+mmux_cc_libc_decl bool mmux_libc_memfd_write_asciiz (mmux_libc_memfd_arg_t mfd, mmux_asciizcp_t bufptr)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_copy (mmux_libc_file_descriptor_t ou, mmux_libc_file_descriptor_t mfd)
+mmux_cc_libc_decl bool mmux_libc_memfd_copy (mmux_libc_fd_arg_t ou, mmux_libc_memfd_arg_t mfd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_copyou (mmux_libc_file_descriptor_t mfd)
+mmux_cc_libc_decl bool mmux_libc_memfd_copyou (mmux_libc_memfd_arg_t mfd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_copyer (mmux_libc_file_descriptor_t mfd)
+mmux_cc_libc_decl bool mmux_libc_memfd_copyer (mmux_libc_memfd_arg_t mfd)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_strerror (mmux_libc_fd_t mfd, mmux_libc_errno_t errnum)
+mmux_cc_libc_decl bool mmux_libc_memfd_strerror (mmux_libc_memfd_arg_t mfd, mmux_libc_errno_t errnum)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_pointer_t bufptr, mmux_usize_t maximum_buflen)
+mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_memfd_arg_t mfd, mmux_pointer_t bufptr,
+						    mmux_usize_t maximum_buflen)
   __attribute__((__warn_unused_result__));
 
 
@@ -821,7 +840,7 @@ mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t mfd, mmux_poi
  ** ----------------------------------------------------------------- */
 
 m4_define([[[DEFINE_PRINTER_PROTO]]],
-  [[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[mmux_cc_libc_decl bool mmux_libc_dprintf_$1 (mmux_libc_file_descriptor_t fd, mmux_$1_t value)
+  [[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[mmux_cc_libc_decl bool mmux_libc_dprintf_$1 (mmux_libc_fd_arg_t fd, mmux_$1_t value)
   __attribute__((__warn_unused_result__));]]])]]])
 
 DEFINE_PRINTER_PROTO([[[pointer]]])
@@ -897,32 +916,32 @@ DEFINE_PRINTER_PROTO([[[libc_gid]]])
 DEFINE_PRINTER_PROTO([[[libc_socklen]]])
 DEFINE_PRINTER_PROTO([[[libc_rlim]]])
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t fd, mmux_libc_file_descriptor_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t fd, mmux_libc_pid_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_pid (mmux_libc_fd_arg_t fd, mmux_libc_pid_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_uid (mmux_libc_fd_arg_t fd, mmux_libc_uid_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t fd, mmux_libc_gid_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_gid (mmux_libc_fd_arg_t fd, mmux_libc_gid_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t fd, mmux_libc_file_system_pathname_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn (mmux_libc_fd_arg_t fd, mmux_libc_file_system_pathname_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_t fd, mmux_libc_ptn_extension_t E)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_ptn_extension_t E)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_t fd, mmux_libc_ptn_segment_t E)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_ptn_segment_t E)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_fd_arg_t fd,
 									mmux_libc_completed_process_status_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd,
 								   mmux_libc_interprocess_signal_t value)
   __attribute__((__warn_unused_result__));
 
@@ -941,7 +960,7 @@ mmux_cc_libc_decl bool mmux_libc_confstr (mmux_sint_t parameter, char * bufptr, 
 mmux_cc_libc_decl bool mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t parameter)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_file_descriptor_t fd, mmux_sint_t parameter)
+mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd, mmux_sint_t parameter)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -949,7 +968,7 @@ mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_f
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_cur,	mmux_libc_rlim_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_max,	mmux_libc_rlim_t)
 
-mmux_cc_libc_decl bool mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlimit_pointer,
+mmux_cc_libc_decl bool mmux_libc_rlimit_dump (mmux_libc_fd_arg_t fd, mmux_libc_rlimit_t * rlimit_pointer,
 					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1176,7 +1195,7 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(passwd,	pw_gecos,	mmux_asciizcp_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(passwd,	pw_dir,		mmux_asciizcp_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(passwd,	pw_shell,	mmux_asciizcp_t)
 
-mmux_cc_libc_decl bool mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const * passw_p,
+mmux_cc_libc_decl bool mmux_libc_passwd_dump (mmux_libc_fd_arg_t fd, mmux_libc_passwd_t const * passw_p,
 					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1189,7 +1208,7 @@ mmux_cc_libc_decl bool mmux_libc_gr_mem_set (mmux_libc_group_t * const P, mmux_a
 mmux_cc_libc_decl bool mmux_libc_gr_mem_ref (mmux_asciizcp_t * * result_p, mmux_libc_group_t const * const P)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * passw_p,
+mmux_cc_libc_decl bool mmux_libc_group_dump (mmux_libc_fd_arg_t fd, mmux_libc_group_t const * passw_p,
 					     mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1318,7 +1337,7 @@ mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_lib
 mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_dirent_t const * dirent_p,
+mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_t const * dirent_p,
 					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1546,7 +1565,7 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_slash (bool * r
 mmux_cc_libc_decl bool mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_dirfd_arg_t fd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
@@ -1555,7 +1574,7 @@ mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
 mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t dirstream)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_file_descriptor_t * result_p, mmux_libc_dirstream_t dirstream)
+mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_t dirstream)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream);
@@ -1579,7 +1598,7 @@ mmux_cc_libc_decl bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname
 mmux_cc_libc_decl bool mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchdir (mmux_libc_file_descriptor_t fd)
+mmux_cc_libc_decl bool mmux_libc_fchdir (mmux_libc_dirfd_arg_t fd)
   __attribute__((__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1595,8 +1614,8 @@ mmux_cc_libc_decl bool mmux_libc_pivot_root (mmux_libc_file_system_pathname_t ne
 mmux_cc_libc_decl bool mmux_libc_link (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_linkat (mmux_libc_file_descriptor_t oldfd, mmux_libc_file_system_pathname_t oldname,
-					 mmux_libc_file_descriptor_t newfd, mmux_libc_file_system_pathname_t newname,
+mmux_cc_libc_decl bool mmux_libc_linkat (mmux_libc_fd_arg_t oldfd, mmux_libc_file_system_pathname_t oldname,
+					 mmux_libc_fd_arg_t newfd, mmux_libc_file_system_pathname_t newname,
 					 mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
@@ -1611,22 +1630,22 @@ mmux_cc_libc_decl bool mmux_libc_readlink_malloc (mmux_libc_file_system_pathname
 						  mmux_libc_file_system_pathname_t linkname)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_dirfd_arg_t dirfd,
 					     mmux_libc_file_system_pathname_t linkname,
 					     mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
   __attribute__((__nonnull__(1,4),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
-						    mmux_libc_file_descriptor_t dirfd,
+						    mmux_libc_dirfd_arg_t dirfd,
 						    mmux_libc_file_system_pathname_t linkname)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_usize_t * required_nbytes_p, mmux_libc_file_descriptor_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_usize_t * required_nbytes_p, mmux_libc_dirfd_arg_t dirfd,
 					     mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * result_pathname_p,
-						    mmux_libc_file_descriptor_t dirfd)
+						    mmux_libc_dirfd_arg_t dirfd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_file_system_pathname_t * result_pathname_p,
@@ -1640,7 +1659,7 @@ mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_file_system_pathname_t * re
 mmux_cc_libc_decl bool mmux_libc_unlink (mmux_libc_file_system_pathname_t pathname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd,
 					   mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
@@ -1653,19 +1672,19 @@ mmux_cc_libc_decl bool mmux_libc_remove (mmux_libc_file_system_pathname_t pathna
 mmux_cc_libc_decl bool mmux_libc_rename (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_file_descriptor_t olddirfd, mmux_libc_file_system_pathname_t oldname,
-					   mmux_libc_file_descriptor_t newdirfd, mmux_libc_file_system_pathname_t newname)
+mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_fd_arg_t olddirfd, mmux_libc_file_system_pathname_t oldname,
+					   mmux_libc_fd_arg_t newdirfd, mmux_libc_file_system_pathname_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t olddirfd, mmux_libc_file_system_pathname_t oldname,
-					    mmux_libc_file_descriptor_t newdirfd, mmux_libc_file_system_pathname_t newname,
+mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_fd_arg_t olddirfd, mmux_libc_file_system_pathname_t oldname,
+					    mmux_libc_fd_arg_t newdirfd, mmux_libc_file_system_pathname_t newname,
 					    mmux_uint_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_mkdirat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1673,17 +1692,17 @@ mmux_cc_libc_decl bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t dirfd, mmu
 mmux_cc_libc_decl bool mmux_libc_chown (mmux_libc_file_system_pathname_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchown (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
+mmux_cc_libc_decl bool mmux_libc_fchown (mmux_libc_fd_arg_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_lchown (mmux_libc_file_system_pathname_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchownat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_cc_libc_decl bool mmux_libc_fchownat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
 					   mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_file_descriptor_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_fd_arg_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1697,21 +1716,21 @@ mmux_cc_libc_decl bool mmux_libc_getumask (mmux_libc_mode_t * current_mask_p)
 mmux_cc_libc_decl bool mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchmod (mmux_libc_file_descriptor_t fd, mmux_libc_mode_t mode)
+mmux_cc_libc_decl bool mmux_libc_fchmod (mmux_libc_fd_arg_t fd, mmux_libc_mode_t mode)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_cc_libc_decl bool mmux_libc_fchmodat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
 					   mmux_libc_mode_t mode, mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 					    mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_file_descriptor_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 					     mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
@@ -1720,7 +1739,7 @@ mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_
 mmux_cc_libc_decl bool mmux_libc_truncate (mmux_libc_file_system_pathname_t pathname, mmux_off_t len)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_ftruncate (mmux_libc_file_descriptor_t fd, mmux_off_t len)
+mmux_cc_libc_decl bool mmux_libc_ftruncate (mmux_libc_fd_arg_t fd, mmux_off_t len)
   __attribute__((__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1741,24 +1760,24 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ctime_nsec,	mmux_slong_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blocks,	mmux_libc_blkcnt_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blksize,	mmux_uint_t)
 
-mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t const * stat_p,
+mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_t const * stat_p,
 					    mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
 mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_file_system_pathname_t pathname, mmux_libc_stat_t * stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_file_system_pathname_t pathname, mmux_libc_stat_t * stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
 					  mmux_libc_stat_t * stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_file_descriptor_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1823,34 +1842,34 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_socket (bool * result_p
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_regular (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_regular (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_symlink (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_symlink (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_directory (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_directory (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_character_special (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_character_special (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_block_special (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_block_special (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_fifo (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_fifo (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_socket (bool * result_p, mmux_libc_file_descriptor_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_socket (bool * result_p, mmux_libc_fd_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_dirfd_arg_t dirfd,
 								     mmux_libc_file_system_pathname_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_t fd)
+mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_arg_t fd)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1858,7 +1877,7 @@ mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * r
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, actime,  mmux_time_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, modtime, mmux_time_t)
 
-mmux_cc_libc_decl bool mmux_libc_utimbuf_dump (mmux_libc_file_descriptor_t fd, mmux_libc_utimbuf_t const * utimbuf_p,
+mmux_cc_libc_decl bool mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * utimbuf_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1873,16 +1892,18 @@ mmux_cc_libc_decl bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t pathn
 					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_fd_arg_t fd,
 					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_futimens (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_futimens (mmux_libc_fd_arg_t fd,
 					   mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname,
-					    mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
+mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd,
+					    mmux_libc_file_system_pathname_t pathname,
+					    mmux_libc_timespec_t access_timespec,
+					    mmux_libc_timespec_t modification_timespec,
 					    mmux_sint_t flags)
   __attribute__((__warn_unused_result__));
 
@@ -2008,57 +2029,57 @@ mmux_cc_libc_decl mmux_usize_t mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const 
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t const * in_addr_p,
+mmux_cc_libc_decl bool mmux_libc_in_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_in_addr_t const * in_addr_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_t const * insix_addr_p,
+mmux_cc_libc_decl bool mmux_libc_insix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_insix_addr_t const * insix_addr_p,
 						  mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_if_nameindex_dump (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_if_nameindex_dump (mmux_libc_fd_arg_t fd,
 						    mmux_libc_if_nameindex_t const * nameindex_p,
 						    mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd,
+mmux_cc_libc_decl bool mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 						mmux_libc_sockaddr_t const * sockaddr_p,
 						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_sockaddr_un_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_un_t const * sockaddr_un_p,
+mmux_cc_libc_decl bool mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const * sockaddr_un_p,
 						   mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_sockaddr_in_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_in_t const * sockaddr_in_p,
+mmux_cc_libc_decl bool mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const * sockaddr_in_p,
 						   mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_sockaddr_insix_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_insix_t const * sockaddr_insix_p,
+mmux_cc_libc_decl bool mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t const * sockaddr_insix_p,
 						      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_addrinfo_dump (mmux_libc_file_descriptor_t fd, mmux_libc_addrinfo_t const * addrinfo_p,
+mmux_cc_libc_decl bool mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * addrinfo_p,
 						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_hostent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_hostent_t const * hostent_p,
+mmux_cc_libc_decl bool mmux_libc_hostent_dump (mmux_libc_fd_arg_t fd, mmux_libc_hostent_t const * hostent_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_servent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_servent_t const * servent_p,
+mmux_cc_libc_decl bool mmux_libc_servent_dump (mmux_libc_fd_arg_t fd, mmux_libc_servent_t const * servent_p,
 					       mmux_asciizcp_t const struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_protoent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_protoent_t const * protoent_p,
+mmux_cc_libc_decl bool mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * protoent_p,
 						mmux_asciizcp_t const struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_netent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_netent_t const * netent_p,
+mmux_cc_libc_decl bool mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_p,
 					      mmux_asciizcp_t const struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_file_descriptor_t fd, mmux_libc_linger_t const * linger_p,
+mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_t const * linger_p,
 					      mmux_asciizcp_t const struct_name)
   __attribute__((__nonnull__(2)));
 

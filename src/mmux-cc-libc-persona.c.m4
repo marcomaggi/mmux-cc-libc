@@ -67,7 +67,7 @@ mmux_libc_uid_parse (mmux_libc_uid_t * p_value, mmux_asciizcp_t s_value, mmux_as
   }
 }
 bool
-mmux_libc_passwd_dump (mmux_libc_file_descriptor_t fd, mmux_libc_passwd_t const * passwd_p, mmux_asciizcp_t struct_name)
+mmux_libc_passwd_dump (mmux_libc_fd_arg_t fd, mmux_libc_passwd_t const * passwd_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct passwd";
@@ -128,7 +128,7 @@ mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_standard_libc_gid_t gid_num
   return false;
 }
 bool
-mmux_libc_group_dump (mmux_libc_file_descriptor_t fd, mmux_libc_group_t const * group_p, mmux_asciizcp_t struct_name)
+mmux_libc_group_dump (mmux_libc_fd_arg_t fd, mmux_libc_group_t const * group_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct group";

@@ -107,6 +107,30 @@ m4_dnl $2 - field name
 m4_dnl
 m4_dnl Usage example:
 m4_dnl
+m4_dnl   DEFINE_STRUCT_POINTER_SETTER_GETTER(iovec, iov_base)
+m4_dnl
+m4_define([[[DEFINE_STRUCT_POINTER_SETTER_GETTER]]],[[[bool
+mmux_libc_$2_set (mmux_libc_$1_t * const P, mmux_pointer_t field_value)
+{
+  /* NOTE This sould work but it does not, for reasons to be inspected later.  (Marco Maggi; Oct  5, 2025)
+   *
+   * P->$2 = mmux_ctype_value(field_value);
+   */
+  P->$2 = field_value;
+  return false;
+}
+bool
+mmux_libc_$2_ref (mmux_pointer_t * result_p, mmux_libc_$1_t const * const P)
+{
+  *result_p = mmux_pointer(P->$2);
+  return false;
+}]]])
+
+m4_dnl $1 - data structure name
+m4_dnl $2 - field name
+m4_dnl
+m4_dnl Usage example:
+m4_dnl
 m4_dnl   DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent, p_aliases)
 m4_dnl
 m4_define([[[DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER]]],[[[bool

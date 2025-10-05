@@ -29,7 +29,7 @@
 
 static mmux_asciizcp_t		PROGNAME;
 static mmux_asciizcp_t		CLEANFILES_PATHNAMES_ASCIIZ[16];
-static mmux_usize_t		CLEANFILES_PATHNAMES_COUNT = 0;
+static mmux_standard_usize_t	CLEANFILES_PATHNAMES_COUNT = 0;
 
 
 /** --------------------------------------------------------------------
@@ -60,9 +60,9 @@ print_error (mmux_asciizcp_t errmsg)
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
 printf_error (mmux_asciizcp_t errmsg_template, ...)
 {
-  mmux_libc_fd_t	mfd;
+  mmux_libc_memfd_t	mfd;
 
-  if (mmux_libc_make_memfd(&mfd)) {
+  if (mmux_libc_make_memfd(mfd)) {
     return;
   }
   {
@@ -94,9 +94,9 @@ printf_error (mmux_asciizcp_t errmsg_template, ...)
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
 printf_message (mmux_asciizcp_t template, ...)
 {
-  mmux_libc_fd_t	mfd;
+  mmux_libc_memfd_t	mfd;
 
-  if (mmux_libc_make_memfd(&mfd)) {
+  if (mmux_libc_make_memfd(mfd)) {
     return;
   }
   {
@@ -130,11 +130,11 @@ printf_message (mmux_asciizcp_t template, ...)
 __attribute__((__noreturn__)) void
 handle_error (void)
 {
-  mmux_sint_t		errnum;
+  mmux_libc_errno_t	errnum;
   mmux_asciizcp_t	errmsg;
 
   mmux_libc_errno_consume(&errnum);
-  if (errnum) {
+  if (errnum.value) {
     if (mmux_libc_strerror(&errmsg, errnum)) {
       mmux_libc_exit_failure();
     } else {
@@ -152,10 +152,12 @@ handle_error (void)
 void
 wait_for_some_time (void)
 {
-  mmux_libc_timespec_t    requested_time;
-  mmux_libc_timespec_t    remaining_time;
+  mmux_libc_timespec_t	requested_time;
+  mmux_libc_timespec_t	remaining_time;
+  auto			seconds     = mmux_time(0);
+  auto			nanoseconds = mmux_slong(5000000);
 
-  mmux_libc_timespec_set(&requested_time, 0, 5000000);
+  mmux_libc_timespec_set(&requested_time, seconds, nanoseconds);
   if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
     printf_error("nanosleep");
     handle_error();
@@ -179,7 +181,7 @@ void
 cleanfiles (void)
 /* Clean all the files registered in "CLEANFILES_PATHNAMES_ASCIIZ[]". */
 {
-  for (mmux_usize_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
+  for (mmux_standard_usize_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
     mmux_libc_ptn_t	ptn;
 
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
@@ -206,17 +208,19 @@ bool
 test_create_data_file (mmux_asciizcp_t pathname_asciiz)
 {
   mmux_libc_ptn_t	ptn;
+  mmux_libc_memfd_t	fd;
 
   if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
     handle_error();
   }
 
-  mmux_sint_t const	flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-  mmux_mode_t const	mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
-  mmux_libc_fd_t	fd;
+  {
+    auto const	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR  | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto const	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) {
-    handle_error();
+    if (mmux_libc_open(fd, ptn, flags, mode)) {
+      handle_error();
+    }
   }
 
   /* Write data to the source file. */
@@ -227,12 +231,11 @@ test_create_data_file (mmux_asciizcp_t pathname_asciiz)
     mmux_asciizcp_t	bufptr = "0123456789abcdefghilmnopqrstuvz0123456789";
     mmux_usize_t	buflen;
 
-    mmux_libc_strlen(&buflen, bufptr);
-
-    if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
+    if (mmux_libc_strlen(&buflen, bufptr)) {
+      return true;
+    } else if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
       handle_error();
-    }
-    if (nbytes_done != buflen) {
+    } else if (mmux_ctype_not_equal(nbytes_done, buflen)) {
       handle_error();
     }
   }

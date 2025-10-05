@@ -93,12 +93,12 @@ mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pa
   return false;
 }
 bool
-mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_file_descriptor_t fd, mmux_sint_t parameter)
+mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd, mmux_sint_t parameter)
 {
   mmux_slong_t	result;
 
   errno = 0;
-  result.value = fpathconf(fd.value, parameter.value);
+  result.value = fpathconf(fd->value, parameter.value);
   if (-1 == result.value) {
     if (0 == errno) {
       /* No error: the system does not impose a limit. */
@@ -122,7 +122,7 @@ DEFINE_STRUCT_SETTER_GETTER(rlimit,	rlim_cur,	libc_rlim)
 DEFINE_STRUCT_SETTER_GETTER(rlimit,	rlim_max,	libc_rlim)
 
 bool
-mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlimit_pointer, char const * struct_name)
+mmux_libc_rlimit_dump (mmux_libc_fd_arg_t fd, mmux_libc_rlimit_t * rlimit_pointer, char const * struct_name)
 {
   int	rv;
 
@@ -131,7 +131,7 @@ mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlim
   }
 
   {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)rlimit_pointer);
+    rv = dprintf(fd->value, "%s = %p\n", struct_name, (mmux_pointer_t)rlimit_pointer);
     if (0 > rv) { return true; }
   }
 
@@ -148,7 +148,7 @@ mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlim
       if (mmux_libc_rlim_sprint(str, required_nbytes, field_value)) {
 	return true;
       } else {
-	rv = dprintf(fd.value, "%s->rlim_cur = %s\n", struct_name, str);
+	rv = dprintf(fd->value, "%s->rlim_cur = %s\n", struct_name, str);
 	if (0 > rv) { return true; }
       }
     }
@@ -167,7 +167,7 @@ mmux_libc_rlimit_dump (mmux_libc_file_descriptor_t fd, mmux_libc_rlimit_t * rlim
       if (mmux_libc_rlim_sprint(str, required_nbytes, field_value)) {
 	return true;
       } else {
-	rv = dprintf(fd.value, "%s->rlim_max = %s\n", struct_name, str);
+	rv = dprintf(fd->value, "%s->rlim_max = %s\n", struct_name, str);
 	if (0 > rv) { return true; }
       }
     }

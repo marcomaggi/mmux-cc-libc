@@ -449,7 +449,7 @@ mmux_libc_make_in_addr_loopback (mmux_libc_in_addr_t * in_addr_p)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_in_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_in_addr_t const * in_addr_p,
+mmux_libc_in_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_in_addr_t const * in_addr_p,
 			mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
@@ -498,7 +498,7 @@ mmux_libc_make_insix_addr_any (mmux_libc_insix_addr_t * insix_addr_p)
 }
 
 bool
-mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_t const * insix_addr_p, mmux_asciizcp_t struct_name)
+mmux_libc_insix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_insix_addr_t const * insix_addr_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct in6_addr";
@@ -527,7 +527,7 @@ mmux_libc_insix_addr_dump (mmux_libc_file_descriptor_t fd, mmux_libc_insix_addr_
 DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	libc_socket_address_family)
 
 bool
-mmux_libc_sockaddr_dump (mmux_libc_file_descriptor_t fd,
+mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 			 mmux_libc_sockaddr_t const * sockaddr_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
@@ -596,7 +596,7 @@ mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * P)
 }
 
 bool
-mmux_libc_sockaddr_un_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_un_t const * sockaddr_un_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const * sockaddr_un_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct sockaddr_un";
@@ -649,7 +649,7 @@ mmux_libc_sin_addr_pp_ref (mmux_libc_in_addr_t ** sin_addr_pp, mmux_libc_sockadd
 }
 
 bool
-mmux_libc_sockaddr_in_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_in_t const * sockaddr_in_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const * sockaddr_in_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct sockaddr_in";
@@ -729,7 +729,7 @@ mmux_libc_sinsix_addr_p_ref (mmux_libc_insix_addr_t ** sinsix_addr_pp, mmux_libc
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_insix_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockaddr_insix_t const * sockaddr_insix_p,
+mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t const * sockaddr_insix_p,
 			       mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
@@ -743,7 +743,7 @@ mmux_libc_sockaddr_insix_dump (mmux_libc_file_descriptor_t fd, mmux_libc_sockadd
 
     sa_family_to_asciiz_name(&sin6_name, field_value);
     DPRINTF(fd, "%s.sin6_family = \"", struct_name);
-    MMUX_LIBC_CALL(mmux_sshort_dprintf_p(fd.value, &field_value));
+    MMUX_LIBC_CALL(mmux_sshort_dprintf_p(fd->value, &field_value));
     DPRINTF(fd, "\" (%s)\n", sin6_name);
   }
 
@@ -824,7 +824,7 @@ mmux_libc_ai_canonname_ref (mmux_asciizcp_t * result_p, mmux_libc_addrinfo_t con
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_addrinfo_dump (mmux_libc_file_descriptor_t fd, mmux_libc_addrinfo_t const * addrinfo_p, mmux_asciizcp_t struct_name)
+mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * addrinfo_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct addrinfo";
@@ -1034,7 +1034,7 @@ mmux_libc_h_addr_ref (mmux_asciizp_t * result_p, mmux_libc_hostent_t const * con
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_hostent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_hostent_t const * hostent_p, mmux_asciizcp_t struct_name)
+mmux_libc_hostent_dump (mmux_libc_fd_arg_t fd, mmux_libc_hostent_t const * hostent_p, mmux_asciizcp_t struct_name)
 {
   int	aliases_idx   = 0;
   int	addr_list_idx = 0;
@@ -1113,7 +1113,7 @@ DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(servent,	s_proto)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_servent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_servent_t const * servent_p, mmux_asciizcp_t struct_name)
+mmux_libc_servent_dump (mmux_libc_fd_arg_t fd, mmux_libc_servent_t const * servent_p, mmux_asciizcp_t struct_name)
 {
   int	aliases_idx = 0;
 
@@ -1148,7 +1148,7 @@ DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent,	p_aliases)
 DEFINE_STRUCT_SETTER_GETTER(protoent,		p_proto,	sint)
 
 bool
-mmux_libc_protoent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
+mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
 {
   int	aliases_idx = 0;
 
@@ -1183,7 +1183,7 @@ DEFINE_STRUCT_SETTER_GETTER(netent,		n_addrtype,	sint)
 DEFINE_STRUCT_SETTER_GETTER(netent,		n_net,		ulong)
 
 bool
-mmux_libc_netent_dump (mmux_libc_file_descriptor_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
+mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct netent";
@@ -1606,7 +1606,7 @@ DEFINE_STRUCT_SETTER_GETTER(if_nameindex,		if_index,	libc_network_interface_inde
 DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(if_nameindex,	if_name)
 
 bool
-mmux_libc_if_nameindex_dump (mmux_libc_file_descriptor_t fd, mmux_libc_if_nameindex_t const * nameindex_p, mmux_asciizcp_t struct_name)
+mmux_libc_if_nameindex_dump (mmux_libc_fd_arg_t fd, mmux_libc_if_nameindex_t const * nameindex_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct if_nameindex";
@@ -1906,7 +1906,7 @@ DEFINE_STRUCT_SETTER_GETTER(linger, l_onoff,		sint)
 DEFINE_STRUCT_SETTER_GETTER(linger, l_linger,		sint)
 
 bool
-mmux_libc_linger_dump (mmux_libc_file_descriptor_t fd, mmux_libc_linger_t const * linger_p, mmux_asciizcp_t struct_name)
+mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_t const * linger_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct linger";

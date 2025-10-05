@@ -64,5 +64,10 @@ mmux_cc_libc_init (void)
 {
   return false;
 }
+bool
+mmux_cc_libc_final (void)
+{
+  return false;
+}
 
 /* end of file */

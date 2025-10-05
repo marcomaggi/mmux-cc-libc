@@ -44,7 +44,7 @@ mmux_libc_timeval_set (mmux_libc_timeval_t * timeval_p, mmux_time_t seconds, mmu
   return false;
 }
 bool
-mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t const * const timeval_p, char const * struct_name)
+mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_t const * const timeval_p, char const * struct_name)
 {
   int	rv;
 
@@ -53,7 +53,7 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
   }
 
   {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)timeval_p);
+    rv = dprintf(fd->value, "%s = %p\n", struct_name, (mmux_pointer_t)timeval_p);
     if (0 > rv) { return true; }
   }
 
@@ -68,7 +68,7 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
       char	str[required_nbytes.value];
 
       mmux_time_sprint(str, required_nbytes, field_value);
-      rv = dprintf(fd.value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
+      rv = dprintf(fd->value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
   }
@@ -84,7 +84,7 @@ mmux_libc_timeval_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timeval_t cons
       char	str[required_nbytes.value];
 
       mmux_slong_sprint(str, required_nbytes, field_value);
-      rv = dprintf(fd.value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
+      rv = dprintf(fd->value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
   }
@@ -129,7 +129,7 @@ mmux_libc_timespec_set (mmux_libc_timespec_t * timespec_p, mmux_time_t seconds, 
   return false;
 }
 bool
-mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t const * const timespec_p, char const * struct_name)
+mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_t const * const timespec_p, char const * struct_name)
 {
   int	rv;
 
@@ -138,7 +138,7 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
   }
 
   {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)timespec_p);
+    rv = dprintf(fd->value, "%s = %p\n", struct_name, (mmux_pointer_t)timespec_p);
     if (0 > rv) { return true; }
   }
 
@@ -153,7 +153,7 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
       char	str[required_nbytes.value];
 
       mmux_time_sprint(str, required_nbytes, field_value);
-      rv = dprintf(fd.value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
+      rv = dprintf(fd->value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
   }
@@ -169,7 +169,7 @@ mmux_libc_timespec_dump (mmux_libc_file_descriptor_t fd, mmux_libc_timespec_t co
       char	str[required_nbytes.value];
 
       mmux_slong_sprint(str, required_nbytes, field_value);
-      rv = dprintf(fd.value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
+      rv = dprintf(fd->value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
   }
@@ -208,7 +208,7 @@ mmux_libc_tm_zone_ref (mmux_asciizcp_t * result_p, mmux_libc_tm_t const * const 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_tm_dump (mmux_libc_file_descriptor_t fd, mmux_libc_tm_t const * tm_p, char const * struct_name)
+mmux_libc_tm_dump (mmux_libc_fd_arg_t fd, mmux_libc_tm_t const * tm_p, char const * struct_name)
 {
   int	rv;
 
@@ -218,7 +218,7 @@ mmux_libc_tm_dump (mmux_libc_file_descriptor_t fd, mmux_libc_tm_t const * tm_p, 
 
   /* Dump the pointer itself. */
   {
-    rv = dprintf(fd.value, "%s = %p\n", struct_name, (mmux_pointer_t)tm_p);
+    rv = dprintf(fd->value, "%s = %p\n", struct_name, (mmux_pointer_t)tm_p);
     if (0 > rv) { return true; }
   }
 
@@ -234,7 +234,7 @@ m4_define([[[DEFINE_TM_FIELD_DUMPER]]],[[[
       char	str[required_nbytes.value];
 
       mmux_$2_sprint(str, required_nbytes, field_value);
-      rv = dprintf(fd.value, "%s->$1 = %s\n", struct_name, str);
+      rv = dprintf(fd->value, "%s->$1 = %s\n", struct_name, str);
       if (0 > rv) { return true; }
     }
   }
@@ -251,7 +251,7 @@ DEFINE_TM_FIELD_DUMPER(tm_isdst,	sint)
 DEFINE_TM_FIELD_DUMPER(tm_gmtoff,	slong)
 
   {
-    rv = dprintf(fd.value, "%s->tm_zone = %s\n", struct_name, tm_p->tm_zone);
+    rv = dprintf(fd->value, "%s->tm_zone = %s\n", struct_name, tm_p->tm_zone);
     if (0 > rv) { return true; }
   }
 
