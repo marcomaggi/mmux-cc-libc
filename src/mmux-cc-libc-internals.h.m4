@@ -446,9 +446,6 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
  ** Helper macros and functions.
  ** ----------------------------------------------------------------- */
 
-#define mmux_usize_strlen(STRPTR)		(mmux_usize(strlen(STRPTR)))
-#define mmux_libc_char_array(BUFPTR,BUFLEN)	char BUFPTR[(BUFLEN).value]
-
 mmux_cc_libc_inline_decl mmux_libc_in_addr_t
 mmux_libc_in_addr (struct in_addr value)
 {
@@ -459,8 +456,6 @@ mmux_libc_insix_addr (struct in6_addr value)
 {
   return (mmux_libc_insix_addr_t) { .value = value };
 }
-
-#define MMUX_LIBC_CALL(EXPR)	{ if (EXPR) { return true; } }
 
 
 /** --------------------------------------------------------------------

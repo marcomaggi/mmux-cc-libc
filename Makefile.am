@@ -212,16 +212,20 @@ tests_test_version_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## errors
 
 check_PROGRAMS	+= \
-	tests/test-strerror
+	tests/test-errors-strerror
 
-tests_test_strerror_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-tests_test_strerror_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_errors_strerror_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_errors_strerror_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
-## persona
+## memory
 
 check_PROGRAMS	+= \
+	tests/test-memory-core		\
 	tests/test-memory-allocator
+
+tests_test_memory_core_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_memory_core_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_memory_allocator_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_memory_allocator_LDADD			= $(mmux_cc_libc_tests_ldadd)

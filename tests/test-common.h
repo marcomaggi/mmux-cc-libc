@@ -19,6 +19,7 @@
 
 #undef NDEBUG
 #include <assert.h>
+#include <mmux-cc-libc.h>
 
 #define BOOL_STRING(BOOL)	((true == BOOL)? "true" : "false")
 
@@ -38,6 +39,7 @@ static mmux_standard_usize_t	CLEANFILES_PATHNAMES_COUNT = 0;
 
 void print_error (mmux_asciizcp_t errmsg);
 void printf_error (mmux_asciizcp_t errmsg_template, ...);
+void printf_string (mmux_asciizcp_t template, ...);
 void printf_message (mmux_asciizcp_t template, ...);
 void handle_error (void);
 
@@ -123,6 +125,34 @@ printf_message (mmux_asciizcp_t template, ...)
       return;
     }
   }
+  if (mmux_libc_close(mfd)) {
+    return;
+  }
+}
+__attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
+printf_string (mmux_asciizcp_t template, ...)
+{
+  mmux_libc_memfd_t	mfd;
+
+  if (mmux_libc_make_memfd(mfd)) {
+    return;
+  }
+  {
+    bool	rv;
+    va_list	ap;
+
+    va_start(ap, template);
+    {
+      rv = mmux_libc_vdprintf(mfd, template, ap);
+    }
+    va_end(ap);
+    if (rv) {
+      goto end;
+    } else if (mmux_libc_memfd_copyer(mfd)) {
+      goto end;
+    }
+  }
+ end:
   if (mmux_libc_close(mfd)) {
     return;
   }

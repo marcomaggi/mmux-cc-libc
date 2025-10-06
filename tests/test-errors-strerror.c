@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include "test-common.h"
 
 
@@ -47,8 +46,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* strerror_r() */
   {
     mmux_asciizcp_t	result;
-    mmux_usize_t	buflen = 1024;
-    mmux_char_t		bufptr[buflen];
+    auto		buflen = mmux_usize_literal(1024);
+    mmux_libc_char_array(bufptr, buflen);
 
     if (mmux_libc_strerror_r(&result, bufptr, buflen, MMUX_LIBC_EINVAL)) {
       handle_error();

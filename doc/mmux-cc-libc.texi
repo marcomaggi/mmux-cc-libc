@@ -1115,33 +1115,185 @@ Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Lib
 @code{program_invocation_short_name}.  @glibcref{Error Messages, Error Messages}.
 @end deftypefn
 
+@c ------------------------------------------------------------------------
+
+@macro MmuxLibcDefineErrnoConstant{NAME}
+@deftypevr {Constant} mmux_libc_errno_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+Error code @code{\NAME\}.
+@end deftypevr
+
+@end macro
+
+
+@MmuxLibcDefineErrnoConstant{EPERM}
+@MmuxLibcDefineErrnoConstant{ENOENT}
+@MmuxLibcDefineErrnoConstant{ESRCH}
+@MmuxLibcDefineErrnoConstant{EINTR}
+@MmuxLibcDefineErrnoConstant{EIO}
+@MmuxLibcDefineErrnoConstant{ENXIO}
+@MmuxLibcDefineErrnoConstant{E2BIG}
+@MmuxLibcDefineErrnoConstant{ENOEXEC}
+@MmuxLibcDefineErrnoConstant{EBADF}
+@MmuxLibcDefineErrnoConstant{ECHILD}
+@MmuxLibcDefineErrnoConstant{EAGAIN}
+@MmuxLibcDefineErrnoConstant{ENOMEM}
+@MmuxLibcDefineErrnoConstant{EACCES}
+@MmuxLibcDefineErrnoConstant{EFAULT}
+@MmuxLibcDefineErrnoConstant{ENOTBLK}
+@MmuxLibcDefineErrnoConstant{EBUSY}
+@MmuxLibcDefineErrnoConstant{EEXIST}
+@MmuxLibcDefineErrnoConstant{EXDEV}
+@MmuxLibcDefineErrnoConstant{ENODEV}
+@MmuxLibcDefineErrnoConstant{ENOTDIR}
+@MmuxLibcDefineErrnoConstant{EISDIR}
+@MmuxLibcDefineErrnoConstant{EINVAL}
+@MmuxLibcDefineErrnoConstant{ENFILE}
+@MmuxLibcDefineErrnoConstant{EMFILE}
+@MmuxLibcDefineErrnoConstant{ENOTTY}
+@MmuxLibcDefineErrnoConstant{ETXTBSY}
+@MmuxLibcDefineErrnoConstant{EFBIG}
+@MmuxLibcDefineErrnoConstant{ENOSPC}
+@MmuxLibcDefineErrnoConstant{ESPIPE}
+@MmuxLibcDefineErrnoConstant{EROFS}
+@MmuxLibcDefineErrnoConstant{EMLINK}
+@MmuxLibcDefineErrnoConstant{EPIPE}
+@MmuxLibcDefineErrnoConstant{EDOM}
+@MmuxLibcDefineErrnoConstant{ERANGE}
+@MmuxLibcDefineErrnoConstant{EDEADLK}
+@MmuxLibcDefineErrnoConstant{ENAMETOOLONG}
+@MmuxLibcDefineErrnoConstant{ENOLCK}
+@MmuxLibcDefineErrnoConstant{ENOSYS}
+@MmuxLibcDefineErrnoConstant{ENOTEMPTY}
+@MmuxLibcDefineErrnoConstant{ELOOP}
+@MmuxLibcDefineErrnoConstant{EWOULDBLOCK}
+@MmuxLibcDefineErrnoConstant{ENOMSG}
+@MmuxLibcDefineErrnoConstant{EIDRM}
+@MmuxLibcDefineErrnoConstant{ECHRNG}
+@MmuxLibcDefineErrnoConstant{EL2NSYNC}
+@MmuxLibcDefineErrnoConstant{EL3HLT}
+@MmuxLibcDefineErrnoConstant{EL3RST}
+@MmuxLibcDefineErrnoConstant{ELNRNG}
+@MmuxLibcDefineErrnoConstant{EUNATCH}
+@MmuxLibcDefineErrnoConstant{ENOCSI}
+@MmuxLibcDefineErrnoConstant{EL2HLT}
+@MmuxLibcDefineErrnoConstant{EBADE}
+@MmuxLibcDefineErrnoConstant{EBADR}
+@MmuxLibcDefineErrnoConstant{EXFULL}
+@MmuxLibcDefineErrnoConstant{ENOANO}
+@MmuxLibcDefineErrnoConstant{EBADRQC}
+@MmuxLibcDefineErrnoConstant{EBADSLT}
+@MmuxLibcDefineErrnoConstant{EDEADLOCK}
+@MmuxLibcDefineErrnoConstant{EBFONT}
+@MmuxLibcDefineErrnoConstant{ENOSTR}
+@MmuxLibcDefineErrnoConstant{ENODATA}
+@MmuxLibcDefineErrnoConstant{ETIME}
+@MmuxLibcDefineErrnoConstant{ENOSR}
+@MmuxLibcDefineErrnoConstant{ENONET}
+@MmuxLibcDefineErrnoConstant{ENOPKG}
+@MmuxLibcDefineErrnoConstant{EREMOTE}
+@MmuxLibcDefineErrnoConstant{ENOLINK}
+@MmuxLibcDefineErrnoConstant{EADV}
+@MmuxLibcDefineErrnoConstant{ESRMNT}
+@MmuxLibcDefineErrnoConstant{ECOMM}
+@MmuxLibcDefineErrnoConstant{EPROTO}
+@MmuxLibcDefineErrnoConstant{EMULTIHOP}
+@MmuxLibcDefineErrnoConstant{EDOTDOT}
+@MmuxLibcDefineErrnoConstant{EBADMSG}
+@MmuxLibcDefineErrnoConstant{EOVERFLOW}
+@MmuxLibcDefineErrnoConstant{ENOTUNIQ}
+@MmuxLibcDefineErrnoConstant{EBADFD}
+@MmuxLibcDefineErrnoConstant{EREMCHG}
+@MmuxLibcDefineErrnoConstant{ELIBACC}
+@MmuxLibcDefineErrnoConstant{ELIBBAD}
+@MmuxLibcDefineErrnoConstant{ELIBSCN}
+@MmuxLibcDefineErrnoConstant{ELIBMAX}
+@MmuxLibcDefineErrnoConstant{ELIBEXEC}
+@MmuxLibcDefineErrnoConstant{EILSEQ}
+@MmuxLibcDefineErrnoConstant{ERESTART}
+@MmuxLibcDefineErrnoConstant{ESTRPIPE}
+@MmuxLibcDefineErrnoConstant{EUSERS}
+@MmuxLibcDefineErrnoConstant{ENOTSOCK}
+@MmuxLibcDefineErrnoConstant{EDESTADDRREQ}
+@MmuxLibcDefineErrnoConstant{EMSGSIZE}
+@MmuxLibcDefineErrnoConstant{EPROTOTYPE}
+@MmuxLibcDefineErrnoConstant{ENOPROTOOPT}
+@MmuxLibcDefineErrnoConstant{EPROTONOSUPPORT}
+@MmuxLibcDefineErrnoConstant{ESOCKTNOSUPPORT}
+@MmuxLibcDefineErrnoConstant{EOPNOTSUPP}
+@MmuxLibcDefineErrnoConstant{EPFNOSUPPORT}
+@MmuxLibcDefineErrnoConstant{EAFNOSUPPORT}
+@MmuxLibcDefineErrnoConstant{EADDRINUSE}
+@MmuxLibcDefineErrnoConstant{EADDRNOTAVAIL}
+@MmuxLibcDefineErrnoConstant{ENETDOWN}
+@MmuxLibcDefineErrnoConstant{ENETUNREACH}
+@MmuxLibcDefineErrnoConstant{ENETRESET}
+@MmuxLibcDefineErrnoConstant{ECONNABORTED}
+@MmuxLibcDefineErrnoConstant{ECONNRESET}
+@MmuxLibcDefineErrnoConstant{ENOBUFS}
+@MmuxLibcDefineErrnoConstant{EISCONN}
+@MmuxLibcDefineErrnoConstant{ENOTCONN}
+@MmuxLibcDefineErrnoConstant{ESHUTDOWN}
+@MmuxLibcDefineErrnoConstant{ETOOMANYREFS}
+@MmuxLibcDefineErrnoConstant{ETIMEDOUT}
+@MmuxLibcDefineErrnoConstant{ECONNREFUSED}
+@MmuxLibcDefineErrnoConstant{EHOSTDOWN}
+@MmuxLibcDefineErrnoConstant{EHOSTUNREACH}
+@MmuxLibcDefineErrnoConstant{EALREADY}
+@MmuxLibcDefineErrnoConstant{EINPROGRESS}
+@MmuxLibcDefineErrnoConstant{ESTALE}
+@MmuxLibcDefineErrnoConstant{EUCLEAN}
+@MmuxLibcDefineErrnoConstant{ENOTNAM}
+@MmuxLibcDefineErrnoConstant{ENAVAIL}
+@MmuxLibcDefineErrnoConstant{EISNAM}
+@MmuxLibcDefineErrnoConstant{EREMOTEIO}
+@MmuxLibcDefineErrnoConstant{EDQUOT}
+@MmuxLibcDefineErrnoConstant{ENOMEDIUM}
+@MmuxLibcDefineErrnoConstant{EMEDIUMTYPE}
+@MmuxLibcDefineErrnoConstant{ECANCELED}
+@MmuxLibcDefineErrnoConstant{ENOKEY}
+@MmuxLibcDefineErrnoConstant{EKEYEXPIRED}
+@MmuxLibcDefineErrnoConstant{EKEYREVOKED}
+@MmuxLibcDefineErrnoConstant{EKEYREJECTED}
+@MmuxLibcDefineErrnoConstant{EOWNERDEAD}
+@MmuxLibcDefineErrnoConstant{ENOTRECOVERABLE}
+
 @c page
 @node memory
 @chapter Memory management
 
 
 @menu
-* memory allocation::           Memory allocation.
+* memory core::                 Core memory allocation operations.
 * memory operations::           Memory operations.
 * memory allocator::            Memory allocator.
 @end menu
 
 @c page
-@node memory allocation
-@section Memory allocation
+@node memory core
+@section Core memory allocation operations
+
+
+Among the following operations: those that allocate or reallocate a block of memory have a result
+argument @code{mmux_pointer_t * @var{result_p}}; all of them have both a function and a macro, the
+latter just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t *}.
 
 
 @deftypefn {Preprocessor Macro} bool mmux_libc_malloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
 @deftypefnx {Function} bool mmux_libc_malloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
-@MmuxCInterface{malloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
-*}.  Upon successful return: the pointer variable referenced by @var{result_p} is set to the pointer
-referencing the newly allocated memory block.
+@MmuxCInterface{malloc}.  Upon successful return: the pointer variable referenced by @var{result_p}
+is set to the pointer referencing the newly allocated memory block.
 
 @example
-mmux_libc_tm_t *  tm;
+auto                     nbytes = mmux_usize_literal(213);
+mmux_standard_octet_t *  ptr;
 
-if (mmux_libc_malloc(&tm, sizeof(mmux_libc_tm_t))) @{
+if (mmux_libc_malloc(&ptr, nbytes)) @{
   /* error */
+@} else @{
+  ...
+  mmux_libc_free(ptr);
 @}
 @end example
 @end deftypefn
@@ -1149,15 +1301,38 @@ if (mmux_libc_malloc(&tm, sizeof(mmux_libc_tm_t))) @{
 
 @deftypefn {Preprocessor Macro} bool mmux_libc_calloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 @deftypefnx Function bool mmux_libc_calloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@MmuxCInterface{calloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
-*}.  Upon successful return: the pointer variable referenced by @var{result_p} is set to the pointer
-referencing the newly allocated memory block.
+@MmuxCInterface{calloc}.  Upon successful return: the pointer variable referenced by @var{result_p}
+is set to the pointer referencing the newly allocated memory block.
 
 @example
-mmux_double_t *  P;
+@{
+  auto                     item_num = mmux_usize_literal(12);
+  auto                     item_len = mmux_usize_literal(34);
+  mmux_standard_octet_t *  ptr;
 
-if (mmux_libc_calloc(&P, 123, sizeof(mmux_double_t))) @{
-  /* error */
+  if (mmux_libc_calloc(&ptr, item_num, item_len)) @{
+    /* error */
+  @} else @{
+    ...
+    mmux_libc_free(ptr);
+  @}
+@}
+
+@{
+  auto                 item_num = mmux_usize_literal(12);
+  auto                 item_len = mmux_flonumd128_sizeof();
+  mmux_flonumd128_t *  ptr;
+
+  if (mmux_libc_calloc(&ptr, item_num, item_len)) @{
+    /* error */
+  @} else @{
+    for (auto i = mmux_usize_constant_zero();
+         mmux_ctype_less(i, item_num);
+         mmux_ctype_incr_variable(i)) @{
+      ptr[i.value] = mmux_flonumd128(i.value);
+    @}
+    mmux_libc_free(ptr);
+  @}
 @}
 @end example
 @end deftypefn
@@ -1165,8 +1340,7 @@ if (mmux_libc_calloc(&P, 123, sizeof(mmux_double_t))) @{
 
 @deftypefn {Preprocessor Macro} bool mmux_libc_realloc (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
 @deftypefnx Function bool mmux_libc_realloc_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
-@MmuxCInterface{realloc}.  The macro just casts a pointer @var{result_p} of any type to @code{mmux_pointer_t
-*}.
+@MmuxCInterface{realloc}.
 
 @itemize
 @item
@@ -1179,33 +1353,43 @@ the new pointer.
 @end itemize
 
 @example
-mmux_libc_tm_t *  tm;
+auto                     nbytes1 = mmux_usize_literal(56);
+auto                     nbytes2 = mmux_usize_literal(89);
+mmux_standard_octet_t *  ptr;
 
-if (mmux_libc_malloc(&tm, 1024)) @{
+if (mmux_libc_malloc(&ptr, nbytes1)) @{
   /* error */
 @}
-if (mmux_libc_realloc(&tm, 4096)) @{
+...
+if (mmux_libc_realloc(&ptr, nbytes2)) @{
   /* error */
 @}
+...
+mmux_libc_free(ptr);
 @end example
 @end deftypefn
 
 
 @deftypefn {Preprocessor Macro} bool mmux_libc_reallocarray (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 @deftypefnx Function bool mmux_libc_reallocarray_ (mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@MmuxCInterface{reallocarray}.  The macro just casts a pointer @var{result_p} of any type to
-@code{mmux_pointer_t *}.  Upon successful return: the pointer variable referenced by @var{result_p} is
-set to the pointer referencing the newly allocated memory block.
+@MmuxCInterface{reallocarray}.  Upon successful return: the pointer variable referenced by
+@var{result_p} is set to the pointer referencing the newly allocated memory block.
 
 @example
-mmux_double_t *  P;
+auto                item_num1 = mmux_usize_literal(12);
+auto                item_num2 = mmux_usize_literal(34);
+auto                item_len  = mmux_flonumd128_sizeof();
+mmux_flonumd128_t * ptr;
 
-if (mmux_libc_calloc(&P, 123, sizeof(mmux_double_t))) @{
+if (mmux_libc_calloc(&ptr, item_num1, item_len)) @{
   /* error */
 @}
-if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
+...
+if (mmux_libc_reallocarray(&ptr, item_num2, item_len)) @{
   /* error */
 @}
+...
+mmux_libc_free(ptr);
 @end example
 @end deftypefn
 
@@ -1219,35 +1403,42 @@ if (mmux_libc_reallocarray(&P, 456, sizeof(mmux_double_t))) @{
 @deftypefnx {Function} bool mmux_libc_malloc_and_copy_ (mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
 Allocate @var{srclen} bytes using @cfunc{mmux_libc_malloc}; then copy @var{srclen} bytes from
 @var{srcptr} to the newly allocated memory block; finally store the resulting pointer in the
-variable referenced by @var{result_p}.  The macro just: casts a pointer @var{result_p} of any type
-to @code{mmux_pointer_t *}; casts a pointer @var{srcptr} of any type to @code{mmux_pointer_t}.
+variable referenced by @var{result_p}.
 
 To copy bytes from a buffer we do:
 
 @example
-mmux_usize_t    srclen;
-mmux_byte_t     srcbuf[srclen];
-mmux_byte_t     dstbuf;
+auto                      buflen = mmux_usize_literal(12);
+mmux_standard_byte_t      srcbuf[buflen.value];
+mmux_standard_byte_t *    dstbuf;
 
-/* Fill "srcbuf" with data. */
-
-/* Copy the data from "srcbuf" to "dstbuf". */
-if (mmux_libc_malloc_and_copy(&dstptr, srcbuf, srclen)) @{
+for (mmux_standard_usize_t i=0; i<buflen.value; ++i) @{
+  srcbuf[i] = ...;
+@}
+if (mmux_libc_malloc_and_copy(&dstbuf, srcbuf, buflen)) @{
   /* error */
 @}
+for (mmux_standard_usize_t i=0; i<buflen.value; ++i) @{
+  do_something_with(dstbuf[i]);
+@}
+mmux_libc_free(dstbuf);
 @end example
 
 To copy an @asciiz{} string we do:
 
 @example
-mmux_asciizcp_t         srcstr = "/path/to/file.ext";
-mmux_usize_t            srclen_plus;
-mmux_asciizcp_t         dststr;
+mmux_standard_char_t *    srcbuf = "the colour of water";
+mmux_standard_char_t *    dstbuf;
+mmux_usize_t              buflen;
 
-mmux_libc_strlen_plus_nil(&srclen_plus, srcstr);
-if (mmux_libc_malloc_and_copy(&dstptr, srcstr, srclen_plus)) @{
+mmux_libc_strlen_plus_nil(&buflen, srcbuf);
+if (mmux_libc_malloc_and_copy(&dstbuf, srcbuf, buflen)) @{
   /* error */
 @}
+if (mmux_libc_dprintfer("@{%s@}\n", dstbuf)) @{
+  /* error */
+@}
+mmux_libc_free(dstbuf);
 @end example
 @end deftypefn
 
