@@ -1554,11 +1554,58 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 
 @deftypefun bool mmux_libc_memmove (mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memmove}.
+
+@example
+@{
+  auto                   buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t  srcptr[buflen.value];
+  mmux_standard_octet_t  dstptr[buflen.value];
+
+  ...
+  mmux_libc_memmove(dstptr, srcptr, buflen);
+@}
+
+@{
+  mmux_standard_char_t *  srcptr = "the colour of water";
+  mmux_usize_t            buflen;
+
+  mmux_libc_strlen_plus_nil(&buflen, srcptr);
+  @{
+    mmux_standard_char_t  dstptr[buflen.value];
+
+    mmux_libc_memmove(dstptr, srcptr, buflen);
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_memcmp (mmux_sint_t * @var{result_p}, mmux_pointerc_t @vari{ptr}, mmux_pointerc_t @varii{ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memcmp}.
+
+@example
+@{
+  auto                   buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t  bufptr1[buflen.value];
+  mmux_standard_octet_t  bufptr2[buflen.value];
+  mmux_sint_t            ternary_result;
+
+  ...
+  mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen);
+  examine_the_value_of(ternary_result);
+@}
+
+@{
+  mmux_standard_char_t *  bufptr1 = "the colour of water";
+  mmux_standard_char_t *  bufptr2 = "the colour of water and quicksilver";
+  mmux_usize_t            buflen;
+  mmux_sint_t             ternary_result;
+
+  mmux_libc_strlen(&buflen, bufptr1);
+  mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen);
+  assert(mmux_ctype_is_zero(ternary_result));
+@}
+@end example
 @end deftypefun
 
 
