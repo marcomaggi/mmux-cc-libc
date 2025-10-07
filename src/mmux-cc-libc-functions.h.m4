@@ -311,12 +311,18 @@ mmux_cc_libc_decl bool mmux_libc_memzero (mmux_pointer_t ptr, mmux_usize_t len)
 mmux_cc_libc_decl bool mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointerc_t src_ptr, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_mempcpy (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
+mmux_cc_libc_decl bool mmux_libc_mempcpy_ (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_memccpy (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr,
-					  mmux_octet_t octet, mmux_usize_t nbytes)
+#define mmux_libc_mempcpy(RESULTP,DSTPTR,SRCPTR,NBYTES)	\
+  mmux_libc_mempcpy_((mmux_pointer_t *)(RESULTP),(DSTPTR),(SRCPTR),(NBYTES))
+
+mmux_cc_libc_decl bool mmux_libc_memccpy_ (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr,
+					   mmux_octet_t octet, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2,3)));
+
+#define mmux_libc_memccpy(RESULTP,DSTPTR,SRCPTR,IT,NBYTES)	\
+  mmux_libc_memccpy_((mmux_pointer_t *)(RESULTP),(DSTPTR),(SRCPTR),(IT),(NBYTES))
 
 mmux_cc_libc_decl bool mmux_libc_memmove (mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2)));

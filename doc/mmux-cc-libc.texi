@@ -1447,29 +1447,109 @@ mmux_libc_free(dstbuf);
 @section Memory operations
 
 
-@deftypefun bool mmux_libc_memset (mmux_pointer_t @var{ptr}, mmux_uint8_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefun bool mmux_libc_memset (mmux_pointer_t @var{ptr}, mmux_octett @var{octet}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memset}.
+
+@example
+auto                    value  = mmux_octet(13);
+auto                    buflen = mmux_usize_literal(5);
+mmux_standard_octet_t   bufptr[buflen.value];
+
+mmux_libc_memset(bufptr, value, buflen);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_memzero (mmux_pointer_t @var{ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memzero}.
+
+@example
+auto                   buflen = mmux_usize_literal(5);
+mmux_standard_octet_t  bufptr[buflen.value];
+
+mmux_libc_memzero(bufptr, buflen);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_memcpy (mmux_pointer_t @var{dst_ptr}, mmux_pointerc_t @var{src_ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memcpy}.
+
+@example
+auto                   buflen = mmux_usize_literal(5);
+mmux_standard_octet_t  srcptr[buflen.value];
+mmux_standard_octet_t  dstptr[buflen.value];
+
+...
+mmux_libc_memcpy(dstptr, srcptr, buflen);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mempcpy (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
+@deftypefn {Preprocessor Macro} bool mmux_libc_mempcpy (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
+@deftypefnx {@gnu{} Function} bool mmux_libc_mempcpy_ (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{mempcpy}.
-@end deftypefun
+
+@example
+@{
+  auto                     buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t    srcptr[buflen.value];
+  mmux_standard_octet_t    dstptr[buflen.value];
+  mmux_standard_octet_t *  nxtptr;
+
+  ...
+  mmux_libc_mempcpy(&nxtptr, dstptr, srcptr, buflen);
+  assert((mmux_standard_usize_t)(nxtptr - dstptr) == buflen.value);
+@}
+
+@{
+  mmux_standard_char_t *    srcptr = "the colour of water";
+  mmux_usize_t              buflen;
+
+  mmux_libc_strlen(&buflen, srcptr);
+  @{
+    mmux_standard_char_t    dstptr[buflen.value];
+    mmux_standard_char_t *  nxtptr;
+
+    mmux_libc_mempcpy(&nxtptr, dstptr, srcptr, buflen);
+    assert( (mmux_standard_usize_t)(nxtptr - dstptr) == buflen.value);
+  @}
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memccpy (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_uint8_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefn {Preprocssor Macro} bool mmux_libc_memccpy (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_uint8_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefnx {Function} bool mmux_libc_memccpy_ (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_uint8_t @var{octet}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memccpy}.
-@end deftypefun
+
+@example
+@{
+  auto                      it     = mmux_octet(3);
+  auto                      buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t     srcptr[buflen.value];
+  mmux_standard_octet_t     dstptr[buflen.value];
+  mmux_standard_octet_t *   nxtptr;
+
+  ...
+  mmux_libc_memccpy(&nxtptr, dstptr, srcptr, it, buflen);
+@}
+
+@{
+  mmux_standard_char_t *    srcptr = "the colour of water";
+  mmux_usize_t              buflen;
+
+  mmux_libc_strlen(&buflen, srcptr);
+  @{
+    auto                    it = mmux_octet('w');
+    mmux_standard_char_t    dstptr[buflen.value];
+    mmux_standard_char_t *  nxtptr;
+
+    mmux_libc_memccpy(&nxtptr, dstptr, srcptr, it, buflen);
+  @}
+@}
+@end example
+@end deftypefn
 
 
 @deftypefun bool mmux_libc_memmove (mmux_pointer_t @var{dst_ptr}, mmux_pointer_t @var{src_ptr}, mmux_usize_t @var{nbytes})

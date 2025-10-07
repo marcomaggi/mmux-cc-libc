@@ -125,7 +125,7 @@ mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointerc_t src_ptr, mmux_usize_t 
   return false;
 }
 bool
-mmux_libc_mempcpy (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
+mmux_libc_mempcpy_ (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t nbytes)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMPCPY]]],[[[
   *result_p = mempcpy(dst_ptr, src_ptr, nbytes.value);
@@ -133,8 +133,8 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMPCPY]]],[[[
 ]]])
 }
 bool
-mmux_libc_memccpy (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr,
-		   mmux_octet_t octet, mmux_usize_t nbytes)
+mmux_libc_memccpy_ (mmux_pointer_t * result_p, mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr,
+		    mmux_octet_t octet, mmux_usize_t nbytes)
 {
   *result_p = memccpy(dst_ptr, src_ptr, octet.value, nbytes.value);
   return false;
