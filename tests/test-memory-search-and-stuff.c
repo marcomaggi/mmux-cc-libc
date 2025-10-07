@@ -273,6 +273,39 @@ test_memcmp (void)
 }
 
 
+static void
+test_memchr (void)
+{
+  printf_string("%s: ", __func__);
+  {
+    auto			it     = mmux_octet(3);
+    auto			buflen = mmux_usize_literal(5);
+    mmux_standard_octet_t	bufptr[buflen.value];
+    mmux_standard_octet_t *	result;
+
+    init_buffer_with_octets(bufptr, buflen);
+    if (mmux_libc_memchr(&result, bufptr, it, buflen)) {
+      handle_error();
+    }
+    assert( (mmux_standard_usize_t)(result - bufptr) == 3);
+  }
+  {
+    //                                    01234567890123456789
+    mmux_standard_char_t *	bufptr = "the colour of water";
+    mmux_usize_t		buflen;
+    auto			it     = mmux_octet('w');
+    mmux_standard_char_t *	result;
+
+    mmux_libc_strlen(&buflen, bufptr);
+    if (mmux_libc_memchr(&result, bufptr, it, buflen)) {
+      handle_error();
+    }
+    assert( (mmux_standard_usize_t)(result - bufptr) == 14);
+  }
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -293,6 +326,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_memccpy();		}
   if (1) {	test_memmove();		}
   if (1) {	test_memcmp();		}
+  if (1) {	test_memchr();		}
 
   mmux_libc_exit_success();
 }

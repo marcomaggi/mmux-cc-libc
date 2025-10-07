@@ -1609,9 +1609,35 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefnx {Function} bool mmux_libc_memchr_ (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memchr}.
-@end deftypefun
+
+@example
+@{
+  auto                        it     = mmux_octet(3);
+  auto                        buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t       bufptr[buflen.value];
+  mmux_standard_octet_t *     result;
+
+  ...
+  mmux_libc_memchr(&result, bufptr, it, buflen);
+  do_something_with(result);
+@}
+
+@{
+  //                                    01234567890123456789
+  mmux_standard_char_t *      bufptr = "the colour of water";
+  mmux_usize_t                buflen;
+  auto                        it     = mmux_octet('w');
+  mmux_standard_char_t *      result;
+
+  mmux_libc_strlen(&buflen, bufptr);
+  mmux_libc_memchr(&result, bufptr, it, buflen);
+  assert( (mmux_standard_usize_t)(result - bufptr) == 14 );
+@}
+@end example
+@end deftypefn
 
 
 @deftypefun bool mmux_libc_rawmemchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet})

@@ -330,8 +330,11 @@ mmux_cc_libc_decl bool mmux_libc_memmove (mmux_pointer_t dst_ptr, mmux_pointer_t
 mmux_cc_libc_decl bool mmux_libc_memcmp (mmux_sint_t * result_p, mmux_pointerc_t ptr1, mmux_pointerc_t ptr2, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_memchr (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t nbytes)
+mmux_cc_libc_decl bool mmux_libc_memchr_ (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2)));
+
+#define mmux_libc_memchr(RESULTP,BUFPTR,OCTET,NBYTES)	\
+  mmux_libc_memchr_((mmux_pointer_t *)(RESULTP),(BUFPTR),(OCTET),(NBYTES))
 
 mmux_cc_libc_decl bool mmux_libc_rawmemchr (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet)
   __attribute__((__nonnull__(1,2)));
