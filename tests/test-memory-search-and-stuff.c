@@ -287,6 +287,7 @@ test_memchr (void)
     if (mmux_libc_memchr(&result, bufptr, it, buflen)) {
       handle_error();
     }
+    assert( NULL != result );
     assert( (mmux_standard_usize_t)(result - bufptr) == 3);
   }
   {
@@ -300,8 +301,131 @@ test_memchr (void)
     if (mmux_libc_memchr(&result, bufptr, it, buflen)) {
       handle_error();
     }
+    assert( NULL != result );
     assert( (mmux_standard_usize_t)(result - bufptr) == 14);
   }
+  printf_string(" DONE\n");
+}
+
+
+static void
+test_rawmemchr (void)
+{
+  printf_string("%s: ", __func__);
+  {
+    auto			it     = mmux_octet(3);
+    auto			buflen = mmux_usize_literal(5);
+    mmux_standard_octet_t	bufptr[buflen.value];
+    mmux_standard_octet_t *	result;
+
+    init_buffer_with_octets(bufptr, buflen);
+    if (mmux_libc_rawmemchr(&result, bufptr, it)) {
+      handle_error();
+    }
+    assert( (mmux_standard_usize_t)(result - bufptr) == 3);
+  }
+  {
+    //                                    01234567890123456789
+    mmux_standard_char_t *	bufptr = "the colour of water";
+    auto			it     = mmux_octet('w');
+    mmux_standard_char_t *	result;
+
+    if (mmux_libc_rawmemchr(&result, bufptr, it)) {
+      handle_error();
+    }
+    assert( (mmux_standard_usize_t)(result - bufptr) == 14);
+  }
+
+  /* Find the terminating nil character. */
+  {
+    //                                    01234567890123456789
+    mmux_standard_char_t *	bufptr = "the colour of water";
+    auto			it     = mmux_octet_constant_zero();
+    mmux_standard_char_t *	result;
+
+    if (mmux_libc_rawmemchr(&result, bufptr, it)) {
+      handle_error();
+    }
+    assert( (mmux_standard_usize_t)(result - bufptr) == 19);
+  }
+  printf_string(" DONE\n");
+}
+
+
+static void
+test_memrchr (void)
+{
+  printf_string("%s: ", __func__);
+  {
+    auto			it     = mmux_octet(3);
+    auto			buflen = mmux_usize_literal(5);
+    mmux_standard_octet_t	bufptr[buflen.value];
+    mmux_standard_octet_t *	result;
+
+    init_buffer_with_octets(bufptr, buflen);
+    if (mmux_libc_memrchr(&result, bufptr, it, buflen)) {
+      handle_error();
+    }
+    assert( NULL != result );
+    assert( (mmux_standard_usize_t)(result - bufptr) == 3);
+  }
+  {
+    //                                    01234567890123456789
+    mmux_standard_char_t *	bufptr = "the colour of water";
+    mmux_usize_t		buflen;
+    auto			it     = mmux_octet('o');
+    mmux_standard_char_t *	result;
+
+    mmux_libc_strlen(&buflen, bufptr);
+    if (mmux_libc_memrchr(&result, bufptr, it, buflen)) {
+      handle_error();
+    }
+    assert( NULL != result );
+    assert( (mmux_standard_usize_t)(result - bufptr) == 11);
+  }
+  printf_string(" DONE\n");
+}
+
+
+static void
+test_memmem (void)
+{
+  printf_string("%s: ", __func__);
+  {
+    auto			haystack_len = mmux_usize_literal(11);
+    mmux_standard_octet_t	haystack_ptr[haystack_len.value];
+    auto			needle_len = mmux_usize_literal(3);
+    mmux_standard_octet_t	needle_ptr[] = { 3, 4, 5 };
+    mmux_standard_octet_t *	result;
+
+    init_buffer_with_octets(haystack_ptr, haystack_len);
+    if (mmux_libc_memmem(&result,
+			 haystack_ptr, haystack_len,
+			 needle_ptr, needle_len)) {
+      handle_error();
+    }
+    assert( NULL != result );
+    assert( (mmux_standard_usize_t)(result - haystack_ptr) == 3);
+  }
+  {
+    //                                          01234567890123456789
+    mmux_standard_char_t *	haystack_ptr = "the colour of water";
+    mmux_standard_char_t *	needle_ptr   = "colour";
+    mmux_usize_t		haystack_len;
+    mmux_usize_t		needle_len;
+    mmux_standard_char_t *	result;
+
+    mmux_libc_strlen(&haystack_len, haystack_ptr);
+    mmux_libc_strlen(&needle_len,   needle_ptr);
+    if (mmux_libc_memmem(&result,
+			 haystack_ptr, haystack_len,
+			 needle_ptr, needle_len)) {
+      handle_error();
+    }
+    assert( NULL != result );
+    assert( (mmux_standard_usize_t)(result - haystack_ptr) == 4);
+  }
+
   printf_string(" DONE\n");
 }
 
@@ -327,6 +451,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_memmove();		}
   if (1) {	test_memcmp();		}
   if (1) {	test_memchr();		}
+  if (1) {	test_rawmemchr();	}
+  if (1) {	test_memrchr();		}
+  if (1) {	test_memmem();		}
 
   mmux_libc_exit_success();
 }

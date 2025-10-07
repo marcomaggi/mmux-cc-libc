@@ -1640,19 +1640,118 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 @end deftypefn
 
 
-@deftypefun bool mmux_libc_rawmemchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet})
+@deftypefn {Preprocessor Macro} bool mmux_libc_rawmemchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet})
+@deftypefnx {@gnu{} Function} bool mmux_libc_rawmemchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet})
 @MmuxCInterface{rawmemchr}.
-@end deftypefun
+
+@example
+@{
+  auto                        it     = mmux_octet(3);
+  auto                        buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t       bufptr[buflen.value];
+  mmux_standard_octet_t *     result;
+
+  ...
+  mmux_libc_rawmemchr(&result, bufptr, it);
+  assert( (mmux_standard_usize_t)(result - bufptr) == 3);
+@}
+
+@{
+  //                                    01234567890123456789
+  mmux_standard_char_t *      bufptr = "the colour of water";
+  auto                        it     = mmux_octet('w');
+  mmux_standard_char_t *      result;
+
+  mmux_libc_rawmemchr(&result, bufptr, it);
+  assert( (mmux_standard_usize_t)(result - bufptr) == 14);
+@}
+
+/* Find the terminating nil character. */
+@{
+  //                                    01234567890123456789
+  mmux_standard_char_t *      bufptr = "the colour of water";
+  auto                        it     = mmux_octet_constant_zero();
+  mmux_standard_char_t *      result;
+
+  mmux_libc_rawmemchr(&result, bufptr, it);
+  assert( (mmux_standard_usize_t)(result - bufptr) == 19);
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memrchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memrchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
+@deftypefnx {Function} bool mmux_libc_memrchr (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{ptr}, mmux_octet_t @var{octet}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memrchr}.
-@end deftypefun
+
+@example
+@{
+  auto                        it     = mmux_octet(3);
+  auto                        buflen = mmux_usize_literal(5);
+  mmux_standard_octet_t       bufptr[buflen.value];
+  mmux_standard_octet_t *     result;
+
+  ...
+  mmux_libc_memrchr(&result, bufptr, it, buflen);
+  do_something_with(result);
+@}
+
+@{
+  //                                    01234567890123456789
+  mmux_standard_char_t *      bufptr = "the colour of water";
+  mmux_usize_t                buflen;
+  auto                        it     = mmux_octet('o');
+  mmux_standard_char_t *      result;
+
+  mmux_libc_strlen(&buflen, bufptr);
+  mmux_libc_memrchr(&result, bufptr, it, buflen);
+  assert( NULL != result );
+  assert( (mmux_standard_usize_t)(result - bufptr) == 11);
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memmem (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{haystack_ptr}, mmux_usize_t @var{haystack_len}, mmux_pointer_t @var{needle_ptr}, mmux_usize_t @var{needle_len})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memmem (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{haystack_ptr}, mmux_usize_t @var{haystack_len}, mmux_pointer_t @var{needle_ptr}, mmux_usize_t @var{needle_len})
+@deftypefnx {Function} bool mmux_libc_memmem (mmux_pointer_t * @var{result_p}, mmux_pointer_t @var{haystack_ptr}, mmux_usize_t @var{haystack_len}, mmux_pointer_t @var{needle_ptr}, mmux_usize_t @var{needle_len})
 @MmuxCInterface{memmem}.
-@end deftypefun
+
+@example
+@{
+  auto                        haystack_len = mmux_usize_literal(11);
+  mmux_standard_octet_t       haystack_ptr[haystack_len.value];
+  auto                        needle_len = mmux_usize_literal(3);
+  mmux_standard_octet_t       needle_ptr[] = @{ 3, 4, 5 @};
+  mmux_standard_octet_t *     result;
+
+  for (mmux_standard_usize_t i=0; i<buflen.value; ++i) @{
+    bufptr[i] = (mmux_standard_octet_t) i;
+  @}
+  mmux_libc_memmem(&result,
+                   haystack_ptr, haystack_len,
+                   needle_ptr, needle_len);
+  assert( NULL != result );
+  assert( (mmux_standard_usize_t)(result - haystack_ptr) == 3);
+@}
+
+@{
+  //                                          01234567890123456789
+  mmux_standard_char_t *      haystack_ptr = "the colour of water";
+  mmux_standard_char_t *      needle_ptr   = "colour";
+  mmux_usize_t                haystack_len;
+  mmux_usize_t                needle_len;
+  mmux_standard_char_t *      result;
+
+  mmux_libc_strlen(&haystack_len, haystack_ptr);
+  mmux_libc_strlen(&needle_len,   needle_ptr);
+  mmux_libc_memmem(&result,
+                   haystack_ptr, haystack_len,
+                   needle_ptr, needle_len);
+  assert( NULL != result );
+  assert( (mmux_standard_usize_t)(result - haystack_ptr) == 4);
+@}
+@end example
+@end deftypefn
 
 @c page
 @node memory allocator

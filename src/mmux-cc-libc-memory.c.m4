@@ -158,7 +158,7 @@ mmux_libc_memchr_ (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t o
   return false;
 }
 bool
-mmux_libc_rawmemchr (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet)
+mmux_libc_rawmemchr_ (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RAWMEMCHR]]],[[[
   *result_p = rawmemchr(ptr, octet.value);
@@ -166,7 +166,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RAWMEMCHR]]],[[[
 ]]])
 }
 bool
-mmux_libc_memrchr (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t nbytes)
+mmux_libc_memrchr_ (mmux_pointer_t * result_p, mmux_pointer_t ptr, mmux_octet_t octet, mmux_usize_t nbytes)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMRCHR]]],[[[
   *result_p = memrchr(ptr, octet.value, nbytes.value);
@@ -174,9 +174,9 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMRCHR]]],[[[
 ]]])
 }
 bool
-mmux_libc_memmem (mmux_pointer_t * result_p,
-		  mmux_pointer_t haystack_ptr, mmux_usize_t haystack_len,
-		  mmux_pointer_t needle_ptr,   mmux_usize_t needle_len)
+mmux_libc_memmem_ (mmux_pointer_t * result_p,
+		   mmux_pointer_t haystack_ptr, mmux_usize_t haystack_len,
+		   mmux_pointer_t needle_ptr,   mmux_usize_t needle_len)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMMEM]]],[[[
   *result_p = memmem(haystack_ptr, haystack_len.value, needle_ptr, needle_len.value);
