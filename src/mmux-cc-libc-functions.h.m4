@@ -358,37 +358,37 @@ mmux_cc_libc_decl bool mmux_libc_memmem_ (mmux_pointer_t * result_p,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+mmux_cc_libc_decl bool mmux_libc_default_memory_allocator_ref (mmux_libc_mall_t* result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_fake_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+mmux_cc_libc_decl bool mmux_libc_fake_memory_allocator_ref (mmux_libc_mall_t* result_p)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_ (mmux_libc_mall_t allocator,
 							   mmux_pointer_t * result_p, mmux_usize_t len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_calloc_ (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_calloc_ (mmux_libc_mall_t allocator,
 							   mmux_pointer_t * result_p,
 							   mmux_usize_t item_num, mmux_usize_t item_len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_realloc_ (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_realloc_ (mmux_libc_mall_t allocator,
 							    mmux_pointer_t * result_p, mmux_usize_t newlen)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_reallocarray_ (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_reallocarray_ (mmux_libc_mall_t allocator,
 								 mmux_pointer_t * result_p, mmux_usize_t item_num,
 								 mmux_usize_t item_len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_free (mmux_libc_mall_t allocator,
 							mmux_pointer_t p)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_memory_allocator_t const * allocator,
+mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_mall_t allocator,
 								    mmux_pointer_t * dstptr_p,
 								    mmux_pointer_t srcptr, mmux_usize_t srclen)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
@@ -2381,6 +2381,16 @@ mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmu
 mmux_cc_libc_decl bool mmux_libc_setsockopt (mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname,
 					     mmux_pointer_t optval_p, mmux_libc_socklen_t optlen)
   __attribute__((__nonnull__(4),__warn_unused_result__));
+
+
+/** --------------------------------------------------------------------
+ ** Interface specification.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl bool mmux_libc_interface_specification_is_compatible (bool * result_p,
+									mmux_libc_interface_specification_t const * IS,
+									mmux_uint_t requested_version)
+  __attribute__((__nonnull__(1)));
 
 
 /** --------------------------------------------------------------------

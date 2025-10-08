@@ -70,4 +70,23 @@ mmux_cc_libc_final (void)
   return false;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Interface specification.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_interface_specification_is_compatible (bool * result_p,
+						 mmux_libc_interface_specification_t const * IS,
+						 mmux_uint_t requested_version)
+{
+  if (((IS->is_current - IS->is_age) <= requested_version.value) &&
+      (IS->is_current                >= requested_version.value)) {
+    *result_p = true;
+  } else {
+    *result_p = false;
+  }
+  return false;
+}
+
 /* end of file */

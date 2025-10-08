@@ -339,16 +339,26 @@ typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 
 
 /** --------------------------------------------------------------------
+ ** Interface specification.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_interface_specification_t {
+  mmux_asciizcp_t	is_name;
+  mmux_standard_uint_t	is_current;
+  mmux_standard_uint_t	is_revision;
+  mmux_standard_uint_t	is_age;
+} mmux_libc_interface_specification_t;
+
+
+/** --------------------------------------------------------------------
  ** Memory allocators.
  ** ----------------------------------------------------------------- */
 
 typedef struct mmux_libc_memory_allocator_t	mmux_libc_memory_allocator_t;
+typedef mmux_libc_memory_allocator_t const *	mmux_libc_mall_t;
 
 typedef struct mmux_libc_memory_allocator_value_t {
-  mmux_asciizcp_t		name;
-  mmux_standard_uint_t		version_major;
-  mmux_standard_uint_t		version_minor;
-  mmux_standard_uint_t		version_patchlevel;
+  mmux_pointer_t	data;
 } mmux_libc_memory_allocator_value_t;
 
 typedef bool mmux_libc_memory_allocator_malloc_fun_t
@@ -382,6 +392,7 @@ typedef bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 typedef struct mmux_libc_memory_allocator_class_t {
+  mmux_libc_interface_specification_t;
   mmux_libc_memory_allocator_malloc_fun_t			* const	malloc;
   mmux_libc_memory_allocator_calloc_fun_t			* const	calloc;
   mmux_libc_memory_allocator_realloc_fun_t			* const	realloc;

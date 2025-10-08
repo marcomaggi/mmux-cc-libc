@@ -225,6 +225,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * fds::                         File descriptors.
 * fs::                          File system.
 * sockets::                     Networking sockets.
+* interface specifications::    Interface specifications.
 
 Appendices
 
@@ -1267,7 +1268,7 @@ Error code @code{\NAME\}.
 @menu
 * memory core::                 Core memory allocation operations.
 * memory operations::           Memory operations.
-* memory allocator::            Memory allocator.
+* memory allocators::           Memory allocator.
 @end menu
 
 @c page
@@ -1754,28 +1755,51 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 @end deftypefn
 
 @c page
-@node memory allocator
-@section Memory allocator
+@node memory allocators
+@section Memory allocators
 
 
-It is often useful to define special memory allocators for specific data types of for data that we
+It is often useful to define special memory allocators for specific data types or for data that we
 know is short--lived or long--lived; the following definitions represent the memory allocator
 defined by @value{PACKAGE}.
 
+To allocate and release a memory block using the default memory allocator we do:
+
+@example
+mmux_libc_mall_t  AP;
+mmux_pointer_t    bufptr;
+auto              buflen = mmux_usize_literal(4096);
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr, buflen)) @{
+  /* error */
+@} else @{
+  ...
+  if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
+    /* error */
+  @}
+@}
+@end example
+
+Memory allocators implement the core operations @code{malloc}, @code{calloc}, @code{realloc},
+@code{reallocarray}, @code{malloc_and_copy}, @code{free}.
+
 @menu
-* memory allocator types::      Memory allocator type definitions.
-* memory allocator api::        Memory allocator programming interface.
-* memory allocator default::    Default memory allocator.
-* memory allocator fake::       Fake memory allocator.
-* memory allocator example::    How to implement a memory allocator.
+* memory allocators types::     Memory allocator type definitions.
+* memory allocators api::       Memory allocator programming interface.
+* memory allocators default::   Default memory allocator.
+* memory allocators fake::      Fake memory allocator.
+* memory allocators example::   How to implement a memory allocator.
 @end menu
 
 @c page
-@node memory allocator types
+@node memory allocators types
 @subsection Memory allocator type definitions
 
 
 @deftp {Struct Typedef} mmux_libc_memory_allocator_t
+@deftpx {Struct Pointer Typedef} mmux_libc_mall_t
 Data structure representing a memory allocator.  It has the following fields:
 
 @table @code
@@ -1786,6 +1810,9 @@ Pointer to an instance of @objtype{mmux_libc_memory_allocator_value_t}.
 Pointer to an instance of @objtype{mmux_libc_memory_allocator_class_t} representing the class of
 this memory allocator.
 @end table
+
+The type @objtype{mmux_libc_mall_t} is an alias for @code{mmux_libc_memory_allocator_t const *} and
+we can use it as type for the argument to functions that reference a memory allocator.
 @end deftp
 
 @c ------------------------------------------------------------------------
@@ -1794,15 +1821,8 @@ this memory allocator.
 Data structure representing the value of the memory allocator.  It has the following fields:
 
 @table @code
-@item mmux_asciizcp_t name
-Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
-memory allocator value.  The string can have any format.
-
-@item mmux_standard_uint_t version_major
-@itemx mmux_standard_uint_t version_minor
-@itemx mmux_standard_uint_t version_patchlevel
-The major, minor, patchlevel version numbers of this memory allocator value; when in doubt: just
-set them to @samp{1}, @samp{0}, @samp{0}.
+@item mmux_pointer_t data
+A pointer to be used for custom data.
 @end table
 @end deftp
 
@@ -1813,6 +1833,16 @@ Data structure type representing the table of allocator--specific functions.  It
 fields:
 
 @table @code
+@item mmux_asciizcp_t name
+Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
+memory allocator.  The string can have any format and it is meant to be used for debugging purposes.
+
+@item mmux_standard_uint_t interface_version_current
+@itemx mmux_standard_uint_t interface_version_revision
+@itemx mmux_standard_uint_t interface_version_age
+The current, revision and age interface version numbers of this memory allocator; when in doubt:
+just set them to @samp{0}, @samp{0}, @samp{0}.
+
 @item mmux_libc_memory_allocator_malloc_fun_t * const malloc
 Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
 
@@ -1828,8 +1858,8 @@ Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_r
 @item mmux_libc_memory_allocator_free_fun_t * const free
 Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_free}.
 
-@item mmux_libc_default_memory_allocator_alloc_and_copy * const alloc_and_copy
-Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_alloc_and_copy}.
+@item mmux_libc_default_memory_allocator_malloc_and_copy * const malloc_and_copy
+Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_malloc_and_copy}.
 @end table
 
 If, for some reason, a custom memory allocator does not implement one or more of these operations:
@@ -1839,49 +1869,50 @@ we should just define the corresponding functions to always set @code{errno} to
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_malloc_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_calloc_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_calloc}.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_realloc_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
 Allocator--specific function that behaves like @cfunc{mmux_libc_realloc}.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_reallocarray_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Allocator--specific function that behaves like @cfunc{mmux_libc_reallocarray}.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t @var{p})
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_free_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t @var{p})
 Allocator--specific function that behaves like @cfunc{mmux_libc_free}.
-@end deftypefun
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
-Allocator--specific function that behaves like @cfunc{mmux_libc_alloc_and_copy}.
-@end deftypefun
+@deftypefn {Function Type} bool mmux_libc_memory_allocator_malloc_and_copy_fun_t (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+Allocator--specific function that behaves like @cfunc{mmux_libc_malloc_and_copy}.
+@end deftypefn
 
 @c page
-@node memory allocator api
+@node memory allocators api
 @subsection Memory allocator programming interface
 
 
 To allocate and release a memory block using the default memory allocator we do:
 
 @example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_pointer_t                          bufptr;
+mmux_libc_mall_t  AP;
+mmux_pointer_t    bufptr;
+auto              buflen = mmux_usize_literal(4096);
 
 mmux_libc_default_memory_allocator_ref(&AP);
 
-if (mmux_libc_memory_allocator_malloc(AP, &bufptr, 4096)) @{
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr, buflen)) @{
   /* error */
 @}
 
@@ -1894,29 +1925,62 @@ if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
 
 @noindent
 while the standard @cfunc{free} function and its wrapper @cfunc{mmux_libc_free} will never return an
-error condition: the same cannot for said by custom memory allocators; so it is better to test the
+error condition: the same cannot be said for custom memory allocators; so it is better to test the
 return value of @cfunc{mmux_libc_memory_allocator_free}.
 
 For all the following definitions: the macro just casts a pointer @var{result_p} of any type to
 @code{mmux_pointer_t *}.
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
-@deftypefnx Function bool mmux_libc_memory_allocator_malloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
+@deftypefnx Function bool mmux_libc_memory_allocator_malloc_ (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{len})
 Call the function of the given memory allocator.
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_calloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@deftypefnx {Function} bool mmux_libc_memory_allocator_calloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_calloc (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_calloc_ (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Call the function of the given memory allocator.
 
 @example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_pointer_t                          bufptr;
+mmux_libc_mall_t  AP;
+mmux_pointer_t    items_ptr;
+auto              item_num = mmux_usize(123);
+auto              item_len = mmux_usize(4096);
 
 mmux_libc_default_memory_allocator_ref(&AP);
 
-if (mmux_libc_memory_allocator_calloc(AP, &bufptr, 123, 4096)) @{
+if (mmux_libc_memory_allocator_calloc(AP, &items_ptr, item_num, item_len)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_free(AP, items_ptr)) @{
+  /* error */
+@}
+@end example
+@end deftypefn
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_realloc (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_realloc_ (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+Call the function of the given memory allocator.
+
+@example
+mmux_libc_mall_t  AP;
+mmux_pointer_t    bufptr;
+auto              buflen = mmux_usize(4096);
+auto              newlen = mmux_usize(2 * 4096);
+
+mmux_libc_default_memory_allocator_ref(&AP);
+
+if (mmux_libc_memory_allocator_malloc(AP, &bufptr, buflen)) @{
+  /* error */
+@}
+
+...
+
+if (mmux_libc_memory_allocator_realloc(AP, &bufptr, newlen)) @{
   /* error */
 @}
 
@@ -1929,23 +1993,26 @@ if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_realloc (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
-@deftypefnx {Function} bool mmux_libc_memory_allocator_realloc_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{newlen})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_reallocarray (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_reallocarray_ (mmux_libc_mall_t @var{allocp}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
 Call the function of the given memory allocator.
 
 @example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_pointer_t                          bufptr;
+mmux_libc_mall_t  AP;
+mmux_pointer_t    items_ptr;
+auto              item_num  = mmux_usize(123);
+auto              item_len  = mmux_usize(4096);
+auto              item_num2 = mmux_usize(2 * 123);
 
 mmux_libc_default_memory_allocator_ref(&AP);
 
-if (mmux_libc_memory_allocator_malloc(AP, &bufptr, 4096)) @{
+if (mmux_libc_memory_allocator_calloc(AP, &items_ptr, item_num, item_len)) @{
   /* error */
 @}
 
 ...
 
-if (mmux_libc_memory_allocator_realloc(AP, &bufptr, 2 * 4096)) @{
+if (mmux_libc_memory_allocator_reallocarray(AP, &items_ptr, item_num2, item_len)) @{
   /* error */
 @}
 
@@ -1958,52 +2025,25 @@ if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
 @end deftypefn
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-@deftypefnx {Function} bool mmux_libc_memory_allocator_reallocarray_ (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t * @var{result_p}, mmux_usize_t @var{item_num}, mmux_usize_t @var{item_len})
-Call the function of the given memory allocator.
-
-@example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_pointer_t                          bufptr;
-
-mmux_libc_default_memory_allocator_ref(&AP);
-
-if (mmux_libc_memory_allocator_calloc(AP, &bufptr, 123, 4096)) @{
-  /* error */
-@}
-
-...
-
-if (mmux_libc_memory_allocator_reallocarray(AP, &bufptr, 456, 4096)) @{
-  /* error */
-@}
-
-...
-
-if (mmux_libc_memory_allocator_free(AP, bufptr)) @{
-  /* error */
-@}
-@end example
-@end deftypefn
-
-
-@deftypefun bool mmux_libc_memory_allocator_free (mmux_libc_memory_allocator_t const * @var{allocator_p}, mmux_pointer_t @var{p})
+@deftypefun bool mmux_libc_memory_allocator_free (mmux_libc_mall_t @var{allocp}, mmux_pointer_t @var{p})
 Call the function of the given memory allocator.
 @end deftypefun
 
 
-@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
-@deftypefnx {Function} bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_memory_allocator_t const * @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+@deftypefn {Preprocessor Macro} bool mmux_libc_memory_allocator_malloc_and_copy (mmux_libc_mall_t @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
+@deftypefnx {Function} bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_mall_t @var{allocator}, mmux_pointer_t * @var{dstptr_p}, mmux_pointer_t @var{srcptr}, mmux_usize_t @var{srclen})
 Call the function of the given memory allocator.
 
 @example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_char_t     srcstr = "/path/to/file.ext";
-mmux_usize_t    srclen_plus;
-mmux_char_t *   dststr;
+mmux_libc_mall_t  AP;
+char              srcstr = "/path/to/file.ext";
+mmux_usize_t      srclen_plus;
+char *            dststr;
 
 mmux_libc_default_memory_allocator_ref(&AP);
-mmux_libc_strlen_plus_nil(&srclen_plus, srcstr)
+
+mmux_libc_strlen_plus_nil(&srclen_plus, srcstr);
+
 if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dststr, srcstr, srclen_plus)) @{
   /* error */
 @}
@@ -2017,44 +2057,44 @@ if (mmux_libc_memory_allocator_free(AP, dststr)) @{
 @end deftypefn
 
 @c page
-@node memory allocator default
+@node memory allocators default
 @subsection Default memory allocator
 
 
 @value{PACKAGE} defines a default memory allocator that just uses the standard memory allocation
-functions.  In the value of this data structure: the name of the allocator is set to the @asciiz{}
-string:
+functions.  In the class of this data structure: the name of the allocator is set to the, statically
+allocated, @asciiz{} string:
 
 @example
 "MMUX CC Libc Default Memory Allocator"
 @end example
 
 @noindent
-and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
+and the interface version specification is set to: @samp{0}, @samp{0}, @samp{0}.
 
 
-@deftypefun bool mmux_libc_default_memory_allocator_ref (mmux_libc_memory_allocator_t const ** @var{result_p})
+@deftypefun bool mmux_libc_default_memory_allocator_ref (mmux_libc_mall_t * @var{result_p})
 Retrieve a pointer to the default memory allocator defined by @value{PACKAGE} and store it in the
 variable referenced by @var{result_p}.
 @end deftypefun
 
 @c page
-@node memory allocator fake
+@node memory allocators fake
 @subsection Fake memory allocator
 
 
 @value{PACKAGE} defines a fake memory allocator to be used to manage statically allocated data.  In
-the value of this data structure: the name of the allocator is set to the @asciiz{} string:
+the class of this data structure: the name of the allocator is set to the, statically allocated,
+@asciiz{} string:
 
 @example
 "MMUX CC Libc Fake Memory Allocator For Statically Allocated Data"
 @end example
 
 @noindent
-and the version specification is set to: @samp{1}, @samp{0}, @samp{0}.
+and the interface version specification is set to: @samp{0}, @samp{0}, @samp{0}.
 
-Among the class of a memory allocator of type @objtype{mmux_libc_memory_allocator_t} only the
-following functions are actually implemented:
+In the class of the fake memory allocator: only the following functions are actually implemented:
 
 @table @code
 @item malloc_and_copy
@@ -2072,10 +2112,10 @@ an error.
 Let's look at the following code:
 
 @example
-mmux_libc_memory_allocator_t const *    AP;
-mmux_char_t     srcstr = "/path/to/file.ext";
-mmux_usize_t    srclen_plus;
-mmux_char_t *   dststr;
+mmux_libc_mall_t  AP;
+char              srcstr = "/path/to/file.ext";
+mmux_usize_t      srclen_plus;
+char *            dststr;
 
 retrieve_a_memory_allocator(&AP);
 
@@ -2109,13 +2149,13 @@ this way we can transparently use statically allocated data and dynamically allo
 responsibility of the caller to handle correctly mutable and immutable data.
 
 
-@deftypefun bool mmux_libc_fake_memory_allocator_ref (mmux_libc_memory_allocator_t const ** @var{result_p})
+@deftypefun bool mmux_libc_fake_memory_allocator_ref (mmux_libc_mall_t * @var{result_p})
 Retrieve a pointer to the fake memory allocator defined by @value{PACKAGE} and store it in the
 variable referenced by @var{result_p}.
 @end deftypefun
 
 @c page
-@node memory allocator example
+@node memory allocators example
 @subsection How to implement a memory allocator
 
 
@@ -2123,39 +2163,39 @@ We can adapt the following implementation of the default allocator:
 
 @example
 static bool
-spiffy_memory_allocator_malloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_malloc (mmux_libc_mall_t allocp __attribute__((__unused__)),
                                 mmux_pointer_t * result_p, mmux_usize_t len)
 @{
   return mmux_libc_malloc_(result_p, len);
 @}
 static bool
-spiffy_memory_allocator_calloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_calloc (mmux_libc_mall_t allocp __attribute__((__unused__)),
                                 mmux_pointer_t * result_p,
                                 mmux_usize_t item_num, mmux_usize_t item_len)
 @{
   return mmux_libc_calloc_(result_p, item_num, item_len);
 @}
 static bool
-spiffy_memory_allocator_realloc (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_realloc (mmux_libc_mall_t allocp __attribute__((__unused__)),
                                  mmux_pointer_t * result_p, mmux_usize_t newlen)
 @{
   return mmux_libc_realloc_(result_p, newlen);
 @}
 static bool
-spiffy_memory_allocator_reallocarray (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_reallocarray (mmux_libc_mall_t allocp __attribute__((__unused__)),
                                       mmux_pointer_t * result_p, mmux_usize_t item_num,
                                       mmux_usize_t item_len)
 @{
   return mmux_libc_reallocarray_(result_p, item_num, item_len);
 @}
 static bool
-spiffy_memory_allocator_free (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_free (mmux_libc_mall_t allocp __attribute__((__unused__)),
                               mmux_pointer_t p)
 @{
   return mmux_libc_free(p);
 @}
 bool
-spiffy_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * allocator __attribute__((__unused__)),
+spiffy_memory_allocator_malloc_and_copy (mmux_libc_mall_t allocp __attribute__((__unused__)),
                                          mmux_pointer_t * dstptr_p,
                                          mmux_pointer_t srcptr, mmux_usize_t srclen)
 @{
@@ -2163,19 +2203,20 @@ spiffy_memory_allocator_malloc_and_copy (mmux_libc_memory_allocator_t const * al
 @}
 
 static mmux_libc_memory_allocator_value_t const spiffy_memory_allocator_value = @{
-  .name                 = "MMUX CC Libc Spiffy Memory Allocator",
-  .version_major        = 1,
-  .version_minor        = 0,
-  .version_patchlevel   = 0,
+  .data = NULL,
 @};
 
 static mmux_libc_memory_allocator_class_t const spiffy_memory_allocator_class = @{
-  .malloc               = spiffy_memory_allocator_malloc,
-  .realloc              = spiffy_memory_allocator_realloc,
-  .calloc               = spiffy_memory_allocator_calloc,
-  .reallocarray         = spiffy_memory_allocator_reallocarray,
-  .free                 = spiffy_memory_allocator_free,
-  .malloc_and_copy      = mmux_libc_default_memory_allocator_malloc_and_copy,
+  .name                        = "MMUX CC Libc Spiffy Memory Allocator",
+  .interface_version_current   = 0,
+  .interface_version_revision  = 0,
+  .interface_version_age       = 0,
+  .malloc                      = spiffy_memory_allocator_malloc,
+  .realloc                     = spiffy_memory_allocator_realloc,
+  .calloc                      = spiffy_memory_allocator_calloc,
+  .reallocarray                = spiffy_memory_allocator_reallocarray,
+  .free                        = spiffy_memory_allocator_free,
+  .malloc_and_copy             = mmux_libc_default_memory_allocator_malloc_and_copy,
 @};
 
 static mmux_libc_memory_allocator_t const spiffy_memory_allocator = @{
@@ -2184,7 +2225,7 @@ static mmux_libc_memory_allocator_t const spiffy_memory_allocator = @{
 @};
 
 bool
-spiffy_memory_allocator_ref (mmux_libc_memory_allocator_t const ** result_p)
+spiffy_memory_allocator_ref (mmux_libc_mall_t * result_p)
 @{
   *result_p = &spiffy_memory_allocator;
   return false;
@@ -10832,6 +10873,211 @@ sender address.
 
 @deftypefun bool mmux_libc_setsockopt (mmux_libc_network_socket_t @var{sock}, mmux_sint_t @var{level}, mmux_sint_t @var{optname}, mmux_pointer_t @var{optval_p}, mmux_socklen_t @var{optlen})
 @MmuxCInterface{setsockopt}.
+@end deftypefun
+
+@c page
+@node interface specifications
+@chapter Interface specifications
+
+
+It happens that we implement an @api{} which undergoes progressive development and we want a library
+to export multiple revisions of the same @api{}; it is useful to define a data structure
+representing an interface version specification.
+
+Under @value{PACKAGE}, interface specifications follow version numbering as established by the
+@gnu{} Autotools for shared libraries; for an explanation of interface numbers as managed by @gnu{}
+Libtool @xref{Libtool versioning, interface, Libtool's versioning system, libtool, Shared library
+support for @gnu{}}.
+
+@menu
+* interface specifications intro::      Introduction to declare interface versioning.
+* interface specifications types::      Data types to declare interface specifications.
+* interface specifications api::        Operations on interface specifications.
+@end menu
+
+@c page
+@node interface specifications intro
+@section Introduction to declare interface versioning
+
+
+Let's say we develop a project implementing a C language library, whose public @api{} contains a
+module exporting the following functions and data types:
+
+@example
+typedef struct alpha_t @{ ... @} alpha_t;
+typedef struct beta_t  @{ ... @} beta_t;
+
+extern void red   (alpha_t * A, beta_t * B);
+extern void green (alpha_t * A);
+extern void blue  (beta_t  * B);
+@end example
+
+@noindent
+and we publish a release of this project.  If this is the first public release we should assign to
+this @api{} an interface version specification with the format @samp{CURRENT:REVISION:AGE} and value
+@samp{0:0:0}.  Using the facilities of @value{PACKAGE}, we could define a data structure:
+
+@example
+mmux_libc_interface_specification_t const spiffy_interface_specification = @{
+  .is_name      = "My Spiffy Project",
+  .is_current   = 0,
+  .is_revision  = 0,
+  .is_age       = 0,
+@};
+@end example
+
+@noindent
+and add it to the public @api{}:
+
+@example
+extern mmux_libc_interface_specification_t const spiffy_interface_specification;
+@end example
+
+Now let's say we fix some errors in the code and/or change the internal implementation for
+optimisation purposes or something else; then we publish another release; we notice that:
+
+@itemize
+@item
+nothing has changed in the type declarations and the function prototypes;
+
+@item
+all the functions perform the same operations as before;
+
+@item
+nothing has changed in the relations between input arguments, output results and side effects; or,
+maybe, some results and side effects have changed because of error fixes, but the intended meaning
+of results and side effects is the same;
+@end itemize
+
+@noindent
+we should increment the @samp{REVISION} component, so that the interface version specification
+becomes @samp{0:1:0}.  The client code the library is linked with can determine if the fixes are
+available by inspecting the @samp{REVISION} component:
+
+@itemize
+@item
+if it is @samp{0}, the library's implementation does not contain the latest fixes; it means the
+package installed on the system has not been upgraded to the latest revision;
+
+@item
+if it is @samp{1}, the package has been upgraded.
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+@subsection Project's development continues
+
+We add a new function:
+
+@example
+extern void transparency (alpha_t * A);
+@end example
+
+@noindent
+now the @api{} has changed, but the old @api{} is still available; we should:
+
+@enumerate
+@item
+increment the @samp{CURRENT} component to @samp{1}, to signal that the @api{} has changed;
+
+@item
+reset the @samp{REVISION} component to @samp{0}, to signal that the available @api{} is the first
+released for @samp{CURRENT} version number @samp{1};
+
+@item
+set the @samp{AGE} component to @samp{1}, to signal that the new @api{} having @samp{CURRENT}
+version number @samp{1} is compatible with the old @api{} having @samp{CURRENT} version number
+@samp{1 - AGE = 1 - 1 = 0}.
+@end enumerate
+
+@c ------------------------------------------------------------------------
+
+@subsection Project's development continues again
+
+We add a new function:
+
+@example
+extern void glossy (beta_t * B);
+@end example
+
+@noindent
+the @api{} has changed again, but the old @api{}s are still available; we should:
+
+@enumerate
+@item
+increment the @samp{CURRENT} component to @samp{2}, to signal that the @api{} has changed;
+
+@item
+reset the @samp{REVISION} component to @samp{0}, to signal that the available @api{} is the first
+released for @samp{CURRENT} version number @samp{2};
+
+@item
+set the @samp{AGE} component to @samp{2}, to signal that the new @api{} having @samp{CURRENT}
+version number @samp{2} is compatible with the old @api{}s having @samp{CURRENT} version number in
+the inclusive range @samp{2 - AGE = 2 - 2 = 0} and @samp{2}; we can link with this new library
+client code that expects the @api{} to be compatible with all the version numbers @samp{0},
+@samp{1}, @samp{2}.
+@end enumerate
+
+@c ------------------------------------------------------------------------
+
+@subsection Project's development continues again again
+
+We remove the old function:
+
+@example
+extern void blue (beta_t * B);
+@end example
+
+@noindent
+because it has become obsolete; the @api{} has changed again, and the old @api{}s are not available
+anymore; we should:
+
+@enumerate
+@item
+increment the @samp{CURRENT} component to @samp{3}, to signal that the @api{} has changed;
+
+@item
+reset the @samp{REVISION} component to @samp{0}, to signal that the available @api{} is the first
+released for @samp{CURRENT} version number @samp{3};
+
+@item
+reset the @samp{AGE} component to @samp{0}, to signal that the old @api{}s are no more available,
+only the @api{} having @samp{CURRENT} version number @samp{3} is available.
+@end enumerate
+
+@c page
+@node interface specifications types
+@section Data types to declare interface specifications
+
+
+@deftp {Struct Typedef} mmux_libc_interface_specification_t
+Data structure representing an interface specification.
+
+@table @code
+@item mmux_asciizcp_t is_name
+Pointer to a, possibly statically--allocated, @asciiz{} string representing the name of this
+interface; there are no constraints on the string's format.
+
+@item mmux_standard_uint_t is_current
+Interface's current version number.  The starting value should be @samp{0}.
+
+@item mmux_standard_uint_t is_revision
+Interface's revision number.  The starting value should be @samp{0}.
+
+@item mmux_standard_uint_t is_age
+Interface's age number.  The starting value should be @samp{0}.
+@end table
+@end deftp
+
+@c page
+@node interface specifications api
+@section Operations on interface specifications
+
+
+@deftypefun bool mmux_libc_interface_specification_is_compatible (bool * @var{result_p}, mmux_libc_interface_specification_t const * @var{IS}, mmux_uint_t @var{requested_version})
+If @var{requested_version} is compatible with the interface specification referenced by @var{IS}:
+store @ctrue{} in the variable referenced by @var{result_p}; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page

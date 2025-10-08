@@ -702,6 +702,15 @@ tests_test_time_strftime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 tests_test_time_strptime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_strptime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
+## ------------------------------------------------------------------------
+## interface specifications
+
+check_PROGRAMS	+= \
+	tests/test-interface-specifications
+
+tests_test_interface_specifications_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_interface_specifications_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
 
 #### interface to "make installcheck"
 
