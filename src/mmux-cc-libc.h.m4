@@ -193,7 +193,6 @@ typedef bool mmux_libc_default_memory_allocator_malloc_and_copy_fun_t
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 typedef struct mmux_libc_memory_allocator_class_t {
-  mmux_libc_interface_specification_t;
   mmux_libc_memory_allocator_malloc_fun_t			* const	malloc;
   mmux_libc_memory_allocator_calloc_fun_t			* const	calloc;
   mmux_libc_memory_allocator_realloc_fun_t			* const	realloc;
@@ -249,6 +248,7 @@ typedef void mmux_libc_sighandler_t (mmux_sint_t signum);
 
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_static_class;
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_dynami_class;
+mmux_cc_libc_decl mmux_libc_interface_specification_t const * mmux_libc_interface_specification;
 
 
 /** --------------------------------------------------------------------

@@ -939,6 +939,11 @@ Return an integer representing the library interface current revision number.
 Return an integer representing the library interface current age.
 @end deftypefun
 
+
+@deftypevr {Struct Pointer} {mmux_libc_interface_specification_t const *} mmux_libc_interface_specification
+Interface specification for @value{PACKAGE}, @ref{interface specifications} for details.
+@end deftypevr
+
 @c page
 @node initialisation
 @chapter Library initialisation
@@ -1833,16 +1838,6 @@ Data structure type representing the table of allocator--specific functions.  It
 fields:
 
 @table @code
-@item mmux_asciizcp_t name
-Pointer to a (possibly statically allocated) @asciiz{} string representing the description of the
-memory allocator.  The string can have any format and it is meant to be used for debugging purposes.
-
-@item mmux_standard_uint_t interface_version_current
-@itemx mmux_standard_uint_t interface_version_revision
-@itemx mmux_standard_uint_t interface_version_age
-The current, revision and age interface version numbers of this memory allocator; when in doubt:
-just set them to @samp{0}, @samp{0}, @samp{0}.
-
 @item mmux_libc_memory_allocator_malloc_fun_t * const malloc
 Pointer to the allocator--specific function that behaves like @cfunc{mmux_libc_malloc}.
 
@@ -2062,15 +2057,7 @@ if (mmux_libc_memory_allocator_free(AP, dststr)) @{
 
 
 @value{PACKAGE} defines a default memory allocator that just uses the standard memory allocation
-functions.  In the class of this data structure: the name of the allocator is set to the, statically
-allocated, @asciiz{} string:
-
-@example
-"MMUX CC Libc Default Memory Allocator"
-@end example
-
-@noindent
-and the interface version specification is set to: @samp{0}, @samp{0}, @samp{0}.
+functions.
 
 
 @deftypefun bool mmux_libc_default_memory_allocator_ref (mmux_libc_mall_t * @var{result_p})
@@ -2084,17 +2071,7 @@ variable referenced by @var{result_p}.
 
 
 @value{PACKAGE} defines a fake memory allocator to be used to manage statically allocated data.  In
-the class of this data structure: the name of the allocator is set to the, statically allocated,
-@asciiz{} string:
-
-@example
-"MMUX CC Libc Fake Memory Allocator For Statically Allocated Data"
-@end example
-
-@noindent
-and the interface version specification is set to: @samp{0}, @samp{0}, @samp{0}.
-
-In the class of the fake memory allocator: only the following functions are actually implemented:
+the class of the fake memory allocator: only the following functions are actually implemented:
 
 @table @code
 @item malloc_and_copy
@@ -2207,10 +2184,6 @@ static mmux_libc_memory_allocator_value_t const spiffy_memory_allocator_value = 
 @};
 
 static mmux_libc_memory_allocator_class_t const spiffy_memory_allocator_class = @{
-  .name                        = "MMUX CC Libc Spiffy Memory Allocator",
-  .interface_version_current   = 0,
-  .interface_version_revision  = 0,
-  .interface_version_age       = 0,
   .malloc                      = spiffy_memory_allocator_malloc,
   .realloc                     = spiffy_memory_allocator_realloc,
   .calloc                      = spiffy_memory_allocator_calloc,
@@ -10890,14 +10863,14 @@ Libtool @xref{Libtool versioning, interface, Libtool's versioning system, libtoo
 support for @gnu{}}.
 
 @menu
-* interface specifications intro::      Introduction to declare interface versioning.
+* interface specifications projects::   Introduction to declare interface versioning for projects.
 * interface specifications types::      Data types to declare interface specifications.
 * interface specifications api::        Operations on interface specifications.
 @end menu
 
 @c page
-@node interface specifications intro
-@section Introduction to declare interface versioning
+@node interface specifications projects
+@section Introduction to declare interface versioning for projects.
 
 
 Let's say we develop a project implementing a C language library, whose public @api{} contains a
@@ -10932,6 +10905,9 @@ and add it to the public @api{}:
 @example
 extern mmux_libc_interface_specification_t const spiffy_interface_specification;
 @end example
+
+@noindent
+so that the process in execution can itself, at run--time, determine the available features.
 
 Now let's say we fix some errors in the code and/or change the internal implementation for
 optimisation purposes or something else; then we publish another release; we notice that:

@@ -236,10 +236,6 @@ static mmux_libc_memory_allocator_value_t const mmux_libc_default_memory_allocat
 };
 
 static mmux_libc_memory_allocator_class_t const mmux_libc_default_memory_allocator_class = {
-  .is_name		= "MMUX CC Libc Default Memory Allocator",
-  .is_current		= 0,
-  .is_revision		= 0,
-  .is_age		= 0,
   .malloc		= mmux_libc_default_memory_allocator_malloc,
   .realloc		= mmux_libc_default_memory_allocator_realloc,
   .calloc		= mmux_libc_default_memory_allocator_calloc,
@@ -324,10 +320,6 @@ static mmux_libc_memory_allocator_value_t const mmux_libc_fake_memory_allocator_
 };
 
 static mmux_libc_memory_allocator_class_t const mmux_libc_fake_memory_allocator_class = {
-  .is_name		= "MMUX CC Libc Fake Memory Allocator For Statically Allocated Data",
-  .is_current		= 0,
-  .is_revision		= 0,
-  .is_age		= 0,
   .malloc		= mmux_libc_fake_memory_allocator_malloc,
   .realloc		= mmux_libc_fake_memory_allocator_realloc,
   .calloc		= mmux_libc_fake_memory_allocator_calloc,

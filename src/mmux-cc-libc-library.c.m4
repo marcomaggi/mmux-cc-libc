@@ -30,8 +30,31 @@
 
 
 /** --------------------------------------------------------------------
- ** Version functions.
+ ** Interface specification and version functions.
  ** ----------------------------------------------------------------- */
+
+static mmux_libc_interface_specification_t const mmux_libc_the_interface_specification = {
+  .is_name      = "My Spiffy Project",
+  .is_current   = mmux_cc_libc_VERSION_INTERFACE_CURRENT,
+  .is_revision  = mmux_cc_libc_VERSION_INTERFACE_REVISION,
+  .is_age       = mmux_cc_libc_VERSION_INTERFACE_AGE,
+};
+
+mmux_libc_interface_specification_t const * mmux_libc_interface_specification = &mmux_libc_the_interface_specification;
+
+bool
+mmux_libc_interface_specification_is_compatible (bool * result_p,
+						 mmux_libc_interface_specification_t const * IS,
+						 mmux_uint_t requested_version)
+{
+  if (((IS->is_current - IS->is_age) <= requested_version.value) &&
+      (IS->is_current                >= requested_version.value)) {
+    *result_p = true;
+  } else {
+    *result_p = false;
+  }
+  return false;
+}
 
 char const *
 mmux_cc_libc_version_string (void)
@@ -67,25 +90,6 @@ mmux_cc_libc_init (void)
 bool
 mmux_cc_libc_final (void)
 {
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Interface specification.
- ** ----------------------------------------------------------------- */
-
-bool
-mmux_libc_interface_specification_is_compatible (bool * result_p,
-						 mmux_libc_interface_specification_t const * IS,
-						 mmux_uint_t requested_version)
-{
-  if (((IS->is_current - IS->is_age) <= requested_version.value) &&
-      (IS->is_current                >= requested_version.value)) {
-    *result_p = true;
-  } else {
-    *result_p = false;
-  }
   return false;
 }
 

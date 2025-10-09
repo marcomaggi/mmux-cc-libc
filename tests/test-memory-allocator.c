@@ -19,10 +19,10 @@
 
 #include "test-common.h"
 
-#define mmux_ctype_loop_from_to(ITERTYPE, ITERNAME, ITERFIRST, ITERPAST)	\
-	mmux_##ITERTYPE##_t ITERNAME = ITERFIRST;				\
-	mmux_ctype_less(ITERNAME, ITERPAST);					\
-	mmux_ctype_incr_variable(ITERNAME)
+#define mmux_ctype_loop_from_to(ITERNAME, ITERFIRST, ITERPAST)	\
+  auto ITERNAME = ITERFIRST;					\
+  mmux_ctype_less(ITERNAME, ITERPAST);				\
+  mmux_ctype_incr_variable(ITERNAME)
 
 
 /** --------------------------------------------------------------------
@@ -35,7 +35,7 @@ test_default_allocator_malloc (void)
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_default_memory_allocator_ref(&AP)) {
       print_error("retrieving default memory allocator, should never happen");
@@ -49,7 +49,7 @@ test_default_allocator_malloc (void)
 	handle_error();
       }
       {
-	for (mmux_ctype_loop_from_to(usize,i,mmux_ctype_constant_zero(i),buflen)) {
+	for (mmux_ctype_loop_from_to(i,mmux_usize_constant_zero(),buflen)) {
 	  bufptr[i.value] = i.value;
 	  if (false) {
 	    printf_message("bufptr[%lu]=%u", i.value, bufptr[i.value]);
@@ -64,31 +64,31 @@ test_default_allocator_malloc (void)
   }
 }
 
-#if 0
 static void
 test_default_allocator_calloc (void)
 {
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_default_memory_allocator_ref(&AP)) {
       print_error("retrieving default memory allocator, should never happen");
       handle_error();
     } else {
-      auto			buflen = mmux_usize(4096);
       mmux_standard_octet_t *	bufptr;
+      auto			item_num = mmux_usize(4096);
+      auto			item_len = mmux_octet_sizeof();
 
-      if (mmux_libc_memory_allocator_calloc(AP, &bufptr, buflen, sizeof(mmux_standard_octet_t))) {
+      if (mmux_libc_memory_allocator_calloc(AP, &bufptr, item_num, item_len)) {
 	print_error("allocating memory with default memory allocator");
 	handle_error();
       }
       {
-	for (mmux_usize_t i=0; i<buflen; ++i) {
-	  bufptr[i] = i;
-	  if (0) {
-	    printf_message("bufptr[%lu]=%lu", i, bufptr[i]);
+	for (mmux_standard_usize_t i=0; i<item_num.value; ++i) {
+	  bufptr[i] = (mmux_standard_octet_t) i;
+	  if (false) {
+	    printf_message("bufptr[%lu]=%u", i, bufptr[i]);
 	  }
 	}
       }
@@ -105,14 +105,13 @@ test_default_allocator_calloc_realloc (void)
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_default_memory_allocator_ref(&AP)) {
       print_error("retrieving default memory allocator, should never happen");
       handle_error();
     } else {
-      auto			item_num1 = mmux_usize_literal(4096);
-      auto			item_num2 = mmux_ctype_mul(mmux_ctyp_constant_two(buflen1), buflen1);
+      auto			item_num1 = mmux_usize_literal(73);
       auto			item_len  = mmux_octet_sizeof();
       mmux_standard_octet_t *	bufptr;
 
@@ -121,28 +120,25 @@ test_default_allocator_calloc_realloc (void)
 	handle_error();
       }
       {
-	for (mmux_usize_t i = mmux_usize_constant_zero();
-	     mmux_ctype_less(i, item_num1.value);
-	     mmux_ctype_incr_variable(i)) {
+	for (mmux_ctype_loop_from_to(i, mmux_usize_constant_zero(), item_num1)) {
 	  bufptr[i.value] = (mmux_standard_octet_t) i.value;
 	  if (false) {
-	    printf_message("bufptr[%lu]=%lu", i.value, bufptr[i.value]);
+	    printf_message("bufptr[%lu]=%u", i.value, bufptr[i.value]);
 	  }
 	}
       }
       {
-	auto	 buflen = mmux_ctype_mul(item_num2, mmux_octet_sizeof());
+	auto	item_num2 = mmux_ctype_mul(mmux_usize_constant_two(), item_num1);
+	auto	buflen    = mmux_ctype_mul(item_num2, mmux_octet_sizeof());
 
 	if (mmux_libc_memory_allocator_realloc(AP, &bufptr, buflen)) {
 	  print_error("allocating memory with default memory allocator");
 	  handle_error();
 	}
-      }
-      {
-	for (mmux_ctype_loop_from_to(usize, i, item_num1, iter_num2)) {
+	for (mmux_ctype_loop_from_to(i, item_num1, item_num2)) {
 	  bufptr[i.value] = i.value;
 	  if (false) {
-	    printf_message("bufptr[%lu]=%lu", i.value, bufptr[i.value]);
+	    printf_message("bufptr[%lu]=%u", i.value, bufptr[i.value]);
 	  }
 	}
       }
@@ -159,37 +155,39 @@ test_default_allocator_calloc_reallocarray (void)
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_default_memory_allocator_ref(&AP)) {
       print_error("retrieving default memory allocator, should never happen");
       handle_error();
     } else {
-      mmux_usize_t	buflen1 = 4096;
-      mmux_usize_t	buflen2 = 2 * buflen1;
-      mmux_usize_t *	bufptr;
+      auto			item_num1 = mmux_usize_literal(73);
+      auto			item_len  = mmux_octet_sizeof();
+      mmux_standard_octet_t *	bufptr;
 
-      if (mmux_libc_memory_allocator_calloc(AP, &bufptr, buflen1, sizeof(mmux_usize_t))) {
+      if (mmux_libc_memory_allocator_calloc(AP, &bufptr, item_num1, item_len)) {
 	print_error("allocating memory with default memory allocator");
 	handle_error();
       }
       {
-	for (mmux_usize_t i=0; i<buflen1; ++i) {
-	  bufptr[i] = i;
-	  if (0) {
-	    printf_message("bufptr[%lu]=%lu", i, bufptr[i]);
+	for (mmux_ctype_loop_from_to(i, mmux_usize_constant_zero(), item_num1)) {
+	  bufptr[i.value] = (mmux_standard_octet_t) i.value;
+	  if (false) {
+	    printf_message("bufptr[%lu]=%u", i.value, bufptr[i.value]);
 	  }
 	}
       }
-      if (mmux_libc_memory_allocator_reallocarray(AP, &bufptr, buflen2, sizeof(mmux_usize_t))) {
-	print_error("allocating memory with default memory allocator");
-	handle_error();
-      }
       {
-	for (mmux_usize_t i=buflen1; i<buflen2; ++i) {
-	  bufptr[i] = i;
-	  if (0) {
-	    printf_message("bufptr[%lu]=%lu", i, bufptr[i]);
+	auto	item_num2 = mmux_ctype_mul(mmux_usize_constant_two(), item_num1);
+
+	if (mmux_libc_memory_allocator_reallocarray(AP, &bufptr, item_num2, item_len)) {
+	  print_error("allocating memory with default memory allocator");
+	  handle_error();
+	}
+	for (mmux_ctype_loop_from_to(i, item_num1, item_num2)) {
+	  bufptr[i.value] = (mmux_standard_octet_t) i.value;
+	  if (false) {
+	    printf_message("bufptr[%lu]=%u", i.value, bufptr[i.value]);
 	  }
 	}
       }
@@ -206,43 +204,43 @@ test_default_allocator_malloc_and_copy (void)
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_default_memory_allocator_ref(&AP)) {
       print_error("retrieving default memory allocator, should never happen");
       handle_error();
     } else {
-      mmux_usize_t	srclen = 4096;
-      mmux_usize_t	srcptr[srclen];
-      mmux_usize_t *	dstptr;
+      auto			srclen = mmux_usize_literal(73);
+      mmux_standard_octet_t	srcptr[srclen.value];
+      mmux_standard_octet_t *	dstptr;
 
       /* Fill the source buffer with data. */
       {
-	for (mmux_usize_t i=0; i<srclen; ++i) {
-	  srcptr[i] = i;
-	  if (0) {
-	    printf_message("srcptr[%lu]=%lu", i, srcptr[i]);
+	for (mmux_ctype_loop_from_to(i, mmux_usize_constant_zero(), srclen)) {
+	  srcptr[i.value] = (mmux_standard_octet_t) i.value;
+	  if (false) {
+	    printf_message("srcptr[%lu]=%u", i.value, srcptr[i.value]);
 	  }
 	}
       }
 
-      if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dstptr, srcptr, srclen * sizeof(mmux_usize_t))) {
+      if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dstptr, srcptr, srclen)) {
 	print_error("allocating memory with default memory allocator");
 	handle_error();
       }
       {
 	/* Simulate an error. */
-	if (0) {
-	  dstptr[123] = 0;
+	if (false) {
+	  dstptr[13] = 0;
 	}
 
-	for (mmux_usize_t i=0; i<srclen; ++i) {
-	  if (0) {
-	    printf_message("srcptr[%lu]=%lu", i, srcptr[i]);
+	for (mmux_ctype_loop_from_to(i, mmux_usize_constant_zero(), srclen)) {
+	  if (false) {
+	    printf_message("srcptr[%lu]=%u", i.value, srcptr[i.value]);
 	  }
-	  if (srcptr[i] != dstptr[i]) {
-	    printf_error("invalid value at offset %lu of dstptr, expected %lu, got %lu",
-			 i, srcptr[i], dstptr[i]);
+	  if (srcptr[i.value] != dstptr[i.value]) {
+	    printf_error("invalid value at offset %lu of dstptr, expected %u, got %u",
+			 i.value, srcptr[i.value], dstptr[i.value]);
 	    mmux_libc_exit_failure();
 	  }
 	}
@@ -254,63 +252,56 @@ test_default_allocator_malloc_and_copy (void)
     }
   }
 }
-#endif
 
 
 /** --------------------------------------------------------------------
  ** Fake allocator.
  ** ----------------------------------------------------------------- */
 
-#if 0
 static void
 test_fake_allocator_malloc_and_copy (void)
 {
   printf_message("running test: %s", __func__);
 
   {
-    mmux_libc_memory_allocator_t const *	AP;
+    mmux_libc_mall_t	AP;
 
     if (mmux_libc_fake_memory_allocator_ref(&AP)) {
       print_error("retrieving fake memory allocator, should never happen");
       handle_error();
     } else {
-      mmux_usize_t	srclen = 4096;
-      mmux_usize_t	srcptr[srclen];
-      mmux_usize_t *	dstptr;
+      auto			srclen = mmux_usize(73);
+      mmux_standard_octet_t	srcptr[srclen.value];
+      mmux_standard_octet_t *	dstptr;
 
       /* Fill the source buffer with data. */
       {
-	for (mmux_usize_t i=0; i<srclen; ++i) {
-	  srcptr[i] = i;
-	  if (0) {
-	    printf_message("srcptr[%lu]=%lu", i, srcptr[i]);
+	for (mmux_ctype_loop_from_to(i,mmux_usize_constant_zero(),srclen)) {
+	  srcptr[i.value] = (mmux_standard_octet_t) i.value;
+	  if (false) {
+	    printf_message("srcptr[%lu]=%u", i.value, srcptr[i.value]);
 	  }
 	}
       }
 
-      if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dstptr, srcptr, srclen * sizeof(mmux_usize_t))) {
+      if (mmux_libc_memory_allocator_malloc_and_copy(AP, &dstptr, srcptr, srclen)) {
 	print_error("allocating memory with fake memory allocator");
 	handle_error();
       }
       {
-	/* Simulate an error. */
-	if (0) {
-	  dstptr[123] = 0;
-	}
-
 	if (srcptr != dstptr) {
 	  printf_error("invalid dstptr pointer, expected %p, got %p",
 		       (mmux_pointer_t)srcptr, (mmux_pointer_t)dstptr);
 	  mmux_libc_exit_failure();
 	}
 
-	for (mmux_usize_t i=0; i<srclen; ++i) {
-	  if (0) {
-	    printf_message("srcptr[%lu]=%lu", i, srcptr[i]);
+	for (mmux_ctype_loop_from_to(i,mmux_usize_constant_zero(),srclen)) {
+	  if (true) {
+	    printf_message("dstptr[%lu]=%u", i.value, dstptr[i.value]);
 	  }
-	  if (srcptr[i] != dstptr[i]) {
-	    printf_error("invalid value at offset %lu of dstptr, expected %lu, got %lu",
-			 i, srcptr[i], dstptr[i]);
+	  if (srcptr[i.value] != dstptr[i.value]) {
+	    printf_error("invalid value at offset %lu of dstptr, expected %u, got %u",
+			 i.value, srcptr[i.value], dstptr[i.value]);
 	    mmux_libc_exit_failure();
 	  }
 	}
@@ -322,7 +313,6 @@ test_fake_allocator_malloc_and_copy (void)
     }
   }
 }
-#endif
 
 
 /** --------------------------------------------------------------------
@@ -339,14 +329,12 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   if (1) {	test_default_allocator_malloc();		}
-#if 0
   if (1) {	test_default_allocator_calloc();		}
   if (1) {	test_default_allocator_calloc_realloc();	}
   if (1) {	test_default_allocator_calloc_reallocarray();	}
   if (1) {	test_default_allocator_malloc_and_copy();	}
 
   if (1) {	test_fake_allocator_malloc_and_copy();		}
-#endif
 
   mmux_libc_exit_success();
 }
