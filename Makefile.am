@@ -235,6 +235,15 @@ tests_test_memory_allocator_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_memory_allocator_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
+## strings
+
+check_PROGRAMS	+= \
+	tests/test-strings-core
+
+tests_test_strings_core_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_strings_core_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
 ## persona
 
 check_PROGRAMS	+= \

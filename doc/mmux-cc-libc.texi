@@ -2229,7 +2229,7 @@ spiffy_memory_allocator_ref (mmux_libc_mall_t * result_p)
 @MmuxCInterface{strlen}.
 
 @example
-mmux_asciizcp_t         bufptr = "hello world";
+mmux_asciizcp_t         bufptr = "the colour of water";
 mmux_usize_t            buflen;
 
 if (mmux_libc_strlen(&buflen, bufptr)) @{
@@ -2250,10 +2250,11 @@ terminating null character.
 @MmuxCInterface{strnlen}.
 
 @example
-mmux_asciizcp_t         bufptr = "hello world";
-mmux_usize_t            buflen;
+mmux_asciizcp_t  bufptr = "the colour of water";
+auto             maxlen = mmux_usize_literal(10);
+typeof(maxlen)   buflen;
 
-if (mmux_libc_strnlen(&buflen, bufptr, 4096)) @{
+if (mmux_libc_strnlen(&buflen, bufptr, maxlen)) @{
   /* error, it should never happen */
 @}
 @end example
