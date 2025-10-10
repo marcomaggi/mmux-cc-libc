@@ -153,6 +153,21 @@ mmux_libc_strncat (mmux_asciizp_t dst_ptr, mmux_asciizcp_t src_ptr, mmux_usize_t
  ** ----------------------------------------------------------------- */
 
 bool
+mmux_libc_strequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+{
+  *result_p = (0 == strcmp(ptr2, ptr1))? true : false;
+  return false;
+}
+bool
+mmux_libc_strnequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+{
+  *result_p = (0 == strncmp(ptr2, ptr1, len.value))? true : false;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
 mmux_libc_strcmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
 {
   *result_p = mmux_sint(strcmp(ptr2, ptr1));

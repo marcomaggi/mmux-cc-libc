@@ -2267,32 +2267,98 @@ if (mmux_libc_strnlen(&buflen, bufptr, maxlen)) @{
 
 @deftypefun bool mmux_libc_strcpy (mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr})
 @MmuxCInterface{strcpy}.
+
+@example
+//                         01234567890123456789
+mmux_asciizcp_t  srcptr = "the colour of water";
+char             dstptr[20];
+
+mmux_libc_strcpy(dstptr, srcptr);
+assert('\0' == dstptr[19]);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strncpy (mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr}, mmux_usize_t @var{len})
 @MmuxCInterface{strncpy}.
+
+@example
+//                         012345678901234567890
+mmux_asciizcp_t  srcptr = "the colour of water";
+auto             dstlen = mmux_usize_literal(64);
+char             dstptr[dstlen.value];
+
+assert(false == mmux_libc_strncpy(dstptr, srcptr, dstlen));
+assert('\0' == dstptr[19]);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stpcpy(mmux_asciizp_t * @var{result_after_ptr_p}, mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr})
+@deftypefun bool mmux_libc_stpcpy(mmux_asciizp_t * @var{result_next_ptr_p}, mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr})
 @MmuxCInterface{stpcpy}.
+
+@example
+//                         012345678901234567890
+mmux_asciizcp_t  srcptr = "the colour of water";
+char             dstptr[20];
+mmux_asciizp_t   next_dstptr;
+
+assert(false == mmux_libc_stpcpy(&next_dstptr, dstptr, srcptr));
+assert('\0' == *next_dstptr);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stpncpy(mmux_asciizp_t * @var{result_after_ptr_p}, mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr}, mmux_usize_t @var{len})
+@deftypefn {@gnu{} Function} bool mmux_libc_stpncpy(mmux_asciizp_t * @var{result_next_ptr_p}, mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr}, mmux_usize_t @var{len})
 @MmuxCInterface{stpncpy}.
-@end deftypefun
+
+@example
+//                         012345678901234567890
+mmux_asciizcp_t  srcptr = "the colour of water";
+auto             dstlen = mmux_usize_literal(64);
+char             dstptr[dstlen.value];
+mmux_asciizp_t   next_dstptr;
+
+assert(false == mmux_libc_stpncpy(&next_dstptr, dstptr, srcptr, dstlen));
+assert('\0' == *next_dstptr);
+@end example
+@end deftypefn
 
 
 @deftypefun bool mmux_libc_strdup (mmux_asciizcp_t * @var{result_oustr_p}, mmux_asciizcp_t @var{instr})
 @MmuxCInterface{strdup}.
+
+@example
+mmux_asciizcp_t     srcptr = "the colour of water";
+mmux_asciizcp_t     dstptr;
+
+if (mmux_libc_strdup(&dstptr, srcptr)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_free((mmux_pointer_t)dstptr);
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strndup (mmux_asciizcp_t * @var{result_oustr_p}, mmux_asciizcp_t @var{instr}, mmux_usize_t @var{len})
+@deftypefn {@gnu{} Function} bool mmux_libc_strndup (mmux_asciizcp_t * @var{result_oustr_p}, mmux_asciizcp_t @var{instr}, mmux_usize_t @var{len})
 @MmuxCInterface{strndup}.
-@end deftypefun
+
+@example
+//                         012345678901234567890
+mmux_asciizcp_t  srcptr = "the colour of water";
+auto             dstlen = mmux_usize_literal(10);
+mmux_asciizcp_t  dstptr;
+
+if (mmux_libc_strndup(&dstptr, srcptr, dstlen)) @{
+  /* error */
+@} else @{
+  ...
+  mmux_libc_free((mmux_pointer_t)dstptr);
+@}
+@end example
+@end deftypefn
 
 @c page
 @node strings concatenation

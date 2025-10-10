@@ -167,6 +167,12 @@ mmux_cc_libc_decl bool mmux_libc_strncasecmp (mmux_sint_t * result_p, mmux_ascii
 mmux_cc_libc_decl bool mmux_libc_strverscmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
   __attribute__((__nonnull__(1,2,3)));
 
+mmux_cc_libc_decl bool mmux_libc_strequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_strnequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+  __attribute__((__nonnull__(1,2,3)));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_strcoll (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
