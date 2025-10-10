@@ -156,6 +156,59 @@ test_strings_copying (void)
 }
 
 
+static void
+test_strings_concatenating (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* strcat() */
+  {
+    //                             01234567890123456789012345678901234567890
+    //                                       1         2         3         4
+    mmux_asciizcp_t	srcptr1 = "the colour of water";
+    mmux_asciizcp_t	srcptr2 =                    " and quicksilver";
+    auto		dstlen  = mmux_usize_literal(36);
+    char		dstptr[dstlen.value];
+
+    mmux_libc_memzero(dstptr, dstlen);
+
+    assert(false == mmux_libc_strcat(dstptr, srcptr1));
+    assert('\0' == dstptr[19]);
+    assert(false == mmux_libc_dprintfer("strcat: dstptr1=%s\n", dstptr));
+
+    assert(false == mmux_libc_strcat(dstptr, srcptr2));
+    assert('\0' == dstptr[35]);
+    assert(false == mmux_libc_dprintfer("strcat: dstptr2=%s\n", dstptr));
+  }
+
+  /* strncat() */
+  {
+    //                             01234567890123456789012345678901234567890
+    //                                       1         2         3         4
+    mmux_asciizcp_t	srcptr1 = "the colour of water ha! ha! ha!";
+    mmux_asciizcp_t	srcptr2 =                    " and quicksilver ha!";
+    //                                                012345678901234567890
+    auto		dstlen  = mmux_usize_literal(36);
+    char		dstptr[dstlen.value];
+
+    auto		len1    = mmux_usize_literal(19);
+    auto		len2    = mmux_usize_literal(16);
+
+    mmux_libc_memzero(dstptr, dstlen);
+
+    assert(false == mmux_libc_strncat(dstptr, srcptr1, len1));
+    assert('\0' == dstptr[19]);
+    assert(false == mmux_libc_dprintfer("strncat: dstptr1=%s\n", dstptr));
+
+    assert(false == mmux_libc_strncat(dstptr, srcptr2, len2));
+    assert('\0' == dstptr[35]);
+    assert(false == mmux_libc_dprintfer("strncat: dstptr2=%s\n", dstptr));
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -171,6 +224,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   if (1) {	test_strings_strlen();		}
   if (1) {	test_strings_copying();		}
+  if (1) {	test_strings_concatenating();	}
 
   mmux_libc_exit_success();
 }
