@@ -209,6 +209,151 @@ test_strings_concatenating (void)
 }
 
 
+static void
+test_strings_comparison (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* strcmp() */
+  {
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strcmp(&result, bufptr_one, bufptr_two));
+      assert(mmux_ctype_is_positive(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strcmp(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_negative(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of water";
+      mmux_sint_t	result;
+
+      assert(false == mmux_libc_strcmp(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_zero(result));
+    }
+    printf_string(" strcmp");
+  }
+
+  /* strncmp() */
+  {
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      auto		buflen     = mmux_usize_literal(15);
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strncmp(&result, bufptr_one, bufptr_two, buflen));
+      assert(mmux_ctype_is_positive(result));
+    }
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      auto		buflen     = mmux_usize_literal(15);
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strncmp(&result, bufptr_two, bufptr_one, buflen));
+      assert(mmux_ctype_is_negative(result));
+    }
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      auto		buflen     = mmux_usize_literal(10);
+      mmux_sint_t	result;
+
+      assert(false == mmux_libc_strncmp(&result, bufptr_two, bufptr_one, buflen));
+      assert(mmux_ctype_is_zero(result));
+    }
+    printf_string(" strncmp");
+  }
+
+  /* strncasecmp() */
+  {
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the COLOUR OF WAter";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      auto		buflen     = mmux_usize_literal(15);
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strncasecmp(&result, bufptr_one, bufptr_two, buflen));
+      assert(mmux_ctype_is_positive(result));
+    }
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the COLOUR OF water";
+      mmux_asciizcp_t	bufptr_two = "the colour of QUICKSILVER";
+      auto		buflen     = mmux_usize_literal(15);
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strncasecmp(&result, bufptr_two, bufptr_one, buflen));
+      assert(mmux_ctype_is_negative(result));
+    }
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the COLOUR OF WATER";
+      mmux_asciizcp_t	bufptr_two = "the colour OF quicksilver";
+      auto		buflen     = mmux_usize_literal(10);
+      mmux_sint_t	result;
+
+      assert(false == mmux_libc_strncasecmp(&result, bufptr_two, bufptr_one, buflen));
+      assert(mmux_ctype_is_zero(result));
+    }
+    printf_string(" strncasecmp");
+  }
+
+  /* strverscmp() */
+  {
+    {
+      mmux_asciizcp_t	bufptr_one = "1.2.3";
+      mmux_asciizcp_t	bufptr_two = "1.2.8";
+      mmux_sint_t	result;
+
+      // '8' > '3' so bufptr_one < bufptr_two */
+      assert(false == mmux_libc_strverscmp(&result, bufptr_one, bufptr_two));
+      assert(mmux_ctype_is_negative(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "1.2.3";
+      mmux_asciizcp_t	bufptr_two = "1.2.8";
+      mmux_sint_t	result;
+
+      // '8' > '3' so bufptr_one < bufptr_two */
+      assert(false == mmux_libc_strverscmp(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_positive(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "1.2.3";
+      mmux_asciizcp_t	bufptr_two = "1.2.3";
+      mmux_sint_t	result;
+
+      assert(false == mmux_libc_strverscmp(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_zero(result));
+    }
+    printf_string(" strverscmp");
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -225,6 +370,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_strings_strlen();		}
   if (1) {	test_strings_copying();		}
   if (1) {	test_strings_concatenating();	}
+  if (1) {	test_strings_comparison();	}
 
   mmux_libc_exit_success();
 }

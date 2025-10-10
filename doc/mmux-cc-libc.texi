@@ -2419,6 +2419,35 @@ assert('\0' == dstptr[35]);
 
 @deftypefun bool mmux_libc_strcmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
 @MmuxCInterface{strcmp}.
+
+@example
+@{
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strcmp(&result, bufptr_one, bufptr_two));
+  assert(mmux_ctype_is_positive(result));
+@}
+@{
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strcmp(&result, bufptr_two, bufptr_one));
+  assert(mmux_ctype_is_negative(result));
+@}
+@{
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of water";
+  mmux_sint_t       result;
+
+  assert(false == mmux_libc_strcmp(&result, bufptr_two, bufptr_one));
+  assert(mmux_ctype_is_zero(result));
+@}
+@end example
 @end deftypefun
 
 
@@ -2429,17 +2458,116 @@ assert('\0' == dstptr[35]);
 
 @deftypefun bool mmux_libc_strcasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
 @MmuxCInterface{strcasecmp}.
+
+@example
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  auto              buflen     = mmux_usize_literal(15);
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strncmp(&result, bufptr_one, bufptr_two, buflen));
+  assert(mmux_ctype_is_positive(result));
+@}
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  auto              buflen     = mmux_usize_literal(15);
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strncmp(&result, bufptr_two, bufptr_one, buflen));
+  assert(mmux_ctype_is_negative(result));
+@}
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  auto              buflen     = mmux_usize_literal(10);
+  mmux_sint_t       result;
+
+  assert(false == mmux_libc_strncmp(&result, bufptr_two, bufptr_one, buflen));
+  assert(mmux_ctype_is_zero(result));
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strncasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr}, mmux_usize_t @var{len})
 @MmuxCInterface{strncasecmp}.
+
+@example
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the COLOUR OF WAter";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  auto              buflen     = mmux_usize_literal(15);
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strncasecmp(&result, bufptr_one, bufptr_two, buflen));
+  assert(mmux_ctype_is_positive(result));
+@}
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the COLOUR OF water";
+  mmux_asciizcp_t   bufptr_two = "the colour of QUICKSILVER";
+  auto              buflen     = mmux_usize_literal(15);
+  mmux_sint_t       result;
+
+  // 'w' > 'q' so bufptr_one > bufptr_two */
+  assert(false == mmux_libc_strncasecmp(&result, bufptr_two, bufptr_one, buflen));
+  assert(mmux_ctype_is_negative(result));
+@}
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the COLOUR OF WATER";
+  mmux_asciizcp_t   bufptr_two = "the colour OF quicksilver";
+  auto              buflen     = mmux_usize_literal(10);
+  mmux_sint_t       result;
+
+  assert(false == mmux_libc_strncasecmp(&result, bufptr_two, bufptr_one, buflen));
+  assert(mmux_ctype_is_zero(result));
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strverscmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
+@deftypefn {@gnu{} Function} bool mmux_libc_strverscmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
 @MmuxCInterface{strverscmp}.
-@end deftypefun
+
+@example
+@{
+  mmux_asciizcp_t   bufptr_one = "1.2.3";
+  mmux_asciizcp_t   bufptr_two = "1.2.8";
+  mmux_sint_t       result;
+
+  // '8' > '3' so bufptr_one < bufptr_two */
+  assert(false == mmux_libc_strverscmp(&result, bufptr_one, bufptr_two));
+  assert(mmux_ctype_is_negative(result));
+@}
+@{
+  mmux_asciizcp_t   bufptr_one = "1.2.3";
+  mmux_asciizcp_t   bufptr_two = "1.2.8";
+  mmux_sint_t       result;
+
+  // '8' > '3' so bufptr_one < bufptr_two */
+  assert(false == mmux_libc_strverscmp(&result, bufptr_two, bufptr_one));
+  assert(mmux_ctype_is_positive(result));
+@}
+@{
+  mmux_asciizcp_t   bufptr_one = "1.2.3";
+  mmux_asciizcp_t   bufptr_two = "1.2.3";
+  mmux_sint_t       result;
+
+  assert(false == mmux_libc_strverscmp(&result, bufptr_two, bufptr_one));
+  assert(mmux_ctype_is_zero(result));
+@}
+@end example
+@end deftypefn
 
 @c page
 @node strings collation
