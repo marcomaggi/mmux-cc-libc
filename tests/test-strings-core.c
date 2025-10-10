@@ -350,6 +350,52 @@ test_strings_comparison (void)
     printf_string(" strverscmp");
   }
 
+  /* mmux_libc_strequ() */
+  {
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      bool		result;
+
+      assert(false == mmux_libc_strequ(&result, bufptr_one, bufptr_two));
+      assert(false == result);
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of water";
+      bool		result;
+
+      assert(false == mmux_libc_strequ(&result, bufptr_one, bufptr_two));
+      assert(true  == result);
+    }
+    printf_string(" strequ");
+  }
+
+  /* mmux_libc_strnequ() */
+  {
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      auto		buflen     = mmux_usize_literal(15);
+      bool		result;
+
+      assert(false == mmux_libc_strnequ(&result, bufptr_one, bufptr_two, buflen));
+      assert(false == result);
+    }
+    {
+      //                              01234567890123456789
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of water";
+      auto		buflen     = mmux_usize_literal(15);
+      bool		result;
+
+      assert(false == mmux_libc_strnequ(&result, bufptr_one, bufptr_two, buflen));
+      assert(true  == result);
+    }
+    printf_string(" strnequ");
+  }
+
   printf_string(" DONE\n");
 }
 
@@ -612,6 +658,83 @@ test_strings_searching (void)
 }
 
 
+static void
+test_strings_tokens (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* strtok() */
+  {
+    {
+      mmux_asciizcp_t	orgptr = "uno due\ttre\nquattro";
+      mmux_usize_t	orglen;
+      mmux_asciizcp_t	delimiters = " \t\n\r";
+      mmux_asciizp_t	bufptr;
+      mmux_asciizp_t	newptr;
+      mmux_asciizp_t	result;
+
+      assert(false == mmux_libc_strlen(&orglen, orgptr));
+      assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+      {
+	newptr = bufptr;
+	assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("1=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("2=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("3=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("4=%s, ", result));
+      }
+      assert(false == mmux_libc_free(bufptr));
+    }
+
+    printf_string(" strtok");
+  }
+
+  /* basename() */
+  {
+    mmux_asciizcp_t	pathname = "/path/to/file.ext";
+    mmux_asciizcp_t	filename;
+
+    assert(false == mmux_libc_basename(&filename, pathname));
+    {
+      bool	result;
+
+      assert(false == mmux_libc_strequ(&result, filename, "file.ext"));
+      assert(true  == result);
+    }
+
+    printf_string(" basename");
+  }
+
+  /* dirname() */
+  if (true) {
+    mmux_asciizcp_t	orgpath = "/path/to/file.ext";
+    mmux_usize_t	orglen;
+    mmux_asciizcp_t	pathname;
+    mmux_asciizcp_t	dirname;
+
+    mmux_libc_strlen(&orglen, orgpath);
+    assert(false == mmux_libc_malloc_and_copy(&pathname, orgpath, orglen));
+    assert(false == mmux_libc_dirname(&dirname, pathname));
+    {
+      bool	result;
+
+      assert(false == mmux_libc_strequ(&result, dirname, "/path/to"));
+      assert(true  == result);
+    }
+
+    printf_string(" dirname");
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -631,6 +754,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_strings_comparison();	}
   if (1) {	test_strings_collation();	}
   if (1) {	test_strings_searching();	}
+  if (1) {	test_strings_tokens();	}
 
   mmux_libc_exit_success();
 }

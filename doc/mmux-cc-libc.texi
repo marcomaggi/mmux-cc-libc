@@ -2417,7 +2417,63 @@ assert('\0' == dstptr[35]);
 @section Comparing @asciiz{} strings
 
 
-@deftypefun bool mmux_libc_strcmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
+@deftypefun bool mmux_libc_strequ (bool * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
+@MmuxCInterface{strcmp}.  Store @ctrue{} in the variable referenced by @var{result_p} if the strings
+referenced by @vari{ptr} and @varii{ptr} are equal according to @cfunc{strcmp}; otherwise store
+@cfalse{}.
+
+@example
+@{
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  bool              result;
+
+  assert(false == mmux_libc_strequ(&result, bufptr_one, bufptr_two));
+  assert(false == result);
+@}
+@{
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of water";
+  bool              result;
+
+  assert(false == mmux_libc_strequ(&result, bufptr_one, bufptr_two));
+  assert(true  == result);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_strnequ (bool * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr}, mmux_usize_t @var{len})
+@MmuxCInterface{strncmp}.  Compare at most @var{len} characters in the given strings: store @ctrue{}
+in the variable referenced by @var{result_p} if the strings referenced by @vari{ptr} and @varii{ptr}
+are equal according to @cfunc{strncmp}; otherwise store @cfalse{}.
+
+@example
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+  auto              buflen     = mmux_usize_literal(15);
+  bool              result;
+
+  assert(false == mmux_libc_strnequ(&result, bufptr_one, bufptr_two, buflen));
+  assert(false == result);
+@}
+@{
+  //                              01234567890123456789
+  mmux_asciizcp_t   bufptr_one = "the colour of water";
+  mmux_asciizcp_t   bufptr_two = "the colour of water";
+  auto              buflen     = mmux_usize_literal(15);
+  bool              result;
+
+  assert(false == mmux_libc_strnequ(&result, bufptr_one, bufptr_two, buflen));
+  assert(true  == result);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_strcmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
 @MmuxCInterface{strcmp}.
 
 @example
@@ -2451,12 +2507,12 @@ assert('\0' == dstptr[35]);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strncmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr}, mmux_usize_t @var{len})
+@deftypefun bool mmux_libc_strncmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr}, mmux_usize_t @var{len})
 @MmuxCInterface{strncmp}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strcasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
+@deftypefun bool mmux_libc_strcasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
 @MmuxCInterface{strcasecmp}.
 
 @example
@@ -2496,7 +2552,7 @@ assert('\0' == dstptr[35]);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strncasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr}, mmux_usize_t @var{len})
+@deftypefun bool mmux_libc_strncasecmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr}, mmux_usize_t @var{len})
 @MmuxCInterface{strncasecmp}.
 
 @example
@@ -2536,7 +2592,7 @@ assert('\0' == dstptr[35]);
 @end deftypefun
 
 
-@deftypefn {@gnu{} Function} bool mmux_libc_strverscmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @varii{ptr}, mmux_asciizcp_t @vari{ptr})
+@deftypefn {@gnu{} Function} bool mmux_libc_strverscmp (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
 @MmuxCInterface{strverscmp}.
 
 @example
@@ -2790,19 +2846,75 @@ assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
 @section Finding tokens in @asciiz{} strings
 
 
-@deftypefun bool mmux_libc_strtok (mmux_asciizcp_t * @var{result_p}, mmux_asciizp_t @var{newstring}, mmux_asciizcp_t @var{delimiters})
+@deftypefun bool mmux_libc_strtok (mmux_asciizp_t * @var{result_p}, mmux_asciizp_t @var{newstring}, mmux_asciizcp_t @var{delimiters})
 @MmuxCInterface{strtok}.
+
+@example
+mmux_asciizcp_t   orgptr = "uno due\ttre\nquattro";
+mmux_usize_t      orglen;
+mmux_asciizcp_t   delimiters = " \t\n\r";
+mmux_asciizp_t    bufptr;
+mmux_asciizp_t    newptr;
+mmux_asciizp_t    result;
+
+assert(false == mmux_libc_strlen(&orglen, orgptr));
+assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+@{
+  newptr = bufptr;
+  assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+  assert(false == mmux_libc_dprintfer("1=%s, ", result));
+  newptr = result;
+  assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+  assert(false == mmux_libc_dprintfer("2=%s, ", result));
+  newptr = result;
+  assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+  assert(false == mmux_libc_dprintfer("3=%s, ", result));
+  newptr = result;
+  assert(false == mmux_libc_strtok(&result, newptr, delimiters));
+  assert(false == mmux_libc_dprintfer("4=%s, ", result));
+@}
+assert(false == mmux_libc_free(bufptr));
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_basename (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{pathname})
+@deftypefn {@gnu{} Function} bool mmux_libc_basename (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{pathname})
 @MmuxCInterface{basename}.
-@end deftypefun
+
+@example
+mmux_asciizcp_t     pathname = "/path/to/file.ext";
+mmux_asciizcp_t     filename;
+
+assert(false == mmux_libc_basename(&filename, pathname));
+@{
+  bool      result;
+
+  assert(false == mmux_libc_strequ(&result, filename, "file.ext"));
+  assert(true  == result);
+@}
+@end example
+@end deftypefn
 
 
-@deftypefun bool mmux_libc_dirname (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{pathname})
-@MmuxCInterface{dirname}.
-@end deftypefun
+@deftypefn {@gnu{} Function} bool mmux_libc_dirname (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{pathname})
+@MmuxCInterface{dirname}.  Notice that the string referenced by @var{pathname} is mutated.
+
+@example
+mmux_asciizcp_t     orgpath = "/path/to/file.ext";
+mmux_usize_t        orglen;
+mmux_asciizcp_t     pathname;
+mmux_asciizcp_t     dirname;
+
+mmux_libc_strlen(&orglen, orgpath);
+assert(false == mmux_libc_malloc_and_copy(&pathname, orgpath, orglen));
+assert(false == mmux_libc_dirname(&dirname, pathname));
+@{
+  bool      result;
+  assert(false == mmux_libc_strequ(&result, dirname, "/path/to"));
+  assert(true  == result);
+@}
+@end example
+@end deftypefn
 
 @c page
 @node characters

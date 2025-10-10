@@ -209,7 +209,7 @@ mmux_cc_libc_decl bool mmux_libc_strpbrk (mmux_asciizcp_t * result_p, mmux_ascii
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_strtok (mmux_asciizcp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters)
+mmux_cc_libc_decl bool mmux_libc_strtok (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_basename (mmux_asciizcp_t * result_p, mmux_asciizcp_t pathname)

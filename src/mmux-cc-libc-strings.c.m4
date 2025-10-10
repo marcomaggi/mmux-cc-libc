@@ -284,7 +284,7 @@ mmux_libc_strpbrk (mmux_asciizcp_t * result_p, mmux_asciizcp_t str, mmux_asciizc
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_strtok (mmux_asciizcp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters)
+mmux_libc_strtok (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters)
 {
   *result_p = strtok(newstring, delimiters);
   return false;
