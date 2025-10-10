@@ -354,6 +354,46 @@ test_strings_comparison (void)
 }
 
 
+static void
+test_strings_collation (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* strcoll() */
+  {
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strcoll(&result, bufptr_one, bufptr_two));
+      assert(mmux_ctype_is_positive(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of quicksilver";
+      mmux_sint_t	result;
+
+      // 'w' > 'q' so bufptr_one > bufptr_two */
+      assert(false == mmux_libc_strcoll(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_negative(result));
+    }
+    {
+      mmux_asciizcp_t	bufptr_one = "the colour of water";
+      mmux_asciizcp_t	bufptr_two = "the colour of water";
+      mmux_sint_t	result;
+
+      assert(false == mmux_libc_strcoll(&result, bufptr_two, bufptr_one));
+      assert(mmux_ctype_is_zero(result));
+    }
+    printf_string(" strcoll");
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -371,6 +411,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_strings_copying();		}
   if (1) {	test_strings_concatenating();	}
   if (1) {	test_strings_comparison();	}
+  if (1) {	test_strings_collation();	}
 
   mmux_libc_exit_success();
 }

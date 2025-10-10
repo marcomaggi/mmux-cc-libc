@@ -2576,6 +2576,16 @@ assert('\0' == dstptr[35]);
 
 @deftypefun bool mmux_libc_strcoll (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
 @MmuxCInterface{strcoll}.
+
+@example
+mmux_asciizcp_t   bufptr_one = "the colour of water";
+mmux_asciizcp_t   bufptr_two = "the colour of quicksilver";
+mmux_sint_t       result;
+
+// 'w' > 'q' so bufptr_one > bufptr_two */
+assert(false == mmux_libc_strcoll(&result, bufptr_one, bufptr_two));
+assert(mmux_ctype_is_positive(result));
+@end example
 @end deftypefun
 
 
