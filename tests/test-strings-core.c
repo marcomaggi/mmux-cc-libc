@@ -562,6 +562,52 @@ test_strings_searching (void)
     printf_string(" strspn");
   }
 
+  /* strcspn() */
+  {
+    {
+      //                            012345678901
+      mmux_asciizcp_t	str_ptr  = "123.456e789";
+      mmux_asciizcp_t	skip_ptr = "e";
+      mmux_usize_t	result;
+
+      assert(false == mmux_libc_strcspn(&result, str_ptr, skip_ptr));
+      assert(7 == result.value);
+    }
+    {
+      //                            01 234 5 6 789012345
+      mmux_asciizcp_t	str_ptr  = " \t  \t\n\nciao";
+      mmux_asciizcp_t	skip_ptr = "acio";
+      mmux_usize_t	result;
+
+      assert(false == mmux_libc_strcspn(&result, str_ptr, skip_ptr));
+      assert(7 == result.value);
+    }
+    printf_string(" strcspn");
+  }
+
+  /* strpbrk() */
+  {
+    {
+      //                            012345678901
+      mmux_asciizcp_t	str_ptr  = "123.456e789";
+      mmux_asciizcp_t	skip_ptr = "e";
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strpbrk(&result, str_ptr, skip_ptr));
+      assert(7 == (mmux_standard_ptrdiff_t)(result - str_ptr));
+    }
+    {
+      //                            01 234 5 6 789012345
+      mmux_asciizcp_t	str_ptr  = " \t  \t\n\nciao";
+      mmux_asciizcp_t	skip_ptr = "acio";
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strpbrk(&result, str_ptr, skip_ptr));
+      assert(7 == (mmux_standard_ptrdiff_t)(result - str_ptr));
+    }
+    printf_string(" strpbrk");
+  }
+
   printf_string(" DONE\n");
 }
 
