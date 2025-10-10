@@ -1505,7 +1505,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 
   ...
   mmux_libc_mempcpy(&nxtptr, dstptr, srcptr, buflen);
-  assert((mmux_standard_usize_t)(nxtptr - dstptr) == buflen.value);
+  assert((mmux_standard_ptrdiff_t)(nxtptr - dstptr) == buflen.value);
 @}
 
 @{
@@ -1518,7 +1518,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
     mmux_standard_char_t *  nxtptr;
 
     mmux_libc_mempcpy(&nxtptr, dstptr, srcptr, buflen);
-    assert( (mmux_standard_usize_t)(nxtptr - dstptr) == buflen.value);
+    assert( (mmux_standard_ptrdiff_t)(nxtptr - dstptr) == buflen.value);
   @}
 @}
 @end example
@@ -1640,7 +1640,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 
   mmux_libc_strlen(&buflen, bufptr);
   mmux_libc_memchr(&result, bufptr, it, buflen);
-  assert( (mmux_standard_usize_t)(result - bufptr) == 14 );
+  assert( (mmux_standard_ptrdiff_t)(result - bufptr) == 14 );
 @}
 @end example
 @end deftypefn
@@ -1659,7 +1659,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 
   ...
   mmux_libc_rawmemchr(&result, bufptr, it);
-  assert( (mmux_standard_usize_t)(result - bufptr) == 3);
+  assert( (mmux_standard_ptrdiff_t)(result - bufptr) == 3);
 @}
 
 @{
@@ -1669,7 +1669,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
   mmux_standard_char_t *      result;
 
   mmux_libc_rawmemchr(&result, bufptr, it);
-  assert( (mmux_standard_usize_t)(result - bufptr) == 14);
+  assert( (mmux_standard_ptrdiff_t)(result - bufptr) == 14);
 @}
 
 /* Find the terminating nil character. */
@@ -1680,7 +1680,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
   mmux_standard_char_t *      result;
 
   mmux_libc_rawmemchr(&result, bufptr, it);
-  assert( (mmux_standard_usize_t)(result - bufptr) == 19);
+  assert( (mmux_standard_ptrdiff_t)(result - bufptr) == 19);
 @}
 @end example
 @end deftypefn
@@ -1712,7 +1712,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
   mmux_libc_strlen(&buflen, bufptr);
   mmux_libc_memrchr(&result, bufptr, it, buflen);
   assert( NULL != result );
-  assert( (mmux_standard_usize_t)(result - bufptr) == 11);
+  assert( (mmux_standard_ptrdiff_t)(result - bufptr) == 11);
 @}
 @end example
 @end deftypefn
@@ -1737,7 +1737,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
                    haystack_ptr, haystack_len,
                    needle_ptr, needle_len);
   assert( NULL != result );
-  assert( (mmux_standard_usize_t)(result - haystack_ptr) == 3);
+  assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 3);
 @}
 
 @{
@@ -1754,7 +1754,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
                    haystack_ptr, haystack_len,
                    needle_ptr, needle_len);
   assert( NULL != result );
-  assert( (mmux_standard_usize_t)(result - haystack_ptr) == 4);
+  assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
 @}
 @end example
 @end deftypefn
@@ -2600,31 +2600,137 @@ assert(mmux_ctype_is_positive(result));
 
 @deftypefun bool mmux_libc_strchr (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{ptr}, mmux_schar_t @var{schar})
 @MmuxCInterface{strchr}.
+
+@example
+@{
+  //                          012345678901234567890123456789012345
+  mmux_asciizcp_t   bufptr = "the colour of water And quicksilver";
+  auto              it     = mmux_char_literal('A');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strchr(&result, bufptr, it));
+  assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+@}
+@{
+  //                          012345678901234567890123456789012345
+  mmux_asciizcp_t   bufptr = "the colour of water and quicksilver";
+  auto              it     = mmux_char_literal('Y');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strchr(&result, bufptr, it));
+  assert( NULL == result );
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_strchrnul (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{ptr}, mmux_schar_t @var{schar})
+@deftypefn {@gnu{} Function} bool mmux_libc_strchrnul (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{ptr}, mmux_schar_t @var{schar})
 @MmuxCInterface{strchrnul}.
-@end deftypefun
+
+@example
+@{
+  //                          012345678901234567890123456789012345
+  mmux_asciizcp_t   bufptr = "the colour of water And quicksilver";
+  auto              it     = mmux_char_literal('A');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strchrnul(&result, bufptr, it));
+  assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+@}
+@{
+  //                          012345678901234567890123456789012345
+  //                                    1         2         3
+  mmux_asciizcp_t   bufptr = "the colour of water and quicksilver";
+  auto              it     = mmux_char_literal('Y');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strchrnul(&result, bufptr, it));
+  assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 35 );
+@}
+@end example
+@end deftypefn
 
 
 @deftypefun bool mmux_libc_strrchr (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{ptr}, mmux_schar_t @var{schar})
 @MmuxCInterface{strrchr}.
+
+@example
+@{
+  //                          012345678901234567890123456789012345
+  mmux_asciizcp_t   bufptr = "the colour of water And quicksilver";
+  auto              it     = mmux_char_literal('A');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strrchr(&result, bufptr, it));
+  assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+@}
+@{
+  //                          012345678901234567890123456789012345
+  mmux_asciizcp_t   bufptr = "the colour of water and quicksilver";
+  auto              it     = mmux_char_literal('Y');
+  mmux_asciizcp_t   result;
+
+  assert(false == mmux_libc_strrchr(&result, bufptr, it));
+  assert( NULL == result );
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strstr (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{haystack}, mmux_asciizcp_t @var{needle})
 @MmuxCInterface{strstr}.
+
+@example
+//                                01234567890123456789
+mmux_asciizcp_t   haystack_ptr = "the colour of water";
+mmux_asciizcp_t   needle_ptr   = "colour";
+mmux_asciizcp_t   result;
+
+assert(false == mmux_libc_strstr(&result, haystack_ptr, needle_ptr));
+assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4 );
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strcasestr (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{haystack}, mmux_asciizcp_t @var{needle})
 @MmuxCInterface{strcasestr}.
+
+@example
+//                                          01234567890123456789
+mmux_asciizcp_t   haystack_ptr = "the colOUR OF water";
+mmux_asciizcp_t   needle_ptr   = "COLour";
+mmux_asciizcp_t   result;
+
+assert(false == mmux_libc_strcasestr(&result, haystack_ptr, needle_ptr));
+assert( NULL != result );
+assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_strspn (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{skipset})
 @MmuxCInterface{strspn}.
+
+@example
+@{
+  //                            012345678901
+  mmux_asciizcp_t   str_ptr  = "123.456e789";
+  mmux_asciizcp_t   skip_ptr = "0123456789.";
+  mmux_usize_t      result;
+
+  assert(false == mmux_libc_strspn(&result, str_ptr, skip_ptr));
+  assert(7 == result.value);
+@}
+@{
+  //                            01 234 5 6 789012345
+  mmux_asciizcp_t   str_ptr  = " \t  \t\n\nciao";
+  mmux_asciizcp_t   skip_ptr = " \t\n\r";
+  mmux_usize_t      result;
+
+  assert(false == mmux_libc_strspn(&result, str_ptr, skip_ptr));
+  assert(7 == result.value);
+@}
+@end example
 @end deftypefun
 
 

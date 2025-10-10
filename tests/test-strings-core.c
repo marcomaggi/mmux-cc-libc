@@ -394,6 +394,178 @@ test_strings_collation (void)
 }
 
 
+static void
+test_strings_searching (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* strchr() */
+  {
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal(65);
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchr(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal('A');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchr(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+      auto		it     = mmux_char_literal('Y');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchr(&result, bufptr, it));
+      assert( NULL == result );
+    }
+
+    printf_string(" strchr");
+  }
+
+  /* strchrnul() */
+  {
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal(65);
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchrnul(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal('A');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchrnul(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      //                                    1         2         3
+      mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+      auto		it     = mmux_char_literal('Y');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strchrnul(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 35 );
+    }
+
+    printf_string(" strchrnul");
+  }
+
+  /* strrchr() */
+  {
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal(65);
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strrchr(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water And quicksilver";
+      auto		it     = mmux_char_literal('A');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strrchr(&result, bufptr, it));
+      assert( (mmux_standard_ptrdiff_t) (result - bufptr) == 20 );
+    }
+
+    {
+      //                          012345678901234567890123456789012345
+      mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+      auto		it     = mmux_char_literal('Y');
+      mmux_asciizcp_t	result;
+
+      assert(false == mmux_libc_strrchr(&result, bufptr, it));
+      assert( NULL == result );
+    }
+
+    printf_string(" strrchr");
+  }
+
+  /* strstr() */
+  {
+    {
+      //                                01234567890123456789
+      mmux_asciizcp_t	haystack_ptr = "the colour of water";
+      mmux_asciizcp_t	needle_ptr   = "colour";
+      mmux_asciizcp_t	result;
+
+      if (mmux_libc_strstr(&result, haystack_ptr, needle_ptr)) {
+	handle_error();
+      }
+      assert( NULL != result );
+      assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
+    }
+    printf_string(" strstr");
+  }
+
+  /* strcasestr() */
+  {
+    {
+      //                                01234567890123456789
+      mmux_asciizcp_t	haystack_ptr = "the colOUR OF water";
+      mmux_asciizcp_t	needle_ptr   = "COLour";
+      mmux_asciizcp_t	result;
+
+      if (mmux_libc_strcasestr(&result, haystack_ptr, needle_ptr)) {
+	handle_error();
+      }
+      assert( NULL != result );
+      assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
+    }
+    printf_string(" strcasestr");
+  }
+
+  /* strspn() */
+  {
+    {
+      //                            012345678901
+      mmux_asciizcp_t	str_ptr  = "123.456e789";
+      mmux_asciizcp_t	skip_ptr = "0123456789.";
+      mmux_usize_t	result;
+
+      assert(false == mmux_libc_strspn(&result, str_ptr, skip_ptr));
+      assert(7 == result.value);
+    }
+    {
+      //                            01 234 5 6 789012345
+      mmux_asciizcp_t	str_ptr  = " \t  \t\n\nciao";
+      mmux_asciizcp_t	skip_ptr = " \t\n\r";
+      mmux_usize_t	result;
+
+      assert(false == mmux_libc_strspn(&result, str_ptr, skip_ptr));
+      assert(7 == result.value);
+    }
+    printf_string(" strspn");
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -412,6 +584,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_strings_concatenating();	}
   if (1) {	test_strings_comparison();	}
   if (1) {	test_strings_collation();	}
+  if (1) {	test_strings_searching();	}
 
   mmux_libc_exit_success();
 }
