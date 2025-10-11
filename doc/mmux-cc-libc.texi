@@ -2862,21 +2862,92 @@ assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
 @{
   newptr = bufptr;
   assert(false == mmux_libc_strtok(&result, newptr, delimiters));
-  assert(false == mmux_libc_dprintfer("1=%s, ", result));
+  mmux_libc_dprintfer("1=%s, ", result);
+
   newptr = result;
   assert(false == mmux_libc_strtok(&result, newptr, delimiters));
-  assert(false == mmux_libc_dprintfer("2=%s, ", result));
+  mmux_libc_dprintfer("2=%s, ", result);
+
   newptr = result;
   assert(false == mmux_libc_strtok(&result, newptr, delimiters));
-  assert(false == mmux_libc_dprintfer("3=%s, ", result));
+  mmux_libc_dprintfer("3=%s, ", result);
+
   newptr = result;
   assert(false == mmux_libc_strtok(&result, newptr, delimiters));
-  assert(false == mmux_libc_dprintfer("4=%s, ", result));
+  mmux_libc_dprintfer("4=%s, ", result);
 @}
 assert(false == mmux_libc_free(bufptr));
 @end example
 @end deftypefun
 
+@deftypefun bool mmux_libc_strtok_r (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters, mmux_asciizp_t * save_ptr)
+@MmuxCInterface{strtok_r}.
+
+@example
+mmux_asciizcp_t   orgptr = "uno due\ttre\nquattro";
+mmux_usize_t      orglen;
+mmux_asciizcp_t   delimiters = " \t\n\r";
+mmux_asciizp_t    save_ptr;
+mmux_asciizp_t    bufptr;
+mmux_asciizp_t    newptr;
+mmux_asciizp_t    result;
+
+assert(false == mmux_libc_strlen(&orglen, orgptr));
+assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+@{
+  newptr = bufptr;
+  assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+  mmux_libc_dprintfer("1=%s, ", result);
+
+  newptr = result;
+  assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+  mmux_libc_dprintfer("2=%s, ", result);
+
+  newptr = result;
+  assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+  mmux_libc_dprintfer("3=%s, ", result);
+
+  newptr = result;
+  assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+  mmux_libc_dprintfer("4=%s, ", result);
+@}
+assert(false == mmux_libc_free(bufptr));
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_strsep (mmux_asciizp_t * result_p, mmux_asciizp_t * newstring_p, mmux_asciizcp_t delimiters)
+@MmuxCInterface{strsep}.
+
+@example
+mmux_asciizcp_t   orgptr = "uno due\ttre\nquattro";
+mmux_usize_t      orglen;
+mmux_asciizcp_t   delimiters = " \t\n\r";
+mmux_asciizp_t    bufptr;
+mmux_asciizp_t    newptr;
+mmux_asciizp_t    result;
+
+assert(false == mmux_libc_strlen(&orglen, orgptr));
+assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+@{
+  newptr = bufptr;
+  assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+  mmux_libc_dprintfer("1=%s, ", result);
+
+  assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+  mmux_libc_dprintfer("2=%s, ", result);
+
+  assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+  mmux_libc_dprintfer("3=%s, ", result);
+
+  assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+  mmux_libc_dprintfer("4=%s, ", result);
+@}
+assert(false == mmux_libc_free(bufptr));
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
 
 @deftypefn {@gnu{} Function} bool mmux_libc_basename (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{pathname})
 @MmuxCInterface{basename}.

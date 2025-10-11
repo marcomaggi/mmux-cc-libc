@@ -290,6 +290,19 @@ mmux_libc_strtok (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asci
   return false;
 }
 bool
+mmux_libc_strtok_r (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters,
+		    mmux_asciizp_t * save_ptr)
+{
+  *result_p = strtok_r(newstring, delimiters, save_ptr);
+  return false;
+}
+bool
+mmux_libc_strsep (mmux_asciizp_t * result_p, mmux_asciizp_t * newstring_p, mmux_asciizcp_t delimiters)
+{
+  *result_p = strsep(newstring_p, delimiters);
+  return false;
+}
+bool
 mmux_libc_basename (mmux_asciizcp_t * result_p, mmux_asciizcp_t pathname)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_BASENAME]]],[[[

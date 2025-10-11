@@ -212,6 +212,14 @@ mmux_cc_libc_decl bool mmux_libc_strpbrk (mmux_asciizcp_t * result_p, mmux_ascii
 mmux_cc_libc_decl bool mmux_libc_strtok (mmux_asciizp_t * result_p, mmux_asciizp_t newstring, mmux_asciizcp_t delimiters)
   __attribute__((__nonnull__(1,2,3)));
 
+mmux_cc_libc_decl bool mmux_libc_strtok_r (mmux_asciizp_t * result_p, mmux_asciizp_t newstring,
+					   mmux_asciizcp_t delimiters, mmux_asciizp_t * save_ptr)
+  __attribute__((__nonnull__(1,2,3,4)));
+
+mmux_cc_libc_decl bool mmux_libc_strsep (mmux_asciizp_t * result_p, mmux_asciizp_t * newstring_p,
+					 mmux_asciizcp_t delimiters)
+  __attribute__((__nonnull__(1,2,3)));
+
 mmux_cc_libc_decl bool mmux_libc_basename (mmux_asciizcp_t * result_p, mmux_asciizcp_t pathname)
   __attribute__((__nonnull__(1,2)));
 

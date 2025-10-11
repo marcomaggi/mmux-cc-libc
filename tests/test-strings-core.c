@@ -695,6 +695,71 @@ test_strings_tokens (void)
     printf_string(" strtok");
   }
 
+  /* strtok_r() */
+  {
+    {
+      mmux_asciizcp_t	orgptr = "uno due\ttre\nquattro";
+      mmux_usize_t	orglen;
+      mmux_asciizcp_t	delimiters = " \t\n\r";
+      mmux_asciizp_t	save_ptr;
+      mmux_asciizp_t	bufptr;
+      mmux_asciizp_t	newptr;
+      mmux_asciizp_t	result;
+
+      assert(false == mmux_libc_strlen(&orglen, orgptr));
+      assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+      {
+	newptr = bufptr;
+	assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+	assert(false == mmux_libc_dprintfer("1=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+	assert(false == mmux_libc_dprintfer("2=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+	assert(false == mmux_libc_dprintfer("3=%s, ", result));
+	newptr = result;
+	assert(false == mmux_libc_strtok_r(&result, newptr, delimiters, &save_ptr));
+	assert(false == mmux_libc_dprintfer("4=%s, ", result));
+      }
+      assert(false == mmux_libc_free(bufptr));
+    }
+
+    printf_string(" strtok_r");
+  }
+
+  /* strsep() */
+  {
+    {
+      mmux_asciizcp_t	orgptr = "uno due\ttre\nquattro";
+      mmux_usize_t	orglen;
+      mmux_asciizcp_t	delimiters = " \t\n\r";
+      mmux_asciizp_t	bufptr;
+      mmux_asciizp_t	newptr;
+      mmux_asciizp_t	result;
+
+      assert(false == mmux_libc_strlen(&orglen, orgptr));
+      assert(false == mmux_libc_malloc_and_copy(&bufptr, orgptr, orglen));
+      {
+	newptr = bufptr;
+	assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("1=%s, ", result));
+
+	assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("2=%s, ", result));
+
+	assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("3=%s, ", result));
+
+	assert(false == mmux_libc_strsep(&result, &newptr, delimiters));
+	assert(false == mmux_libc_dprintfer("4=%s, ", result));
+      }
+      assert(false == mmux_libc_free(bufptr));
+    }
+
+    printf_string(" strsep");
+  }
+
   /* basename() */
   {
     mmux_asciizcp_t	pathname = "/path/to/file.ext";
