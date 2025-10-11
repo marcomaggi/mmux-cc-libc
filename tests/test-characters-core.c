@@ -371,6 +371,37 @@ test_characters_classes (void)
 }
 
 
+static void
+test_characters_capicalisation (void)
+{
+  printf_string("%s: ", __func__);
+
+  /* tolower() */
+  {
+    {
+      auto		it = mmux_char_literal('A');
+      mmux_char_t	result;
+
+      assert(false == mmux_libc_tolower(&result, it));
+      assert(mmux_ctype_equal(mmux_char_literal('a'), result));
+    }
+  }
+
+  /* toupper() */
+  {
+    {
+      auto		it = mmux_char_literal('a');
+      mmux_char_t	result;
+
+      assert(false == mmux_libc_toupper(&result, it));
+      assert(mmux_ctype_equal(mmux_char_literal('A'), result));
+    }
+  }
+
+  printf_string(" DONE\n");
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -385,6 +416,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   if (1) {	test_characters_classes();		}
+  if (1) {	test_characters_capicalisation();	}
 
   mmux_libc_exit_success();
 }
