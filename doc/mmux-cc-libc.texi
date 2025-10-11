@@ -3004,21 +3004,53 @@ assert(false == mmux_libc_dirname(&dirname, pathname));
 
 @deftypefun bool mmux_libc_islower (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{islower}.
+
+@example
+auto      it = mmux_char_literal('a');
+bool      result;
+
+assert(false == mmux_libc_islower(&result, it));
+assert(true  == result);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_isupper (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isupper}.
+
+@example
+auto      it = mmux_char_literal('a');
+bool      result;
+
+assert(false == mmux_libc_isupper(&result, it));
+assert(false == result);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_isalpha (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isalpha}.
+
+@example
+auto      it = mmux_char_literal('A');
+bool      result;
+
+assert(false == mmux_libc_isalpha(&result, it));
+assert(true  == result);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_isdigit (bool * @var{result_p}, mmux_char_t @var{ch})
 @MmuxCInterface{isdigit}.
+
+@example
+auto      it = mmux_char_literal('7');
+bool      result;
+
+assert(false == mmux_libc_isdigit(&result, it));
+assert(true  == result);
+@end example
 @end deftypefun
 
 

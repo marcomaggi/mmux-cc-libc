@@ -244,6 +244,15 @@ tests_test_strings_core_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_strings_core_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
+## characters
+
+check_PROGRAMS	+= \
+	tests/test-characters-core
+
+tests_test_characters_core_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_characters_core_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
 ## persona
 
 check_PROGRAMS	+= \
