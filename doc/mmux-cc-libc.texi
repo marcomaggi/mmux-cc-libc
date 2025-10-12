@@ -3125,13 +3125,59 @@ assert(true  == result);
 * time epoch time::             Converting from Epoch time to other formats.
 * time broken time::            Converting from broken time to other formats.
 * time format::                 Formatting string timestamps.
-* time parsing::               Converting from string timestamps to other formats.
+* time parsing::                Converting from string timestamps to other formats.
 * time sleeping::               Suspending a process for a time.
 @end menu
 
 @c page
 @node time timeval
 @section The @objtype{mmux_libc_timeval_t} type
+
+
+To initialise and inspect a value of type @objtype{mmux_libc_timeval_t} we do:
+
+@example
+mmux_libc_timeval_t  TV[1];
+
+/* setters */
+@{
+  auto      sec  = mmux_time_literal(12);
+  auto      usec = mmux_slong_literal(34);
+
+  mmux_libc_tv_sec_set  (TV, sec);
+  mmux_libc_tv_usec_set (TV, usec);
+@}
+
+/* getters */
+@{
+  mmux_time_t       sec;
+  mmux_slong_t      usec;
+
+  mmux_libc_tv_sec_ref  (&sec,  TV);
+  mmux_libc_tv_usec_ref (&usec, TV);
+@}
+
+/* another setter */
+@{
+  auto    sec  = mmux_time_literal(56);
+  auto    usec = mmux_slong_literal(78);
+
+  mmux_libc_timeval_set(TV, sec, usec);
+@}
+
+/* dumping */
+@{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_stder(fd);
+  if (mmux_libc_timeval_dump(fd, TV, NULL)) @{
+    /* error */
+  @}
+@}
+@print{} struct timeval = 0x7ffea9a701f0
+@print{} struct timeval->tv_sec = 56 [seconds]
+@print{} struct timeval->tv_usec = 78 [microseconds]
+@end example
 
 
 @MmuxCStructOpaqueTypedef{timeval}
@@ -3151,6 +3197,48 @@ Initialise the fields of a @MmuxCStruct{timeval}.
 
 To have more expressive names: in this @api{} we ``rename'' the fields @samp{tv_sec} and
 @samp{tv_nsec} of @MmuxCStruct{timespec} to @samp{ts_sec} and @samp{ts_nsec}.
+
+To initialise and inspect a value of type @objtype{mmux_libc_timespec_t} we do:
+
+@example
+mmux_libc_timespec_t  TS[1];
+
+/* setters */
+@{
+  auto    sec  = mmux_time_literal(12);
+  auto    nsec = mmux_slong_literal(34);
+
+  mmux_libc_ts_sec_set  (TS, sec);
+  mmux_libc_ts_nsec_set (TS, nsec);
+@}
+
+/* getters */
+@{
+  mmux_time_t     sec;
+  mmux_slong_t    nsec;
+
+  mmux_libc_ts_sec_ref  (&sec,  TS);
+  mmux_libc_ts_nsec_ref (&nsec, TS);
+@}
+
+/* another setter */
+@{
+  auto    sec  = mmux_time_literal(56);
+  auto    nsec = mmux_slong_literal(78);
+
+  mmux_libc_timespec_set(TS, sec, nsec);
+@}
+
+/* dumping */
+@{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_stder(fd);
+  if (mmux_libc_timespec_dump(fd, TS, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
 
 
 @MmuxCStructOpaqueTypedef{timespec}
