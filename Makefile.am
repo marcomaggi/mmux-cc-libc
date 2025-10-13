@@ -698,7 +698,8 @@ check_PROGRAMS	+= \
 	tests/test-time-mktime					\
 	tests/test-time-timegm					\
 	tests/test-time-strftime				\
-	tests/test-time-strptime
+	tests/test-time-strptime				\
+	tests/test-time-sleep-nanosleep
 
 tests_test_time_timeval_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_timeval_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -735,6 +736,9 @@ tests_test_time_strftime_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_strptime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_strptime_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_sleep_nanosleep_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_sleep_nanosleep_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## interface specifications
