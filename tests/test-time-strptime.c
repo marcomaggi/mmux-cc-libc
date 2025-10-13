@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include "test-common.h"
 
 
@@ -47,7 +46,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       mmux_libc_fd_t	fd;
 
-      mmux_libc_stder(&fd);
+      mmux_libc_stder(fd);
       if (mmux_libc_tm_dump(fd, BT, NULL)) {
 	handle_error();
       } else if (mmux_libc_dprintf(fd, "the leftover string is: \"%s\"\n", first_unprocessed_after_timestamp)) {
