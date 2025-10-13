@@ -3256,6 +3256,25 @@ Initialise the fields of a @MmuxCStruct{timespec}.
 @section The @objtype{mmux_libc_tm_t} type
 
 
+To acquire and dump an instance of @objtype{mmux_libc_tm_t} we do:
+
+@example
+mmux_time_t     T;
+mmux_libc_tm_t  TM[1];
+
+mmux_libc_time(&T);
+mmux_libc_localtime_r(TM, T);
+@{
+  mmux_libc_fd_t    fd;
+
+  mmux_libc_stder(fd);
+  if (mmux_libc_tm_dump(fd, TM, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
 @MmuxCStructOpaqueTypedef{tm}
 @MmuxSetterGetter{tm, tm_sec,         mmux_sint_t}
 @MmuxSetterGetter{tm, tm_min,         mmux_sint_t}
@@ -3298,13 +3317,13 @@ tm_zone   = NULL
 @MmuxCInterface{time}.
 
 @example
-mmux_time_t         T;
+mmux_time_t  T;
 
 mmux_libc_current_time(&T);
 @{
   mmux_libc_fd_t    fd;
 
-  mmux_libc_libou(&fd);
+  mmux_libc_stder(fd);
   if (mmux_libc_dprintf_time(fd, T)) @{
     /* error */
   @}

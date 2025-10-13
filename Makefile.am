@@ -92,6 +92,7 @@ install-html-local:
 
 EXTRA_DIST	+= \
 	src/mmux-cc-libc.h.m4				\
+	src/mmux-cc-libc-typedefs.h.m4			\
 	src/mmux-cc-libc-internals.h.m4			\
 	src/mmux-cc-libc-constants.h.m4			\
 	src/mmux-cc-libc-functions.h.m4			\
@@ -113,6 +114,7 @@ EXTRA_DIST	+= \
 
 MMUX_CC_LIBC_BUILT_SOURCES	= \
 	src/mmux-cc-libc.h				\
+	src/mmux-cc-libc-typedefs.h			\
 	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-constants.h			\
 	src/mmux-cc-libc-functions.h			\
@@ -155,6 +157,7 @@ libmmux_cc_libc_la_LIBADD	= $(MMUX_CC_TYPES_LIBS)
 libmmux_cc_libc_la_SOURCES	= \
 	src/mmux-cc-libc.h				\
 	src/mmux-cc-libc-config.h			\
+	src/mmux-cc-libc-typedefs.h			\
 	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-constants.h			\
 	src/mmux-cc-libc-functions.h			\
@@ -185,6 +188,7 @@ src/%.c: src/%.c.m4 $(MMUX_M4_CC_MACROS)
 	$(M4_PROGRAM) $(MMUX_M4_FLAGS) $(MMUX_M4_CC_MACROS) $< >$@
 
 src/%.$(OBJEXT): \
+	src/mmux-cc-libc-typedefs.h		\
 	src/mmux-cc-libc-internals.h		\
 	src/mmux-cc-libc-constants.h		\
 	src/mmux-cc-libc-functions.h		\
@@ -685,6 +689,7 @@ tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
 check_PROGRAMS	+= \
 	tests/test-time-timeval					\
 	tests/test-time-timespec				\
+	tests/test-time-tm					\
 	tests/test-time-time					\
 	tests/test-time-localtime				\
 	tests/test-time-gmtime					\
@@ -700,6 +705,9 @@ tests_test_time_timeval_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_timespec_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_timespec_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_time_tm_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_time_tm_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_time_time_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_time_time_LDADD				= $(mmux_cc_libc_tests_ldadd)

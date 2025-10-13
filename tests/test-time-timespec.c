@@ -72,8 +72,16 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	mmux_libc_ts_sec_ref  (&sec,  TS);
 	mmux_libc_ts_nsec_ref (&nsec, TS);
 
-	assert(mmux_ctype_equal(mmux_time_literal(56),  sec));
-	assert(mmux_ctype_equal(mmux_slong_literal(78), nsec));
+	{
+	  auto	expected_sec  = mmux_time_literal(56);
+	  auto	expected_nsec = mmux_slong_literal(78);
+	  bool	result;
+
+	  mmux_ctype_equal_p(&result, &expected_sec,  &sec);
+	  assert(result);
+	  mmux_ctype_equal_p(&result, &expected_nsec, &nsec);
+	  assert(result);
+	}
       }
     }
 

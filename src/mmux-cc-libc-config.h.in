@@ -80,7 +80,7 @@
 #  endif
 #endif
 
-#define mmux_cc_libc_inline_decl	__attribute__((__const__,__always_inline__)) static inline
+#define mmux_cc_libc_inline_decl	__attribute__((__always_inline__)) static inline
 
 #endif /* MMUX_CC_LIBC_CONFIG_H */
 
