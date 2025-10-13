@@ -48,10 +48,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* mmux_libc_ctime_r() */
   {
+    constexpr auto	buflen = mmux_standard_usize_literal(512);
+    char		bufptr[buflen];
     mmux_time_t		T;
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK		512
-    mmux_char_t		bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
     mmux_libc_time(&T);
     mmux_libc_ctime_r(bufptr, T);

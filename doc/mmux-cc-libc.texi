@@ -3313,13 +3313,13 @@ tm_zone   = NULL
 @section Acquiring the current time
 
 
-@deftypefun bool mmux_libc_current_time (mmuc_time_t * @var{result_p})
+@deftypefun bool mmux_libc_time (mmuc_time_t * @var{result_p})
 @MmuxCInterface{time}.
 
 @example
 mmux_time_t  T;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 @{
   mmux_libc_fd_t    fd;
 
@@ -3345,12 +3345,12 @@ functions; we should just use @cfunc{mmux_libc_localtime_r}.
 mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_localtime(&BT, T);
 @{
   mmux_libc_fd_t        fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
     /* error */
   @}
@@ -3366,12 +3366,12 @@ mmux_libc_localtime(&BT, T);
 mmux_time_t             T;
 mmux_libc_tm_t          BT[1];
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
 @{
   mmux_libc_fd_t        fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
     /* error */
   @}
@@ -3389,12 +3389,12 @@ functions; we should just use @cfunc{mmux_libc_gmtime_r}.
 mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_gmtime(&BT, T);
 @{
   mmux_libc_fd_t        fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
     /* error */
   @}
@@ -3410,12 +3410,12 @@ mmux_libc_gmtime(&BT, T);
 mmux_time_t             T;
 mmux_libc_tm_t          BT[1];
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_gmtime_r(BT, T);
 @{
   mmux_libc_fd_t        fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
     /* error */
   @}
@@ -3433,7 +3433,7 @@ just use @cfunc{mmux_libc_ctime_r}.
 mmux_time_t         T;
 mmux_asciizcp_t     bufptr;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_asctime(&bufptr, T);
 if (mmux_libc_dprintfer("the timestamp from ctime is: \"%s\"\n", bufptr)) @{
   /* error */
@@ -3446,12 +3446,11 @@ if (mmux_libc_dprintfer("the timestamp from ctime is: \"%s\"\n", bufptr)) @{
 @MmuxCInterface{ctime_r}.
 
 @example
-mmux_time_t         T;
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK            512
-mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+constexpr auto  buflen = mmux_standard_usize_literal(512);
+char            bufptr[buflen];
+mmux_time_t     T;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_asctime_r(bufptr, T);
 if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
   /* error */
@@ -3471,7 +3470,7 @@ if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
 mmux_time_t     T1, T2;
 mmux_libc_tm_t  BT[1];
 
-mmux_libc_current_time(&T1);
+mmux_libc_time(&T1);
 mmux_libc_localtime_r(BT, T1);
 mmux_libc_mktime(&T2, BT);
 @{
@@ -3493,7 +3492,7 @@ mmux_libc_mktime(&T2, BT);
 mmux_time_t     T1, T2;
 mmux_libc_tm_t  BT[1];
 
-mmux_libc_current_time(&T1);
+mmux_libc_time(&T1);
 mmux_libc_localtime_r(BT, T1);
 mmux_libc_timegm(&T2, BT);
 @{
@@ -3518,7 +3517,7 @@ mmux_time_t         T;
 mmux_libc_tm_t      BT[1];
 mmux_asciizcp_t     bufptr;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
 mmux_libc_asctime(&bufptr, BT);
 if (mmux_libc_dprintfer("the timestamp from asctime is: \"%s\"\n", bufptr)) @{
@@ -3538,7 +3537,7 @@ mmux_libc_tm_t      BT[1];
 #define IS_THIS_ENOUGH_QUESTION_MARK            512
 mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
 mmux_libc_asctime_r(bufptr, BT);
 if (mmux_libc_dprintfer("the timestamp from asctime_r is: \"%s\"\n", bufptr)) @{
@@ -3578,7 +3577,7 @@ mmux_time_t             T;
 mmux_libc_tm_t *        BT;
 mmux_usize_t            required_nbytes_including_nil;
 
-mmux_libc_current_time(&T);
+mmux_libc_time(&T);
 mmux_libc_localtime(&BT, T);
 
 if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT) @{
@@ -5620,7 +5619,7 @@ mmux_usize_t                    buflen;
 mmux_asciizcp_t                 bufptr = "ciao";
 
 mmux_libc_strlen(&buflen, bufptr);
-mmux_libc_stdou(&fd);
+mmux_libc_stdou(fd);
 if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
   /* error */
 @}
@@ -5911,7 +5910,7 @@ for (mmux_uint_t i=0; i<bufnum; ++i) @{
 @{
   mmux_libc_fd_t      fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_iovec_dump(fd, &(iov[0]), NULL)) @{
     /* error */
   @}
@@ -5962,7 +5961,7 @@ mmux_libc_iova_base_set (&iova, iov);
 @{
   mmux_libc_fd_t      fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_iovec_array_dump(fd, &iova, NULL)) @{
     /* error */
   @}
@@ -6353,7 +6352,7 @@ mmux_libc_l_pid_set    (&flo, pid);
 @{
   mmux_libc_fd_t      fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_flock_dump(fd, &flo, NULL)) @{
     /* error */
   @}
@@ -8402,7 +8401,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @} else @{
   mmux_libc_fd_t        fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_dprintf_libc_ptn(fd, ptn)) @{
     /* error */
   @}
@@ -10289,8 +10288,8 @@ If we want to toy with a @objtype{mmux_libc_utimbuf_t} objects, we do:
 mmux_libc_utimbuf_t   UTB[1];
 mmux_time_t           T1, T2;
 
-mmux_libc_current_time(&T1);
-mmux_libc_current_time(&T2);
+mmux_libc_time(&T1);
+mmux_libc_time(&T2);
 
 mmux_libc_actime_set  (UTB, T1);
 mmux_libc_modtime_set (UTB, T2);
@@ -10298,7 +10297,7 @@ mmux_libc_modtime_set (UTB, T2);
 @{
   mmux_libc_fd_t      fd;
 
-  mmux_libc_stdou(&fd);
+  mmux_libc_stdou(fd);
   if (mmux_libc_utimbuf_dump(fd, UTB, NULL)) @{
     /* error */
   @}
@@ -10331,8 +10330,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_utimbuf_t UTB;
   mmux_time_t         T1, T2;
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   mmux_libc_actime_set  (&UTB, T1);
   mmux_libc_modtime_set (&UTB, T2);
@@ -10361,8 +10360,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -10393,8 +10392,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -10437,8 +10436,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                microsecs1, microsecs2;
   mmux_libc_timeval_t         access_timeval, modification_timeval;
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   microsecs1 = 123;
   microsecs2 = 456;
@@ -10481,8 +10480,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_slong_t                nanosecs1, nanosecs2;
   mmux_libc_timespec_t        access_timespec, modification_timespec;
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   nanosecs1 = 123;
   nanosecs2 = 456;
@@ -10518,8 +10517,8 @@ if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
 
   mmux_libc_at_fdcwd(&dirfd);
 
-  mmux_libc_current_time(&T1);
-  mmux_libc_current_time(&T2);
+  mmux_libc_time(&T1);
+  mmux_libc_time(&T2);
 
   nanosecs1 = 123;
   nanosecs2 = 456;
