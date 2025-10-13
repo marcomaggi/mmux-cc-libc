@@ -3476,7 +3476,7 @@ mmux_libc_mktime(&T2, BT);
 @{
   mmux_libc_fd_t    fd;
 
-  mmux_libc_libou(&fd);
+  mmux_libc_libou(fd);
   if (mmux_libc_dprintf_time(fd, T2)) @{
     /* error */
   @}
@@ -3498,7 +3498,7 @@ mmux_libc_timegm(&T2, BT);
 @{
   mmux_libc_fd_t    fd;
 
-  mmux_libc_libou(&fd);
+  mmux_libc_libou(fd);
   if (mmux_libc_dprintf_time(fd, T2)) @{
     /* error */
   @}
@@ -3535,7 +3535,7 @@ mmux_time_t         T;
 mmux_libc_tm_t      BT[1];
 #undef  IS_THIS_ENOUGH_QUESTION_MARK
 #define IS_THIS_ENOUGH_QUESTION_MARK            512
-mmux_char_t         bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+char                bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
 mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
@@ -4101,8 +4101,8 @@ if (mmux_libc_getlogin(&name)) @{
 @MmuxCInterface{getlogin_r}.
 
 @example
-mmux_usize_t    buflen = 64;
-mmux_char_t     bufptr[buflen];
+mmux_usize_t  buflen = 64;
+char          bufptr[buflen];
 
 if (mmux_libc_getlogin_r(bufptr, buflen)) @{
   /* error */
@@ -6702,7 +6702,7 @@ if (mmux_libc_memfd_length(&buflen, mfd)) @{
 @}
 
 @{
-  mmux_char_t   bufptr[1+buflen];
+  char  bufptr[1+buflen];
 
   bufptr[buflen] = '\0';
   ...
@@ -6749,9 +6749,9 @@ mmux_usize_t    buflen;
 if (mmux_libc_memfd_length(&buflen, mfd)) @{
   /* error */
 @} else @{
-  mmux_char_t   bufptr[1+buflen];
+  char  bufptr[1+buflen.value];
 
-  bufptr[buflen] = '\0';
+  bufptr[buflen.value] = '\0';
   if (mmux_libc_memfd_read_buffer(mfd, bufptr, buflen)) @{
     /* error */
   @}
@@ -8698,8 +8698,8 @@ if (mmux_libc_rmdir(ptn)) @{
 the terminating null character.
 
 @example
-mmux_usize_t        buflen = 4096;
-mmux_char_t         bufptr[buflen];
+auto  buflen = mmux_usize_literal(4096);
+char  bufptr[buflen.value];
 
 if (mmux_libc_getcwd(bufptr, buflen)) @{
   /* error */

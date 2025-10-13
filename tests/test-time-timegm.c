@@ -43,9 +43,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_localtime_r(BT, T1);
     mmux_libc_timegm(&T2, BT);
     {
-      mmux_libc_fd_t	fd;
+      mmux_libc_memfd_t	fd;
 
-      if (mmux_libc_make_memfd(&fd)) {
+      if (mmux_libc_make_memfd(fd)) {
 	handle_error();
       } else if (mmux_libc_dprintf(fd, "the time in seconds since the Epoch is: \"")) {
 	handle_error();

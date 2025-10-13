@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include "test-common.h"
 
 
@@ -54,7 +53,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_tm_t	BT[1];
 #undef  IS_THIS_ENOUGH_QUESTION_MARK
 #define IS_THIS_ENOUGH_QUESTION_MARK		512
-    mmux_char_t		bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+    char		bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
     mmux_libc_time(&T);
     mmux_libc_localtime_r(BT, T);
