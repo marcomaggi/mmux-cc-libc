@@ -46,7 +46,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_timespec_t    requested_time;
     mmux_libc_timespec_t    remaining_time;
     {
-      auto	seconds     = mmux_time_constant_zero(0);
+      auto	seconds     = mmux_time_constant_zero();
       auto	nanoseconds = mmux_slong_literal(34);
       mmux_libc_timespec_set(&requested_time, seconds, nanoseconds);
     }
