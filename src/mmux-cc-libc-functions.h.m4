@@ -989,17 +989,38 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_
  ** System configuration.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_sysconf (mmux_slong_t * result_p, mmux_sint_t parameter)
+mmux_cc_libc_inline_decl mmux_libc_sysconf_parameter_t
+mmux_libc_sysconf_parameter (mmux_standard_sint_t parm)
+{
+  return (mmux_libc_sysconf_parameter_t) { { .value = parm } };
+}
+mmux_cc_libc_inline_decl mmux_libc_sysconf_string_parameter_t
+mmux_libc_sysconf_string_parameter (mmux_standard_sint_t parm)
+{
+  return (mmux_libc_sysconf_string_parameter_t) { { .value = parm } };
+}
+mmux_cc_libc_inline_decl mmux_libc_sysconf_pathname_parameter_t
+mmux_libc_sysconf_pathname_parameter (mmux_standard_sint_t parm)
+{
+  return (mmux_libc_sysconf_pathname_parameter_t) { { .value = parm } };
+}
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sysconf (mmux_slong_t * result_p, mmux_libc_sysconf_parameter_t parameter)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_confstr_size (mmux_usize_t * required_nbytes_p, mmux_sint_t parameter);
-mmux_cc_libc_decl bool mmux_libc_confstr (mmux_sint_t parameter, char * bufptr, mmux_usize_t buflen)
-  __attribute__((__nonnull__(2)));
-
-mmux_cc_libc_decl bool mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t parameter)
+mmux_cc_libc_decl bool mmux_libc_confstr_size (mmux_usize_t * required_nbytes_p, mmux_libc_sysconf_string_parameter_t parameter);
+mmux_cc_libc_decl bool mmux_libc_confstr (mmux_asciizp_t result_bufptr, mmux_usize_t provided_nbytes,
+					  mmux_libc_sysconf_string_parameter_t parameter)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd, mmux_sint_t parameter)
+mmux_cc_libc_decl bool mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname,
+					   mmux_libc_sysconf_pathname_parameter_t parameter)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd,
+					    mmux_libc_sysconf_pathname_parameter_t parameter)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */

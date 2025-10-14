@@ -193,9 +193,12 @@ typedef void mmux_libc_sighandler_t (mmux_standard_sint_t signum);
 
 
 /** --------------------------------------------------------------------
- ** Time.
+ ** System configuration.
  ** ----------------------------------------------------------------- */
 
+typedef struct mmux_libc_sysconf_parameter_t { mmux_sint_t; } mmux_libc_sysconf_parameter_t;
+typedef struct mmux_libc_sysconf_string_parameter_t { mmux_sint_t; } mmux_libc_sysconf_string_parameter_t;
+typedef struct mmux_libc_sysconf_pathname_parameter_t { mmux_sint_t; } mmux_libc_sysconf_pathname_parameter_t;
 
 
 /** --------------------------------------------------------------------

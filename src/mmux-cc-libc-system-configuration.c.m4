@@ -34,7 +34,7 @@
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sysconf (mmux_slong_t * value_p, mmux_sint_t parameter)
+mmux_libc_sysconf (mmux_slong_t * value_p, mmux_libc_sysconf_parameter_t parameter)
 {
   mmux_slong_t	value;
 
@@ -54,7 +54,7 @@ mmux_libc_sysconf (mmux_slong_t * value_p, mmux_sint_t parameter)
   return false;
 }
 bool
-mmux_libc_confstr_size (mmux_usize_t * required_nbytes_p, mmux_sint_t parameter)
+mmux_libc_confstr_size (mmux_usize_t * required_nbytes_p, mmux_libc_sysconf_string_parameter_t parameter)
 {
   auto	required_nbytes = mmux_usize(confstr(parameter.value, NULL, 0));
 
@@ -66,14 +66,15 @@ mmux_libc_confstr_size (mmux_usize_t * required_nbytes_p, mmux_sint_t parameter)
   }
 }
 bool
-mmux_libc_confstr (mmux_sint_t parameter, char * bufptr, mmux_usize_t buflen)
+mmux_libc_confstr (mmux_asciizp_t result_bufptr, mmux_usize_t provided_nbytes, mmux_libc_sysconf_string_parameter_t parameter)
 {
-  auto	required_nbytes = mmux_usize(confstr(parameter.value, bufptr, buflen.value));
+  auto	required_nbytes = mmux_usize(confstr(parameter.value, result_bufptr, provided_nbytes.value));
 
   return ((0 == required_nbytes.value)? true : false);
 }
 bool
-mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t parameter)
+mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname,
+		    mmux_libc_sysconf_pathname_parameter_t parameter)
 {
   mmux_slong_t	result;
 
@@ -93,7 +94,8 @@ mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pa
   return false;
 }
 bool
-mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd, mmux_sint_t parameter)
+mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd,
+		     mmux_libc_sysconf_pathname_parameter_t parameter)
 {
   mmux_slong_t	result;
 

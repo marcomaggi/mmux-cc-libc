@@ -621,239 +621,6 @@ remainder of which flags are available for the operation.
 The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
 @end defvr
 
-@MmuxDefineConstant{_SC_2_CHAR_TERM}
-@MmuxDefineConstant{_SC_2_C_BIND}
-@MmuxDefineConstant{_SC_2_C_DEV}
-@MmuxDefineConstant{_SC_2_C_VERSION}
-@MmuxDefineConstant{_SC_2_FORT_DEV}
-@MmuxDefineConstant{_SC_2_FORT_RUN}
-@MmuxDefineConstant{_SC_2_LOCALEDEF}
-@MmuxDefineConstant{_SC_2_PBS}
-@MmuxDefineConstant{_SC_2_PBS_ACCOUNTING}
-@MmuxDefineConstant{_SC_2_PBS_CHECKPOINT}
-@MmuxDefineConstant{_SC_2_PBS_LOCATE}
-@MmuxDefineConstant{_SC_2_PBS_MESSAGE}
-@MmuxDefineConstant{_SC_2_PBS_TRACK}
-@MmuxDefineConstant{_SC_2_SW_DEV}
-@MmuxDefineConstant{_SC_2_UPE}
-@MmuxDefineConstant{_SC_2_VERSION}
-@MmuxDefineConstant{_SC_ADVISORY_INFO}
-@MmuxDefineConstant{_SC_AIO_LISTIO_MAX}
-@MmuxDefineConstant{_SC_AIO_MAX}
-@MmuxDefineConstant{_SC_AIO_PRIO_DELTA_MAX}
-@MmuxDefineConstant{_SC_ARG_MAX}
-@MmuxDefineConstant{_SC_ASYNCHRONOUS_IO}
-@MmuxDefineConstant{_SC_ATEXIT_MAX}
-@MmuxDefineConstant{_SC_AVPHYS_PAGES}
-@MmuxDefineConstant{_SC_BARRIERS}
-@MmuxDefineConstant{_SC_BASE}
-@MmuxDefineConstant{_SC_BC_BASE_MAX}
-@MmuxDefineConstant{_SC_BC_DIM_MAX}
-@MmuxDefineConstant{_SC_BC_SCALE_MAX}
-@MmuxDefineConstant{_SC_BC_STRING_MAX}
-@MmuxDefineConstant{_SC_CHARCLASS_NAME_MAX}
-@MmuxDefineConstant{_SC_CHAR_BIT}
-@MmuxDefineConstant{_SC_CHAR_MAX}
-@MmuxDefineConstant{_SC_CHAR_MIN}
-@MmuxDefineConstant{_SC_CHILD_MAX}
-@MmuxDefineConstant{_SC_CLK_TCK}
-@MmuxDefineConstant{_SC_CLOCK_SELECTION}
-@MmuxDefineConstant{_SC_COLL_WEIGHTS_MAX}
-@MmuxDefineConstant{_SC_CPUTIME}
-@MmuxDefineConstant{_SC_C_LANG_SUPPORT}
-@MmuxDefineConstant{_SC_C_LANG_SUPPORT_R}
-@MmuxDefineConstant{_SC_DELAYTIMER_MAX}
-@MmuxDefineConstant{_SC_DEVICE_IO}
-@MmuxDefineConstant{_SC_DEVICE_SPECIFIC}
-@MmuxDefineConstant{_SC_DEVICE_SPECIFIC_R}
-@MmuxDefineConstant{_SC_EQUIV_CLASS_MAX}
-@MmuxDefineConstant{_SC_EXPR_NEST_MAX}
-@MmuxDefineConstant{_SC_FD_MGMT}
-@MmuxDefineConstant{_SC_FIFO}
-@MmuxDefineConstant{_SC_FILE_ATTRIBUTES}
-@MmuxDefineConstant{_SC_FILE_LOCKING}
-@MmuxDefineConstant{_SC_FILE_SYSTEM}
-@MmuxDefineConstant{_SC_FSYNC}
-@MmuxDefineConstant{_SC_GETGR_R_SIZE_MAX}
-@MmuxDefineConstant{_SC_GETPW_R_SIZE_MAX}
-@MmuxDefineConstant{_SC_HOST_NAME_MAX}
-@MmuxDefineConstant{_SC_INT_MAX}
-@MmuxDefineConstant{_SC_INT_MIN}
-@MmuxDefineConstant{_SC_IOV_MAX}
-@MmuxDefineConstant{_SC_IPV6}
-@MmuxDefineConstant{_SC_JOB_CONTROL}
-@MmuxDefineConstant{_SC_LEVEL1_DCACHE_ASSOC}
-@MmuxDefineConstant{_SC_LEVEL1_DCACHE_LINESIZE}
-@MmuxDefineConstant{_SC_LEVEL1_DCACHE_SIZE}
-@MmuxDefineConstant{_SC_LEVEL1_ICACHE_ASSOC}
-@MmuxDefineConstant{_SC_LEVEL1_ICACHE_LINESIZE}
-@MmuxDefineConstant{_SC_LEVEL1_ICACHE_SIZE}
-@MmuxDefineConstant{_SC_LEVEL2_CACHE_ASSOC}
-@MmuxDefineConstant{_SC_LEVEL2_CACHE_LINESIZE}
-@MmuxDefineConstant{_SC_LEVEL2_CACHE_SIZE}
-@MmuxDefineConstant{_SC_LEVEL3_CACHE_ASSOC}
-@MmuxDefineConstant{_SC_LEVEL3_CACHE_LINESIZE}
-@MmuxDefineConstant{_SC_LEVEL3_CACHE_SIZE}
-@MmuxDefineConstant{_SC_LEVEL4_CACHE_ASSOC}
-@MmuxDefineConstant{_SC_LEVEL4_CACHE_LINESIZE}
-@MmuxDefineConstant{_SC_LEVEL4_CACHE_SIZE}
-@MmuxDefineConstant{_SC_LINE_MAX}
-@MmuxDefineConstant{_SC_LOGIN_NAME_MAX}
-@MmuxDefineConstant{_SC_LONG_BIT}
-@MmuxDefineConstant{_SC_MAPPED_FILES}
-@MmuxDefineConstant{_SC_MB_LEN_MAX}
-@MmuxDefineConstant{_SC_MEMLOCK}
-@MmuxDefineConstant{_SC_MEMLOCK_RANGE}
-@MmuxDefineConstant{_SC_MEMORY_PROTECTION}
-@MmuxDefineConstant{_SC_MESSAGE_PASSING}
-@MmuxDefineConstant{_SC_MONOTONIC_CLOCK}
-@MmuxDefineConstant{_SC_MQ_OPEN_MAX}
-@MmuxDefineConstant{_SC_MQ_PRIO_MAX}
-@MmuxDefineConstant{_SC_MULTI_PROCESS}
-@MmuxDefineConstant{_SC_NETWORKING}
-@MmuxDefineConstant{_SC_NGROUPS_MAX}
-@MmuxDefineConstant{_SC_NL_ARGMAX}
-@MmuxDefineConstant{_SC_NL_LANGMAX}
-@MmuxDefineConstant{_SC_NL_MSGMAX}
-@MmuxDefineConstant{_SC_NL_NMAX}
-@MmuxDefineConstant{_SC_NL_SETMAX}
-@MmuxDefineConstant{_SC_NL_TEXTMAX}
-@MmuxDefineConstant{_SC_NPROCESSORS_CONF}
-@MmuxDefineConstant{_SC_NPROCESSORS_ONLN}
-@MmuxDefineConstant{_SC_NZERO}
-@MmuxDefineConstant{_SC_OPEN_MAX}
-@MmuxDefineConstant{_SC_PAGESIZE}
-@MmuxDefineConstant{_SC_PAGE_SIZE}
-@MmuxDefineConstant{_SC_PASS_MAX}
-@MmuxDefineConstant{_SC_PHYS_PAGES}
-@MmuxDefineConstant{_SC_PII}
-@MmuxDefineConstant{_SC_PII_INTERNET}
-@MmuxDefineConstant{_SC_PII_INTERNET_DGRAM}
-@MmuxDefineConstant{_SC_PII_INTERNET_STREAM}
-@MmuxDefineConstant{_SC_PII_OSI}
-@MmuxDefineConstant{_SC_PII_OSI_CLTS}
-@MmuxDefineConstant{_SC_PII_OSI_COTS}
-@MmuxDefineConstant{_SC_PII_OSI_M}
-@MmuxDefineConstant{_SC_PII_SOCKET}
-@MmuxDefineConstant{_SC_PII_XTI}
-@MmuxDefineConstant{_SC_PIPE}
-@MmuxDefineConstant{_SC_POLL}
-@MmuxDefineConstant{_SC_PRIORITIZED_IO}
-@MmuxDefineConstant{_SC_PRIORITY_SCHEDULING}
-@MmuxDefineConstant{_SC_RAW_SOCKETS}
-@MmuxDefineConstant{_SC_READER_WRITER_LOCKS}
-@MmuxDefineConstant{_SC_REALTIME_SIGNALS}
-@MmuxDefineConstant{_SC_REGEXP}
-@MmuxDefineConstant{_SC_REGEX_VERSION}
-@MmuxDefineConstant{_SC_RE_DUP_MAX}
-@MmuxDefineConstant{_SC_RTSIG_MAX}
-@MmuxDefineConstant{_SC_SAVED_IDS}
-@MmuxDefineConstant{_SC_SCHAR_MAX}
-@MmuxDefineConstant{_SC_SCHAR_MIN}
-@MmuxDefineConstant{_SC_SELECT}
-@MmuxDefineConstant{_SC_SEMAPHORES}
-@MmuxDefineConstant{_SC_SEM_NSEMS_MAX}
-@MmuxDefineConstant{_SC_SEM_VALUE_MAX}
-@MmuxDefineConstant{_SC_SHARED_MEMORY_OBJECTS}
-@MmuxDefineConstant{_SC_SHELL}
-@MmuxDefineConstant{_SC_SHRT_MAX}
-@MmuxDefineConstant{_SC_SHRT_MIN}
-@MmuxDefineConstant{_SC_SIGNALS}
-@MmuxDefineConstant{_SC_SIGQUEUE_MAX}
-@MmuxDefineConstant{_SC_SINGLE_PROCESS}
-@MmuxDefineConstant{_SC_SPAWN}
-@MmuxDefineConstant{_SC_SPIN_LOCKS}
-@MmuxDefineConstant{_SC_SPORADIC_SERVER}
-@MmuxDefineConstant{_SC_SSIZE_MAX}
-@MmuxDefineConstant{_SC_STREAMS}
-@MmuxDefineConstant{_SC_STREAM_MAX}
-@MmuxDefineConstant{_SC_SYMLOOP_MAX}
-@MmuxDefineConstant{_SC_SYNCHRONIZED_IO}
-@MmuxDefineConstant{_SC_SYSTEM_DATABASE}
-@MmuxDefineConstant{_SC_SYSTEM_DATABASE_R}
-@MmuxDefineConstant{_SC_THREADS}
-@MmuxDefineConstant{_SC_THREAD_ATTR_STACKADDR}
-@MmuxDefineConstant{_SC_THREAD_ATTR_STACKSIZE}
-@MmuxDefineConstant{_SC_THREAD_CPUTIME}
-@MmuxDefineConstant{_SC_THREAD_DESTRUCTOR_ITERATIONS}
-@MmuxDefineConstant{_SC_THREAD_KEYS_MAX}
-@MmuxDefineConstant{_SC_THREAD_PRIORITY_SCHEDULING}
-@MmuxDefineConstant{_SC_THREAD_PRIO_INHERIT}
-@MmuxDefineConstant{_SC_THREAD_PRIO_PROTECT}
-@MmuxDefineConstant{_SC_THREAD_PROCESS_SHARED}
-@MmuxDefineConstant{_SC_THREAD_SAFE_FUNCTIONS}
-@MmuxDefineConstant{_SC_THREAD_SPORADIC_SERVER}
-@MmuxDefineConstant{_SC_THREAD_STACK_MIN}
-@MmuxDefineConstant{_SC_THREAD_THREADS_MAX}
-@MmuxDefineConstant{_SC_TIMEOUTS}
-@MmuxDefineConstant{_SC_TIMERS}
-@MmuxDefineConstant{_SC_TIMER_MAX}
-@MmuxDefineConstant{_SC_TRACE}
-@MmuxDefineConstant{_SC_TRACE_EVENT_FILTER}
-@MmuxDefineConstant{_SC_TRACE_INHERIT}
-@MmuxDefineConstant{_SC_TRACE_LOG}
-@MmuxDefineConstant{_SC_TTY_NAME_MAX}
-@MmuxDefineConstant{_SC_TYPED_MEMORY_OBJECTS}
-@MmuxDefineConstant{_SC_TZNAME_MAX}
-@MmuxDefineConstant{_SC_T_IOV_MAX}
-@MmuxDefineConstant{_SC_UCHAR_MAX}
-@MmuxDefineConstant{_SC_UINT_MAX}
-@MmuxDefineConstant{_SC_UIO_MAXIOV}
-@MmuxDefineConstant{_SC_ULONG_MAX}
-@MmuxDefineConstant{_SC_USER_GROUPS}
-@MmuxDefineConstant{_SC_USER_GROUPS_R}
-@MmuxDefineConstant{_SC_USHRT_MAX}
-@MmuxDefineConstant{_SC_V6_ILP32_OFF32}
-@MmuxDefineConstant{_SC_V6_ILP32_OFFBIG}
-@MmuxDefineConstant{_SC_V6_LP64_OFF64}
-@MmuxDefineConstant{_SC_V6_LPBIG_OFFBIG}
-@MmuxDefineConstant{_SC_VERSION}
-@MmuxDefineConstant{_SC_WORD_BIT}
-@MmuxDefineConstant{_SC_XBS5_ILP32_OFF32}
-@MmuxDefineConstant{_SC_XBS5_ILP32_OFFBIG}
-@MmuxDefineConstant{_SC_XBS5_LP64_OFF64}
-@MmuxDefineConstant{_SC_XBS5_LPBIG_OFFBIG}
-@MmuxDefineConstant{_SC_XOPEN_CRYPT}
-@MmuxDefineConstant{_SC_XOPEN_ENH_I18N}
-@MmuxDefineConstant{_SC_XOPEN_LEGACY}
-@MmuxDefineConstant{_SC_XOPEN_REALTIME}
-@MmuxDefineConstant{_SC_XOPEN_REALTIME_THREADS}
-@MmuxDefineConstant{_SC_XOPEN_SHM}
-@MmuxDefineConstant{_SC_XOPEN_UNIX}
-@MmuxDefineConstant{_SC_XOPEN_VERSION}
-@MmuxDefineConstant{_SC_XOPEN_XCU_VERSION}
-@MmuxDefineConstant{_SC_XOPEN_XPG2}
-@MmuxDefineConstant{_SC_XOPEN_XPG3}
-@MmuxDefineConstant{_SC_XOPEN_XPG4}
-
-@MmuxDefineConstant{_CS_LFS64_CFLAGS}
-@MmuxDefineConstant{_CS_LFS64_LDFLAGS}
-@MmuxDefineConstant{_CS_LFS64_LIBS}
-@MmuxDefineConstant{_CS_LFS64_LINTFLAGS}
-@MmuxDefineConstant{_CS_LFS_CFLAGS}
-@MmuxDefineConstant{_CS_LFS_LDFLAGS}
-@MmuxDefineConstant{_CS_LFS_LIBS}
-@MmuxDefineConstant{_CS_LFS_LINTFLAGS}
-@MmuxDefineConstant{_CS_PATH}
-
-@MmuxDefineConstant{_PC_ASYNC_IO}
-@MmuxDefineConstant{_PC_CHOWN_RESTRICTED}
-@MmuxDefineConstant{_PC_FILESIZEBITS}
-@MmuxDefineConstant{_PC_LINK_MAX}
-@MmuxDefineConstant{_PC_MAX_CANON}
-@MmuxDefineConstant{_PC_MAX_INPUT}
-@MmuxDefineConstant{_PC_NAME_MAX}
-@MmuxDefineConstant{_PC_NO_TRUNC}
-@MmuxDefineConstant{_PC_PATH_MAX}
-@MmuxDefineConstant{_PC_PIPE_BUF}
-@MmuxDefineConstant{_PC_PRIO_IO}
-@MmuxDefineConstant{_PC_REC_INCR_XFER_SIZE}
-@MmuxDefineConstant{_PC_REC_MAX_XFER_SIZE}
-@MmuxDefineConstant{_PC_REC_MIN_XFER_SIZE}
-@MmuxDefineConstant{_PC_REC_XFER_ALIGN}
-@MmuxDefineConstant{_PC_SYNC_IO}
-@MmuxDefineConstant{_PC_VDISABLE}
-
 @MmuxDefineConstant{RLIMIT_AS}
 @MmuxDefineConstant{RLIMIT_CORE}
 @MmuxDefineConstant{RLIMIT_CPU}
@@ -3662,22 +3429,29 @@ if (mmux_libc_nanosleep(&requested_time, &remaining_time)) @{
 
 
 @menu
-* system parameters::           Configuration parameters.
-* system limits::               Configuration limits.
+* system configuration parameters::  System configuration parameters.
+* system configuration strings::     System configuration strings.
+* system configuration fs::          System configuration for file system parameters.
+* system configuration limits::      System configuration limits.
 @end menu
 
 @c page
-@node system parameters
-@section Configuration parameters
+@node system configuration parameters
+@section System configuration parameters
 
 
-@cindex @samp{MMUX_LIBC_SC_} constants
-@cindex @samp{MMUX_LIBC_CS_} constants
-@cindex Constants @samp{MMUX_LIBC_SC_}
-@cindex Constants @samp{MMUX_LIBC_CS_}
+@cindex @samp{MMUX_LIBC__SC_} constants
+@cindex Constants @samp{MMUX_LIBC__SC_}
 
 
-@deftypefun bool mmux_libc_sysconf (mmux_slong_t * @var{result_p}, mmux_sint_t @var{parameter})
+@deftp {Struct Typedef} mmux_libc_sysconf_parameter_t
+Data structure type representing the selector of a configurable parameter whose value fits into a
+@objtype{mmux_slong_t}.  The constants @code{MMUX_LIBC__SC_*} are expressions which evaluate to
+instances of this type.
+@end deftp
+
+
+@deftypefun bool mmux_libc_sysconf (mmux_slong_t * @var{result_p}, mmux_libc_sysconf_parameter_t @var{parameter})
 @MmuxCInterface{sysconf}.  @var{parameter} must be one of the @samp{MMUX_LIBC__SC_*} constants.
 
 @example
@@ -3685,43 +3459,399 @@ mmux_slong_t    result;
 
 if (mmux_libc_sysconf(&result, MMUX_LIBC__SC_PAGESIZE)) @{
   /* error */
+@} else @{
+  /* the result is in "result" */
 @}
-/* the result is in "result" */
 @end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_confstr_size (mmux_usize_t * @var{result_required_nbytes_p}, mmux_sint_t @var{parameter})
-@deftypefunx bool mmux_libc_confstr (mmux_sint_t @var{parameter}, char * @var{bufptr}, mmux_usize_t @var{buflen})
+@macro MmuxDefineSystemParameterConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
+@objtype{mmux_libc_sysconf_parameter_t}; it can be defined or not depending on the features of the
+underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineSystemParameterConstant{_SC_2_CHAR_TERM}
+@MmuxDefineSystemParameterConstant{_SC_2_C_BIND}
+@MmuxDefineSystemParameterConstant{_SC_2_C_DEV}
+@MmuxDefineSystemParameterConstant{_SC_2_C_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_2_FORT_DEV}
+@MmuxDefineSystemParameterConstant{_SC_2_FORT_RUN}
+@MmuxDefineSystemParameterConstant{_SC_2_LOCALEDEF}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS_ACCOUNTING}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS_CHECKPOINT}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS_LOCATE}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS_MESSAGE}
+@MmuxDefineSystemParameterConstant{_SC_2_PBS_TRACK}
+@MmuxDefineSystemParameterConstant{_SC_2_SW_DEV}
+@MmuxDefineSystemParameterConstant{_SC_2_UPE}
+@MmuxDefineSystemParameterConstant{_SC_2_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_ADVISORY_INFO}
+@MmuxDefineSystemParameterConstant{_SC_AIO_LISTIO_MAX}
+@MmuxDefineSystemParameterConstant{_SC_AIO_MAX}
+@MmuxDefineSystemParameterConstant{_SC_AIO_PRIO_DELTA_MAX}
+@MmuxDefineSystemParameterConstant{_SC_ARG_MAX}
+@MmuxDefineSystemParameterConstant{_SC_ASYNCHRONOUS_IO}
+@MmuxDefineSystemParameterConstant{_SC_ATEXIT_MAX}
+@MmuxDefineSystemParameterConstant{_SC_AVPHYS_PAGES}
+@MmuxDefineSystemParameterConstant{_SC_BARRIERS}
+@MmuxDefineSystemParameterConstant{_SC_BASE}
+@MmuxDefineSystemParameterConstant{_SC_BC_BASE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_BC_DIM_MAX}
+@MmuxDefineSystemParameterConstant{_SC_BC_SCALE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_BC_STRING_MAX}
+@MmuxDefineSystemParameterConstant{_SC_CHARCLASS_NAME_MAX}
+@MmuxDefineSystemParameterConstant{_SC_CHAR_BIT}
+@MmuxDefineSystemParameterConstant{_SC_CHAR_MAX}
+@MmuxDefineSystemParameterConstant{_SC_CHAR_MIN}
+@MmuxDefineSystemParameterConstant{_SC_CHILD_MAX}
+@MmuxDefineSystemParameterConstant{_SC_CLK_TCK}
+@MmuxDefineSystemParameterConstant{_SC_CLOCK_SELECTION}
+@MmuxDefineSystemParameterConstant{_SC_COLL_WEIGHTS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_CPUTIME}
+@MmuxDefineSystemParameterConstant{_SC_C_LANG_SUPPORT}
+@MmuxDefineSystemParameterConstant{_SC_C_LANG_SUPPORT_R}
+@MmuxDefineSystemParameterConstant{_SC_DELAYTIMER_MAX}
+@MmuxDefineSystemParameterConstant{_SC_DEVICE_IO}
+@MmuxDefineSystemParameterConstant{_SC_DEVICE_SPECIFIC}
+@MmuxDefineSystemParameterConstant{_SC_DEVICE_SPECIFIC_R}
+@MmuxDefineSystemParameterConstant{_SC_EQUIV_CLASS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_EXPR_NEST_MAX}
+@MmuxDefineSystemParameterConstant{_SC_FD_MGMT}
+@MmuxDefineSystemParameterConstant{_SC_FIFO}
+@MmuxDefineSystemParameterConstant{_SC_FILE_ATTRIBUTES}
+@MmuxDefineSystemParameterConstant{_SC_FILE_LOCKING}
+@MmuxDefineSystemParameterConstant{_SC_FILE_SYSTEM}
+@MmuxDefineSystemParameterConstant{_SC_FSYNC}
+@MmuxDefineSystemParameterConstant{_SC_GETGR_R_SIZE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_GETPW_R_SIZE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_HOST_NAME_MAX}
+@MmuxDefineSystemParameterConstant{_SC_INT_MAX}
+@MmuxDefineSystemParameterConstant{_SC_INT_MIN}
+@MmuxDefineSystemParameterConstant{_SC_IOV_MAX}
+@MmuxDefineSystemParameterConstant{_SC_IPV6}
+@MmuxDefineSystemParameterConstant{_SC_JOB_CONTROL}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_DCACHE_ASSOC}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_DCACHE_LINESIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_DCACHE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_ICACHE_ASSOC}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_ICACHE_LINESIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL1_ICACHE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL2_CACHE_ASSOC}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL2_CACHE_LINESIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL2_CACHE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL3_CACHE_ASSOC}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL3_CACHE_LINESIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL3_CACHE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL4_CACHE_ASSOC}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL4_CACHE_LINESIZE}
+@MmuxDefineSystemParameterConstant{_SC_LEVEL4_CACHE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_LINE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_LOGIN_NAME_MAX}
+@MmuxDefineSystemParameterConstant{_SC_LONG_BIT}
+@MmuxDefineSystemParameterConstant{_SC_MAPPED_FILES}
+@MmuxDefineSystemParameterConstant{_SC_MB_LEN_MAX}
+@MmuxDefineSystemParameterConstant{_SC_MEMLOCK}
+@MmuxDefineSystemParameterConstant{_SC_MEMLOCK_RANGE}
+@MmuxDefineSystemParameterConstant{_SC_MEMORY_PROTECTION}
+@MmuxDefineSystemParameterConstant{_SC_MESSAGE_PASSING}
+@MmuxDefineSystemParameterConstant{_SC_MONOTONIC_CLOCK}
+@MmuxDefineSystemParameterConstant{_SC_MQ_OPEN_MAX}
+@MmuxDefineSystemParameterConstant{_SC_MQ_PRIO_MAX}
+@MmuxDefineSystemParameterConstant{_SC_MULTI_PROCESS}
+@MmuxDefineSystemParameterConstant{_SC_NETWORKING}
+@MmuxDefineSystemParameterConstant{_SC_NGROUPS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_ARGMAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_LANGMAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_MSGMAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_NMAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_SETMAX}
+@MmuxDefineSystemParameterConstant{_SC_NL_TEXTMAX}
+@MmuxDefineSystemParameterConstant{_SC_NPROCESSORS_CONF}
+@MmuxDefineSystemParameterConstant{_SC_NPROCESSORS_ONLN}
+@MmuxDefineSystemParameterConstant{_SC_NZERO}
+@MmuxDefineSystemParameterConstant{_SC_OPEN_MAX}
+@MmuxDefineSystemParameterConstant{_SC_PAGESIZE}
+@MmuxDefineSystemParameterConstant{_SC_PAGE_SIZE}
+@MmuxDefineSystemParameterConstant{_SC_PASS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_PHYS_PAGES}
+@MmuxDefineSystemParameterConstant{_SC_PII}
+@MmuxDefineSystemParameterConstant{_SC_PII_INTERNET}
+@MmuxDefineSystemParameterConstant{_SC_PII_INTERNET_DGRAM}
+@MmuxDefineSystemParameterConstant{_SC_PII_INTERNET_STREAM}
+@MmuxDefineSystemParameterConstant{_SC_PII_OSI}
+@MmuxDefineSystemParameterConstant{_SC_PII_OSI_CLTS}
+@MmuxDefineSystemParameterConstant{_SC_PII_OSI_COTS}
+@MmuxDefineSystemParameterConstant{_SC_PII_OSI_M}
+@MmuxDefineSystemParameterConstant{_SC_PII_SOCKET}
+@MmuxDefineSystemParameterConstant{_SC_PII_XTI}
+@MmuxDefineSystemParameterConstant{_SC_PIPE}
+@MmuxDefineSystemParameterConstant{_SC_POLL}
+@MmuxDefineSystemParameterConstant{_SC_PRIORITIZED_IO}
+@MmuxDefineSystemParameterConstant{_SC_PRIORITY_SCHEDULING}
+@MmuxDefineSystemParameterConstant{_SC_RAW_SOCKETS}
+@MmuxDefineSystemParameterConstant{_SC_READER_WRITER_LOCKS}
+@MmuxDefineSystemParameterConstant{_SC_REALTIME_SIGNALS}
+@MmuxDefineSystemParameterConstant{_SC_REGEXP}
+@MmuxDefineSystemParameterConstant{_SC_REGEX_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_RE_DUP_MAX}
+@MmuxDefineSystemParameterConstant{_SC_RTSIG_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SAVED_IDS}
+@MmuxDefineSystemParameterConstant{_SC_SCHAR_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SCHAR_MIN}
+@MmuxDefineSystemParameterConstant{_SC_SELECT}
+@MmuxDefineSystemParameterConstant{_SC_SEMAPHORES}
+@MmuxDefineSystemParameterConstant{_SC_SEM_NSEMS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SEM_VALUE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SHARED_MEMORY_OBJECTS}
+@MmuxDefineSystemParameterConstant{_SC_SHELL}
+@MmuxDefineSystemParameterConstant{_SC_SHRT_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SHRT_MIN}
+@MmuxDefineSystemParameterConstant{_SC_SIGNALS}
+@MmuxDefineSystemParameterConstant{_SC_SIGQUEUE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SINGLE_PROCESS}
+@MmuxDefineSystemParameterConstant{_SC_SPAWN}
+@MmuxDefineSystemParameterConstant{_SC_SPIN_LOCKS}
+@MmuxDefineSystemParameterConstant{_SC_SPORADIC_SERVER}
+@MmuxDefineSystemParameterConstant{_SC_SSIZE_MAX}
+@MmuxDefineSystemParameterConstant{_SC_STREAMS}
+@MmuxDefineSystemParameterConstant{_SC_STREAM_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SYMLOOP_MAX}
+@MmuxDefineSystemParameterConstant{_SC_SYNCHRONIZED_IO}
+@MmuxDefineSystemParameterConstant{_SC_SYSTEM_DATABASE}
+@MmuxDefineSystemParameterConstant{_SC_SYSTEM_DATABASE_R}
+@MmuxDefineSystemParameterConstant{_SC_THREADS}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_ATTR_STACKADDR}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_ATTR_STACKSIZE}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_CPUTIME}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_DESTRUCTOR_ITERATIONS}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_KEYS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_PRIORITY_SCHEDULING}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_PRIO_INHERIT}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_PRIO_PROTECT}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_PROCESS_SHARED}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_SAFE_FUNCTIONS}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_SPORADIC_SERVER}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_STACK_MIN}
+@MmuxDefineSystemParameterConstant{_SC_THREAD_THREADS_MAX}
+@MmuxDefineSystemParameterConstant{_SC_TIMEOUTS}
+@MmuxDefineSystemParameterConstant{_SC_TIMERS}
+@MmuxDefineSystemParameterConstant{_SC_TIMER_MAX}
+@MmuxDefineSystemParameterConstant{_SC_TRACE}
+@MmuxDefineSystemParameterConstant{_SC_TRACE_EVENT_FILTER}
+@MmuxDefineSystemParameterConstant{_SC_TRACE_INHERIT}
+@MmuxDefineSystemParameterConstant{_SC_TRACE_LOG}
+@MmuxDefineSystemParameterConstant{_SC_TTY_NAME_MAX}
+@MmuxDefineSystemParameterConstant{_SC_TYPED_MEMORY_OBJECTS}
+@MmuxDefineSystemParameterConstant{_SC_TZNAME_MAX}
+@MmuxDefineSystemParameterConstant{_SC_T_IOV_MAX}
+@MmuxDefineSystemParameterConstant{_SC_UCHAR_MAX}
+@MmuxDefineSystemParameterConstant{_SC_UINT_MAX}
+@MmuxDefineSystemParameterConstant{_SC_UIO_MAXIOV}
+@MmuxDefineSystemParameterConstant{_SC_ULONG_MAX}
+@MmuxDefineSystemParameterConstant{_SC_USER_GROUPS}
+@MmuxDefineSystemParameterConstant{_SC_USER_GROUPS_R}
+@MmuxDefineSystemParameterConstant{_SC_USHRT_MAX}
+@MmuxDefineSystemParameterConstant{_SC_V6_ILP32_OFF32}
+@MmuxDefineSystemParameterConstant{_SC_V6_ILP32_OFFBIG}
+@MmuxDefineSystemParameterConstant{_SC_V6_LP64_OFF64}
+@MmuxDefineSystemParameterConstant{_SC_V6_LPBIG_OFFBIG}
+@MmuxDefineSystemParameterConstant{_SC_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_WORD_BIT}
+@MmuxDefineSystemParameterConstant{_SC_XBS5_ILP32_OFF32}
+@MmuxDefineSystemParameterConstant{_SC_XBS5_ILP32_OFFBIG}
+@MmuxDefineSystemParameterConstant{_SC_XBS5_LP64_OFF64}
+@MmuxDefineSystemParameterConstant{_SC_XBS5_LPBIG_OFFBIG}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_CRYPT}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_ENH_I18N}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_LEGACY}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_REALTIME}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_REALTIME_THREADS}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_SHM}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_UNIX}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_XCU_VERSION}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_XPG2}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_XPG3}
+@MmuxDefineSystemParameterConstant{_SC_XOPEN_XPG4}
+
+@c page
+@node system configuration strings
+@section System configuration strings
+
+
+@cindex @samp{MMUX_LIBC__CS_} constants
+@cindex Constants @samp{MMUX_LIBC__CS_}
+
+
+@deftp {Struct Typedef} mmux_libc_sysconf_string_parameter_t
+Data structure type representing the selector of a configurable parameter whose value is represented
+by an @asciiz{} string.  The constants @code{MMUX_LIBC__CS_*} are expressions which evaluate to
+instances of this type.
+@end deftp
+
+
+@deftypefun bool mmux_libc_confstr_size (mmux_usize_t * @var{result_required_nbytes_p}, mmux_libc_sysconf_string_parameter_t @var{parameter})
+@deftypefunx bool mmux_libc_confstr (mmux_asciizp_t @var{result_bufptr}, mmux_usize_t @var{provided_nbytes}, mmux_libc_sysconf_string_parameter_t @var{parameter})
 @MmuxCInterface{confstr}.  @var{parameter} must be one of the @samp{MMUX_LIBC__CS_*} constants.
 
 @example
-mmux_sint_t     parameter = MMUX_LIBC__CS_PATH;
-mmux_usize_t    required_nbytes;
+auto          parameter = MMUX_LIBC__CS_PATH;
+mmux_usize_t  required_nbytes;
 
-if (mmux_libc_confstr_size(&required_nbytes, parameter)) @{ /* error */ @}
-@{
-  char value[required_nbytes];
+if (mmux_libc_confstr_size(&required_nbytes, parameter)) @{
+  /* error */
+@} else @{
+  char  value[required_nbytes.value];
 
-  if (mmux_libc_confstr(parameter, value, required_nbytes)) @{ /* error */ @}
-  /* the result is in "value" */
+  if (mmux_libc_confstr(value, required_nbytes, parameter)) @{
+    /* error */
+  @} else @{
+    /* the result is in "value" */
+  @}
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineSystemStringParameterConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
+@objtype{mmux_libc_sysconf_string_parameter_t}; it can be defined or not depending on the features
+of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineSystemStringParameterConstant{_CS_LFS64_CFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS64_LDFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS64_LIBS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS64_LINTFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS_CFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS_LDFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS_LIBS}
+@MmuxDefineSystemStringParameterConstant{_CS_LFS_LINTFLAGS}
+@MmuxDefineSystemStringParameterConstant{_CS_PATH}
+
+@c page
+@node system configuration fs
+@section System configuration for file system parameters
+
+
+@cindex @samp{MMUX_LIBC__PC_} constants
+@cindex Constants @samp{MMUX_LIBC__PC_}
+
+
+@deftp {Struct Typedef} mmux_libc_sysconf_pathname_parameter_t
+Data structure type representing the selector of a configurable file system parameter whose value
+fits into a @objtype{mmux_slong_t}.  The constants @code{MMUX_LIBC__PC_*} are expressions which
+evaluate to instances of this type.
+@end deftp
+
+
+@deftypefun bool mmux_libc_pathconf (mmux_slong_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_sysconf_pathname_parameter_t @var{parameter})
+@MmuxCInterface{pathconf}.  When successful: if the variable referenced by @var{result_p} is set to
+@samp{-1}, the system does not impose a limit on the specified parameter.
+
+@example
+mmux_libc_ptn_t     ptn;
+mmux_slong_t        result;
+
+if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
+                                        &ptn, "/path/to/file.ext")) @{
+  /* error */
+@} else if (mmux_libc_pathconf(&result, ptn, MMUX_LIBC__PC_LINK_MAX)) @{
+  /* error */
+@} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
+  /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pathconf (mmux_slong_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{parameter})
-@MmuxCInterface{pathconf}.
+@deftypefun bool mmux_libc_fpathconf (mmux_slong_t * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_sysconf_pathname_parameter_t @var{parameter})
+@MmuxCInterface{fpathconf}.  When successful: if the variable referenced by @var{result_p} is set to
+@samp{-1}, the system does not impose a limit on the specified parameter.
+
+@example
+mmux_libc_ptn_t     ptn;
+mmux_libc_fd_t      fd;
+mmux_slong_t        result;
+
+if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
+                                        &ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+
+/* Open the file. */
+@{
+  auto      flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+  auto      mode  = mmux_libc_mode_constant_zero();
+
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_fpathconf(&result, fd, MMUX_LIBC__PC_LINK_MAX)) @{
+  /* error */
+@} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_fpathconf (mmux_slong_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_sint_t @var{parameter})
-@MmuxCInterface{fpathconf}.
-@end deftypefun
+@macro MmuxDefineFileSystemParameterConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
+@objtype{mmux_libc_sysconf_string_parameter_t}; it can be defined or not depending on the features
+of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineFileSystemParameterConstant{_PC_ASYNC_IO}
+@MmuxDefineFileSystemParameterConstant{_PC_CHOWN_RESTRICTED}
+@MmuxDefineFileSystemParameterConstant{_PC_FILESIZEBITS}
+@MmuxDefineFileSystemParameterConstant{_PC_LINK_MAX}
+@MmuxDefineFileSystemParameterConstant{_PC_MAX_CANON}
+@MmuxDefineFileSystemParameterConstant{_PC_MAX_INPUT}
+@MmuxDefineFileSystemParameterConstant{_PC_NAME_MAX}
+@MmuxDefineFileSystemParameterConstant{_PC_NO_TRUNC}
+@MmuxDefineFileSystemParameterConstant{_PC_PATH_MAX}
+@MmuxDefineFileSystemParameterConstant{_PC_PIPE_BUF}
+@MmuxDefineFileSystemParameterConstant{_PC_PRIO_IO}
+@MmuxDefineFileSystemParameterConstant{_PC_REC_INCR_XFER_SIZE}
+@MmuxDefineFileSystemParameterConstant{_PC_REC_MAX_XFER_SIZE}
+@MmuxDefineFileSystemParameterConstant{_PC_REC_MIN_XFER_SIZE}
+@MmuxDefineFileSystemParameterConstant{_PC_REC_XFER_ALIGN}
+@MmuxDefineFileSystemParameterConstant{_PC_SYNC_IO}
+@MmuxDefineFileSystemParameterConstant{_PC_VDISABLE}
 
 @c page
-@node system limits
-@section Configuration limits
+@node system configuration limits
+@section System configuration limits
 
 
 @MmuxCStructOpaqueTypedef{rlimit}
