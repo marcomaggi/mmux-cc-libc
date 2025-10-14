@@ -744,10 +744,14 @@ tests_test_time_sleep_nanosleep_LDADD			= $(mmux_cc_libc_tests_ldadd)
 ## system configuration
 
 check_PROGRAMS	+= \
-	tests/test-sysconf-sysconf
+	tests/test-sysconf-sysconf		\
+	tests/test-sysconf-rlimit
 
 tests_test_sysconf_sysconf_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_sysconf_sysconf_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_sysconf_rlimit_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_sysconf_rlimit_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## interface specifications

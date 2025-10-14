@@ -124,6 +124,17 @@ DEFINE_STRUCT_SETTER_GETTER(rlimit,	rlim_cur,	libc_rlim)
 DEFINE_STRUCT_SETTER_GETTER(rlimit,	rlim_max,	libc_rlim)
 
 bool
+mmux_libc_rlimit_set (mmux_libc_rlimit_t * rlimit_p, mmux_libc_rlim_t cur, mmux_libc_rlim_t max)
+{
+  if (mmux_libc_rlim_cur_set(rlimit_p, cur)) {
+    return true;
+  } else if (mmux_libc_rlim_max_set(rlimit_p, max)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+bool
 mmux_libc_rlimit_dump (mmux_libc_fd_arg_t fd, mmux_libc_rlimit_t * rlimit_pointer, char const * struct_name)
 {
   int	rv;
@@ -177,21 +188,23 @@ mmux_libc_rlimit_dump (mmux_libc_fd_arg_t fd, mmux_libc_rlimit_t * rlimit_pointe
   return false;
 }
 bool
-mmux_libc_getrlimit (mmux_sint_t resource, mmux_libc_rlimit_t * rlimit_p)
+mmux_libc_getrlimit (mmux_libc_rlimit_t * result_rlimit_p, mmux_libc_sysconf_resource_limit_t resource)
 {
-  int	rv = getrlimit(resource.value, rlimit_p);
+  int	rv = getrlimit(resource.value, result_rlimit_p);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_setrlimit (mmux_sint_t resource, mmux_libc_rlimit_t * rlimit_p)
+mmux_libc_setrlimit (mmux_libc_sysconf_resource_limit_t resource, mmux_libc_rlimit_t * new_rlimit_p)
 {
-  int	rv = setrlimit(resource.value, rlimit_p);
+  int	rv = setrlimit(resource.value, new_rlimit_p);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_prlimit (mmux_libc_pid_t pid, mmux_sint_t resource, mmux_libc_rlimit_t * new_rlimit_p, mmux_libc_rlimit_t * old_rlimit_p)
+mmux_libc_prlimit (mmux_libc_rlimit_t * old_rlimit_p,
+		   mmux_libc_pid_t pid, mmux_libc_sysconf_resource_limit_t resource,
+		   mmux_libc_rlimit_t * new_rlimit_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_PRLIMIT]]],[[[
   int	rv = prlimit(pid.value, resource.value, new_rlimit_p, old_rlimit_p);

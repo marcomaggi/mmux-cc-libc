@@ -132,7 +132,7 @@ Setter and getter for the field @code{\FIELDNAME\} of @objtype{mmux_libc_\STRUCT
 
 
 @macro MmuxStructDumperTwo{STRUCTNAME,STRUCTTYPE}
-@deftypefun bool mmux_libc_\STRUCTNAME\_dump (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_\STRUCTNAME\_t const * @var{struct_p}, mmux_asciizcp_t @var{struct_name})
+@deftypefun bool mmux_libc_\STRUCTNAME\_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_\STRUCTNAME\_t const * @var{struct_p}, mmux_asciizcp_t @var{struct_name})
 Write to @var{fd} a description of the fields of the @MmuxCStruct{\STRUCTNAME\} referenced by
 @var{struct_p}.  @var{struct_name} must be a pointer to an @asciiz{} string representing the name of
 the data structure used in the description; when @cnull{}: it defaults to @samp{\STRUCTTYPE\}.
@@ -620,24 +620,6 @@ remainder of which flags are available for the operation.
 
 The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
 @end defvr
-
-@MmuxDefineConstant{RLIMIT_AS}
-@MmuxDefineConstant{RLIMIT_CORE}
-@MmuxDefineConstant{RLIMIT_CPU}
-@MmuxDefineConstant{RLIMIT_DATA}
-@MmuxDefineConstant{RLIMIT_FSIZE}
-@MmuxDefineConstant{RLIMIT_LOCKS}
-@MmuxDefineConstant{RLIMIT_MEMLOCK}
-@MmuxDefineConstant{RLIMIT_MSGQUEUE}
-@MmuxDefineConstant{RLIMIT_NICE}
-@MmuxDefineConstant{RLIMIT_NOFILE}
-@MmuxDefineConstant{RLIMIT_NPROC}
-@MmuxDefineConstant{RLIMIT_RSS}
-@MmuxDefineConstant{RLIMIT_RTPRIO}
-@MmuxDefineConstant{RLIMIT_RTTIME}
-@MmuxDefineConstant{RLIMIT_SIGPENDING}
-@MmuxDefineConstant{RLIMIT_STACK}
-@MmuxDefineConstant{RLIM_INFINITY}
 
 @MmuxDefineConstant{NSIG}
 @MmuxDefineConstant{SIGFPE}
@@ -3854,25 +3836,172 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @section System configuration limits
 
 
+@cindex @samp{MMUX_LIBC_RLIMIT_} constants
+@cindex Constants @samp{MMUX_LIBC_RLIMIT_}
+
+
+To initialise and inspect an object of type @objtype{mmux_libc_rlimit_t} we do:
+
+@example
+auto                cur = mmux_libc_rlim_literal(12);
+auto                max = mmux_libc_rlim_literal(34);
+mmux_libc_rlimit_t  RL[1];
+
+mmux_libc_rlim_cur_set(RL, cur);
+mmux_libc_rlim_max_set(RL, max);
+@{
+  mmux_libc_fd_t    er;
+
+  mmux_libc_stder(er);
+  if (mmux_libc_rlimit_dump(er, RL, NULL)) @{
+    /* error */
+  @}
+@}
+
+@{
+  mmux_libc_rlim_t  cur1, max1;
+
+  mmux_libc_rlim_cur_ref(&cur1, RL);
+  mmux_libc_rlim_max_ref(&max1, RL);
+  ...
+@}
+@end example
+
+
 @MmuxCStructOpaqueTypedef{rlimit}
-@MmuxSetterGetter{rlimit, rlim_cur, mmux_rlim_t}
-@MmuxSetterGetter{rlimit, rlim_max, mmux_rlim_t}
+@MmuxSetterGetter{rlimit, rlim_cur, mmux_libc_rlim_t}
+@MmuxSetterGetter{rlimit, rlim_max, mmux_libc_rlim_t}
 @MmuxStructDumper{rlimit}
 
 
-@deftypefun bool mmux_libc_getrlimit (mmux_sint_t @var{resource}, mmux_libc_rlimit_t * @var{rlimit_p})
+@deftypefun bool mmux_libc_rlimit_set (mmux_libc_rlimit_t * @var{rlimit_p}, mmux_libc_rlim_t @var{cur}, mmux_libc_rlim_t @var{max})
+Setter for the fields of @objtype{mmux_libc_rlimit_t}.
+
+@example
+auto                cur = mmux_libc_rlim_literal(12);
+auto                max = mmux_libc_rlim_literal(34);
+mmux_libc_rlimit_t  RL[1];
+
+mmux_libc_rlimit_set(RL, cur, max);
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_sysconf_resource_limit_t
+Data structure type representing the selector of a system/process parameter whose value fits into an
+object of type @objtype{mmux_libc_rlimit_t}.  The constants @code{MMUX_LIBC_RLIMIT_*} are
+expressions which evaluate to instances of this type.
+@end deftp
+
+
+@deftypefun bool mmux_libc_getrlimit (mmux_libc_rlimit_t * @var{result_rlimit_p}, mmux_libc_sysconf_resource_limit_t @var{resource})
 @MmuxCInterface{getrlimit}.
+
+@example
+mmux_libc_rlimit_t  RL[1];
+
+if (mmux_libc_getrlimit(RL, MMUX_LIBC_RLIMIT_FSIZE))  @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_setrlimit (mmux_sint_t @var{resource}, mmux_libc_rlimit_t * @var{rlimit_p})
+@deftypefun bool mmux_libc_setrlimit (mmux_libc_sysconf_resource_limit_t @var{resource}, mmux_libc_rlimit_t * @var{new_rlimit_p})
 @MmuxCInterface{setrlimit}.
+
+@example
+auto                cur = mmux_libc_rlim_literal(12);
+auto                max = mmux_libc_rlim_literal(34);
+mmux_libc_rlimit_t  RL[1];
+
+mmux_libc_rlimit_set(RL, cur, max);
+if (mmux_libc_setrlimit(MMUX_LIBC_RLIMIT_FSIZE, RL))  @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_prlimit (mmux_libc_pid_t @var{pid}, mmux_sint_t @var{resource}, mmux_libc_rlimit_t * @var{new_rlimit_p}, mmux_libc_rlimit_t * @var{old_rlimit_p})
+@deftypefn {Linux Function} bool mmux_libc_prlimit (mmux_libc_rlimit_t * @var{old_rlimit_p}, mmux_libc_pid_t @var{pid}, mmux_libc_sysconf_resource_limit_t @var{resource}, mmux_libc_rlimit_t * @var{new_rlimit_p})
 @MmuxCInterface{prlimit}.
-@end deftypefun
+
+The argument @var{old_rlimit_p} is the first because it is a result of the function call.
+
+The argument @var{new_rlimit_p} is the last because it is an argument of the function call.
+
+@example
+/* setting and getting */
+@{
+  auto                cur = mmux_libc_rlim_literal(1000000);
+  auto                max = mmux_libc_rlim_literal(1100000);
+  mmux_libc_rlimit_t  old_RL[1], new_RL[1];
+  mmux_libc_pid_t     pid;
+
+  mmux_libc_getpid(&pid);
+  mmux_libc_rlimit_set(new_RL, cur, max);
+  if (mmux_libc_prlimit(old_RL, pid, MMUX_LIBC_RLIMIT_STACK, new_RL))  @{
+    /* error */
+  @}
+@}
+
+/* only setting and only getting */
+@{
+  auto                cur = mmux_libc_rlim_literal(1000000);
+  auto                max = mmux_libc_rlim_literal(1100000);
+  mmux_libc_rlimit_t  new_RL[1], old_RL[1];
+  mmux_libc_pid_t     pid;
+
+  mmux_libc_getpid(&pid);
+  mmux_libc_rlimit_set(new_RL, cur, max);
+  if (mmux_libc_prlimit(NULL, pid, MMUX_LIBC_RLIMIT_STACK, new_RL))  @{
+    /* error */
+  @}
+  if (mmux_libc_prlimit(old_RL, pid, MMUX_LIBC_RLIMIT_STACK, NULL))  @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefn
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineResourceLimitParameterConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
+@objtype{mmux_libc_sysconf_resource_limit_t}; it can be defined or not depending on the features of
+the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_AS}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_CORE}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_CPU}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_DATA}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_FSIZE}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_LOCKS}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_MEMLOCK}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_MSGQUEUE}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_NICE}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_NOFILE}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_NPROC}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_RSS}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_RTPRIO}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_RTTIME}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_SIGPENDING}
+@MmuxDefineResourceLimitParameterConstant{RLIMIT_STACK}
+
+
+@defvr {Preprocessor Symbol} MMUX_LIBC_RLIM_INFINITY
+Evaluates to an instance of @objtype{mmux_libc_rlim_t} representing the value of the C constant
+@samp{MMUX_LIBC_RLIM_INFINITY}.
+@end defvr
 
 @c page
 @node persona

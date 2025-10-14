@@ -1004,6 +1004,11 @@ mmux_libc_sysconf_pathname_parameter (mmux_standard_sint_t parm)
 {
   return (mmux_libc_sysconf_pathname_parameter_t) { { .value = parm } };
 }
+mmux_cc_libc_inline_decl mmux_libc_sysconf_resource_limit_t
+mmux_libc_sysconf_resource_limit (mmux_standard_sint_t parm)
+{
+  return (mmux_libc_sysconf_resource_limit_t) { { .value = parm } };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1028,19 +1033,23 @@ mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_f
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_cur,	mmux_libc_rlim_t)
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(rlimit,	rlim_max,	mmux_libc_rlim_t)
 
+mmux_cc_libc_decl bool mmux_libc_rlimit_set (mmux_libc_rlimit_t * rlimit_p, mmux_libc_rlim_t cur, mmux_libc_rlim_t max)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_rlimit_dump (mmux_libc_fd_arg_t fd, mmux_libc_rlimit_t * rlimit_pointer,
 					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_getrlimit (mmux_sint_t resource, mmux_libc_rlimit_t * rlimit_p)
+mmux_cc_libc_decl bool mmux_libc_getrlimit (mmux_libc_rlimit_t * result_rlimit_p, mmux_libc_sysconf_resource_limit_t resource)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_setrlimit (mmux_libc_sysconf_resource_limit_t resource, mmux_libc_rlimit_t * new_rlimit_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_setrlimit (mmux_sint_t resource, mmux_libc_rlimit_t * rlimit_p)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_prlimit (mmux_libc_pid_t pid, mmux_sint_t resource,
-					  mmux_libc_rlimit_t * new_rlimit_p, mmux_libc_rlimit_t * old_rlimit_p)
-  __attribute__((__nonnull__(3,4),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_prlimit (mmux_libc_rlimit_t * old_rlimit_p,
+					  mmux_libc_pid_t pid, mmux_libc_sysconf_resource_limit_t resource,
+					  mmux_libc_rlimit_t * new_rlimit_p)
+  __attribute__((__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------
