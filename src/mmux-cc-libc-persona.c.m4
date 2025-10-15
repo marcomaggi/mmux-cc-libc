@@ -51,20 +51,8 @@ mmux_libc_$2_ref (mmux_asciizcp_t * result_p, mmux_libc_$1_t const * const P)
 bool
 mmux_libc_make_uid (mmux_libc_uid_t * result_p, mmux_standard_libc_uid_t uid_num)
 {
-  result_p->value = uid_num;
+  *result_p = mmux_libc_uid(uid_num);
   return false;
-}
-bool
-mmux_libc_uid_parse (mmux_libc_uid_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
-{
-  mmux_libc_uid_t	the_uid;
-
-  if (mmux_libc_uid_parse(&the_uid, s_value, who)) {
-    return true;
-  } else {
-    *p_value = the_uid;
-    return false;
-  }
 }
 bool
 mmux_libc_passwd_dump (mmux_libc_fd_arg_t fd, mmux_libc_passwd_t const * passwd_p, mmux_asciizcp_t struct_name)
@@ -73,41 +61,27 @@ mmux_libc_passwd_dump (mmux_libc_fd_arg_t fd, mmux_libc_passwd_t const * passwd_
     struct_name = "struct passwd";
   }
   DPRINTF(fd, "%s *         = %p\n", struct_name, (mmux_pointer_t)passwd_p);
-  DPRINTF(fd, "%s.pw_name   = %s\n",   struct_name, passwd_p->pw_name);
+  DPRINTF(fd, "%s.pw_name   = %s\n", struct_name, passwd_p->pw_name);
   DPRINTF(fd, "%s.pw_passwd = %s\n", struct_name, passwd_p->pw_passwd);
   {
-    mmux_usize_t	required_nchars;
     mmux_libc_uid_t	uid;
 
     mmux_libc_pw_uid_ref(&uid, passwd_p);
-    if (mmux_libc_uid_sprint_size(&required_nchars, uid)) {
+    DPRINTF(fd, "%s.pw_uid    = ", struct_name);
+    if (mmux_libc_dprintf_libc_uid(fd, uid)) {
       return true;
-    } else {
-      char	str[required_nchars.value];
-
-      if (mmux_libc_uid_sprint(str, required_nchars, uid)) {
-	return true;
-      } else {
-	DPRINTF(fd, "%s.pw_uid    = %s\n", struct_name, str);
-      }
     }
+    DPRINTF(fd, "\n");
   }
   {
-    mmux_usize_t	required_nchars;
     mmux_libc_gid_t	gid;
 
     mmux_libc_pw_gid_ref(&gid, passwd_p);
-    if (mmux_libc_gid_sprint_size(&required_nchars, gid)) {
+    DPRINTF(fd, "%s.pw_gid    = ", struct_name);
+    if (mmux_libc_dprintf_libc_gid(fd, gid)) {
       return true;
-    } else {
-      char	str[required_nchars.value];
-
-      if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
-	return true;
-      } else {
-	DPRINTF(fd, "%s.pw_gid    = %s\n", struct_name, str);
-      }
     }
+    DPRINTF(fd, "\n");
   }
   DPRINTF(fd, "%s.pw_gecos  = %s\n", struct_name, passwd_p->pw_gecos);
   DPRINTF(fd, "%s.pw_dir    = %s\n", struct_name, passwd_p->pw_dir);
@@ -124,7 +98,7 @@ mmux_libc_passwd_dump (mmux_libc_fd_arg_t fd, mmux_libc_passwd_t const * passwd_
 bool
 mmux_libc_make_gid (mmux_libc_gid_t * result_p, mmux_standard_libc_gid_t gid_num)
 {
-  result_p->value = gid_num;
+  *result_p = mmux_libc_gid(gid_num);
   return false;
 }
 bool
@@ -135,21 +109,14 @@ mmux_libc_group_dump (mmux_libc_fd_arg_t fd, mmux_libc_group_t const * group_p, 
   }
   DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)group_p);
   {
-    mmux_usize_t	required_nchars;
     mmux_libc_gid_t	gid;
 
     mmux_libc_gr_gid_ref(&gid, group_p);
-    if (mmux_libc_gid_sprint_size(&required_nchars, gid)) {
+    DPRINTF(fd, "%s.gr_gid    = ", struct_name);
+    if (mmux_libc_dprintf_libc_gid(fd, gid)) {
       return true;
-    } else {
-      char	str[required_nchars.value];
-
-      if (mmux_libc_gid_sprint(str, required_nchars, gid)) {
-	return true;
-      } else {
-	DPRINTF(fd, "%s.gr_gid = %s\n", struct_name, str);
-      }
     }
+    DPRINTF(fd, "\n");
   }
   {
     mmux_asciizcpp_t	mem;
@@ -237,7 +204,8 @@ mmux_libc_getgrouplist_size (mmux_usize_t * result_ngroups_p, mmux_asciizcp_t us
   }
 }
 bool
-mmux_libc_getgrouplist (mmux_asciizcp_t username, mmux_libc_gid_t gid, mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
+mmux_libc_getgrouplist (mmux_libc_gid_t * groups_p, mmux_usize_t * ngroups_p,
+			mmux_asciizcp_t username, mmux_libc_gid_t gid)
 {
   if (MMUX_LIBC_GETGROUPLIST_MAXIMUM_GROUPS_NUMBER < ngroups_p->value) {
     return true;

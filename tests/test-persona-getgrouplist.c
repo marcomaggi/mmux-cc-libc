@@ -54,7 +54,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       } else {
 	mmux_libc_gid_t       gids[ngroups.value];
 
-	if (mmux_libc_getgrouplist(name, gid, &ngroups, gids)) {
+	if (mmux_libc_getgrouplist(gids, &ngroups, name, gid)) {
 	  handle_error();
 	} else {
 	  mmux_libc_fd_t	er;

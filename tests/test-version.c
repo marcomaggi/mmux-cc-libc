@@ -21,9 +21,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("version number string: %s\n", mmux_cc_libc_version_string()));
   MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("libtool version number: %d:%d:%d\n",
-					      mmux_cc_libc_version_interface_current(),
-					      mmux_cc_libc_version_interface_revision(),
-					      mmux_cc_libc_version_interface_age()));
+					      mmux_cc_libc_version_interface_current().value,
+					      mmux_cc_libc_version_interface_revision().value,
+					      mmux_cc_libc_version_interface_age().value));
   mmux_libc_exit_success();
 }
 

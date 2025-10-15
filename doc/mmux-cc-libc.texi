@@ -4047,6 +4047,18 @@ to just define a variable from a literal value, we do:
 auto    the_uid = mmux_libc_uid_literal(1000);
 @end example
 
+
+@deftypefun bool mmux_libc_make_uid (mmux_libc_uid_t * @var{result_p}, mmux_standard_libc_uid_t @var{uid_num})
+Constructor for @objtype{mmux_libc_uid_t} values; it is equivalent to using @cfunc{mmux_libc_uid},
+but it follows the calling convention of @value{PACKAGE}.
+
+@example
+mmux_libc_uid_t  the_uid;
+
+mmux_libc_make_uid(&the_uid, 1000);
+@end example
+@end deftypefun
+
 @c page
 @node persona gids
 @section Representing GIDs
@@ -4075,6 +4087,18 @@ to just define a variable from a literal value, we do:
 @example
 auto    the_gid = mmux_libc_gid_literal(1000);
 @end example
+
+
+@deftypefun bool mmux_libc_make_gid (mmux_libc_gid_t * @var{result_p}, mmux_standard_libc_gid_t @var{gid_num})
+Constructor for @objtype{mmux_libc_gid_t} values; it is equivalent to using @cfunc{mmux_libc_gid},
+but it follows the calling convention of @value{PACKAGE}.
+
+@example
+mmux_libc_gid_t  the_gid;
+
+mmux_libc_make_gid(&the_gid, 1000);
+@end example
+@end deftypefun
 
 @c page
 @node persona getting
@@ -4124,29 +4148,11 @@ mmux_libc_getegid(&egid);
 @end example
 @end deftypefun
 
-
-To retrieve the supplementary groups of the current process we do:
-
-@example
-mmux_usize_t    ngroups;
-
-if (mmux_libc_getgroups_size(&ngroups)) @{
-  /* error */
-@} else @{
-  mmux_libc_gid_t       gids[ngroups.value];
-
-  if (mmux_libc_getgroups(&ngroups, gids)) @{
-    /* error */
-  @} else @{
-    /* do something with gids */
-  @}
-@}
-@end example
-
+@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_getgroups_size (mmux_usize_t * @var{result_ngroups_p})
 Determine the number of supplementary groups of the current process and store it in the location
-referenced by @var{ngroups_p}.
+referenced by @var{ngroups_p}.  This function is meant to be used with @cfunc{mmux_libc_getgroups}.
 @end deftypefun
 
 
@@ -4163,50 +4169,37 @@ referenced by @var{ngroups_p}.
 Upon returning from the function call: the location referenced by @var{ngroups_p} is updated with
 the actual number of values stored in the array.
 @end itemize
-@end deftypefun
 
-
-To retrieve the groups a user belongs to we do:
+To retrieve the supplementary groups of the current process we do:
 
 @example
-mmux_libc_uid_t         uid;
-mmux_libc_passwd_t *    PW;
+mmux_usize_t  ngroups;
 
-mmux_libc_getuid(&uid);
-if (mmux_libc_getpwuid(&PW, uid)) @{
+if (mmux_libc_getgroups_size(&ngroups)) @{
   /* error */
 @} else @{
-  mmux_asciizcp_t       name;
-  mmux_libc_gid_t       gid;
-  mmux_usize_t          ngroups;
+  mmux_libc_gid_t  gids[ngroups.value];
 
-  mmux_libc_pw_name_ref (&name, PW);
-  mmux_libc_pw_gid_ref  (&gid,  PW);
-
-  if (mmux_libc_getgrouplist_size(&ngroups, name, gid)) @{
+  if (mmux_libc_getgroups(&ngroups, gids)) @{
     /* error */
   @} else @{
-    mmux_libc_gid_t       gids[ngroups];
-
-    if (mmux_libc_getgrouplist(name, gid, &ngroups, gids)) @{
-      /* error */
-    @} else @{
-     /* do something with "gids" */
-    @}
+    /* do something with gids */
   @}
 @}
 @end example
+@end deftypefun
 
+@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_getgrouplist_size (mmux_usize_t * @var{result_ngroups_p}, mmux_asciizcp_t @var{username}, mmux_libc_gid_t @var{gid})
 Determine the number of groups a user belongs to and store it in the location referenced by
-@var{ngroups_p}.
+@var{ngroups_p}.  This function is meant to be used with @cfunc{mmux_libc_getgrouplist}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_getgrouplist (mmux_asciizcp_t @var{username}, mmux_libc_gid_t @var{gid}, mmux_usize_t * @var{ngroups_p}, mmux_libc_gid_t * @var{groups_p})
-@MmuxCInterface{getgrouplist}.  Fill the array referenced by @var{groups_p} with values representing
-the groups a user belongs to.
+@deftypefun bool mmux_libc_getgrouplist (mmux_libc_gid_t * @var{result_groups_p}, mmux_usize_t * @var{ngroups_p}, mmux_asciizcp_t @var{username}, mmux_libc_gid_t @var{gid})
+@MmuxCInterface{getgrouplist}.  Fill the array referenced by @var{result_groups_p} with values
+representing the groups a user belongs to.
 
 @itemize
 @item
@@ -4217,6 +4210,37 @@ referenced by @var{ngroups_p}.
 Upon returning from the function call: the location referenced by @var{ngroups_p} is updated with
 the actual number of values stored in the array.
 @end itemize
+
+To retrieve the groups a user belongs to we do:
+
+@example
+mmux_libc_uid_t       uid;
+mmux_libc_passwd_t *  PW;
+
+mmux_libc_getuid(&uid);
+if (mmux_libc_getpwuid(&PW, uid)) @{
+  /* error */
+@} else @{
+  mmux_asciizcp_t  name;
+  mmux_libc_gid_t  gid;
+  mmux_usize_t     ngroups;
+
+  mmux_libc_pw_name_ref (&name, PW);
+  mmux_libc_pw_gid_ref  (&gid,  PW);
+
+  if (mmux_libc_getgrouplist_size(&ngroups, name, gid)) @{
+    /* error */
+  @} else @{
+    mmux_libc_gid_t  gids[ngroups.value];
+
+    if (mmux_libc_getgrouplist(gids, &ngroups, name, gid)) @{
+      /* error */
+    @} else @{
+     /* do something with "gids" */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page

@@ -1332,9 +1332,9 @@ mmux_cc_libc_decl bool mmux_libc_getgroups (mmux_usize_t * ngroups_p, mmux_libc_
 mmux_cc_libc_decl bool mmux_libc_getgrouplist_size (mmux_usize_t * result_ngroups_p, mmux_asciizcp_t username, mmux_libc_gid_t gid)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getgrouplist (mmux_asciizcp_t username, mmux_libc_gid_t gid,
-					       mmux_usize_t * ngroups_p, mmux_libc_gid_t * groups_p)
-  __attribute__((__nonnull__(1,3,4),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getgrouplist (mmux_libc_gid_t * groups_p, mmux_usize_t * ngroups_p,
+					       mmux_asciizcp_t username, mmux_libc_gid_t gid)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
