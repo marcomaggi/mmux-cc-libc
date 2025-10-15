@@ -4023,6 +4023,11 @@ Evaluates to an instance of @objtype{mmux_libc_rlim_t} representing the value of
 @section Representing UIDs
 
 
+@cindex @objtype{mmux_libc_uid_t}, type definition
+@cindex Structure type @objtype{mmux_libc_uid_t}
+@cindex Type @objtype{mmux_libc_uid_t}
+
+
 Under @value{PACKAGE}: user identifier values are represented by objects of type
 @objtype{mmux_libc_uid_t} which are defined by the external package @mmux{} CC Types; many core
 operations are defined for this type.  To obtain a UID value and print its string representation to
@@ -4062,6 +4067,11 @@ mmux_libc_make_uid(&the_uid, 1000);
 @c page
 @node persona gids
 @section Representing GIDs
+
+
+@cindex @objtype{mmux_libc_gid_t}, type definition
+@cindex Structure type @objtype{mmux_libc_gid_t}
+@cindex Type @objtype{mmux_libc_gid_t}
 
 
 Under @value{PACKAGE}: group identifier values are represented by objects of type
@@ -4591,13 +4601,45 @@ if (mmux_libc_getgid(&gid)) @{
 @section Representing PIDs
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_pid_t
-Opaque data structure type representing a @objtype{mmux_pid_t}.
-@end deftp
+@cindex @objtype{mmux_libc_pid_t}, type definition
+@cindex Structure type @objtype{mmux_libc_pid_t}
+@cindex Type @objtype{mmux_libc_pid_t}
 
 
-@deftypefun bool mmux_libc_make_pid (mmux_libc_pid_t * @var{result_p}, mmux_pid_t @var{pid_num})
-Build a new value of type @objtype{mmux_libc_pid_t}.
+Under @value{PACKAGE}: process identifier values are represented by objects of type
+@objtype{mmux_libc_pid_t} which are defined by the external package @mmux{} CC Types; many core
+operations are defined for this type.  To obtain a PID value and print its string representation to
+@stderr{}, we can do:
+
+@example
+mmux_libc_pid_t  the_pid;
+mmux_libc_fd_t   fd;
+
+mmux_libc_getpid(&the_pid);
+
+mmux_libc_stder(fd);
+if (mmux_libc_dprintf_libc_pid(fd, pid)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+to just define a variable from a literal value, we do:
+
+@example
+auto    the_pid = mmux_libc_pid_literal(1000);
+@end example
+
+
+@deftypefun bool mmux_libc_make_pid (mmux_libc_pid_t * @var{result_p}, mmux_standard_libc_pid_t @var{pid_num})
+Constructor for @objtype{mmux_libc_pid_t} values; it is equivalent to using @cfunc{mmux_libc_pid},
+but it follows the calling convention of @value{PACKAGE}.
+
+@example
+mmux_libc_pid_t  the_pid;
+
+mmux_libc_make_pid(&the_pid, 1000);
+@end example
 @end deftypefun
 
 
@@ -4612,48 +4654,6 @@ Build a new value of type @objtype{mmux_libc_pid_t} whose process identifier equ
 is useful for special initialisation of some data structures like @objtype{mmux_libc_flock_t}, in
 which a process identifier equal to @samp{-1} is used for file description locks, @glibcref{Open
 File Description Locks, Open File Description Locks}.
-@end deftypefun
-
-
-To convert a file descriptor to string we can do:
-
-@example
-mmux_libc_pid_t the_pid;
-mmux_usize_t    required_nchars;
-
-mmux_libc_getpid (&the_pid);
-
-if (mmux_libc_pid_sprint_size(&required_nchars, the_pid) @{
-  /* error */
-@} else @{
-  char  str[required_nchars.value];
-
-  if (mmux_libc_pid_sprint(str, required_nchars, the_pid) @{
-    /* error */
-  @}
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_pid_parse (mmux_libc_pid_t * @var{pid_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a @objtype{mmux_libc_pid_t}
-value; store the value in the location referenced by @var{pid_p}.  If an error occurs and @var{who}
-is not @cnull{}: print an error message to @stderr{} using @var{who} as name of the entity that
-performed the function call.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_pid_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_pid_t @var{pid})
-Determine the number of characters required to contain the string representation of @var{pid} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_pid_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_pid_t @var{pid})
-Convert @var{pid} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
 @end deftypefun
 
 @c page
