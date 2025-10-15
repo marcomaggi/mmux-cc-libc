@@ -102,8 +102,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* mmux_libc_setrlimit() */
   {
-    auto	cur = mmux_libc_rlim_literal(12);
-    auto	max = mmux_libc_rlim_literal(34);
+    auto	cur = mmux_libc_rlim_literal(120000);
+    auto	max = mmux_libc_rlim_literal(340000);
     mmux_libc_rlimit_t	RL[1];
 
     mmux_libc_rlimit_set(RL, cur, max);

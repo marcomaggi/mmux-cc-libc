@@ -4023,112 +4023,58 @@ Evaluates to an instance of @objtype{mmux_libc_rlim_t} representing the value of
 @section Representing UIDs
 
 
-To obtain a UID value and convert it to string, we can do:
+Under @value{PACKAGE}: user identifier values are represented by objects of type
+@objtype{mmux_libc_uid_t} which are defined by the external package @mmux{} CC Types; many core
+operations are defined for this type.  To obtain a UID value and print its string representation to
+@stderr{}, we can do:
 
 @example
-mmux_libc_uid_t         the_uid;
-mmux_usize_t            required_nchars;
+mmux_libc_uid_t  the_uid;
+mmux_libc_fd_t   fd;
 
 mmux_libc_getuid(&the_uid);
 
-if (mmux_libc_uid_sprint_size(&required_nchars, the_uid) @{
+mmux_libc_stder(fd);
+if (mmux_libc_dprintf_libc_uid(fd, uid)) @{
   /* error */
-@} else @{
-  char  str[required_nchars];
-
-  if (mmux_libc_uid_sprint(str, required_nchars, the_uid) @{
-    /* error */
-  @}
 @}
 @end example
 
+@noindent
+to just define a variable from a literal value, we do:
 
-@deftp {Opaque Struct Alias} mmux_libc_uid_t
-Type of data structure containing a value of type @objtype{mmux_uid_t}.
-@end deftp
-
-
-@deftypefun bool mmux_libc_make_uid (mmux_libc_uid_t * @var{result_p}, mmux_standard_libc_uid_t @var{uid_num})
-Build a new value of type @objtype{mmux_libc_uid_t}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_uid_parse (mmux_libc_uid_t * @var{uid_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a @objtype{mmux_libc_uid_t}
-value; store the value in the location referenced by @var{uid_p}.  If an error occurs and @var{who}
-is not @cnull{}: print an error message to @stderr{} using @var{who} as name of the entity that
-performed the function call.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_uid_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_uid_t @var{uid})
-Determine the number of characters required to contain the string representation of @var{uid} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_uid_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_uid_t @var{uid})
-Convert @var{uid} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
-@end deftypefun
+@example
+auto    the_uid = mmux_libc_uid_literal(1000);
+@end example
 
 @c page
 @node persona gids
 @section Representing GIDs
 
 
-To obtain a GID value and convert it to string, we can do:
+Under @value{PACKAGE}: group identifier values are represented by objects of type
+@objtype{mmux_libc_gid_t} which are defined by the external package @mmux{} CC Types; many core
+operations are defined for this type.  To obtain a GID value and print its string representation to
+@stderr{}, we can do:
 
 @example
-mmux_libc_gid_t         the_gid;
-mmux_usize_t            required_nchars;
+mmux_libc_gid_t  the_gid;
+mmux_libc_fd_t   fd;
 
 mmux_libc_getgid(&the_gid);
 
-if (mmux_libc_gid_sprint_size(&required_nchars, the_gid) @{
+mmux_libc_stder(fd);
+if (mmux_libc_dprintf_libc_gid(fd, gid)) @{
   /* error */
-@} else @{
-  char  str[required_nchars];
-
-  if (mmux_libc_gid_sprint(str, required_nchars, the_gid) @{
-    /* error */
-  @}
 @}
 @end example
 
+@noindent
+to just define a variable from a literal value, we do:
 
-@deftp {Opaque Struct Alias} mmux_libc_gid_t
-Type of data structure containing a value of type @objtype{mmux_gid_t}.
-@end deftp
-
-
-@deftypefun bool mmux_libc_make_gid (mmux_libc_gid_t * @var{result_p}, mmux_standard_libc_gid_t @var{gid_num})
-Build a new value of type @objtype{mmux_libc_gid_t}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gid_parse (mmux_libc_gid_t * @var{gid_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a @objtype{mmux_libc_gid_t}
-value; store the value in the location referenced by @var{gid_p}.  If an error occurs and @var{who}
-is not @cnull{}: print an error message to @stderr{} using @var{who} as name of the entity that
-performed the function call.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gid_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_gid_t @var{gid})
-Determine the number of characters required to contain the string representation of @var{gid} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gid_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_gid_t @var{gid})
-Convert @var{gid} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
-@end deftypefun
+@example
+auto    the_gid = mmux_libc_gid_literal(1000);
+@end example
 
 @c page
 @node persona getting
@@ -4137,21 +4083,45 @@ wide.
 
 @deftypefun bool mmux_libc_getuid (mmux_libc_uid_t * @var{result_p})
 @MmuxCInterface{getuid}.
+
+@example
+mmux_libc_uid_t  uid;
+
+mmux_libc_getuid(&uid);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_getgid (mmux_libc_gid_t * @var{result_p})
 @MmuxCInterface{getgid}.
+
+@example
+mmux_libc_gid_t  gid;
+
+mmux_libc_getgid(&gid);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_geteuid (mmux_libc_uid_t * @var{result_p})
 @MmuxCInterface{geteuid}.
+
+@example
+mmux_libc_uid_t  euid;
+
+mmux_libc_geteuid(&euid);
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_getegid (mmux_libc_gid_t * @var{result_p})
 @MmuxCInterface{getegid}.
+
+@example
+mmux_libc_gid_t  egid;
+
+mmux_libc_getegid(&egid);
+@end example
 @end deftypefun
 
 
@@ -4163,7 +4133,7 @@ mmux_usize_t    ngroups;
 if (mmux_libc_getgroups_size(&ngroups)) @{
   /* error */
 @} else @{
-  mmux_libc_gid_t       gids[ngroups];
+  mmux_libc_gid_t       gids[ngroups.value];
 
   if (mmux_libc_getgroups(&ngroups, gids)) @{
     /* error */
