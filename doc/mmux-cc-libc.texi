@@ -4365,8 +4365,8 @@ if (mmux_libc_getlogin(&name)) @{
 @MmuxCInterface{getlogin_r}.
 
 @example
-mmux_usize_t  buflen = 64;
-char          bufptr[buflen];
+auto  buflen = mmux_usize_literal(64);
+char  bufptr[buflen.value];
 
 if (mmux_libc_getlogin_r(bufptr, buflen)) @{
   /* error */
@@ -4385,10 +4385,10 @@ To print the whole @file{/etc/passwd} database using the non--reentrant function
 @example
 mmux_libc_setpwent();
 @{
-  mmux_libc_passwd_t *      PW;
-  mmux_libc_fd_t            fd;
+  mmux_libc_passwd_t *  PW;
+  mmux_libc_fd_t        fd;
 
-  mmux_libc_stder(&fd);
+  mmux_libc_stdou(fd);
   for (;;) @{
     mmux_libc_getpwent(&PW);
     if (NULL == PW) @{
@@ -4432,11 +4432,11 @@ mmux_libc_endpwent();
 @MmuxCInterface{getpwuid}.
 
 @example
-mmux_libc_uid_t             uid;
-mmux_libc_passwd_t *        PW;
-mmux_libc_fd_t              fd;
+mmux_libc_uid_t       uid;
+mmux_libc_passwd_t *  PW;
+mmux_libc_fd_t        fd;
 
-mmux_libc_stder(&fd);
+mmux_libc_stdou(fd);
 if (mmux_libc_getuid(&uid)) @{
   /* error */
 @} else if (mmux_libc_getpwuid(&PW, uid)) @{
@@ -4452,10 +4452,11 @@ if (mmux_libc_getuid(&uid)) @{
 @MmuxCInterface{getpwnam}.
 
 @example
-mmux_asciizcp_t             name = "root";
-mmux_libc_passwd_t *        PW;
-mmux_libc_fd_t              fd;
+mmux_asciizcp_t       name = "root";
+mmux_libc_passwd_t *  PW;
+mmux_libc_fd_t        fd;
 
+mmux_libc_stdou(fd);
 if (mmux_libc_getpwnam(&PW, name)) @{
   /* error */
 @} else if (PW && mmux_libc_passwd_dump(fd, PW, NULL)) @{
@@ -4475,10 +4476,10 @@ To print the whole @file{/etc/group} database using the non--reentrant function
 @example
 mmux_libc_setgrent();
 @{
-  mmux_libc_group_t *   GR;
-  mmux_libc_fd_t        fd;
+  mmux_libc_group_t *  GR;
+  mmux_libc_fd_t       fd;
 
-  mmux_libc_stder(&fd);
+  mmux_libc_stdou(fd);
   for (;;) @{
     mmux_libc_getgrent(&GR);
     if (NULL == GR) @{
@@ -4518,11 +4519,11 @@ mmux_libc_endgrent();
 @MmuxCInterface{getgrgid}.
 
 @example
-mmux_libc_gid_t             gid;
-mmux_libc_group_t *        GR;
-mmux_libc_fd_t              fd;
+mmux_libc_gid_t      gid;
+mmux_libc_group_t *  GR;
+mmux_libc_fd_t       fd;
 
-mmux_libc_stder(&fd);
+mmux_libc_stdou(fd);
 if (mmux_libc_getgid(&gid)) @{
   /* error */
 @} else if (mmux_libc_getgrgid(&GR, gid)) @{
@@ -4538,10 +4539,11 @@ if (mmux_libc_getgid(&gid)) @{
 @MmuxCInterface{getgrnam}.
 
 @example
-mmux_asciizcp_t             name = "root";
-mmux_libc_group_t *         GR;
-mmux_libc_fd_t              fd;
+mmux_asciizcp_t      name = "root";
+mmux_libc_group_t *  GR;
+mmux_libc_fd_t       fd;
 
+mmux_libc_stdou(fd);
 if (mmux_libc_getgrnam(&GR, name)) @{
   /* error */
 @} else if (GR && mmux_libc_group_dump(fd, GR, NULL)) @{
@@ -4555,8 +4557,8 @@ if (mmux_libc_getgrnam(&GR, name)) @{
 @MmuxCInterface{group_member}.
 
 @example
-mmux_libc_gid_t     gid;
-bool                this_process_belongs_to_group;
+mmux_libc_gid_t  gid;
+bool             this_process_belongs_to_group;
 
 if (mmux_libc_getgid(&gid)) @{
   /* error */
