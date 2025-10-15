@@ -4589,8 +4589,8 @@ if (mmux_libc_getgid(&gid)) @{
 
 @menu
 * processes pids::              Representing PIDs.
-* processes statuses::          Representing process completion--statuses.
 * processes getting::           Getting PIDs.
+* processes statuses::          Representing process completion--statuses.
 * processes forking::           Forking processes.
 * processes waiting::           Waiting for process completion.
 * processes exiting::           Exiting processes.
@@ -4657,6 +4657,43 @@ File Description Locks, Open File Description Locks}.
 @end deftypefun
 
 @c page
+@node processes getting
+@section Getting PIDs
+
+
+@deftypefun bool mmux_libc_getpid  (mmux_libc_pid_t * @var{result_p})
+@MmuxCInterface{gitpid}.
+
+@example
+mmux_libc_pid_t	pid;
+
+mmux_libc_getpid(&pid);
+@end example
+@end deftypefun
+
+
+@deftypefun  bool mmux_libc_getppid (mmux_libc_pid_t * @var{result_p})
+@MmuxCInterface{gitppid}.
+
+@example
+mmux_libc_pid_t	pid;
+
+mmux_libc_getppid(&pid);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_gettid (mmux_libc_pid_t * @var{result_p})
+@MmuxCInterface{gittid}.
+
+@example
+mmux_libc_pid_t	pid;
+
+mmux_libc_gettid(&pid);
+@end example
+@end deftypefun
+
+@c page
 @node processes statuses
 @section Representing process completion--statuses
 
@@ -4667,7 +4704,7 @@ Opaque data structure type representing a process completion--status, which is a
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_process_completion_status (mmux_libc_completed_process_status_t * @var{result_p}, mmux_sint_t @var{status_num})
+@deftypefun bool mmux_libc_make_process_completion_status (mmux_libc_completed_process_status_t * @var{result_p}, mmux_standard_sint_t @var{status_num})
 Build a new value of type @objtype{mmux_libc_completed_process_status_t}.
 @end deftypefun
 
@@ -4680,13 +4717,13 @@ Return true if @vari{status} and @varii{status} are equal.
 To convert a file descriptor to string we can do:
 
 @example
-mmux_libc_completed_process_status_t    the_status = ...;
-mmux_usize_t                            required_nchars;
+mmux_libc_completed_process_status_t  the_status = ...;
+mmux_usize_t                          required_nchars;
 
 if (mmux_libc_completed_process_status_sprint_size(&required_nchars, the_status) @{
   /* error */
 @} else @{
-  char  str[required_nchars];
+  char  str[required_nchars.value];
 
   if (mmux_libc_completed_process_status_sprint(str, required_nchars, the_status) @{
     /* error */
@@ -4763,25 +4800,6 @@ value computed by the C preprocessor macro.
 @deftypefun bool mmux_libc_WIFCONTINUED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFCONTINUED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
-@end deftypefun
-
-@c page
-@node processes getting
-@section Getting PIDs
-
-
-@deftypefun bool mmux_libc_getpid  (mmux_libc_pid_t * @var{result_p})
-@MmuxCInterface{gitpid}.
-@end deftypefun
-
-
-@deftypefun  bool mmux_libc_getppid (mmux_libc_pid_t * @var{result_p})
-@MmuxCInterface{gitppid}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gettid (mmux_libc_pid_t * @var{result_p})
-@MmuxCInterface{gittid}.
 @end deftypefun
 
 @c page

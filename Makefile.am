@@ -348,32 +348,43 @@ tests_test_persona_group_member_LDADD			= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 ## processes
 
+check_PROGRAMS	+= \
+	tests/test-processes-getpid				\
+	tests/test-processes-getppid				\
+	tests/test-processes-gettid				\
+	tests/test-processes-fork				\
+	tests/test-processes-wait				\
+	tests/test-processes-wait-any-process			\
+	tests/test-processes-wait-group-id			\
+	tests/test-processes-wait-my-process-group		\
+	tests/test-processes-wait-process-id
 
-# check_PROGRAMS	+= \
-# 	tests/test-processes-fork				\
-# 	tests/test-processes-wait				\
-# 	tests/test-processes-wait-any-process			\
-# 	tests/test-processes-wait-group-id			\
-# 	tests/test-processes-wait-my-process-group		\
-# 	tests/test-processes-wait-process-id
+tests_test_processes_getpid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_getpid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_getppid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_getppid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_wait_any_process_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_gettid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_gettid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_wait_my_process_group_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_wait_process_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_wait_any_process_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_wait_any_process_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_wait_my_process_group_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_wait_my_process_group_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_processes_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_processes_wait_process_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_wait_process_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_processes_wait_group_id_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_processes_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 # ## ------------------------------------------------------------------------
 # ## file descriptors
