@@ -1178,6 +1178,10 @@ mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (bool * result_p,
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_make_process_exit_status (mmux_libc_process_exit_status_t * status_p,
+							   mmux_standard_sint_t exit_status_num)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_exit (mmux_libc_process_exit_status_t status)
   __attribute__((__noreturn__));
 mmux_cc_libc_decl bool mmux_libc_exit_success (void)

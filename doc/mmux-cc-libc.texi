@@ -5093,6 +5093,19 @@ Type of the exit status constants.
 @end deftp
 
 
+@deftypefun mmux_libc_process_exit_status_t mmux_libc_process_exit_status (mmux_standard_sint_t @var{status_num})
+@deftypefunx bool mmux_libc_make_process_exit_status (mmux_libc_process_exit_status_t * @var{status_p}, mmux_standard_sint_t @var{exit_status_num})
+Constructor for objects of type @objtype{mmux_libc_process_exit_status}.
+
+@example
+auto  status1 = mmux_libc_process_exit_status(77);
+mmux_libc_process_exit_status_t  status2;
+
+mmux_libc_make_process_exit_status(&status2, 77)
+@end example
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_exit (mmux_libc_process_exit_status_t @var{status})
 @MmuxCInterface{exit}.
 @end deftypefun

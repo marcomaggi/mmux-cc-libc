@@ -119,6 +119,14 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_GETTID]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
+mmux_libc_make_process_exit_status (mmux_libc_process_exit_status_t * status_p,
+				    mmux_standard_sint_t exit_status_num)
+{
+  *status_p = mmux_libc_process_exit_status(exit_status_num);
+  return false;
+}
+
+bool
 mmux_libc_exit (mmux_libc_process_exit_status_t status)
 {
   exit(status.value);
