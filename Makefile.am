@@ -352,6 +352,7 @@ check_PROGRAMS	+= \
 	tests/test-processes-getpid				\
 	tests/test-processes-getppid				\
 	tests/test-processes-gettid				\
+	tests/test-processes-completion-status			\
 	tests/test-processes-fork				\
 	tests/test-processes-wait				\
 	tests/test-processes-wait-any-process			\
@@ -367,6 +368,9 @@ tests_test_processes_getppid_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_processes_gettid_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_processes_gettid_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_processes_completion_status_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_processes_completion_status_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_processes_fork_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_processes_fork_LDADD				= $(mmux_cc_libc_tests_ldadd)

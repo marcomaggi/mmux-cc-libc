@@ -100,7 +100,7 @@ struct mmux_libc_memory_allocator_t {
 
 typedef struct mmux_libc_errno_t			{ mmux_sint_t;  } mmux_libc_errno_t;
 typedef struct mmux_libc_process_exit_status_t		{ mmux_sint_t;  } mmux_libc_process_exit_status_t;
-typedef struct mmux_libc_completed_process_status_t	{ mmux_sint_t;	} mmux_libc_completed_process_status_t;
+typedef struct mmux_libc_process_completion_status_t	{ mmux_sint_t;	} mmux_libc_process_completion_status_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
 
 

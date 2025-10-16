@@ -62,7 +62,7 @@ mmux_libc_make_pid_minus_one (mmux_libc_pid_t * result_p)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * result_p,
+mmux_libc_make_process_completion_status (mmux_libc_process_completion_status_t * result_p,
 					 mmux_standard_sint_t status_num)
 {
   if (0 <= status_num) {
@@ -73,47 +73,18 @@ mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * 
   }
 }
 bool
-mmux_libc_completed_process_status_equal (mmux_libc_completed_process_status_t one, mmux_libc_completed_process_status_t two)
+mmux_libc_process_completion_status_equal (bool * result_p,
+					   mmux_libc_process_completion_status_t one,
+					   mmux_libc_process_completion_status_t two)
 {
-  if (one.value == two.value) {
-    return true;
-  } else {
-    return false;
-  }
+  return mmux_sint_equal_p(result_p, &one, &two);
 }
 bool
-mmux_libc_completed_process_status_parse (mmux_libc_completed_process_status_t * p_value,
-					  mmux_asciizcp_t s_value, mmux_asciizcp_t who)
+mmux_libc_process_completion_status_not_equal (bool * result_p,
+					       mmux_libc_process_completion_status_t one,
+					       mmux_libc_process_completion_status_t two)
 {
-  mmux_libc_completed_process_status_t	the_status;
-
-  if (mmux_sint_parse(&the_status, s_value, who)) {
-    return true;
-  }
-  *p_value = the_status;
-  return false;
-}
-bool
-mmux_libc_completed_process_status_sprint (char * ptr, mmux_usize_t len, mmux_libc_completed_process_status_t status)
-{
-  if (MMUX_LIBC_COMPLETED_PROCESS_STATUS_MAXIMUM_STRING_REPRESENTATION_LENGTH < len.value) {
-    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
-    return true;
-  } else {
-    return mmux_sint_sprint(ptr, len, mmux_sint(status.value));
-  }
-}
-bool
-mmux_libc_completed_process_status_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_completed_process_status_t status)
-{
-  mmux_usize_t	required_nchars;
-
-  if (mmux_sint_sprint_size(&required_nchars, mmux_sint(status.value))) {
-    return true;
-  } else {
-    *required_nchars_p = required_nchars;
-    return false;
-  }
+  return mmux_sint_not_equal_p(result_p, &one, &two);
 }
 
 
@@ -211,9 +182,9 @@ mmux_libc_fork (bool * this_is_the_parent_process_p, mmux_libc_pid_t * child_pro
  ** ----------------------------------------------------------------- */
 
 static bool
-mmux_p_libc_waitpid (bool * completed_process_status_available_p,
+mmux_p_libc_waitpid (bool * process_completion_status_available_p,
 		     mmux_libc_pid_t * completed_process_pid_p,
-		     mmux_libc_completed_process_status_t * completed_process_status_p,
+		     mmux_libc_process_completion_status_t * process_completion_status_p,
 		     mmux_libc_pid_t pid, mmux_sint_t options)
 {
   mmux_standard_sint_t		status_num;
@@ -224,63 +195,63 @@ mmux_p_libc_waitpid (bool * completed_process_status_available_p,
   } else if ((0 == rv) && (MMUX_LIBC_WNOHANG & options.value)) {
     /* We requested not to block if no process  has completed.  It is not an error if
        we are here. */
-    *completed_process_status_available_p = false;
+    *process_completion_status_available_p = false;
     return false;
   } else {
     if (mmux_libc_make_pid(completed_process_pid_p, rv)) {
       return true;
     } else {
-      *completed_process_status_available_p	= true;
-      return mmux_libc_make_completed_process_status(completed_process_status_p, status_num);
+      *process_completion_status_available_p	= true;
+      return mmux_libc_make_process_completion_status(process_completion_status_p, status_num);
     }
   }
 }
 bool
-mmux_libc_wait_process_id (bool * completed_process_status_available_p,
+mmux_libc_wait_process_id (bool * process_completion_status_available_p,
 			   mmux_libc_pid_t * completed_process_pid_p,
-			   mmux_libc_completed_process_status_t * completed_process_status_p,
+			   mmux_libc_process_completion_status_t * process_completion_status_p,
 			   mmux_libc_pid_t pid, mmux_sint_t options)
 {
-  return mmux_p_libc_waitpid(completed_process_status_available_p,
+  return mmux_p_libc_waitpid(process_completion_status_available_p,
 			     completed_process_pid_p,
-			     completed_process_status_p,
+			     process_completion_status_p,
 			     pid,
 			     options);
 }
 bool
-mmux_libc_wait_group_id (bool * completed_process_status_available_p,
+mmux_libc_wait_group_id (bool * process_completion_status_available_p,
 			 mmux_libc_pid_t * completed_process_pid_p,
-			 mmux_libc_completed_process_status_t * completed_process_status_p,
+			 mmux_libc_process_completion_status_t * process_completion_status_p,
 			 mmux_libc_gid_t gid, mmux_sint_t options)
 {
   auto	pid = (mmux_libc_pid_t){ .value = (- gid.value) };
 
-  return mmux_p_libc_waitpid(completed_process_status_available_p,
+  return mmux_p_libc_waitpid(process_completion_status_available_p,
 			     completed_process_pid_p,
-			     completed_process_status_p,
+			     process_completion_status_p,
 			     pid, options);
 }
 bool
-mmux_libc_wait_any_process (bool * completed_process_status_available_p,
+mmux_libc_wait_any_process (bool * process_completion_status_available_p,
 			    mmux_libc_pid_t * completed_process_pid_p,
-			    mmux_libc_completed_process_status_t * completed_process_status_p,
+			    mmux_libc_process_completion_status_t * process_completion_status_p,
 			    mmux_sint_t options)
 {
-  return mmux_p_libc_waitpid(completed_process_status_available_p,
+  return mmux_p_libc_waitpid(process_completion_status_available_p,
 			     completed_process_pid_p,
-			     completed_process_status_p,
+			     process_completion_status_p,
 			     MMUX_LIBC_WAIT_ANY,
 			     options);
 }
 bool
-mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
+mmux_libc_wait_my_process_group (bool * process_completion_status_available_p,
 				 mmux_libc_pid_t * completed_process_pid_p,
-				 mmux_libc_completed_process_status_t * completed_process_status_p,
+				 mmux_libc_process_completion_status_t * process_completion_status_p,
 				 mmux_sint_t options)
 {
-  return mmux_p_libc_waitpid(completed_process_status_available_p,
+  return mmux_p_libc_waitpid(process_completion_status_available_p,
 			     completed_process_pid_p,
-			     completed_process_status_p,
+			     process_completion_status_p,
 			     MMUX_LIBC_WAIT_MYPGRP,
 			     options);
 }
@@ -288,9 +259,9 @@ mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_wait (bool * completed_process_status_available_p,
+mmux_libc_wait (bool * process_completion_status_available_p,
 		mmux_libc_pid_t * completed_process_pid_p,
-		mmux_libc_completed_process_status_t * completed_process_status_p)
+		mmux_libc_process_completion_status_t * process_completion_status_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_WAIT]]],[[[
   mmux_standard_sint_t		status_num;
@@ -301,14 +272,14 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_WAIT]]],[[[
   } else if (0 == rv) {
     /* We requested not to block if no process  has completed.  It is not an error if
        we are here. */
-    *completed_process_status_available_p = false;
+    *process_completion_status_available_p = false;
     return false;
   } else {
     if (mmux_libc_make_pid(completed_process_pid_p, rv)) {
       return true;
     } else {
-      *completed_process_status_available_p	= true;
-      return mmux_libc_make_completed_process_status(completed_process_status_p, status_num);
+      *process_completion_status_available_p	= true;
+      return mmux_libc_make_process_completion_status(process_completion_status_p, status_num);
     }
   }
 ]]])
@@ -317,9 +288,9 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_WAIT]]],[[[
 /* Someday I will implement this.  But not today.  (Marco Maggi; Jun 25, 2025) */
 #if 0
 bool
-mmux_libc_waitid (bool * completed_process_status_available_p,
+mmux_libc_waitid (bool * process_completion_status_available_p,
 		  mmux_libc_pid_t * completed_process_pid_p,
-		  mmux_libc_completed_process_status_t * completed_process_status_p,
+		  mmux_libc_process_completion_status_t * process_completion_status_p,
 		  mmux_sint_t idtype, mmux_libc_pid_t pid, mmux_libc_siginfo_t * info_p, mmux_sint_t options)
 {
   mmux_standard_libc_pid_t	rv = waitid((idtype_t) idtype, pidnum.value, info_p, options);
@@ -329,14 +300,14 @@ mmux_libc_waitid (bool * completed_process_status_available_p,
   } else if ((0 == rv) && (MMUX_LIBC_WNOHANG & options.value)) {
     /* We requested not to block if no process  has completed.  It is not an error if
        we are here. */
-    *completed_process_status_available_p = false;
+    *process_completion_status_available_p = false;
     return false;
   } else {
     if (mmux_libc_make_pid(completed_process_pid_p, rv)) {
       return true;
     } else {
-      *completed_process_status_available_p	= true;
-      return mmux_libc_make_completed_process_status(completed_process_status_p, status_num);
+      *process_completion_status_available_p	= true;
+      return mmux_libc_make_process_completion_status(process_completion_status_p, status_num);
     }
   }
 }
@@ -349,83 +320,83 @@ mmux_libc_waitid (bool * completed_process_status_available_p,
 
 bool
 mmux_libc_WIFEXITED (bool * result_p MMUX_CC_LIBC_UNUSED,
-		     mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		     mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFEXITED]]],[[[
-  *result_p = (WIFEXITED(completed_process_status.value))? true : false;
+  *result_p = (WIFEXITED(process_completion_status.value))? true : false;
   return false;
 ]]])
 }
 bool
 mmux_libc_WEXITSTATUS (mmux_sint_t * result_p MMUX_CC_LIBC_UNUSED,
-		       mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		       mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WEXITSTATUS]]],[[[
-  *result_p = mmux_sint(WEXITSTATUS(completed_process_status.value));
+  *result_p = mmux_sint(WEXITSTATUS(process_completion_status.value));
   return false;
 ]]])
 }
 bool
 mmux_libc_WIFSIGNALED (bool * result_p MMUX_CC_LIBC_UNUSED,
-		       mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		       mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFSIGNALED]]],[[[
-  *result_p = (WIFSIGNALED(completed_process_status.value))? true : false;
+  *result_p = (WIFSIGNALED(process_completion_status.value))? true : false;
   return false;
 ]]])
 }
 bool
 mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUSED,
-		    mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		    mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WTERMSIG]]],[[[
   mmux_libc_interprocess_signal_t	ipxsig;
 
   /* We do  not check this return  value because the  argument is a value  that comes
      from the libc; we assume it is correct. */
-  mmux_libc_make_interprocess_signal(&ipxsig, WTERMSIG(completed_process_status.value));
+  mmux_libc_make_interprocess_signal(&ipxsig, WTERMSIG(process_completion_status.value));
   *result_p = ipxsig;
   return false;
 ]]])
 }
 bool
 mmux_libc_WCOREDUMP (bool * result_p MMUX_CC_LIBC_UNUSED,
-		     mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		     mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WCOREDUMP]]],[[[
-  *result_p = (WCOREDUMP(completed_process_status.value))? true : false;
+  *result_p = (WCOREDUMP(process_completion_status.value))? true : false;
   return false;
 ]]])
 }
 bool
 mmux_libc_WIFSTOPPED (bool * result_p MMUX_CC_LIBC_UNUSED,
-		      mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		      mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFSTOPPED]]],[[[
-  *result_p = (WIFSTOPPED(completed_process_status.value))? true : false;
+  *result_p = (WIFSTOPPED(process_completion_status.value))? true : false;
   return false;
 ]]])
 }
 bool
 mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUSED,
-		    mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+		    mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WSTOPSIG]]],[[[
   mmux_libc_interprocess_signal_t	ipxsig;
 
   /* We do  not check this return  value because the  argument is a value  that comes
      from the libc; we assume it is correct. */
-  mmux_libc_make_interprocess_signal(&ipxsig, WSTOPSIG(completed_process_status.value));
+  mmux_libc_make_interprocess_signal(&ipxsig, WSTOPSIG(process_completion_status.value));
   *result_p = ipxsig;
   return false;
 ]]])
 }
 bool
 mmux_libc_WIFCONTINUED (bool * result_p MMUX_CC_LIBC_UNUSED,
-			mmux_libc_completed_process_status_t completed_process_status MMUX_CC_LIBC_UNUSED)
+			mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFCONTINUED]]],[[[
-  *result_p = (WIFCONTINUED(completed_process_status.value))? true : false;
+  *result_p = (WIFCONTINUED(process_completion_status.value))? true : false;
   return false;
 ]]])
 }

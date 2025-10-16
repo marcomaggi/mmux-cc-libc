@@ -4698,106 +4698,97 @@ mmux_libc_gettid(&pid);
 @section Representing process completion--statuses
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_completed_process_status_t
-Opaque data structure type representing a process completion--status, which is a
-@objtype{mmux_sint_t} value.
+@menu
+* processes statuses typedef::     Process completion--status type.
+* processes statuses operations::  Process completion--status operations.
+@end menu
+
+@c page
+@node processes statuses typedef
+@subsection Process completion--status type
+
+
+A process can obtain a process completion--status exact integer as result of waiting for another
+process completion with the @cfunc{mmux_libc_waitpid} and @cfunc{mmux_libc_wait} functions.  Once
+obtained, the completion--status can be inspected using the @cfunc{mmux_libc_W*} functions,
+@ref{processes statuses operations} for details.
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_process_completion_status_t
+Opaque data structure type representing a process completion--status.
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_process_completion_status (mmux_libc_completed_process_status_t * @var{result_p}, mmux_standard_sint_t @var{status_num})
-Build a new value of type @objtype{mmux_libc_completed_process_status_t}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_completed_process_status_equal (mmux_libc_completed_process_status_t @vari{status}, mmux_libc_completed_process_status_t @varii{status})
-Return true if @vari{status} and @varii{status} are equal.
-@end deftypefun
-
-
-To convert a file descriptor to string we can do:
+@deftypefun bool mmux_libc_make_process_completion_status (mmux_libc_process_completion_status_t * @var{result_p}, mmux_standard_sint_t @var{status_num})
+Build a new value of type @objtype{mmux_libc_process_completion_status_t}.
 
 @example
-mmux_libc_completed_process_status_t  the_status = ...;
-mmux_usize_t                          required_nchars;
+mmux_libc_process_completion_status_t   pcs;
 
-if (mmux_libc_completed_process_status_sprint_size(&required_nchars, the_status) @{
-  /* error */
-@} else @{
-  char  str[required_nchars.value];
-
-  if (mmux_libc_completed_process_status_sprint(str, required_nchars, the_status) @{
-    /* error */
-  @}
-@}
+mmux_libc_make_process_completion_status(&psc, 123);
 @end example
-
-
-@deftypefun bool mmux_libc_completed_process_status_parse (mmux_libc_completed_process_status_t * @var{status_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a
-@objtype{mmux_libc_completed_process_status_t} value; store the value in the location referenced by
-@var{status_p}.  If an error occurs and @var{who} is not @cnull{}: print an error message to
-@stderr{} using @var{who} as name of the entity that performed the function call.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_completed_process_status_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_completed_process_status_t @var{status})
-Determine the number of characters required to contain the string representation of @var{status} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
+@deftypefun bool mmux_libc_process_completion_status_equal (bool * @var{result_p}, mmux_libc_process_completion_status_t @vari{status}, mmux_libc_process_completion_status_t @varii{status})
+Store @ctrue{} in the variable referenced by @var{result_p} if @vari{status} and @varii{status} are
+equal; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_completed_process_status_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_completed_process_status_t @var{status})
-Convert @var{status} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
+@deftypefun bool mmux_libc_process_completion_status_not_equal (bool * @var{result_p}, mmux_libc_process_completion_status_t @vari{status}, mmux_libc_process_completion_status_t @varii{status})
+Store @cfalse{} in the variable referenced by @var{result_p} if @vari{status} and @varii{status} are
+equal; otherwise store @ctrue{}.
 @end deftypefun
 
-@c ------------------------------------------------------------------------
+@c page
+@node processes statuses operations
+@subsection Process completion--status operations
 
-@deftypefun bool mmux_libc_WIFEXITED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+
+@deftypefun bool mmux_libc_WIFEXITED (bool * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFEXITED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WEXITSTATUS (mmux_sint_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WEXITSTATUS (mmux_sint_t * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFSIGNALED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WIFSIGNALED (bool * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFSIGNALED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WTERMSIG,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WCOREDUMP (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WCOREDUMP (bool * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WCOREDUMP,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFSTOPPED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WIFSTOPPED (bool * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFSTOPPED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WSTOPSIG,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WIFCONTINUED (bool * @var{result_p}, mmux_libc_completed_process_status_t @var{completed_process_status})
+@deftypefun bool mmux_libc_WIFCONTINUED (bool * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
 @MmuxCMacroInterfaceTwo{WIFCONTINUED,waitpid}.  Set the variable referenced by @var{result_p} to the
 value computed by the C preprocessor macro.
 @end deftypefun
@@ -4888,7 +4879,7 @@ pointer argument which cannot be @cnull{}; when the function call is successful 
 collected the completion status of a process: the PID of the completed process is stored in the
 referenced variable, otherwise the variable is left untouched;
 
-@item mmux_libc_completed_process_status_t * @var{completed_process_status_p}
+@item mmux_libc_process_completion_status_t * @var{completed_process_status_p}
 pointer argument which cannot be @cnull{}; when the function call is successful and we have
 collected the completion status of a process: such status is stored in the referenced variable,
 otherwise the variable is left untouched.
@@ -4903,13 +4894,13 @@ For the documentation of the common arguments see @ref{processes waiting args, C
 arguments}.
 
 
-@deftypefun bool mmux_libc_wait_any_process (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_completed_process_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_any_process (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
 @MmuxCInterface{waitpid}.  Wait for the termination of any child process.
 
 @example
 bool                                    completed_process_status_available;
 mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_completed_process_status_t    completed_process_status;
+mmux_libc_process_completion_status_t    completed_process_status;
 
 if (mmux_libc_wait_any_process(&completed_process_status_available, &completed_process_pid,
                                &completed_process_status, MMUX_LIBC_WNOHANG)) @{
@@ -4925,14 +4916,14 @@ if (mmux_libc_wait_any_process(&completed_process_status_available, &completed_p
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_wait_my_process_group (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_completed_process_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_my_process_group (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
 @MmuxCInterface{waitpid}.  Wait for the termination of any child process in the same process group
 of the calling process.
 
 @example
 bool                                    completed_process_status_available;
 mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_completed_process_status_t    completed_process_status;
+mmux_libc_process_completion_status_t    completed_process_status;
 
 if (mmux_libc_wait_my_process_group(&completed_process_status_available, &completed_process_pid,
                                     &completed_process_status, MMUX_LIBC_WNOHANG)) @{
@@ -4948,7 +4939,7 @@ if (mmux_libc_wait_my_process_group(&completed_process_status_available, &comple
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_wait_process_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_completed_process_status_t * @var{completed_process_status_p}, mmux_libc_pid_t @var{pid}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_process_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_libc_pid_t @var{pid}, mmux_sint_t @var{options})
 @MmuxCInterface{waitpid}.  Wait for the termination of a specific process whose process identifier
 is @var{pid}.
 
@@ -4961,7 +4952,7 @@ if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
 @} else if (this_is_the_parent_process) @{
   bool                                  completed_process_status_available;
   mmux_libc_pid_t                       completed_process_pid;
-  mmux_libc_completed_process_status_t  completed_process_status;
+  mmux_libc_process_completion_status_t  completed_process_status;
 
   if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
                                 &completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) @{
@@ -4992,7 +4983,7 @@ if (mmux_libc_getgid(&the_gid)) @{
 @} else @{
   bool                                  completed_process_status_available;
   mmux_libc_pid_t                       completed_process_pid;
-  mmux_libc_completed_process_status_t  completed_process_status;
+  mmux_libc_process_completion_status_t  completed_process_status;
 
   if (mmux_libc_wait_group_id(&completed_process_status_available, &completed_process_pid,
                               &completed_process_status, the_gid, MMUX_LIBC_WNOHANG)) @{
@@ -5017,13 +5008,13 @@ For the documentation of the common arguments see @ref{processes waiting args, C
 arguments}.
 
 
-@deftypefun bool mmux_libc_wait (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_completed_process_status_t * @var{completed_process_status_p})
+@deftypefun bool mmux_libc_wait (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p})
 @MmuxCInterface{wait}.  Wait for the termination of any child process.
 
 @example
 bool                                    completed_process_status_available;
 mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_completed_process_status_t    completed_process_status;
+mmux_libc_process_completion_status_t    completed_process_status;
 
 if (mmux_libc_wait(&completed_process_status_available, &completed_process_pid, &completed_process_status)) @{
   ... /* handle the error */
@@ -5691,8 +5682,8 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_completed_process_status}
-@deftypefun bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_completed_process_status_t @var{value})
+@anchor{mmux_libc_dprintf_libc_process_completion_status}
+@deftypefun bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_process_completion_status_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 

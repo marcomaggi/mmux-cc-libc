@@ -1680,7 +1680,7 @@ DEFINE_PRINTER([[[libc_blkcnt]]])
 bool
 mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
 {
-  return mmux_libc_dprintf_sint(fd, mmux_sint(value->value));
+  return mmux_sint_dprintf_p(fd->value, value);
 }
 bool
 mmux_libc_dprintf_libc_ptn (mmux_libc_fd_arg_t fd, mmux_libc_file_system_pathname_t value)
@@ -1688,14 +1688,14 @@ mmux_libc_dprintf_libc_ptn (mmux_libc_fd_arg_t fd, mmux_libc_file_system_pathnam
   return mmux_libc_dprintf(fd, "%s", value.value);
 }
 bool
-mmux_libc_dprintf_libc_completed_process_status (mmux_libc_fd_arg_t fd, mmux_libc_completed_process_status_t value)
+mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd, mmux_libc_process_completion_status_t value)
 {
-  return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
+  return mmux_sint_dprintf_p(fd->value, &value);
 }
 bool
 mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd, mmux_libc_interprocess_signal_t value)
 {
-  return mmux_libc_dprintf_sint(fd, mmux_sint(value.value));
+  return mmux_sint_dprintf_p(fd->value, &value);
 }
 bool
 mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_ptn_extension_t E)

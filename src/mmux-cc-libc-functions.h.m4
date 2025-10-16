@@ -976,8 +976,8 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_arg_t 
 mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_ptn_segment_t E)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_completed_process_status (mmux_libc_fd_arg_t fd,
-									mmux_libc_completed_process_status_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd,
+									 mmux_libc_process_completion_status_t value)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd,
@@ -1067,24 +1067,19 @@ mmux_cc_libc_decl bool mmux_libc_make_pid_minus_one (mmux_libc_pid_t * result_p)
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_completed_process_status (mmux_libc_completed_process_status_t * result_p,
-								mmux_standard_sint_t status)
+mmux_cc_libc_decl bool mmux_libc_make_process_completion_status (mmux_libc_process_completion_status_t * result_p,
+								 mmux_standard_sint_t status)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_completed_process_status_equal (mmux_libc_completed_process_status_t one,
-								 mmux_libc_completed_process_status_t two);
+mmux_cc_libc_decl bool mmux_libc_process_completion_status_equal (bool * result_p,
+								  mmux_libc_process_completion_status_t one,
+								  mmux_libc_process_completion_status_t two)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_completed_process_status_parse (mmux_libc_completed_process_status_t * p_value,
-								 mmux_asciizcp_t s_value, mmux_asciizcp_t who)
-  __attribute__((__nonnull__(1,2)));
-
-mmux_cc_libc_decl bool mmux_libc_completed_process_status_sprint (char * ptr, mmux_usize_t len,
-								  mmux_libc_completed_process_status_t pid)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_completed_process_status_sprint_size (mmux_usize_t * required_nchars_p,
-								       mmux_libc_completed_process_status_t pid)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_process_completion_status_not_equal (bool * result_p,
+								      mmux_libc_process_completion_status_t one,
+								      mmux_libc_process_completion_status_t two)
+  __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
@@ -1104,62 +1099,62 @@ mmux_cc_libc_decl bool mmux_libc_fork (bool * this_is_the_parent_process_p, mmux
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_wait_any_process (bool * completed_process_status_available_p,
+mmux_cc_libc_decl bool mmux_libc_wait_any_process (bool * process_completion_status_available_p,
 						   mmux_libc_pid_t * completed_process_pid_p,
-						   mmux_libc_completed_process_status_t * completed_process_status_p,
+						   mmux_libc_process_completion_status_t * process_completion_status_p,
 						   mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_wait_my_process_group (bool * completed_process_status_available_p,
+mmux_cc_libc_decl bool mmux_libc_wait_my_process_group (bool * process_completion_status_available_p,
 							mmux_libc_pid_t * completed_process_pid_p,
-							mmux_libc_completed_process_status_t * completed_process_status_p,
+							mmux_libc_process_completion_status_t * process_completion_status_p,
 							mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_wait_process_id (bool * completed_process_status_available_p,
+mmux_cc_libc_decl bool mmux_libc_wait_process_id (bool * process_completion_status_available_p,
 						  mmux_libc_pid_t * completed_process_pid_p,
-						  mmux_libc_completed_process_status_t * completed_process_status_p,
+						  mmux_libc_process_completion_status_t * process_completion_status_p,
 						  mmux_libc_pid_t pid, mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_wait_group_id (bool * completed_process_status_available_p,
+mmux_cc_libc_decl bool mmux_libc_wait_group_id (bool * process_completion_status_available_p,
 						mmux_libc_pid_t * completed_process_pid_p,
-						mmux_libc_completed_process_status_t * completed_process_status_p,
+						mmux_libc_process_completion_status_t * process_completion_status_p,
 						mmux_libc_gid_t gid, mmux_sint_t options)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_wait (bool * completed_process_status_available_p,
+mmux_cc_libc_decl bool mmux_libc_wait (bool * process_completion_status_available_p,
 				       mmux_libc_pid_t * completed_process_pid_p,
-				       mmux_libc_completed_process_status_t * completed_process_status_p)
+				       mmux_libc_process_completion_status_t * process_completion_status_p)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_WIFEXITED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+mmux_cc_libc_decl bool mmux_libc_WIFEXITED (bool * result_p, mmux_libc_process_completion_status_t psc)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WEXITSTATUS (mmux_sint_t * result_p, mmux_libc_completed_process_status_t completed_process_status)
+mmux_cc_libc_decl bool mmux_libc_WEXITSTATUS (mmux_sint_t * result_p, mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (bool * result_p, mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * result_p,
-					   mmux_libc_completed_process_status_t completed_process_status)
+					   mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WCOREDUMP (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+mmux_cc_libc_decl bool mmux_libc_WCOREDUMP (bool * result_p, mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WIFSTOPPED (bool * result_p, mmux_libc_completed_process_status_t completed_process_status)
+mmux_cc_libc_decl bool mmux_libc_WIFSTOPPED (bool * result_p, mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * result_p,
-					   mmux_libc_completed_process_status_t completed_process_status)
+					   mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_WIFCONTINUED (bool * result_p,
-					       mmux_libc_completed_process_status_t completed_process_status)
+					       mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
