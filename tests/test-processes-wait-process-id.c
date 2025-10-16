@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -43,33 +42,39 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     print_error("forking");
     goto error;
   } else if (this_is_the_parent_process) {
-    bool					completed_process_status_available;
-    mmux_libc_pid_t				completed_process_pid;
-    mmux_libc_completed_process_status_t	completed_process_status;
-
     /* Give the child process a bit of time to exit. */
     {
       mmux_libc_timespec_t    requested_time;
       mmux_libc_timespec_t    remaining_time;
 
-      mmux_libc_timespec_set(&requested_time, 0, 5000000);
+      mmux_libc_timespec_set(&requested_time, mmux_time_literal(0), mmux_slong_literal(5000000));
       if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
 	print_error("nanosleep");
 	goto error;
       }
     }
 
-    if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
-				  &completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) {
-      print_error("waiting");
-      goto error;
-    } else {
-      if (completed_process_status_available) {
-	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status.value));
-	mmux_libc_exit_success();
+    /* Wait for the child process. */
+    {
+      bool					process_completion_status_available;
+      mmux_libc_pid_t				completed_process_pid;
+      mmux_libc_process_completion_status_t	process_completion_status;
+      auto	waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
+
+      if (mmux_libc_wait_process_id(&process_completion_status_available,
+				    &process_completion_status,
+				    &completed_process_pid,
+				    child_pid, waiting_options)) {
+	print_error("waiting");
+	goto error;
       } else {
-	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME));
-	mmux_libc_exit_failure();
+	if (process_completion_status_available) {
+	  printf_message("child process completion status: %d\n", process_completion_status.value);
+	  mmux_libc_exit_success();
+	} else {
+	  printf_error("no complete child process status\n");
+	  mmux_libc_exit_failure();
+	}
       }
     }
   } else {
@@ -79,7 +84,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
  error:
   {
-    mmux_sint_t         errnum;
+    mmux_libc_errno_t	errnum;
     mmux_asciizcp_t	errmsg;
 
     mmux_libc_errno_consume(&errnum);

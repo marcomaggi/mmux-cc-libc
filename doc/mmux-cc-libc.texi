@@ -596,13 +596,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{WAIT_ANY}
 @MmuxDefineConstant{WAIT_MYPGRP}
 
-@MmuxDefineConstant{WEXITED}
-@MmuxDefineConstant{WNOHANG}
-@MmuxDefineConstant{WNOWAIT}
-@MmuxDefineConstant{WSTOPPED}
-@MmuxDefineConstant{WCONTINUED}
-@MmuxDefineConstant{WUNTRACED}
-
 @MmuxDefineConstant{P_ALL}
 @MmuxDefineConstant{P_PID}
 @MmuxDefineConstant{P_PIDFD}
@@ -4798,8 +4791,27 @@ value computed by the C preprocessor macro.
 @section Forking processes
 
 
+To fork the current process into two processes, parent and child, we do:
+
+@example
+bool             this_is_the_parent_process;
+mmux_libc_pid_t  child_pid;
+
+if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
+  mmux_libc_errno_t  errnum;
+
+  mmux_libc_errno_consume(&errnum);
+  ... /* handle the error */
+@} else if (this_is_the_parent_process) @{
+  ... /* do something in the parent process, maybe using "child_pid" */
+@} else @{
+  ... /* do something in the child process */
+@}
+@end example
+
+
 @deftypefun bool mmux_libc_fork (bool * @var{this_is_the_parent_process_p}, mmux_libc_pid_t * @var{child_process_pid_p})
-@MmuxCInterface{fork}.  When a call is successful:
+@MmuxCInterface{fork}.
 
 Regarding the argument @var{this_is_the_parent_process_p}: the referenced variable is mutated only
 when a call is successful, otherwise it is left untouched.
@@ -4822,22 +4834,6 @@ In the parent process: the referenced variable is set to the child process ident
 @item
 In the child process: the referenced variable is left untouched.
 @end itemize
-
-@example
-bool                    this_is_the_parent_process;
-mmux_libc_pid_t         child_pid;
-
-if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
-  mmux_sint_t         errnum;
-
-  mmux_libc_errno_consume(&errnum);
-  ... /* handle the error */
-@} else if (this_is_the_parent_process) @{
-  ... /* do something in the parent process, maybe using "child_pid" */
-@} else @{
-  ... /* do something in the child process */
-@}
-@end example
 @end deftypefun
 
 @c page
@@ -4846,44 +4842,99 @@ if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
 
 
 @menu
-* processes waiting args::      Convention for common arguments.
+* processes waiting args::      Conventions for common arguments.
+* processes waiting options::   Process completion waiting options.
 * processes waiting waitpid::   Waiting with @cfunc{waitpid}.
 * processes waiting other::     Waiting with other functions.
 @end menu
 
 @c page
 @node processes waiting args
-@subsection Convention for common arguments
+@subsection Conventions for common arguments
 
 
-This section documents the common arguments in calls to process--completion waiting--functions.  For
-all the documented functions:
-
-@table @code
-@item bool * @var{completed_process_status_available_p}
-pointer argument which cannot be @cnull{}; when the function call is successful:
+This section documents the common arguments in calls to process--completion waiting--functions; to
+make sense of these arguments, we need to remember that:
 
 @itemize
 @item
-if we have collected the completion status of a process: the referenced variable is set to @ctrue{};
+it is possible to wait for the completion of one among a set of processes; we do not know of which
+of those we will collect the completion--status;
 
 @item
-if no completion status was collected: the referenced variable is set to @cfalse{};
+it is possible to test if a process completion--status is available without blocking the execution
+until it is actually available.
+@end itemize
+
+@table @code
+@item bool * @var{process_completion_status_is_available_p}
+This argument is a pointer which cannot be @cnull{}; when the function call is successful:
+
+@itemize
+@item
+if we have collected the completion--status of a process: the referenced variable is set to
+@ctrue{};
+
+@item
+if no completion--status was collected: the referenced variable is set to @cfalse{};
 @end itemize
 
 @noindent
 when the function call is a failure: the referenced variable is left untouched;
 
 @item mmux_libc_pid_t * @var{completed_process_pid_p}
-pointer argument which cannot be @cnull{}; when the function call is successful and we have
-collected the completion status of a process: the PID of the completed process is stored in the
-referenced variable, otherwise the variable is left untouched;
+This argument is a pointer which cannot be @cnull{}; when the function call is successful and we
+have collected the completion--status of a process: the PID of the completed process is stored in
+the referenced variable, otherwise the variable is left untouched;
 
-@item mmux_libc_process_completion_status_t * @var{completed_process_status_p}
-pointer argument which cannot be @cnull{}; when the function call is successful and we have
-collected the completion status of a process: such status is stored in the referenced variable,
-otherwise the variable is left untouched.
+@item mmux_libc_process_completion_status_t * @var{process_completion_status_p}
+This argument is a pointer which cannot be @cnull{}; when the function call is successful and we
+have collected the completion--status of a process: such status is stored in the referenced
+variable, otherwise the variable is left untouched.
 @end table
+
+@c page
+@node processes waiting options
+@subsection Process completion waiting options
+
+
+@deftp {Opaque Data Structure} mmux_libc_process_completion_waiting_options_t
+Data structure type representing process--completion waiting--options.  It must contain a bitwise OR
+combination of the constants listed below.
+@end deftp
+
+
+@deftypefun mmux_libc_process_completion_waiting_options_t mmux_libc_process_completion_waiting_options (mmux_standard_sint_t @var{waiting_options})
+Build and return a new instance of @objtype{mmux_libc_process_completion_waiting_options_t}, for
+details @MmuxCFuncpage{waitpid}.
+
+@example
+auto  waiting_options =
+  mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG | MMUX_LIBC_WEXITED);
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineProcessCompletionWaitingOptionConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
+either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
+features of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineProcessCompletionWaitingOptionConstant{WEXITED}
+@MmuxDefineProcessCompletionWaitingOptionConstant{WNOHANG}
+@MmuxDefineProcessCompletionWaitingOptionConstant{WNOWAIT}
+@MmuxDefineProcessCompletionWaitingOptionConstant{WSTOPPED}
+@MmuxDefineProcessCompletionWaitingOptionConstant{WCONTINUED}
+@MmuxDefineProcessCompletionWaitingOptionConstant{WUNTRACED}
 
 @c page
 @node processes waiting waitpid
@@ -4894,52 +4945,54 @@ For the documentation of the common arguments see @ref{processes waiting args, C
 arguments}.
 
 
-@deftypefun bool mmux_libc_wait_any_process (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_any_process (bool * @var{process_completion_status_is_available_p}, mmux_libc_process_completion_status_t * @var{process_completion_status_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_waiting_options_t @var{waiting_options})
 @MmuxCInterface{waitpid}.  Wait for the termination of any child process.
 
 @example
-bool                                    completed_process_status_available;
+bool                                    process_completion_status_is_available;
+mmux_libc_process_completion_status_t   process_completion_status;
 mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_process_completion_status_t    completed_process_status;
+auto  waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
-if (mmux_libc_wait_any_process(&completed_process_status_available, &completed_process_pid,
-                               &completed_process_status, MMUX_LIBC_WNOHANG)) @{
+if (mmux_libc_wait_any_process(&process_completion_status_is_available,
+                               &process_completion_status,
+                               &completed_process_pid,
+                               waiting_options)) @{
   ... /* handle the error */
+@} else if (process_completion_status_is_available) @{
+  ... /* do something with "process_completion_status" */
 @} else @{
-  if (completed_process_status_available) @{
-    ... /* do something with "completed_process_status" */
-  @} else @{
-    ... /* no completed process status was collected */
-  @}
+  ... /* no completed process status was collected */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_wait_my_process_group (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_my_process_group (bool * @var{process_completion_status_is_available_p}, mmux_libc_process_completion_status_t * @var{process_completion_status_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_waiting_options_t @var{waiting_options})
 @MmuxCInterface{waitpid}.  Wait for the termination of any child process in the same process group
 of the calling process.
 
 @example
-bool                                    completed_process_status_available;
-mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_process_completion_status_t    completed_process_status;
+bool                                   process_completion_status_is_available;
+mmux_libc_process_completion_status_t  process_completion_status;
+mmux_libc_pid_t                        completed_process_pid;
+auto  waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
-if (mmux_libc_wait_my_process_group(&completed_process_status_available, &completed_process_pid,
-                                    &completed_process_status, MMUX_LIBC_WNOHANG)) @{
+if (mmux_libc_wait_my_process_group(&process_completion_status_is_available,
+                                    &process_completion_status,
+                                    &completed_process_pid,
+                                    waiting_options)) @{
   ... /* handle the error */
+@} else if (process_completion_status_is_available) @{
+  ... /* do something with "process_completion_status" */
 @} else @{
-  if (completed_process_status_available) @{
-    ... /* do something with "completed_process_status" */
-  @} else @{
-    ... /* no completed process status was collected */
-  @}
+  ... /* no completed process status was collected */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_wait_process_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p}, mmux_libc_pid_t @var{pid}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_process_id (bool * @var{process_completion_status_is_available_p}, mmux_libc_process_completion_status_t * @var{process_completion_status_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_pid_t @var{pid}, mmux_libc_process_completion_waiting_options_t @var{waiting_options})
 @MmuxCInterface{waitpid}.  Wait for the termination of a specific process whose process identifier
 is @var{pid}.
 
@@ -4950,19 +5003,20 @@ mmux_libc_pid_t         child_pid;
 if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
   ... /* handle the error */
 @} else if (this_is_the_parent_process) @{
-  bool                                  completed_process_status_available;
-  mmux_libc_pid_t                       completed_process_pid;
-  mmux_libc_process_completion_status_t  completed_process_status;
+  bool                                   process_completion_status_is_available;
+  mmux_libc_process_completion_status_t  process_completion_status;
+  mmux_libc_pid_t                        completed_process_pid;
+  auto  waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
-  if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
-                                &completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) @{
+  if (mmux_libc_wait_process_id(&process_completion_status_is_available,
+                                &process_completion_status,
+                                &completed_process_pid,
+                                child_pid, waiting_options)) @{
     ... /* handle the error */
+  @} else if (process_completion_status_is_available) @{
+    ... /* do something with "process_completion_status" */
   @} else @{
-    if (completed_process_status_available) @{
-      ... /* do something with "completed_process_status" */
-    @} else @{
-      ... /* no completed process status was collected */
-    @}
+    ... /* no completed process status was collected */
   @}
 @} else @{
   ... /* do something in the child process */
@@ -4971,7 +5025,7 @@ if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_wait_group_id (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_sint_t * @var{completed_process_status_p}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{options})
+@deftypefun bool mmux_libc_wait_group_id (bool * @var{process_completion_status_is_available_p}, mmux_libc_process_completion_status_t * @var{process_completion_status_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_gid_t @var{gid}, mmux_libc_process_completion_waiting_options_t @var{waiting_options})
 @MmuxCInterface{waitpid}.  Wait for the termination of any process belonging to the process group
 @var{gid}.
 
@@ -4981,19 +5035,20 @@ mmux_libc_gid_t       the_gid;
 if (mmux_libc_getgid(&the_gid)) @{
   ... /* handle the error */
 @} else @{
-  bool                                  completed_process_status_available;
-  mmux_libc_pid_t                       completed_process_pid;
-  mmux_libc_process_completion_status_t  completed_process_status;
+  bool                                   process_completion_status_is_available;
+  mmux_libc_process_completion_status_t  process_completion_status;
+  mmux_libc_pid_t                        completed_process_pid;
+  auto  waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
-  if (mmux_libc_wait_group_id(&completed_process_status_available, &completed_process_pid,
-                              &completed_process_status, the_gid, MMUX_LIBC_WNOHANG)) @{
+  if (mmux_libc_wait_group_id(&process_completion_status_is_available,
+                              &process_completion_status,
+                              &completed_process_pid,
+                              the_gid, waiting_options)) @{
     ... /* handle the error */
+  @} else if (process_completion_status_is_available) @{
+    ... /* do something with "process_completion_status" */
   @} else @{
-    if (completed_process_status_available) @{
-      ... /* do something with "completed_process_status" */
-    @} else @{
-      ... /* no completed process status was collected */
-    @}
+    ... /* no completed process status was collected */
   @}
 @}
 @end example
@@ -5008,22 +5063,22 @@ For the documentation of the common arguments see @ref{processes waiting args, C
 arguments}.
 
 
-@deftypefun bool mmux_libc_wait (bool * @var{completed_process_status_available_p}, mmux_libc_pid_t * @var{completed_process_pid_p}, mmux_libc_process_completion_status_t * @var{completed_process_status_p})
+@deftypefun bool mmux_libc_wait (bool * @var{process_completion_status_is_available_p}, mmux_libc_process_completion_status_t * @var{process_completion_status_p}, mmux_libc_pid_t * @var{completed_process_pid_p})
 @MmuxCInterface{wait}.  Wait for the termination of any child process.
 
 @example
-bool                                    completed_process_status_available;
-mmux_libc_pid_t                         completed_process_pid;
-mmux_libc_process_completion_status_t    completed_process_status;
+bool                                   process_completion_status_is_available;
+mmux_libc_process_completion_status_t  completed_process_status;
+mmux_libc_pid_t                        completed_process_pid;
 
-if (mmux_libc_wait(&completed_process_status_available, &completed_process_pid, &completed_process_status)) @{
+if (mmux_libc_wait(&process_completion_status_is_available,
+                   &completed_process_status
+                   &completed_process_pid)) @{
   ... /* handle the error */
+@} else if (process_completion_status_is_available) @{
+  ... /* do something with "completed_process_status" */
 @} else @{
-  if (completed_process_status_available) @{
-    ... /* do something with "completed_process_status" */
-  @} else @{
-    ... /* no completed process status was collected */
-  @}
+  ... /* no completed process status was collected */
 @}
 @end example
 @end deftypefun

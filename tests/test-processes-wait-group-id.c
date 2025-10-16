@@ -43,38 +43,42 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     print_error("forking");
     goto error;
   } else if (this_is_the_parent_process) {
-    bool					completed_process_status_available;
-    mmux_libc_pid_t				completed_process_pid;
-    mmux_libc_completed_process_status_t	completed_process_status;
 
     /* Give the child process a bit of time to exit. */
     {
       mmux_libc_timespec_t    requested_time;
       mmux_libc_timespec_t    remaining_time;
 
-      mmux_libc_timespec_set(&requested_time, 0, 5000000);
+      mmux_libc_timespec_set(&requested_time, mmux_time_literal(0), mmux_slong_literal(5000000));
       if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
 	print_error("nanosleep");
 	goto error;
       }
     }
 
+    /* Wait for the child process. */
     {
+      bool					process_completion_status_available;
+      mmux_libc_pid_t				completed_process_pid;
+      mmux_libc_process_completion_status_t	process_completion_status;
       mmux_libc_gid_t       the_gid;
+      auto	waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
       if (mmux_libc_getgid(&the_gid)) {
 	print_error("getting gid");
 	goto error;
-      } else if (mmux_libc_wait_group_id(&completed_process_status_available, &completed_process_pid,
-					 &completed_process_status, the_gid, MMUX_LIBC_WNOHANG)) {
-	print_error("waiting");
+      } else if (mmux_libc_wait_group_id(&process_completion_status_available,
+					 &process_completion_status,
+					 &completed_process_pid,
+					 the_gid, waiting_options)) {
+	print_error("parent process: waiting");
 	// This test  fails, I am  too ignorant to  understand why.  Let's  cheat and
 	// skip it.  Ha! Ha! Ha! (Marco Maggi; Jun 23, 2025)
-	mmux_libc_exit(77);
+	mmux_libc_exit(mmux_libc_process_exit_status(77));
 	goto error;
       } else {
-	if (completed_process_status_available) {
-	  MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: child process completion status: %d\n", PROGNAME, completed_process_status.value));
+	if (process_completion_status_available) {
+	  printf_message("parent process: child process completion status: %d\n", process_completion_status.value);
 	  if (mmux_libc_pid_equal(completed_process_pid, child_pid)) {
 	    mmux_libc_exit_success();
 	  } else {
@@ -82,7 +86,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	    mmux_libc_exit_failure();
 	  }
 	} else {
-	  MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: no complete child process status\n", PROGNAME));
+	  MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfou("%s: parent process: no complete child process status\n", PROGNAME));
 	  mmux_libc_exit_failure();
 	}
       }
@@ -94,7 +98,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
  error:
   {
-    mmux_sint_t         errnum;
+    mmux_libc_errno_t	errnum;
     mmux_asciizcp_t	errmsg;
 
     mmux_libc_errno_consume(&errnum);
