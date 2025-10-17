@@ -33,6 +33,125 @@
  ** Interprocess signal stucture.
  ** ----------------------------------------------------------------- */
 
+bool
+mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t fd, mmux_libc_interprocess_signal_t ipxsig)
+{
+  mmux_asciizcp_t	signame;
+
+m4_define([[[DEFINE_SIGNAL_CASE]]],[[[m4_dnl
+#ifdef MMUX_HAVE_LIBC_$1
+  case MMUX_LIBC_VALUEOF_$1:
+    signame = "$1";
+    break;
+#endif
+]]])
+
+  switch (ipxsig.value) {
+    DEFINE_SIGNAL_CASE(SIGFPE)
+    DEFINE_SIGNAL_CASE(SIGILL)
+    DEFINE_SIGNAL_CASE(SIGSEGV)
+    DEFINE_SIGNAL_CASE(SIGBUS)
+    DEFINE_SIGNAL_CASE(SIGABRT)
+m4_dnl DEFINE_SIGNAL_CASE(SIGIOT) /* duplicate of SIGABRT */
+    DEFINE_SIGNAL_CASE(SIGTRAP)
+    DEFINE_SIGNAL_CASE(SIGEMT)
+    DEFINE_SIGNAL_CASE(SIGSYS)
+    DEFINE_SIGNAL_CASE(SIGTERM)
+    DEFINE_SIGNAL_CASE(SIGINT)
+    DEFINE_SIGNAL_CASE(SIGQUIT)
+    DEFINE_SIGNAL_CASE(SIGKILL)
+    DEFINE_SIGNAL_CASE(SIGHUP)
+    DEFINE_SIGNAL_CASE(SIGALRM)
+    DEFINE_SIGNAL_CASE(SIGVRALRM)
+    DEFINE_SIGNAL_CASE(SIGPROF)
+    DEFINE_SIGNAL_CASE(SIGIO)
+    DEFINE_SIGNAL_CASE(SIGURG)
+m4_dnl DEFINE_SIGNAL_CASE(SIGPOLL) /* duplicate of SIGIO */
+    DEFINE_SIGNAL_CASE(SIGCHLD)
+m4_dnl DEFINE_SIGNAL_CASE(SIGCLD) /* duplicate of SIGCHLD */
+    DEFINE_SIGNAL_CASE(SIGCONT)
+    DEFINE_SIGNAL_CASE(SIGSTOP)
+    DEFINE_SIGNAL_CASE(SIGTSTP)
+    DEFINE_SIGNAL_CASE(SIGTTIN)
+    DEFINE_SIGNAL_CASE(SIGTTOU)
+    DEFINE_SIGNAL_CASE(SIGPIPE)
+    DEFINE_SIGNAL_CASE(SIGLOST)
+    DEFINE_SIGNAL_CASE(SIGXCPU)
+    DEFINE_SIGNAL_CASE(SIGXSFZ)
+    DEFINE_SIGNAL_CASE(SIGUSR1)
+    DEFINE_SIGNAL_CASE(SIGUSR2)
+    DEFINE_SIGNAL_CASE(SIGWINCH)
+    DEFINE_SIGNAL_CASE(SIGINFO)
+    default:
+      return true;
+  }
+
+  return mmux_libc_dprintf(fd, "%s", signame);
+}
+
+bool
+mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * ipxsig_p,
+				     mmux_asciizcp_t input_string, mmux_asciizcp_t who)
+{
+  if ((! (('S' == input_string[0]) && ('I' == input_string[1]) && ('G' == input_string[2]))) ||
+      (4 > strlen(input_string))) {
+    goto invalid_input;
+  } else {
+
+m4_define([[[DEFINE_SIGNAL_CASE]]],[[[m4_dnl
+#ifdef MMUX_HAVE_LIBC_SIG$1
+  if (0 == strcmp("$1", (input_string + 3))) {
+    *ipxsig_p = MMUX_LIBC_SIG$1;
+    return false;
+  }
+#endif
+]]])
+
+    DEFINE_SIGNAL_CASE(FPE);
+    DEFINE_SIGNAL_CASE(ILL);
+    DEFINE_SIGNAL_CASE(SEGV);
+    DEFINE_SIGNAL_CASE(BUS);
+    DEFINE_SIGNAL_CASE(ABRT);
+    m4_dnl DEFINE_SIGNAL_CASE(IOT); /* duplicate of SIGABRT */
+    DEFINE_SIGNAL_CASE(TRAP);
+    DEFINE_SIGNAL_CASE(EMT);
+    DEFINE_SIGNAL_CASE(SYS);
+    DEFINE_SIGNAL_CASE(TERM);
+    DEFINE_SIGNAL_CASE(INT);
+    DEFINE_SIGNAL_CASE(QUIT);
+    DEFINE_SIGNAL_CASE(KILL);
+    DEFINE_SIGNAL_CASE(HUP);
+    DEFINE_SIGNAL_CASE(ALRM);
+    DEFINE_SIGNAL_CASE(VRALRM);
+    DEFINE_SIGNAL_CASE(PROF);
+    DEFINE_SIGNAL_CASE(IO);
+    DEFINE_SIGNAL_CASE(URG);
+    m4_dnl DEFINE_SIGNAL_CASE(POLL); /* duplicate of SIGIO */
+    DEFINE_SIGNAL_CASE(CHLD);
+    m4_dnl DEFINE_SIGNAL_CASE(CLD); /* duplicate of SIGCHLD */
+    DEFINE_SIGNAL_CASE(CONT);
+    DEFINE_SIGNAL_CASE(STOP);
+    DEFINE_SIGNAL_CASE(TSTP);
+    DEFINE_SIGNAL_CASE(TTIN);
+    DEFINE_SIGNAL_CASE(TTOU);
+    DEFINE_SIGNAL_CASE(PIPE);
+    DEFINE_SIGNAL_CASE(LOST);
+    DEFINE_SIGNAL_CASE(XCPU);
+    DEFINE_SIGNAL_CASE(XSFZ);
+    DEFINE_SIGNAL_CASE(USR1);
+    DEFINE_SIGNAL_CASE(USR2);
+    DEFINE_SIGNAL_CASE(WINCH);
+    DEFINE_SIGNAL_CASE(INFO);
+  }
+
+ invalid_input:
+  if (who) {
+    MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: error: invalid argument, expected interprocess signal string representation: \"%s\"\n",
+						who, input_string));
+  }
+  return true;
+}
+
 
 /** --------------------------------------------------------------------
  ** Delivering signals.

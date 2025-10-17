@@ -5144,6 +5144,40 @@ if (the_signal_is_the_expected_one) @{
 @end example
 @end deftp
 
+
+@deftypefun bool mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_interprocess_signal_t @var{ipxsig})
+Write to @var{fd} a string representation of the given signal.
+
+@example
+auto            ipxsig = MMUX_LIBC_SIGUSR1;
+mmux_libc_fd_t  fd;
+
+mmux_libc_stder(fd);
+mmux_libc_interprocess_signal_dump(fd, ipxsig);
+@print{} SIGUSR1
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * @var{ipxsig_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
+Parse a string which is meant to be the representation of an interprocess signal symbol; when
+successful store the result in the variable referenced by @var{ipxsig_p}, then return @cfalse{};
+otherwise leave @var{ipxsig_p} untouched and return @ctrue{}.
+
+In case of failure: if @var{who} is not @cnull{}, print on @stderr{} a message describing the
+parsing error; @var{who} must reference an @asciiz{} string representing the entity that requested
+the parsing operation, for example: the name of a C function.
+
+@example
+mmux_asciizcp_t                  input_string = "SIGUSR1";
+mmux_libc_interprocess_signal_t  ipxsig;
+
+if (mmux_libc_interprocess_signal_parse(&ipxsig, input_string, __func__)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
 @c ------------------------------------------------------------------------
 
 @macro MmuxDefineInterprocessSignalConstant{NAME}

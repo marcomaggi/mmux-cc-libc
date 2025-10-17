@@ -1208,6 +1208,13 @@ mmux_libc_interprocess_signal (mmux_standard_sint_t signal_num)
   return (mmux_libc_interprocess_signal_t) { { .value = signal_num } };
 }
 
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t fd,
+							   mmux_libc_interprocess_signal_t ipxsig);
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * ipxsig_p,
+							    mmux_asciizcp_t str, mmux_asciizcp_t who)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal)
