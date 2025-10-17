@@ -5240,10 +5240,7 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 To deliver a signal to the calling process we do:
 
 @example
-mmux_libc_interprocess_signal_t         ipxsignal;
-
-mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-if (mmux_libc_raise(ipxsignal)) @{
+if (mmux_libc_raise(MMUX_LIBC_SIGUSR1)) @{
   /* error */
 @}
 @end example
@@ -5262,10 +5259,7 @@ mmux_libc_pid_t         child_pid;
 if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
   /* error */
 @} else if (this_is_the_parent_process) @{
-  mmux_libc_interprocess_signal_t         ipxsignal;
-
-  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-  if (mmux_libc_kill(child_pid, ipxsignal)) @{
+  if (mmux_libc_kill(child_pid, MMUX_LIBC_SIGUSR1)) @{
     /* error */
   @}
 @} else @{
@@ -5320,13 +5314,8 @@ if (mmux_libc_interprocess_signals_bub_init()) @{
 @}
 
 /* Deliver a signal to the calling process. */
-@{
-  mmux_libc_interprocess_signal_t       ipxsignal;
-
-  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-  if (mmux_libc_raise(ipxsignal)) @{
-    /* error */
-  @}
+if (mmux_libc_raise(MMUX_LIBC_SIGUSR1)) @{
+  /* error */
 @}
 
 /* Unblock all the signals, then block them again. */
@@ -5336,11 +5325,9 @@ if (mmux_libc_interprocess_signals_bub_acquire()) @{
 
 /* Check if the signal was delivered. */
 @{
-  mmux_libc_interprocess_signal_t       ipxsignal;
-  bool                                  delivered;
+  bool  delivered;
 
-  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-  if (mmux_libc_interprocess_signals_bub_delivered(&result, ipxsignal)) @{
+  if (mmux_libc_interprocess_signals_bub_delivered(&result, MMUX_LIBC_SIGUSR1)) @{
     /* error */
   @}
   if (delivered) @{
