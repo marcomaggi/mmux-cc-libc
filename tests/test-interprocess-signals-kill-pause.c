@@ -196,10 +196,12 @@ test_delivery_and_termination (void)
 	    if (child_process_has_been_signaled) {
 	      printf_message("paren process: the child process has been signaled, as we expected");
 	      {
-		mmux_libc_interprocess_signal_t		ipxsig;
+		mmux_libc_interprocess_signal_t		ipxsig, expected_ipxsig = MMUX_LIBC_SIGUSR1;
+		bool					the_signal_is_the_expected_one;
 
 		assert(false == mmux_libc_WTERMSIG(&ipxsig, process_completion_status));
-		if (ipxsig.value == MMUX_LIBC_SIGUSR1.value) {
+		assert(false == mmux_sint_equal_p(&the_signal_is_the_expected_one, &ipxsig, &expected_ipxsig));
+		if (the_signal_is_the_expected_one) {
 		  printf_message("parent process: the child process was correctly terminated by SIGUSR1, as we expected");
 		  return false;
 		} else {

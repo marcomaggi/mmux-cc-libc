@@ -33,52 +33,6 @@
  ** Interprocess signal stucture.
  ** ----------------------------------------------------------------- */
 
-bool
-mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p, mmux_standard_sint_t signum)
-{
-  if (0 <= signum) {
-    result_p->value = signum;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t one, mmux_libc_interprocess_signal_t two)
-{
-  if (one.value == two.value) {
-    return true;
-  } else {
-    return false;
-  }
-}
-bool
-mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * p_value, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
-{
-  mmux_libc_interprocess_signal_t	signum;
-
-  if (mmux_sint_parse(&signum, s_value, who)) {
-    return true;
-  }
-  *p_value = signum;
-  return false;
-}
-bool
-mmux_libc_interprocess_signal_sprint (char * ptr, mmux_usize_t len, mmux_libc_interprocess_signal_t ipxsignal)
-{
-  if (MMUX_LIBC_INTERPROCESS_SIGNAL_MAXIMUM_STRING_REPRESENTATION_LENGTH < len.value) {
-    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
-    return true;
-  } else {
-    return mmux_sint_sprint(ptr, len, mmux_sint(ipxsignal.value));
-  }
-}
-bool
-mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_interprocess_signal_t ipxsig MMUX_CC_LIBC_UNUSED)
-{
-  return mmux_sint_sprint_size(required_nchars_p, mmux_sint(ipxsig.value));
-}
-
 
 /** --------------------------------------------------------------------
  ** Delivering signals.

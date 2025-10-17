@@ -5128,67 +5128,21 @@ if (ipxsig.value == MMUX_LIBC_SIGUSR1.value) @{
   ...
 @}
 @end example
+
+@noindent
+or code like:
+
+@example
+mmux_libc_interprocess_signal_t  ipxsig, expected_ipxsig = MMUX_LIBC_SIGUSR1;
+bool                             the_signal_is_the_expected_one;
+
+mmux_libc_WTERMSIG(&ipxsig, process_completion_status);
+mmux_sint_equal_p(&the_signal_is_the_expected_one, &ipxsig, &expected_ipxsig);
+if (the_signal_is_the_expected_one) @{
+  ...
+@}
+@end example
 @end deftp
-
-
-@deftypefun bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * @var{result_p}, mmux_sint_t @var{signal_number})
-Build a new value of type @objtype{mmux_libc_interprocess_signal_t}.
-
-@example
-mmux_libc_interprocess_signal_t ipxsig;
-
-if (mmux_libc_make_interprocess_signal(&ipxsig, MMUX_LIBC_SIGUSR1) @{
-  ... /* this error happens only if @var{signal_number} is negative */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t @vari{ipxsig}, mmux_libc_interprocess_signal_t @varii{ipxsig})
-Return true if @vari{ipxsig} and  @varii{ipxsig} are equal.
-@end deftypefun
-
-
-To convert a file descriptor to string we can do:
-
-@example
-mmux_libc_interprocess_signal_t         ipxsig;
-mmux_usize_t                            required_nchars;
-
-mmux_libc_make_interprocess_signal(&the_signal_number, MMUX_LIBC_SIGUSR1);
-
-if (mmux_libc_interprocess_signal_sprint_size(&required_nchars, ipxsig) @{
-  /* error */
-@} else @{
-  char  str[required_nchars];
-
-  if (mmux_libc_interprocess_signal_sprint(str, required_nchars, ipxsig) @{
-    /* error */
-  @}
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * @var{ipxsig_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a
-@objtype{mmux_libc_interprocess_signal_t} value; store the value in the location referenced by
-@var{ipxsig_p}.  If an error occurs and @var{who} is not @cnull{}: print an error message to
-@stderr{} using @var{who} as name of the entity that performed the function call.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_interprocess_signal_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_interprocess_signal_t @var{ipxsig})
-Determine the number of characters required to contain the string representation of @var{ipxsig} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_interprocess_signal_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_interprocess_signal_t @var{ipxsig})
-Convert @var{ipxsig} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
-@end deftypefun
 
 @c ------------------------------------------------------------------------
 
@@ -5243,7 +5197,7 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 
 @c page
 @node signals delivering
-@subsection Delivering interprocess signals
+@section Delivering interprocess signals
 
 
 @deftypefun bool mmux_libc_raise (mmux_libc_interprocess_signal_t @var{ipxsignal})
@@ -5311,7 +5265,7 @@ Process, Signaling Another Process}.
 
 @c page
 @node signals bub
-@subsection Block/unblock interprocess signals handling
+@section Block/unblock interprocess signals handling
 
 
 @cindex @bub{} interprocess signals @api{}
@@ -5395,7 +5349,7 @@ again without acquiring new signals always stores @false{} in the variable refer
 
 @c page
 @node signals handling
-@subsection Other interprocess signals delivering methods
+@section Other interprocess signals delivering methods
 
 
 @deftypefn {Function Type} bool mmux_libc_sighandler_t (mmux_sint_t @var{signum})

@@ -362,12 +362,7 @@ mmux_libc_WTERMSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUS
 		    mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WTERMSIG]]],[[[
-  mmux_libc_interprocess_signal_t	ipxsig;
-
-  /* We do  not check this return  value because the  argument is a value  that comes
-     from the libc; we assume it is correct. */
-  mmux_libc_make_interprocess_signal(&ipxsig, WTERMSIG(process_completion_status.value));
-  *result_p = ipxsig;
+  *result_p = mmux_libc_interprocess_signal(WTERMSIG(process_completion_status.value));
   return false;
 ]]])
 }
@@ -394,12 +389,7 @@ mmux_libc_WSTOPSIG (mmux_libc_interprocess_signal_t * result_p MMUX_CC_LIBC_UNUS
 		    mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WSTOPSIG]]],[[[
-  mmux_libc_interprocess_signal_t	ipxsig;
-
-  /* We do  not check this return  value because the  argument is a value  that comes
-     from the libc; we assume it is correct. */
-  mmux_libc_make_interprocess_signal(&ipxsig, WSTOPSIG(process_completion_status.value));
-  *result_p = ipxsig;
+  *result_p = mmux_libc_interprocess_signal(WSTOPSIG(process_completion_status.value));
   return false;
 ]]])
 }
