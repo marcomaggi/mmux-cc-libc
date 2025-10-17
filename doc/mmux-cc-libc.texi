@@ -614,43 +614,6 @@ remainder of which flags are available for the operation.
 The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
 @end defvr
 
-@MmuxDefineConstant{NSIG}
-@MmuxDefineConstant{SIGFPE}
-@MmuxDefineConstant{SIGILL}
-@MmuxDefineConstant{SIGSEGV}
-@MmuxDefineConstant{SIGBUS}
-@MmuxDefineConstant{SIGABRT}
-@MmuxDefineConstant{SIGIOT}
-@MmuxDefineConstant{SIGTRAP}
-@MmuxDefineConstant{SIGEMT}
-@MmuxDefineConstant{SIGSYS}
-@MmuxDefineConstant{SIGTERM}
-@MmuxDefineConstant{SIGINT}
-@MmuxDefineConstant{SIGQUIT}
-@MmuxDefineConstant{SIGKILL}
-@MmuxDefineConstant{SIGHUP}
-@MmuxDefineConstant{SIGALRM}
-@MmuxDefineConstant{SIGVRALRM}
-@MmuxDefineConstant{SIGPROF}
-@MmuxDefineConstant{SIGIO}
-@MmuxDefineConstant{SIGURG}
-@MmuxDefineConstant{SIGPOLL}
-@MmuxDefineConstant{SIGCHLD}
-@MmuxDefineConstant{SIGCLD}
-@MmuxDefineConstant{SIGCONT}
-@MmuxDefineConstant{SIGSTOP}
-@MmuxDefineConstant{SIGTSTP}
-@MmuxDefineConstant{SIGTTIN}
-@MmuxDefineConstant{SIGTTOU}
-@MmuxDefineConstant{SIGPIPE}
-@MmuxDefineConstant{SIGLOST}
-@MmuxDefineConstant{SIGXCPU}
-@MmuxDefineConstant{SIGXSFZ}
-@MmuxDefineConstant{SIGUSR1}
-@MmuxDefineConstant{SIGUSR2}
-@MmuxDefineConstant{SIGWINCH}
-@MmuxDefineConstant{SIGINFO}
-
 @c page
 @node version
 @chapter Version functions
@@ -5144,8 +5107,27 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 @section Representing interprocess signals
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_interprocess_signal_t
-Opaque data structure type representing an interprocess signal number.
+@deftp {Struct Typedef} mmux_libc_interprocess_signal_t
+Opaque data structure type representing an interprocess signal number.  It has a single anonymous
+field of type @objtype{mmux_sint_t}, so we can access the numeric value of the signal with:
+
+@example
+auto  ipxsig = MMUX_LIBC_SIGUSR1;
+
+mmux_libc_dprintf("%s\n", ipxsig.value);
+@end example
+
+@noindent
+or code like:
+
+@example
+mmux_libc_interprocess_signal_t  ipxsig;
+
+mmux_libc_WTERMSIG(&ipxsig, process_completion_status);
+if (ipxsig.value == MMUX_LIBC_SIGUSR1.value) @{
+  ...
+@}
+@end example
 @end deftp
 
 
@@ -5207,6 +5189,57 @@ Convert @var{ipxsig} to its @asciiz{} string representation and store the result
 the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
 wide.
 @end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineInterprocessSignalConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
+@objtype{mmux_libc_interprocess_signal_t} representing the signal number @samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineInterprocessSignalConstant{NSIG}
+@MmuxDefineInterprocessSignalConstant{SIGFPE}
+@MmuxDefineInterprocessSignalConstant{SIGILL}
+@MmuxDefineInterprocessSignalConstant{SIGSEGV}
+@MmuxDefineInterprocessSignalConstant{SIGBUS}
+@MmuxDefineInterprocessSignalConstant{SIGABRT}
+@MmuxDefineInterprocessSignalConstant{SIGIOT}
+@MmuxDefineInterprocessSignalConstant{SIGTRAP}
+@MmuxDefineInterprocessSignalConstant{SIGEMT}
+@MmuxDefineInterprocessSignalConstant{SIGSYS}
+@MmuxDefineInterprocessSignalConstant{SIGTERM}
+@MmuxDefineInterprocessSignalConstant{SIGINT}
+@MmuxDefineInterprocessSignalConstant{SIGQUIT}
+@MmuxDefineInterprocessSignalConstant{SIGKILL}
+@MmuxDefineInterprocessSignalConstant{SIGHUP}
+@MmuxDefineInterprocessSignalConstant{SIGALRM}
+@MmuxDefineInterprocessSignalConstant{SIGVRALRM}
+@MmuxDefineInterprocessSignalConstant{SIGPROF}
+@MmuxDefineInterprocessSignalConstant{SIGIO}
+@MmuxDefineInterprocessSignalConstant{SIGURG}
+@MmuxDefineInterprocessSignalConstant{SIGPOLL}
+@MmuxDefineInterprocessSignalConstant{SIGCHLD}
+@MmuxDefineInterprocessSignalConstant{SIGCLD}
+@MmuxDefineInterprocessSignalConstant{SIGCONT}
+@MmuxDefineInterprocessSignalConstant{SIGSTOP}
+@MmuxDefineInterprocessSignalConstant{SIGTSTP}
+@MmuxDefineInterprocessSignalConstant{SIGTTIN}
+@MmuxDefineInterprocessSignalConstant{SIGTTOU}
+@MmuxDefineInterprocessSignalConstant{SIGPIPE}
+@MmuxDefineInterprocessSignalConstant{SIGLOST}
+@MmuxDefineInterprocessSignalConstant{SIGXCPU}
+@MmuxDefineInterprocessSignalConstant{SIGXSFZ}
+@MmuxDefineInterprocessSignalConstant{SIGUSR1}
+@MmuxDefineInterprocessSignalConstant{SIGUSR2}
+@MmuxDefineInterprocessSignalConstant{SIGWINCH}
+@MmuxDefineInterprocessSignalConstant{SIGINFO}
 
 @c page
 @node signals delivering
@@ -5423,7 +5456,23 @@ my_handler (mmux_sint_t signum)
 
 
 @deftypefun bool mmux_libc_pause (void)
-@MmuxCInterface{pause}.  It is usually not useful to check the return value of @cfunc{pause}.
+@MmuxCInterface{pause}.
+
+It is usually not useful to check the return value of @cfunc{pause}, but we need to remember that,
+by convention: the successful execution of @cfunc{mmux_libc_pause} is to pause the process forever;
+so, it if returns, it is considered a failure.
+
+After calling @cfunc{mmux_libc_pause}:
+
+@itemize
+@item
+if the current process receives a signal for which a handler was registered: the handler will be
+invoked, then @cfunc{mmux_libc_pause} will return @ctrue{};
+
+@item
+if the current process receives a signal for which @strong{no} handler was registered: the process
+will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
+@end itemize
 @end deftypefun
 
 @c page

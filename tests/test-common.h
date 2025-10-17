@@ -37,6 +37,7 @@ static mmux_standard_usize_t	CLEANFILES_PATHNAMES_COUNT = 0;
  ** Prototypes.
  ** ----------------------------------------------------------------- */
 
+void print_newline (void);
 void print_error (mmux_asciizcp_t errmsg);
 void printf_error (mmux_asciizcp_t errmsg_template, ...);
 void printf_string (mmux_asciizcp_t template, ...);
@@ -58,6 +59,11 @@ __attribute__((__nonnull__(1))) void
 print_error (mmux_asciizcp_t errmsg)
 {
   if (mmux_libc_dprintfer("%s: error: %s\n", PROGNAME, errmsg)) {;};
+}
+void
+print_newline (void)
+{
+  if (mmux_libc_dprintfer("\n")) {;};
 }
 __attribute__((__nonnull__(1),__format__(__printf__,1,2))) void
 printf_error (mmux_asciizcp_t errmsg_template, ...)

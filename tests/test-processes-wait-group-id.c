@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -45,16 +44,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   } else if (this_is_the_parent_process) {
 
     /* Give the child process a bit of time to exit. */
-    {
-      mmux_libc_timespec_t    requested_time;
-      mmux_libc_timespec_t    remaining_time;
-
-      mmux_libc_timespec_set(&requested_time, mmux_time_literal(0), mmux_slong_literal(5000000));
-      if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
-	print_error("nanosleep");
-	goto error;
-      }
-    }
+    wait_for_some_time();
 
     /* Wait for the child process. */
     {

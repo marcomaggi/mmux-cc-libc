@@ -690,16 +690,15 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 # ## ------------------------------------------------------------------------
 
-# check_PROGRAMS	+= \
-# 	tests/test-interprocess-signals-kill-bub		\
-# 	tests/test-interprocess-signals-kill-pause
+check_PROGRAMS	+= \
+	tests/test-interprocess-signals-kill-bub		\
+	tests/test-interprocess-signals-kill-pause
 
-# tests_test_interprocess_signals_kill_pause_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-# tests_test_interprocess_signals_kill_pause_LDADD	= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_kill_pause_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_kill_pause_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_interprocess_signals_kill_bub_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-# tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
-
+tests_test_interprocess_signals_kill_bub_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_kill_bub_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

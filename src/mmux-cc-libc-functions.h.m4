@@ -1202,6 +1202,12 @@ mmux_cc_libc_decl bool mmux_libc_abort (void)
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
+mmux_cc_libc_inline_decl mmux_libc_interprocess_signal_t
+mmux_libc_interprocess_signal (mmux_standard_sint_t signal_num)
+{
+  return (mmux_libc_interprocess_signal_t) { { .value = signal_num } };
+}
+
 mmux_cc_libc_decl bool mmux_libc_make_interprocess_signal (mmux_libc_interprocess_signal_t * result_p,
 							   mmux_standard_sint_t signal_num)
   __attribute__((__nonnull__(1)));
@@ -1262,12 +1268,12 @@ mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sigh
 mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p, mmux_libc_interprocess_signal_t ipxsignal,
+mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
+					 mmux_libc_interprocess_signal_t ipxsignal,
 					 mmux_libc_sighandler_t action)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pause (void)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_pause (void);
 
 
 /** --------------------------------------------------------------------
