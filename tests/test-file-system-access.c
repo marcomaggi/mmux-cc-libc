@@ -47,15 +47,20 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
-  mmux_libc_ptn_t	ptn;
+  mmux_libc_fs_ptn_t	ptn;
 
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
+  {
+    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, src_pathname_asciiz)) {
+      handle_error();
+    }
   }
 
   /* Set permissions. */
   {
-    mmux_mode_t		mode = 0600;
+    auto	mode = mmux_libc_mode_literal(0600);
 
     printf_message("chmoding");
     if (mmux_libc_chmod(ptn, mode)) {
@@ -67,7 +72,6 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_libc_stat_t	ST[1];
     mmux_libc_fd_t	fd;
-    mmux_mode_t	st_mode;
 
     mmux_libc_stder(fd);
     if (mmux_libc_stat(ptn, ST)) {
@@ -76,20 +80,24 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
 
-    mmux_libc_st_mode_ref(&st_mode, ST);
+    {
+      mmux_libc_mode_t	st_mode;
 
-    if (0600 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode)) {
-      printf_message("mode checks out");
-    } else {
-      printf_message("mode does NOT check out");
-      mmux_libc_exit_failure();
+      mmux_libc_st_mode_ref(&st_mode, ST);
+
+      if (0600 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode.value)) {
+	printf_message("mode checks out");
+      } else {
+	printf_message("mode does NOT check out");
+	mmux_libc_exit_failure();
+      }
     }
   }
 
   /* Do it. */
   if (1) {
-    mmux_sint_t		how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK;
-    bool		access_is_permitted;
+    auto	how = mmux_sint(MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK);
+    bool	access_is_permitted;
 
     printf_message("accessing first time");
     if (mmux_libc_access(&access_is_permitted, ptn, how)) {
@@ -104,8 +112,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Do it again. */
   if (1) {
-    mmux_sint_t		how = MMUX_LIBC_X_OK;
-    bool		access_is_permitted;
+    auto	how = mmux_sint(MMUX_LIBC_X_OK);
+    bool	access_is_permitted;
 
     printf_message("accessing second time");
     if (mmux_libc_access(&access_is_permitted, ptn, how)) {

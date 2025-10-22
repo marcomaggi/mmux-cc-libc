@@ -85,8 +85,6 @@ mmux_libc_fchdir (mmux_libc_dirfd_arg_t fd)
   return (rv)? true : false;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Root directory.
@@ -252,18 +250,51 @@ mmux_libc_link (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_linkat (mmux_libc_fd_arg_t oldfd, mmux_libc_fs_ptn_arg_t oldname,
-		  mmux_libc_fd_arg_t newfd, mmux_libc_fs_ptn_arg_t newname,
-		  mmux_sint_t flags)
+mmux_libc_linkat (mmux_libc_dirfd_arg_t dirfd_old, mmux_libc_fs_ptn_arg_t oldname,
+		  mmux_libc_dirfd_arg_t dirfd_new, mmux_libc_fs_ptn_arg_t newname,
+		  mmux_libc_linkat_flags_t flags)
 {
-  int	rv = linkat(oldfd->value, oldname->value, newfd->value, newname->value, flags.value);
+  if (MMUX_LIBC_AT_EMPTY_PATH & flags.value) {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  } else {
+    int	rv = linkat(dirfd_old->value, oldname->value,
+		    dirfd_new->value, newname->value,
+		    flags.value);
+
+    return ((0 == rv)? false : true);
+  }
+}
+bool
+mmux_libc_linkfd (mmux_libc_fd_arg_t fd_old,
+		  mmux_libc_dirfd_arg_t dirfd_new, mmux_libc_fs_ptn_arg_t newname,
+		  mmux_libc_linkat_flags_t flags)
+{
+#ifdef MMUX_HAVE_LIBC_AT_EMPTY_PATH
+  int	rv = linkat(fd_old->value, "",
+		    dirfd_new->value, newname->value,
+		    (flags.value | MMUX_LIBC_AT_EMPTY_PATH));
 
   return ((0 == rv)? false : true);
+#else
+  mmux_libc_errno_set(MMUX_LIBC_ENOSYS);
+  return true;
+#endif
 }
 bool
 mmux_libc_symlink (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
 {
   int	rv = symlink(oldname->value, newname->value);
+
+  return ((0 == rv)? false : true);
+}
+
+bool
+mmux_libc_symlinkat (mmux_libc_fs_ptn_arg_t oldname,
+		     mmux_libc_dirfd_arg_t dirfd_new,
+		     mmux_libc_fs_ptn_arg_t newname)
+{
+  int	rv = symlinkat(oldname->value, dirfd_new->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
@@ -458,39 +489,35 @@ mmux_libc_readlinkfd (mmux_libc_fs_ptn_t		fs_ptn_result,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t result_pathname_p, mmux_libc_fs_ptn_arg_t input_pathname)
+mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
+				  mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+				  mmux_libc_fs_ptn_arg_t	fs_ptn_input)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
-  mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(input_pathname->value);
+  mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(fs_ptn_input->value);
 
-  if (asciiz_output_pathname) {
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-					    result_pathname_p, asciiz_output_pathname)) {
-      mmux_libc_free(asciiz_output_pathname);
-      return true;
-    } else {
-      return false;
-    }
-  } else {
+  if (NULL == asciiz_output_pathname) {
     return true;
+  } else {
+    bool	rv = mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, asciiz_output_pathname);
+    mmux_libc_free(asciiz_output_pathname);
+    return rv;
   }
 ]]])
 }
 bool
-mmux_libc_realpath (mmux_libc_fs_ptn_t result_pathname_p, mmux_libc_fs_ptn_arg_t input_pathname)
+mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,
+		    mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+		    mmux_libc_fs_ptn_arg_t	fs_ptn_input)
 {
-  mmux_asciizp_t	asciiz_output_pathname = realpath(input_pathname->value, NULL);
+  mmux_asciizp_t	asciiz_output_pathname = realpath(fs_ptn_input->value, NULL);
 
-  if (asciiz_output_pathname) {
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-					    result_pathname_p, asciiz_output_pathname)) {
-      mmux_libc_free(asciiz_output_pathname);
-      return true;
-    } else {
-      return false;
-    }
-  } else {
+  if (NULL == asciiz_output_pathname) {
     return true;
+  } else {
+    bool	rv = mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, asciiz_output_pathname);
+    mmux_libc_free(asciiz_output_pathname);
+    return rv;
   }
 }
 
@@ -515,7 +542,6 @@ mmux_libc_rmdir (mmux_libc_fs_ptn_arg_t pathname)
 
   return ((0 == rv)? false : true);
 }
-#endif
 bool
 mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
 {
@@ -523,7 +549,6 @@ mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
 
   return ((0 == rv)? false : true);
 }
-#if 0
 bool
 mmux_libc_rename (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
 {
@@ -1254,7 +1279,6 @@ mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p)
 
   return ((0 == rv)? false : true);
 }
-#endif
 bool
 mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
 {
@@ -1262,7 +1286,6 @@ mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
 
   return ((0 == rv)? false : true);
 }
-#if 0
 bool
 mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
 		   mmux_libc_stat_t * stat_p, mmux_sint_t flags)
@@ -1312,7 +1335,6 @@ DEFINE_STAT_MODE_PREDICATE([[[S_ISSOCK]]])
 
 /* ------------------------------------------------------------------ */
 
-#endif
 bool
 mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
@@ -1344,7 +1366,6 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_fs_ptn_arg_t p
     return false;
   }
 }
-#if 0
 
 /* ------------------------------------------------------------------ */
 
@@ -1593,7 +1614,5 @@ mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn,
 
   return ((0 == rv)? false : true);
 }
-
-#endif
 
 /* end of file */

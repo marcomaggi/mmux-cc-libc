@@ -556,6 +556,11 @@ mmux_libc_open_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_open_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_linkat_flags_t
+mmux_libc_linkat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_linkat_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1735,13 +1740,23 @@ mmux_cc_libc_decl bool mmux_libc_pivot_root (mmux_libc_fs_ptn_arg_t new_root_ptn
 mmux_cc_libc_decl bool mmux_libc_link (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_linkat (mmux_libc_fd_arg_t oldfd, mmux_libc_fs_ptn_arg_t oldname,
-					 mmux_libc_fd_arg_t newfd, mmux_libc_fs_ptn_arg_t newname,
-					 mmux_sint_t flags)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_linkat (mmux_libc_dirfd_arg_t oldfd, mmux_libc_fs_ptn_arg_t oldname,
+					 mmux_libc_dirfd_arg_t newfd, mmux_libc_fs_ptn_arg_t newname,
+					 mmux_libc_linkat_flags_t flags)
+  __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_linkfd (mmux_libc_fd_arg_t fd_old,
+					 mmux_libc_dirfd_arg_t dirfd_new, mmux_libc_fs_ptn_arg_t newname,
+					 mmux_libc_linkat_flags_t flags)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_symlink (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
-  __attribute__((__warn_unused_result__));
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_symlinkat (mmux_libc_fs_ptn_arg_t oldname,
+					    mmux_libc_dirfd_arg_t dirfd_new,
+					    mmux_libc_fs_ptn_arg_t newname)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_readlink (mmux_libc_fs_ptn_t			fs_ptn_result,
 					   mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
@@ -1782,13 +1797,15 @@ mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t			fs_ptn_result,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t result_pathname_p,
-							 mmux_libc_fs_ptn_arg_t input_pathname)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
+							 mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+							 mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_fs_ptn_t result_pathname_p,
-					   mmux_libc_fs_ptn_arg_t input_pathname)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,
+					   mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+					   mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
   __attribute__((__warn_unused_result__));

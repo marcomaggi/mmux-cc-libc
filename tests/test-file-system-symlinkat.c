@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Jul 14, 2025
+  Date: Oct 22, 2025
 
   Abstract
 
@@ -20,8 +20,8 @@
 #include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t	ptn_asciiz_src = "./test-file-system-symlink.src.ext";
-static mmux_asciizcp_t	ptn_asciiz_dst = "./test-file-system-symlink.dst.ext";
+static mmux_asciizcp_t	ptn_asciiz_src = "./test-file-system-symlinkat.src.ext";
+static mmux_asciizcp_t	ptn_asciiz_dst = "./test-file-system-symlinkat.dst.ext";
 
 
 /** --------------------------------------------------------------------
@@ -66,10 +66,14 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
 
     {
-      printf_message("symlink-ing");
-      if (mmux_libc_symlink(fs_ptn_src, fs_ptn_dst)) {
+      mmux_libc_dirfd_t		dirfd_dst;
+
+      mmux_libc_at_fdcwd(dirfd_dst);
+
+      printf_message("symlinkat-ing");
+      if (mmux_libc_symlinkat(fs_ptn_src, dirfd_dst, fs_ptn_dst)) {
 	handle_error();
-	printf_error("symlink-ing");
+	printf_error("symlinkat-ing");
       }
     }
 

@@ -122,6 +122,7 @@ typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
 typedef mmux_libc_memory_file_descriptor_t const	mmux_libc_memfd_arg_t[1];
 
 typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
+typedef struct mmux_libc_linkat_flags_t	{ mmux_sint_t;	} mmux_libc_linkat_flags_t;
 
 
 /** --------------------------------------------------------------------
