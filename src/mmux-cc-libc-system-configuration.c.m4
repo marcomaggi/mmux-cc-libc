@@ -73,13 +73,13 @@ mmux_libc_confstr (mmux_asciizp_t result_bufptr, mmux_usize_t provided_nbytes, m
   return ((0 == required_nbytes.value)? true : false);
 }
 bool
-mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_file_system_pathname_t pathname,
+mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_fs_ptn_arg_t fs_ptn,
 		    mmux_libc_sysconf_pathname_parameter_t parameter)
 {
   mmux_slong_t	result;
 
   errno = 0;
-  result = mmux_slong(pathconf(pathname.value, parameter.value));
+  result = mmux_slong(pathconf(fs_ptn->value, parameter.value));
   if (-1 == result.value) {
     if (0 == errno) {
       /* No error: the system does not impose a limit. */

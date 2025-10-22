@@ -125,20 +125,6 @@ typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
 
 
 /** --------------------------------------------------------------------
- ** File system.
- ** ----------------------------------------------------------------- */
-
-typedef struct mmux_libc_dirstream_position_t	{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
-
-typedef struct mmux_libc_directory_file_descriptor_t {
-  mmux_libc_file_descriptor_t;
-} mmux_libc_directory_file_descriptor_t;
-
-typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
-typedef mmux_libc_directory_file_descriptor_t const	mmux_libc_dirfd_arg_t[1];
-
-
-/** --------------------------------------------------------------------
  ** Networking.
  ** ----------------------------------------------------------------- */
 
@@ -161,17 +147,62 @@ typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_n
 
 
 /** --------------------------------------------------------------------
- ** Type definitions: file system pathnames.
+ ** File system.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_libc_file_system_pathname_class_t {
-  mmux_libc_memory_allocator_t const * const	memory_allocator;
-} mmux_libc_file_system_pathname_class_t;
+/* Forward type declarations. */
+typedef struct mmux_libc_file_system_pathname_class_t	mmux_libc_file_system_pathname_class_t;
+typedef struct mmux_libc_file_system_pathname_t		mmux_libc_file_system_pathname_t;
 
-typedef struct mmux_libc_file_system_pathname_t {
+typedef bool mmux_libc_file_system_pathname_unmake_fun_t (mmux_libc_file_system_pathname_t * fs_ptn);
+
+struct mmux_libc_file_system_pathname_class_t {
+  mmux_libc_interface_specification_t		const	* const	interface_specification;
+  mmux_libc_file_system_pathname_unmake_fun_t		* const	unmake;
+  mmux_libc_memory_allocator_t			const	* const memory_allocator;
+};
+
+/* NOTE Whatever changes we  make in the future: this data structure  must be at most
+   two machine words, because we will always want  to be able to pass it by value, if
+   there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
+struct mmux_libc_file_system_pathname_t {
   mmux_asciizcp_t					value;
   mmux_libc_file_system_pathname_class_t const *	class;
-} mmux_libc_file_system_pathname_t;
+};
+
+typedef mmux_libc_file_system_pathname_t	mmux_libc_fs_ptn_t[1];
+typedef mmux_libc_file_system_pathname_t const	mmux_libc_fs_ptn_arg_t[1];
+
+/* ------------------------------------------------------------------ */
+
+/* Forward type declarations. */
+typedef struct mmux_libc_file_system_pathname_factory_class_t	mmux_libc_file_system_pathname_factory_class_t;
+typedef struct mmux_libc_file_system_pathname_factory_t		mmux_libc_file_system_pathname_factory_t;
+
+typedef bool mmux_libc_file_system_pathname_factory_make_from_asciiz_fun_t
+   (mmux_libc_fs_ptn_t ptn_result, mmux_libc_file_system_pathname_factory_t const * fs_ptn_factory,
+    mmux_asciizcp_t src_ptn_asciiz);
+
+typedef bool mmux_libc_file_system_pathname_factory_make_from_ascii_len_fun_t
+   (mmux_libc_fs_ptn_t ptn_result, mmux_libc_file_system_pathname_factory_t const * fs_ptn_factory,
+    mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len);
+
+struct mmux_libc_file_system_pathname_factory_class_t {
+  mmux_libc_file_system_pathname_factory_make_from_asciiz_fun_t *	make_from_asciiz;
+  mmux_libc_file_system_pathname_factory_make_from_ascii_len_fun_t *	make_from_ascii_len;
+};
+
+/* NOTE Whatever changes we  make in the future: this data structure  must be at most
+   two machine words, because we will always want  to be able to pass it by value, if
+   there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
+struct mmux_libc_file_system_pathname_factory_t {
+  mmux_libc_file_system_pathname_factory_class_t const *	class;
+};
+
+typedef mmux_libc_file_system_pathname_factory_t	mmux_libc_fs_ptn_factory_t[1];
+typedef mmux_libc_file_system_pathname_factory_t const	mmux_libc_fs_ptn_factory_arg_t[1];
+
+/* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_file_system_pathname_extension_t {
   mmux_asciizcp_t	ptr;
@@ -183,9 +214,19 @@ typedef struct mmux_libc_file_system_pathname_segment_t {
   mmux_usize_t		len;
 } mmux_libc_file_system_pathname_segment_t;
 
-typedef mmux_libc_file_system_pathname_t		mmux_libc_ptn_t;
 typedef mmux_libc_file_system_pathname_extension_t	mmux_libc_ptn_extension_t;
 typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_dirstream_position_t	{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
+
+typedef struct mmux_libc_directory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_directory_file_descriptor_t;
+
+typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
+typedef mmux_libc_directory_file_descriptor_t const	mmux_libc_dirfd_arg_t[1];
 
 
 /** --------------------------------------------------------------------

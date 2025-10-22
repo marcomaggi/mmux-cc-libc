@@ -57,14 +57,13 @@ mmux_libc_getcwd_malloc (mmux_asciizcpp_t result_p)
   }
 }
 bool
-mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
+mmux_libc_getcwd_pathname (mmux_libc_fs_ptn_t fs_ptn_result_p, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
 {
   mmux_asciizcp_t	bufptr;
 
   if (mmux_libc_getcwd_malloc(&bufptr)) {
     return true;
-  } else if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-						 result_p, bufptr)) {
+  } else if (mmux_libc_make_file_system_pathname(fs_ptn_result_p, fs_ptn_factory, bufptr)) {
     mmux_libc_free((mmux_pointer_t)bufptr);
     return true;
   } else {
@@ -72,9 +71,9 @@ mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * result_p)
   }
 }
 bool
-mmux_libc_chdir (mmux_libc_file_system_pathname_t dirptn)
+mmux_libc_chdir (mmux_libc_fs_ptn_arg_t dirptn)
 {
-  int	rv = chdir(dirptn.value);
+  int	rv = chdir(dirptn->value);
 
   return (rv)? true : false;
 }
@@ -86,22 +85,24 @@ mmux_libc_fchdir (mmux_libc_dirfd_arg_t fd)
   return (rv)? true : false;
 }
 
+#if 0
+
 
 /** --------------------------------------------------------------------
  ** Root directory.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_chroot (mmux_libc_file_system_pathname_t ptn)
+mmux_libc_chroot (mmux_libc_fs_ptn_arg_t ptn)
 {
-  int	rv = chroot(ptn.value);
+  int	rv = chroot(ptn->value);
 
   return (rv)? true : false;
 }
 bool
-mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
+mmux_libc_pivot_root (mmux_libc_fs_ptn_arg_t new_root_ptn, mmux_libc_fs_ptn_arg_t put_old_ptn)
 {
-  int	rv = syscall(SYS_pivot_root, new_root_ptn, put_old_ptn.value);
+  int	rv = syscall(SYS_pivot_root, new_root_ptn, put_old_ptn->value);
 
   return (rv)? true : false;
 }
@@ -152,9 +153,9 @@ mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_t const * dirent_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
-  DIR *		rv = opendir(ptn.value);
+  DIR *		rv = opendir(ptn->value);
 
   if (rv) {
     result_p->value = rv;
@@ -244,174 +245,223 @@ mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_link (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
+mmux_libc_link (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
 {
-  int	rv = link(oldname.value, newname.value);
+  int	rv = link(oldname->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_linkat (mmux_libc_fd_arg_t oldfd, mmux_libc_file_system_pathname_t oldname,
-		  mmux_libc_fd_arg_t newfd, mmux_libc_file_system_pathname_t newname,
+mmux_libc_linkat (mmux_libc_fd_arg_t oldfd, mmux_libc_fs_ptn_arg_t oldname,
+		  mmux_libc_fd_arg_t newfd, mmux_libc_fs_ptn_arg_t newname,
 		  mmux_sint_t flags)
 {
-  int	rv = linkat(oldfd->value, oldname.value, newfd->value, newname.value, flags.value);
+  int	rv = linkat(oldfd->value, oldname->value, newfd->value, newname->value, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_symlink (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
+mmux_libc_symlink (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
 {
-  int	rv = symlink(oldname.value, newname.value);
+  int	rv = symlink(oldname->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
 
 /* ------------------------------------------------------------------ */
 
-bool
-mmux_libc_readlink (mmux_usize_t * required_nbytes_p, mmux_libc_file_system_pathname_t linkname,
-		    mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+static bool
+mmux_libc_readlink_from_asciiz_buffer_to_ascii_buffer (mmux_usize_t *	nbytes_written_to_output_buffer_no_nul_p,
+						       mmux_asciip_t	output_buffer_ascii,
+						       mmux_usize_t	output_buffer_provided_nbytes_no_nul,
+						       mmux_asciizcp_t	input_linkname_asciiz)
 {
-  mmux_standard_ssize_t	required_nbytes = readlink(linkname.value, buffer, provided_nbytes.value);
+  mmux_standard_ssize_t	nbytes_written_to_output_buffer_no_nul =
+    readlink(input_linkname_asciiz, output_buffer_ascii, output_buffer_provided_nbytes_no_nul.value);
 
-  if (required_nbytes < 0) {
+  if (nbytes_written_to_output_buffer_no_nul < 0) {
     return true;
   } else {
-    mmux_standard_usize_t	required_nbytes1 = required_nbytes;
-
-    if (required_nbytes1 == provided_nbytes.value) {
-      *required_nbytes_p = mmux_usize(required_nbytes1);
-      return false;
-    } else {
-      return false;
-    }
-  }
-}
-bool
-mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t linkname)
-{
-  auto	provided_nbytes_with_nul = mmux_usize_constant_zero();
-
-  while (true) {
-    provided_nbytes_with_nul = mmux_ctype_add(provided_nbytes_with_nul, mmux_usize_literal(1024));
-    {
-      char		buffer[provided_nbytes_with_nul.value];
-      auto		provided_nbytes_no_nul = mmux_ctype_sub(provided_nbytes_with_nul, mmux_usize_constant_one());
-      mmux_usize_t	nbytes_done_no_nul;
-
-      mmux_libc_memzero(buffer, provided_nbytes_with_nul);
-      if (mmux_libc_readlink(&nbytes_done_no_nul, linkname, buffer, provided_nbytes_no_nul)) {
-	return true;
-      } else if (mmux_ctype_equal(nbytes_done_no_nul, provided_nbytes_with_nul)) {
-	continue;
-      } else {
-	mmux_asciizp_t	asciiz_pathname;
-
-	if (mmux_libc_malloc(&asciiz_pathname, provided_nbytes_with_nul)) {
-	  return true;
-	}
-	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul.value);
-	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-						result_pathname_p, asciiz_pathname)) {
-	  mmux_libc_free(asciiz_pathname);
-	  return true;
-	} else {
-	  return false;
-	}
-      }
-    }
+    *nbytes_written_to_output_buffer_no_nul_p = mmux_usize(nbytes_written_to_output_buffer_no_nul);
+    return false;
   }
 }
 static bool
-mmux_libc_readlinkat_pathname_asciiz (mmux_usize_t * required_nbytes_p, mmux_libc_dirfd_arg_t dirfd,
-				      mmux_asciizcp_t linkname_asciiz,
-				      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+mmux_libc_readlink_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t		fs_ptn_result,
+						 mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+						 mmux_asciizcp_t		input_linkname_asciiz)
 {
-  mmux_standard_ssize_t	required_nbytes = readlinkat(dirfd->value, linkname_asciiz, buffer, provided_nbytes.value);
+  auto	output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
 
-  if (required_nbytes < 0) {
+  for (;;) {
+    char		output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
+    mmux_usize_t	nbytes_written_to_output_buffer_no_nul;
+
+    if (mmux_libc_readlink_from_asciiz_buffer_to_ascii_buffer(&nbytes_written_to_output_buffer_no_nul,
+							      output_buffer_ascii,
+							      output_buffer_provided_nbytes_no_nul,
+							      input_linkname_asciiz)) {
+      return true;
+    } else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) {
+      /* There was not enough room in the output buffer. */
+      mmux_ctype_add_to_variable(output_buffer_provided_nbytes_no_nul, mmux_usize_literal(64));
+      if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_NO_NUL_ARBITRARY_LIMIT,
+			  output_buffer_provided_nbytes_no_nul)) {
+	mmux_libc_errno_set(MMUX_LIBC_ENAMETOOLONG);
+	return true;
+      }
+    } else {
+      return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						  output_buffer_ascii,
+						  nbytes_written_to_output_buffer_no_nul);
+    }
+  }
+}
+bool
+mmux_libc_readlink_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no_nul_p,
+			      mmux_asciip_t		output_buffer_ascii,
+			      mmux_usize_t		output_buffer_provided_nbytes_no_nul,
+			      mmux_libc_fs_ptn_arg_t	fs_ptn_input_linkname)
+{
+  return mmux_libc_readlink_from_asciiz_buffer_to_ascii_buffer(nbytes_written_to_output_buffer_no_nul_p,
+							       output_buffer_ascii,
+							       output_buffer_provided_nbytes_no_nul,
+							       fs_ptn_input_linkname->value);
+}
+bool
+mmux_libc_readlink (mmux_libc_fs_ptn_t			fs_ptn_result,
+		    mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+		    mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
+{
+  return mmux_libc_readlink_from_asciiz_buffer_to_fs_ptn(fs_ptn_result, fs_ptn_factory, fs_ptn_input_linkname->value);
+}
+
+/* ------------------------------------------------------------------ */
+
+static bool
+mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no_nul_p,
+							 mmux_asciip_t		output_buffer_ascii,
+							 mmux_usize_t		output_buffer_provided_nbytes_no_nul,
+							 mmux_standard_sint_t	fd_num,
+							 mmux_asciizcp_t	input_linkname_asciiz)
+/* If the  argument "input_linkname_asciiz" is not  empty: read the file  system link
+ * pathname in "input_linkname_asciiz", relative to "fd_num".
+ *
+ * If the argument "input_linkname_asciiz" is the  empty string: read the file system
+ * link pathname associated to "fd_num".
+ *
+ * Store   the  resulting   pathname  in   "output_buffer_ascii",  whose   length  is
+ * "output_buffer_provided_nbytes_no_nul".
+ *
+ * If no  error occurs when calling  "readlinkat()" the result value  is "false", but
+ * the caller needs to check if the output buffer is wide enough to contain the whole
+ * output pathname not nul-terminated.
+ *
+ * See "mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn()" below  for an example of
+ * how to use this function.
+ */
+{
+  mmux_standard_ssize_t	nbytes_written_to_output_buffer_no_nul =
+    readlinkat(fd_num,
+	       input_linkname_asciiz,
+	       output_buffer_ascii,
+	       output_buffer_provided_nbytes_no_nul.value);
+
+  if (nbytes_written_to_output_buffer_no_nul < 0) {
+    /* The global variable "errno" is set to the error code. */
     return true;
   } else {
-    auto	required_nbytes_unsigned = mmux_usize(required_nbytes);
-
-    if (mmux_ctype_equal(required_nbytes_unsigned, provided_nbytes)) {
-      *required_nbytes_p = required_nbytes_unsigned;
-      return false;
-    } else {
-      return false;
-    }
+    *nbytes_written_to_output_buffer_no_nul_p = mmux_usize(nbytes_written_to_output_buffer_no_nul);
+    return false;
   }
 }
 static bool
-mmux_libc_readlinkat_malloc_pathname_asciiz (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_dirfd_arg_t dirfd,
-					     mmux_asciizcp_t linkname_asciiz)
+mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t			fs_ptn_result,
+						   mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+						   mmux_standard_sint_t			fd_num,
+						   mmux_asciizcp_t			input_linkname_asciiz)
 {
-  auto	provided_nbytes_with_nul = mmux_usize_constant_zero();
+  auto	output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
 
-  while (true) {
-    provided_nbytes_with_nul = mmux_ctype_add(provided_nbytes_with_nul, mmux_usize_literal(1024));
-    {
-      auto		provided_nbytes_no_nul = mmux_ctype_decr(provided_nbytes_with_nul);
-      mmux_usize_t	required_nbytes_no_nul;
-      char		buffer[provided_nbytes_with_nul.value];
+  for (;;) {
+    char		output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
+    mmux_usize_t	nbytes_written_to_output_buffer_no_nul;
 
-      mmux_libc_memzero(buffer, provided_nbytes_with_nul);
-      if (mmux_libc_readlinkat_pathname_asciiz(&required_nbytes_no_nul, dirfd, linkname_asciiz, buffer,
-					       provided_nbytes_no_nul)) {
+    if (mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer(&nbytes_written_to_output_buffer_no_nul,
+								output_buffer_ascii,
+								output_buffer_provided_nbytes_no_nul,
+								fd_num,
+								input_linkname_asciiz)) {
+      return true;
+    } else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) {
+      /* There was not enough room in the output buffer. */
+      mmux_ctype_add_to_variable(output_buffer_provided_nbytes_no_nul, mmux_usize_literal(64));
+      if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_NO_NUL_ARBITRARY_LIMIT,
+			  output_buffer_provided_nbytes_no_nul)) {
+	mmux_libc_errno_set(MMUX_LIBC_ENAMETOOLONG);
 	return true;
-      } else if (mmux_ctype_equal(required_nbytes_no_nul, provided_nbytes_with_nul)) {
-	continue;
-      } else {
-	mmux_asciizp_t	asciiz_pathname;
-
-	if (mmux_libc_malloc(&asciiz_pathname, provided_nbytes_with_nul)) {
-	  return true;
-	};
-	memcpy(asciiz_pathname, buffer, provided_nbytes_with_nul.value);
-	if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-						result_pathname_p, asciiz_pathname)) {
-	  mmux_libc_free(asciiz_pathname);
-	  return true;
-	} else {
-	  return false;
-	}
       }
+    } else {
+      return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						  output_buffer_ascii,
+						  nbytes_written_to_output_buffer_no_nul);
     }
   }
 }
 bool
-mmux_libc_readlinkat (mmux_usize_t * required_nbytes_p, mmux_libc_dirfd_arg_t dirfd,
-		      mmux_libc_file_system_pathname_t linkname,
-		      mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+mmux_libc_readlinkat_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no_nul_p,
+				mmux_asciip_t		output_buffer_ascii,
+				mmux_usize_t		output_buffer_provided_nbytes_no_nul,
+				mmux_libc_dirfd_arg_t	dirfd,
+				mmux_libc_fs_ptn_arg_t	fs_ptn_input_linkname)
 {
-  return mmux_libc_readlinkat_pathname_asciiz (required_nbytes_p, dirfd, linkname.value, buffer, provided_nbytes);
+  return mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer(nbytes_written_to_output_buffer_no_nul_p,
+								 output_buffer_ascii,
+								 output_buffer_provided_nbytes_no_nul,
+								 dirfd->value,
+								 fs_ptn_input_linkname->value);
 }
 bool
-mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_dirfd_arg_t dirfd,
-			     mmux_libc_file_system_pathname_t linkname)
+mmux_libc_readlinkfd_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no_nul_p,
+				mmux_asciip_t		output_buffer_ascii,
+				mmux_usize_t		output_buffer_provided_nbytes_no_nul,
+				mmux_libc_fd_arg_t	fd)
 {
-  return mmux_libc_readlinkat_malloc_pathname_asciiz(result_pathname_p, dirfd, linkname.value);
+  return mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer(nbytes_written_to_output_buffer_no_nul_p,
+								 output_buffer_ascii,
+								 output_buffer_provided_nbytes_no_nul,
+								 fd->value,
+								 "");
 }
 bool
-mmux_libc_readlinkfd (mmux_usize_t * required_nbytes_p, mmux_libc_dirfd_arg_t dirfd,
-				  mmux_asciizp_t buffer, mmux_usize_t provided_nbytes)
+mmux_libc_readlinkat (mmux_libc_fs_ptn_t		fs_ptn_result,
+		      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+		      mmux_libc_dirfd_arg_t		dirfd,
+		      mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
 {
-  return mmux_libc_readlinkat_pathname_asciiz (required_nbytes_p, dirfd, "", buffer, provided_nbytes);
+  return mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn(fs_ptn_result,
+							   fs_ptn_factory,
+							   dirfd->value,
+							   fs_ptn_input_linkname->value);
 }
 bool
-mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_dirfd_arg_t dirfd)
+mmux_libc_readlinkfd (mmux_libc_fs_ptn_t		fs_ptn_result,
+		      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+		      mmux_libc_fd_arg_t		fd)
 {
-  return mmux_libc_readlinkat_malloc_pathname_asciiz(result_pathname_p, dirfd, "");
+  return mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn(fs_ptn_result,
+							   fs_ptn_factory,
+							   fd->value,
+							   "");
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_canonicalize_file_name (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t input_pathname)
+mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t result_pathname_p, mmux_libc_fs_ptn_arg_t input_pathname)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
-  mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(input_pathname.value);
+  mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(input_pathname->value);
 
   if (asciiz_output_pathname) {
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
@@ -427,9 +477,9 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
 ]]])
 }
 bool
-mmux_libc_realpath (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_libc_file_system_pathname_t input_pathname)
+mmux_libc_realpath (mmux_libc_fs_ptn_t result_pathname_p, mmux_libc_fs_ptn_arg_t input_pathname)
 {
-  mmux_asciizp_t	asciiz_output_pathname = realpath(input_pathname.value, NULL);
+  mmux_asciizp_t	asciiz_output_pathname = realpath(input_pathname->value, NULL);
 
   if (asciiz_output_pathname) {
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
@@ -445,56 +495,57 @@ mmux_libc_realpath (mmux_libc_file_system_pathname_t * result_pathname_p, mmux_l
 }
 
 bool
-mmux_libc_unlink (mmux_libc_file_system_pathname_t pathname)
+mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
 {
-  int	rv = unlink(pathname.value);
+  int	rv = unlink(pathname->value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags)
+mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t flags)
 {
-  int	rv = unlinkat(dirfd->value, pathname.value, flags.value);
+  int	rv = unlinkat(dirfd->value, pathname->value, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
+mmux_libc_rmdir (mmux_libc_fs_ptn_arg_t pathname)
 {
-  int	rv = rmdir(pathname.value);
+  int	rv = rmdir(pathname->value);
+
+  return ((0 == rv)? false : true);
+}
+#endif
+bool
+mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
+{
+  int	rv = remove(pathname->value);
+
+  return ((0 == rv)? false : true);
+}
+#if 0
+bool
+mmux_libc_rename (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
+{
+  int	rv = rename(oldname->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_remove (mmux_libc_file_system_pathname_t pathname)
+mmux_libc_renameat (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+		    mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname)
 {
-  int	rv = remove(pathname.value);
-
-  return ((0 == rv)? false : true);
-}
-
-bool
-mmux_libc_rename (mmux_libc_file_system_pathname_t oldname, mmux_libc_file_system_pathname_t newname)
-{
-  int	rv = rename(oldname.value, newname.value);
+  int	rv = renameat(olddirfd->value, oldname->value, newdirfd->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_renameat (mmux_libc_fd_arg_t olddirfd, mmux_libc_file_system_pathname_t oldname,
-		    mmux_libc_fd_arg_t newdirfd, mmux_libc_file_system_pathname_t newname)
-{
-  int	rv = renameat(olddirfd->value, oldname.value, newdirfd->value, newname.value);
-
-  return ((0 == rv)? false : true);
-}
-bool
-mmux_libc_renameat2 (mmux_libc_fd_arg_t olddirfd, mmux_libc_file_system_pathname_t oldname,
-		     mmux_libc_fd_arg_t newdirfd, mmux_libc_file_system_pathname_t newname,
+mmux_libc_renameat2 (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+		     mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
 		     mmux_uint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
-  int	rv = renameat2(olddirfd->value, oldname.value, newdirfd->value, newname.value, flags.value);
+  int	rv = renameat2(olddirfd->value, oldname->value, newdirfd->value, newname->value, flags.value);
 
   return ((0 == rv)? false : true);
 ]]])
@@ -506,16 +557,16 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_mkdir (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
+mmux_libc_mkdir (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = mkdir(pathname.value, mode.value);
+  int	rv = mkdir(pathname->value, mode.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_mkdirat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
+mmux_libc_mkdirat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = mkdirat(dirfd->value, pathname.value, mode.value);
+  int	rv = mkdirat(dirfd->value, pathname->value, mode.value);
 
   return ((0 == rv)? false : true);
 }
@@ -526,9 +577,9 @@ mmux_libc_mkdirat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_chown (mmux_libc_file_system_pathname_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
+mmux_libc_chown (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
 {
-  int	rv = chown(pathname.value, uid.value, gid.value);
+  int	rv = chown(pathname->value, uid.value, gid.value);
 
   return ((0 == rv)? false : true);
 }
@@ -540,17 +591,17 @@ mmux_libc_fchown (mmux_libc_fd_arg_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gi
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_lchown (mmux_libc_file_system_pathname_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
+mmux_libc_lchown (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_uid_t uid, mmux_libc_gid_t gid)
 {
-  int	rv = lchown(pathname.value, uid.value, gid.value);
+  int	rv = lchown(pathname->value, uid.value, gid.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fchownat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_libc_fchownat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
 		    mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
 {
-  int	rv = fchownat(dirfd->value, pathname.value, uid.value, gid.value, flags.value);
+  int	rv = fchownat(dirfd->value, pathname->value, uid.value, gid.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -586,9 +637,9 @@ mmux_libc_getumask (mmux_libc_mode_t * current_mask_p)
   return false;
 }
 bool
-mmux_libc_chmod (mmux_libc_file_system_pathname_t pathname, mmux_libc_mode_t mode)
+mmux_libc_chmod (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_mode_t mode)
 {
-  int	rv = chmod(pathname.value, mode.value);
+  int	rv = chmod(pathname->value, mode.value);
 
   return ((0 == rv)? false : true);
 }
@@ -600,20 +651,20 @@ mmux_libc_fchmod (mmux_libc_fd_arg_t fd, mmux_libc_mode_t mode)
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fchmodat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_libc_fchmodat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
 		    mmux_libc_mode_t mode, mmux_sint_t flags)
 {
-  int	rv = fchmodat(dirfd->value, pathname.value, mode.value, flags.value);
+  int	rv = fchmodat(dirfd->value, pathname->value, mode.value, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t pathname, mmux_sint_t how)
+mmux_libc_access (bool * access_is_permitted_p, mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t how)
 {
   int	rv;
 
   mmux_libc_errno_clear();
-  rv = access(pathname.value, how.value);
+  rv = access(pathname->value, how.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
@@ -634,12 +685,12 @@ mmux_libc_access (bool * access_is_permitted_p, mmux_libc_file_system_pathname_t
 }
 bool
 mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
-		     mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
+		     mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t how, mmux_sint_t flags)
 {
   int	rv;
 
   mmux_libc_errno_clear();
-  rv = faccessat(dirfd->value, pathname.value, how.value, flags.value);
+  rv = faccessat(dirfd->value, pathname->value, how.value, flags.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
@@ -660,12 +711,12 @@ mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 }
 bool
 mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
-		      mmux_libc_file_system_pathname_t pathname, mmux_sint_t how, mmux_sint_t flags)
+		      mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t how, mmux_sint_t flags)
 {
   int	rv;
 
   mmux_libc_errno_clear();
-  rv = syscall(SYS_faccessat2, dirfd->value, pathname.value, how.value, flags.value);
+  rv = syscall(SYS_faccessat2, dirfd->value, pathname->value, how.value, flags.value);
 
   if (0 == rv) {
     *access_is_permitted_p = true;
@@ -691,9 +742,9 @@ mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_truncate (mmux_libc_file_system_pathname_t pathname, mmux_off_t len)
+mmux_libc_truncate (mmux_libc_fs_ptn_arg_t pathname, mmux_off_t len)
 {
-  int	rv = truncate(pathname.value, len.value);
+  int	rv = truncate(pathname->value, len.value);
 
   return ((0 == rv)? false : true);
 }
@@ -1190,9 +1241,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_t const * const stat_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_stat (mmux_libc_file_system_pathname_t pathname, mmux_libc_stat_t * stat_p)
+mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
 {
-  int	rv = stat(pathname.value, stat_p);
+  int	rv = stat(pathname->value, stat_p);
 
   return ((0 == rv)? false : true);
 }
@@ -1203,18 +1254,20 @@ mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p)
 
   return ((0 == rv)? false : true);
 }
+#endif
 bool
-mmux_libc_lstat (mmux_libc_file_system_pathname_t pathname, mmux_libc_stat_t * stat_p)
+mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
 {
-  int	rv = lstat(pathname.value, stat_p);
+  int	rv = lstat(pathname->value, stat_p);
 
   return ((0 == rv)? false : true);
 }
+#if 0
 bool
-mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t pathname,
+mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
 		   mmux_libc_stat_t * stat_p, mmux_sint_t flags)
 {
-  int	rv = fstatat(dirfd->value, pathname.value, stat_p, flags.value);
+  int	rv = fstatat(dirfd->value, pathname->value, stat_p, flags.value);
 
   return ((0 == rv)? false : true);
 }
@@ -1259,8 +1312,9 @@ DEFINE_STAT_MODE_PREDICATE([[[S_ISSOCK]]])
 
 /* ------------------------------------------------------------------ */
 
+#endif
 bool
-mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   mmux_libc_stat_t	stru;
 
@@ -1290,11 +1344,12 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_file_system_pa
     return false;
   }
 }
+#if 0
 
 /* ------------------------------------------------------------------ */
 
 static bool
-mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_system_pathname_t ptn, mmux_libc_stat_mode_pred_t * pred)
+mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_fs_ptn_arg_t ptn, mmux_libc_stat_mode_pred_t * pred)
 {
   mmux_libc_stat_t	stru;
 
@@ -1326,7 +1381,7 @@ mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_file_sys
 }
 
 m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_PREDICATE]]],[[[bool
-mmux_libc_file_system_pathname_is_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_is_$1 (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   return mmux_libc_file_system_pathname_is_predicate(result_p, ptn, mmux_libc_$2);
 }]]])
@@ -1388,7 +1443,7 @@ DEFINE_FILE_DESCRIPTOR_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn)
 {
   mmux_libc_stat_t	ST[1];
   auto			flags = mmux_sint_constant_zero();
@@ -1486,27 +1541,27 @@ mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * const
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_utime (mmux_libc_file_system_pathname_t pathname, mmux_libc_utimbuf_t utimbuf)
+mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_t utimbuf)
 {
-  int	rv = utime(pathname.value, &utimbuf);
+  int	rv = utime(pathname->value, &utimbuf);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_utimes (mmux_libc_file_system_pathname_t pathname,
+mmux_libc_utimes (mmux_libc_fs_ptn_arg_t pathname,
 		  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
 {
   mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
-  int			rv   = utimes(pathname.value, T);
+  int			rv   = utimes(pathname->value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_lutimes (mmux_libc_file_system_pathname_t pathname,
+mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t pathname,
 		   mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
 {
   mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
-  int			rv   = lutimes(pathname.value, T);
+  int			rv   = lutimes(pathname->value, T);
 
   return ((0 == rv)? false : true);
 }
@@ -1529,14 +1584,16 @@ mmux_libc_futimens (mmux_libc_fd_arg_t fd,
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_file_system_pathname_t ptn,
+mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn,
 		     mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
 		     mmux_sint_t flags)
 {
   mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
-  int			rv   = utimensat(dirfd->value, ptn.value, T, flags.value);
+  int			rv   = utimensat(dirfd->value, ptn->value, T, flags.value);
 
   return ((0 == rv)? false : true);
 }
+
+#endif
 
 /* end of file */

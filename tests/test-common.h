@@ -218,45 +218,57 @@ cleanfiles (void)
 /* Clean all the files registered in "CLEANFILES_PATHNAMES_ASCIIZ[]". */
 {
   for (mmux_standard_usize_t i=0; i < CLEANFILES_PATHNAMES_COUNT; ++i) {
-    mmux_libc_ptn_t	ptn;
+    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_t		fs_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-					    &ptn, CLEANFILES_PATHNAMES_ASCIIZ[i])) {
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, CLEANFILES_PATHNAMES_ASCIIZ[i])) {
       continue;
     } else {
       bool	exists;
 
-      if (mmux_libc_file_system_pathname_exists(&exists, ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&exists, fs_ptn)) {
 	continue;
       } else if (exists) {
-	printf_message("common: removing existent cleanfile[%lu]: \"%s\"", i, ptn.value);
-	if (mmux_libc_remove(ptn)) {
-	  printf_error("common: removing \"%s\"", ptn.value);
+	printf_message("common: removing existent cleanfile[%lu]: \"%s\"", i, fs_ptn->value);
+	if (mmux_libc_remove(fs_ptn)) {
+	  printf_error("common: removing \"%s\"", fs_ptn->value);
 	}
       } else {
-	printf_message("common: unexistent cleanfile[%lu]: \"%s\"", i, ptn.value);
+	printf_message("common: unexistent cleanfile[%lu]: \"%s\"", i, fs_ptn->value);
       }
     }
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   }
 }
 
 bool
 test_create_data_file (mmux_asciizcp_t pathname_asciiz)
 {
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_memfd_t	fd;
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
-    handle_error();
-  }
+  mmux_libc_fd_t	fd;
 
   {
-    auto const	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR  | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
-    auto const	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    if (mmux_libc_open(fd, ptn, flags, mode)) {
-      handle_error();
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, pathname_asciiz)) {
+	handle_error();
+      }
     }
+
+    {
+      auto const	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR  | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+      auto const	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+      if (mmux_libc_open(fd, fs_ptn, flags, mode)) {
+	handle_error();
+      }
+    }
+
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   }
 
   /* Write data to the source file. */

@@ -199,49 +199,17 @@ mmux_libc_at_fdcwd (mmux_libc_dirfd_t result_p)
 bool
 mmux_libc_make_fd (mmux_libc_fd_t result_p, mmux_standard_sint_t fd_num)
 {
-  result_p->value = fd_num;
-  return false;
-}
-bool
-mmux_libc_make_dirfd (mmux_libc_dirfd_t result_p, mmux_standard_sint_t fd_num)
-{
-  result_p->value = fd_num;
-  return false;
-}
-
-bool
-mmux_libc_fd_equal (mmux_libc_fd_arg_t one, mmux_libc_fd_arg_t two)
-{
-  return (one->value == two->value)? true : false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_fd_parse (mmux_libc_fd_t result_p, mmux_asciizcp_t s_value, mmux_asciizcp_t who)
-{
-  mmux_sint_t	fd_sint;
-
-  if (mmux_sint_parse(&fd_sint, s_value, who)) {
-    return true;
+  if (0 <= fd_num) {
+    result_p->value = fd_num;
+    return false;
   } else {
-    return mmux_libc_make_fd(result_p, fd_sint.value);
+    return true;
   }
 }
 bool
-mmux_libc_fd_sprint (char * ptr, mmux_usize_t provided_nchars, mmux_libc_fd_arg_t fd)
+mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd, mmux_standard_sint_t fd_num)
 {
-  if (MMUX_LIBC_FD_MAXIMUM_STRING_REPRESENTATION_LENGTH < provided_nchars.value) {
-    mmux_libc_errno_set_to_einval();
-    return true;
-  } else {
-    return mmux_sint_sprint_p(ptr, provided_nchars, fd);
-  }
-}
-bool
-mmux_libc_fd_sprint_size (mmux_usize_t * required_nchars_p, mmux_libc_fd_arg_t fd)
-{
-  return mmux_sint_sprint_size_p(required_nchars_p, fd);
+  return mmux_libc_make_fd(dirfd, fd_num);
 }
 
 /* ------------------------------------------------------------------ */
@@ -366,10 +334,10 @@ mmux_libc_dprintfer_newline (void)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_open (mmux_libc_fd_t fd, mmux_libc_file_system_pathname_t pathname,
+mmux_libc_open (mmux_libc_fd_t fd, mmux_libc_fs_ptn_arg_t pathname,
 		mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
 {
-  int	fd_num = open(pathname.value, flags.value, mode.value);
+  int	fd_num = open(pathname->value, flags.value, mode.value);
 
   if (-1 != fd_num) {
     return mmux_libc_make_fd(fd, fd_num);
@@ -386,10 +354,10 @@ mmux_libc_close (mmux_libc_fd_arg_t fd)
 }
 bool
 mmux_libc_openat (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
-		  mmux_libc_file_system_pathname_t pathname,
+		  mmux_libc_fs_ptn_arg_t pathname,
 		  mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
 {
-  int	fd_num = openat(dirfd->value, pathname.value, flags.value, mode.value);
+  int	fd_num = openat(dirfd->value, pathname->value, flags.value, mode.value);
 
   if (-1 != fd_num) {
     return mmux_libc_make_fd(fd, fd_num);
@@ -480,10 +448,10 @@ mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_t const * con
 
 bool
 mmux_libc_openat2 (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
-		   mmux_libc_file_system_pathname_t pathname, mmux_libc_open_how_t const * const how_p)
+		   mmux_libc_fs_ptn_arg_t pathname, mmux_libc_open_how_t const * const how_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
-  mmux_standard_slong_t	fdval = syscall(SYS_openat2, dirfd->value, pathname.value, how_p, sizeof(mmux_libc_open_how_t));
+  mmux_standard_slong_t	fdval = syscall(SYS_openat2, dirfd->value, pathname->value, how_p, sizeof(mmux_libc_open_how_t));
 
   if (-1 != fdval) {
     fd->value = fdval;
@@ -1683,9 +1651,9 @@ mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
   return mmux_sint_dprintf_p(fd->value, value);
 }
 bool
-mmux_libc_dprintf_libc_ptn (mmux_libc_fd_arg_t fd, mmux_libc_file_system_pathname_t value)
+mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t pathname)
 {
-  return mmux_libc_dprintf(fd, "%s", value.value);
+  return mmux_libc_dprintf(fd, "%s", pathname->value);
 }
 bool
 mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd, mmux_libc_process_completion_status_t value)

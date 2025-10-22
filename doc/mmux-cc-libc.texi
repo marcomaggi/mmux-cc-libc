@@ -3702,22 +3702,30 @@ evaluate to instances of this type.
 @end deftp
 
 
-@deftypefun bool mmux_libc_pathconf (mmux_slong_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_sysconf_pathname_parameter_t @var{parameter})
+@deftypefun bool mmux_libc_pathconf (mmux_slong_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_sysconf_pathname_parameter_t @var{parameter})
 @MmuxCInterface{pathconf}.  When successful: if the variable referenced by @var{result_p} is set to
 @samp{-1}, the system does not impose a limit on the specified parameter.
 
 @example
-mmux_libc_ptn_t     ptn;
-mmux_slong_t        result;
+mmux_libc_fs_ptn_t  fs_ptn;
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-                                        &ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_pathconf(&result, ptn, MMUX_LIBC__PC_LINK_MAX)) @{
-  /* error */
-@} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
-  /* error */
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, "/path/to/file.ext")) @{
+    /* error */
+  @}
 @}
+@{
+  mmux_slong_t  result;
+
+  if (mmux_libc_pathconf(&result, fs_ptn, MMUX_LIBC__PC_LINK_MAX)) @{
+  /* error */
+  @} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
+    /* error */
+  @}
+@}
+mmux_libc_unmake_file_system_pathname(fs_ptn);
 @end example
 @end deftypefun
 
@@ -3727,29 +3735,37 @@ if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_c
 @samp{-1}, the system does not impose a limit on the specified parameter.
 
 @example
-mmux_libc_ptn_t     ptn;
-mmux_libc_fd_t      fd;
-mmux_slong_t        result;
+mmux_libc_fd_t  fd;
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-                                        &ptn, "/path/to/file.ext")) @{
-  /* error */
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, "/path/to/file.ext")) @{
+      /* error */
+    @}
+  @}
+  /* Open the file. */
+  @{
+    auto    flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+    auto    mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 
-/* Open the file. */
 @{
-  auto      flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
-  auto      mode  = mmux_libc_mode_constant_zero();
+  mmux_slong_t  result;
 
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
+  if (mmux_libc_fpathconf(&result, fd, MMUX_LIBC__PC_LINK_MAX)) @{
+    /* error */
+  @} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
     /* error */
   @}
-@}
-
-if (mmux_libc_fpathconf(&result, fd, MMUX_LIBC__PC_LINK_MAX)) @{
-  /* error */
-@} else if (mmux_libc_dprintfer("%s: pc_link_max is: '%lu'\n", __func__, result.value)) @{
-  /* error */
 @}
 @end example
 @end deftypefun
@@ -5455,8 +5471,20 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 @chapter File descriptors
 
 
+File descriptors are used to represent data sources and data destinations for the process's input
+and output facilities.  As simple example, to write a formatted string to @stdout{} we do:
+
+@example
+mmux_libc_fd_t  fd;
+
+mmux_libc_stdou(fd);
+mmux_libc_dprintf(fd, "the integer is: %d\n", 123);
+@end example
+
 @menu
 * fds fds::                     File descriptors type.
+* fds dirfds::                  Directory file descriptors type.
+* fds standard::                Standard file descriptors.
 * fds printing::                Printing formatted output.
 * fds opening::                 Opening file descriptors.
 * fds closing::                 Closing file descriptors.
@@ -5481,80 +5509,137 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 @section File descriptors type
 
 
-@deftp {Opaque Type} mmux_libc_file_descriptor_t
-@deftpx {Opaque Type} mmux_libc_fd_t
-Opaque type representing file descriptors.  It must be passed by value.
+@deftp {Struct Type} mmux_libc_file_descriptor_t
+@deftpx {Parent Struct Type} mmux_sint_t
+Data structure type representing file descriptors.
 @end deftp
 
 
-@deftypefun bool mmux_libc_stdin (mmux_libc_file_descriptor_t * @var{fd_p})
+@deftp {Pointer Type} mmux_libc_fd_t
+Pointer types defined as:
+
+@example
+typedef mmux_libc_file_descriptor_t  mmux_libc_fd_t[1];
+@end example
+
+@noindent
+it is meant to be used as type of result in function calls that open a new file descriptor or
+retrieve an already opened file descriptor, so the referenced @objtype{mmux_libc_file_descriptor_t}
+instance must be mutable.
+@end deftp
+
+
+@deftp {Pointer Type} mmux_libc_fd_arg_t
+Pointer types defined as:
+
+@example
+typedef mmux_libc_file_descriptor_t const  mmux_libc_fd_arg_t[1];
+@end example
+
+@noindent
+it is meant to be used as type of arguments in function calls that make use of a file descriptor, so
+the referenced @objtype{mmux_libc_file_descriptor_t} instance must be immutable.
+@end deftp
+
+
+@deftypefun bool mmux_libc_make_fd (mmux_libc_fd_t @var{fd}, mmux_standard_sint_t @var{fd_num})
+Make a new file descriptor value.  If @var{fd_num} is negative: @var{fd} is left untouched and the
+return value is @ctrue{}.
+
+@example
+mmux_libc_fd_t  in, ou, er;
+
+mmux_libc_make_fd(&in, 0);
+mmux_libc_make_fd(&ou, 1);
+mmux_libc_make_fd(&er, 2);
+@end example
+@end deftypefun
+
+@c page
+@node fds dirfds
+@section Directory file descriptors type
+
+
+Directory file descriptors are represented as instances of
+@objtype{mmux_libc_directory_file_descriptor_t}; we can open a file descriptor referencing a file
+system directory with the opening functions like @func{mmux_libc_open} using the flag
+@samp{MMUX_LIBC_O_DIRECTORY}; we are required to use directory file descriptors with functions like
+@cfunc{mmux_libc_openat} and similar.
+
+
+@deftp {Struct Type} mmux_libc_directory_file_descriptor_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+Data structure type representing directory file descriptors.
+@end deftp
+
+
+@deftp {Pointer Type} mmux_libc_dirfd_t
+Pointer types defined as:
+
+@example
+typedef mmux_libc_directory_file_descriptor_t  mmux_libc_dirfd_t[1];
+@end example
+
+@noindent
+it is meant to be used as type of result in function calls that open a new directory file descriptor
+or retrieve an already opened file descriptor, so the referenced
+@objtype{mmux_libc_directory_file_descriptor_t} instance must be mutable.
+@end deftp
+
+
+@deftp {Pointer Type} mmux_libc_dirfd_arg_t
+Pointer types defined as:
+
+@example
+typedef mmux_libc_directory_file_descriptor_t const  mmux_libc_dirfd_arg_t[1];
+@end example
+
+@noindent
+it is meant to be used as type of arguments in function calls that make use of a directory file
+descriptor, so the referenced @objtype{mmux_libc_directory_file_descriptor_t} instance must be
+immutable.
+@end deftp
+
+
+@deftypefun bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t @var{dirfd})
+Store in the variable referenced by @var{dirfd} directory file descriptor associated to the constant
+@code{AT_FDCWD}.  We can use it with @cfunc{mmux_libc_openat} and similar functions.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_dirfd (mmux_libc_dirfd_t @var{dirfd}, mmux_standard_sint_t @var{dirfd_num})
+Make a new file descriptor value representing a file system directory.  If @var{dirfd_num} is
+negative: @var{dirfd} is left untouched and the return value is @ctrue{}.
+@end deftypefun
+
+@c page
+@node fds standard
+@section Standard file descriptors
+
+
+@cindex Standard input file descriptor
+@cindex Standard output file descriptor
+@cindex Standard error file descriptor
+@cindex File descriptor for standard input
+@cindex File descriptor for standard output
+@cindex File descriptor for standard error
+@cindex @stdin{} file descriptor
+@cindex @stdout{} file descriptor
+@cindex @stderr{} file descriptor
+
+
+@deftypefun bool mmux_libc_stdin (mmux_libc_fd_t @var{fd})
 Retrieve the file descriptor value associated to the standard input.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stdou (mmux_libc_file_descriptor_t * @var{fd_p})
+@deftypefun bool mmux_libc_stdou (mmux_libc_fd_t @var{fd})
 Retrieve the file descriptor value associated to the standard output.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stder (mmux_libc_file_descriptor_t * @var{fd_p})
+@deftypefun bool mmux_libc_stder (mmux_libc_fd_t @var{fd})
 Retrieve the file descriptor value associated to the standard error.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_at_fdcwd (mmux_libc_file_descriptor_t * @var{result_p})
-Return the file descriptor associated to the constant @code{AT_FDCWD}.  We can use it with
-@cfunc{mmux_libc_openat} and similar functions.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_make_fd (mmux_libc_file_descriptor_t * @var{result_p}, mmux_sint_t @var{fd_num})
-Make a new file descriptor value.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_fd_equal (mmux_libc_fd_t @vari{fd}, mmux_libc_fd_t @varii{fd})
-Return @ctrue{} if @vari{fd} is equal to @varii{fd}; otherwise return @cfalse{}.
-@end deftypefun
-
-
-To convert a file descriptor to string we can do:
-
-@example
-mmux_libc_fd_t  the_fd = gimme_an_fd();
-mmux_usize_t    required_nchars;
-
-if (mmux_libc_fd_sprint_size(&required_nchars, the_fd) @{
-  /* error */
-@} else @{
-  char  str[required_nchars];
-
-  if (mmux_libc_fd_sprint(str, required_nchars, the_fd) @{
-    /* error */
-  @}
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_fd_parse (mmux_libc_fd_t * @var{fd_p}, mmux_asciizcp_t @var{str}, mmux_asciizcp_t @var{who})
-Parse the @asciiz{} string referenced by @var{str} and convert it into a @objtype{mmux_libc_fd_t}
-value; store the value in the location referenced by @var{fd_p}.  If an error occurs and @var{who}
-is not @cnull{}: print an error message to @stderr{} using @var{who} as name of the entity that
-performed the function call.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_fd_sprint_size (mmux_usize_t * @var{required_nchars_p}, mmux_libc_fd_t @var{fd})
-Determine the number of characters required to contain the string representation of @var{fd} as
-@asciiz{} string, @strong{including} the terminating nul character, and store it in the location
-referenced by @var{required_nchars_p}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_fd_sprint (char * @var{str}, mmux_usize_t @var{nchars}, mmux_libc_fd_t @var{fd})
-Convert @var{fd} to its @asciiz{} string representation and store the result, @strong{including}
-the terminating nul character, in the array referenced by @var{str}, which must be @var{nchars}
-wide.
 @end deftypefun
 
 @c page
@@ -5562,7 +5647,7 @@ wide.
 @section Printing formatted output
 
 
-@deftypefun bool mmux_libc_dprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_asciizcp_t @var{template}, ...)
+@deftypefun bool mmux_libc_dprintf (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, ...)
 @deftypefunx bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 @deftypefunx bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 @MmuxCInterface{dprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
@@ -5570,19 +5655,18 @@ wide.
 To print to a file descriptor:
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-mmux_sint_t             flags = MMUX_LIBC_O_RDONLY;
-mmux_mode_t             mode  = 0;
+mmux_libc_fs_ptn_t  ptn;
+mmux_libc_fd_t      fd;
+auto                flags = mmux_libc_open_flags(MMUX_LIBC_O_RDONLY);
+auto                mode  = mmux_libc_mode_literal(0);
 
-if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
+if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
+                                        ptn, "/path/to/file.ext")) @{
   /* error */
 @}
-
-if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+if (mmux_libc_open(fd, ptn, flags, mode)) @{
   /* error */
 @}
-
 if (mmux_libc_dprintf(fd, "the number is %d\n", 123)) @{
   /* error */
 @}
@@ -5756,8 +5840,8 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_ptn}
-@deftypefun bool mmux_libc_dprintf_libc_ptn (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{value})
+@anchor{mmux_libc_dprintf_fs_ptn}
+@deftypefun bool mmux_libc_dprintf_fs_ptn (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -5800,17 +5884,17 @@ Print to @var{fd} the string representation of @var{value}.
 @subsection Standard file descriptor opening
 
 
-@deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
 @MmuxCInterface{open}.
 
 @example
-mmux_libc_file_system_pathname_t pathname;
-mmux_libc_file_descriptor_t      fd;
+mmux_libc_fs_ptn_t  pathname;
+mmux_libc_fs_t      fd;
 
 mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
 mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
-if (mmux_libc_make_file_system_pathname(&pathname, "/path/to/file.ext")) @{
+if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
   /* error */
 @}
 
@@ -5821,18 +5905,18 @@ if (mmux_libc_open(&fd, pathname, flags, mode)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_openat (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_openat (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
 @MmuxCInterface{openat}.
 
 @example
-mmux_libc_file_system_pathname_t pathname;
+mmux_libc_fs_ptn_t      pathname;
 mmux_libc_file_descriptor_t      dirfd;
 mmux_libc_file_descriptor_t      fd;
 
 mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
 mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
-if (mmux_libc_make_file_system_pathname(&pathname, "/path/to/file.ext")) @{
+if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
   /* error */
 @}
 
@@ -5900,11 +5984,11 @@ struct open_how->resolve = 15 (RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS | RESOLVE
 @end example
 
 
-@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * @var{fd}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_open_how_t const * const @var{how_p})
+@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * @var{fd}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_open_how_t const * const @var{how_p})
 @MmuxCInterface{openat2}.
 
 @example
-mmux_libc_file_system_pathname_t      ptn;
+mmux_libc_fs_ptn_t      ptn;
 mmux_libc_file_descriptor_t           dirfd;
 mmux_libc_file_descriptor_t           fd;
 mmux_libc_open_how_t                  open_how;
@@ -5924,7 +6008,7 @@ mmux_libc_open_how_resolve_set(&open_how, \
   | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
   | MMUX_LIBC_RESOLVE_NO_XDEV);
 
-if (mmux_libc_make_file_system_pathname(&ptn, "./file.ext")) @{
+if (mmux_libc_make_file_system_pathname(ptn, "./file.ext")) @{
   /* error */
 @}
 
@@ -6593,19 +6677,19 @@ mmux_libc_file_descriptor_t     dst_fd;
 
 /* Open the source and destination files. */
 @{
-  mmux_libc_file_system_pathname_t    src_ptn;
-  mmux_libc_file_system_pathname_t    dst_ptn;
+  mmux_libc_fs_ptn_t    src_ptn;
+  mmux_libc_fs_ptn_t    dst_ptn;
   mmux_sint_t  flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
   mmux_mode_t  mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
-  if (mmux_libc_make_file_system_pathname(&src_ptn, "source.ext")) @{
+  if (mmux_libc_make_file_system_pathname(src_ptn, "source.ext")) @{
     /* error */
   @}
   if (mmux_libc_open(&src_fd, src_ptn, flags, mode)) @{
     /* error */
   @}
 
-  if (mmux_libc_make_file_system_pathname(&dst_ptn, "destination.ext")) @{
+  if (mmux_libc_make_file_system_pathname(dst_ptn, "destination.ext")) @{
     /* error */
   @}
 
@@ -6935,6 +7019,7 @@ to it almost all the functions acting upon file descriptors.
 
 @menu
 * fds memfd intro::             Introduction to memfds and usage examples.
+* fds memfd fds::               Memory-mapped file descriptors types.
 * fds memfd makers::            Constructing memfds.
 * fds memfd inspect::           Inspecting memfds.
 * fds memfd reading::           Special reading operations upon memfds.
@@ -6950,7 +7035,7 @@ to it almost all the functions acting upon file descriptors.
 To use a memory--mapped file descriptor, we do:
 
 @example
-mmux_libc_fd_t  mfd;
+mmux_libc_memfd_t  mfd;
 
 if (mmux_libc_make_memfd(&mfd)) @{
   /* error */
@@ -6962,12 +7047,11 @@ if (mmux_libc_make_memfd(&mfd)) @{
   @}
 
   @{
-    mmux_double_t       rep = 1.2;
-    mmux_double_t       imp = 3.4;
-    mmux_complexd_t     Z;
+    auto  rep = mmux_double_literal(1.2);
+    auto  imp = mmux_double_literal(3.4);
+    auto  Z   = mmux_complexd_make_rectangular(rep, imp);
 
-    Z = mmux_complexd_make_rectangular(rep, imp);
-    mmux_complexd_dprintf(mfd, Z);
+    mmux_libc_dprintf_complexd(mfd, Z);
   @}
 
   /* Copy the data to stdout. */
@@ -6988,8 +7072,14 @@ We need to remember to appropriately shift the input/output position of the unde
 position to its original value, we do:
 
 @example
-mmux_libc_fd_t  mfd = ...;
-mmux_off_t      position = 0; /* new position with respect to MMUX_LIBC_SEEK_SET */
+mmux_libc_memfd_t  mfd;
+
+ /* new position with respect to MMUX_LIBC_SEEK_SET */
+auto               position = mmux_off_literal(0);
+
+if (mmux_libc_make_memfd(&mfd)) @{
+  /* error */
+@}
 
 /* Save the current position then seek to the beginning. */
 if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
@@ -7007,6 +7097,27 @@ if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
 @noindent
 also we can use @cfunc{mmux_libc_pread} and @cfunc{mmux_libc_pwrite} to read from and write to a
 position from the beginning of the underlying device.
+
+@c page
+@node fds memfd fds
+@subsection Memory--mapped file descriptors types
+
+
+@deftp {Struct Type} mmux_libc_memory_file_descriptor_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+Data structure type representing memory--mapped file descriptors.
+@end deftp
+
+
+@deftp {Pointer Type} mmux_libc_memfd_t
+@deftpx {Pointer Type} mmux_libc_memfd_arg_t
+Pointer types defined as:
+
+@example
+typedef mmux_libc_memory_file_descriptor_t        mmux_libc_memfd_t[1];
+typedef mmux_libc_memory_file_descriptor_t const  mmux_libc_memfd_arg_t[1];
+@end example
+@end deftp
 
 @c page
 @node fds memfd makers
@@ -7425,14 +7536,14 @@ Invoke @cfunc{mmux_libc_fstat} and retrieve the @code{st_size} field value of th
 casting the @objtype{mmux_off_t} value to @objtype{mmux_usize_t}.
 
 @example
-mmux_libc_file_system_pathname_t        ptn;
+mmux_libc_fs_ptn_t        ptn;
 mmux_libc_file_descriptor_t             dirfd;
 mmux_libc_file_descriptor_t             fd;
 mmux_sint_t                             flags = MMUX_LIBC_O_RDWR;
 mmux_mode_t                             mode  = 0;
 mmux_usize_t                            size;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+mmux_libc_make_file_system_pathname(ptn, "/path/to/file.ext");
 mmux_libc_at_fdcwd(&dirfd);
 
 if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
@@ -7590,9 +7701,8 @@ a sequence dot, slash, segment can be normalised to the segment.
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
-@deftpx {Struct Typedef} mmux_libc_ptn_t
-Data type representing a file system pathname as a non--@cnull{} pointer to non--empty @asciiz{}
-string.  It has a single field:
+Structure data type representing a file system pathname as a non--@cnull{} pointer to non--empty
+@asciiz{} string.  It has the following public fields:
 
 @table @code
 @item mmux_asciizcp_t value
@@ -7600,14 +7710,25 @@ Pointer to the first octet in the array of octets.
 @end table
 @end deftp
 
+
+@deftp {Struct Pointer Type} mmux_libc_fs_ptn_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
+Pointer types defined as follows:
+
+@example
+typedef struct mmux_libc_file_system_pathname_t         mmux_libc_fs_ptn_t[1];
+typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_arg_t[1];
+@end example
+@end deftp
+
 @c page
 @node fs pathnames pathnames constructors
 @subsubsection Building file system pathnames
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{ptn_asciiz})
-Make a new file system pathname value; the pointer @var{ptn_asciiz} is stored in the data
-structure referenced by @var{result_p}.  The @asciiz{} string @var{ptn_asciiz} is validated:
+@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t @var{result}, mmux_asciizcp_t @var{ptn_asciiz})
+Make a new file system pathname value; the pointer @var{ptn_asciiz} is stored in the data structure
+referenced by @var{result}.  The @asciiz{} string @var{ptn_asciiz} is validated:
 
 @enumerate
 @item
@@ -7618,25 +7739,25 @@ the string length must not be zero: the first character must not be null.
 @end enumerate
 
 @example
-mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t         ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
+if (mmux_libc_make_file_system_pathname(ptn, ptn_asciiz)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{ptn_asciiz})
+@deftypefun bool mmux_libc_make_file_system_pathname_malloc (mmux_libc_fs_ptn_t @var{result}, mmux_asciizcp_t @var{ptn_asciiz})
 Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
 the given pathname.
 
 @example
-mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t         ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  ptn;
 
-if (mmux_libc_make_file_system_pathname_malloc(&ptn, ptn_asciiz)) @{
+if (mmux_libc_make_file_system_pathname_malloc(ptn, ptn_asciiz)) @{
   /* error */
 @}
 @{
@@ -7649,7 +7770,7 @@ if (mmux_libc_file_system_pathname_free(ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_malloc_from_buffer (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_asciizcp_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_make_file_system_pathname_malloc_from_buffer (mmux_libc_fs_ptn_t @var{result_p}, mmux_asciizcp_t @var{bufptr}, mmux_usize_t @var{buflen})
 Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
 @var{buflen} octets from the given buffer referenced by @var{bufptr}.
 
@@ -7670,22 +7791,41 @@ if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t @var{pathname})
+@deftypefun bool mmux_libc_file_system_pathname_free (mmux_libc_fs_ptn_t @var{pathname})
 Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_libc_free}.
 @end deftypefun
+
+
+@ignore
+What happens when an error occurs building the pathname?
+
+@deftypefun bool mmux_libc_file_system_pathname_free_variable (mmux_libc_fs_ptn_t * @var{pathname_p})
+Release the memory holding the pathname as @asciiz{} string using @cfunc{mmux_libc_free}.
+
+@example
+mmux_libc_fs_ptn_t  ptn
+  __attribute__((__cleanup__(mmux_libc_file_system_pathname_free_variable)));
+
+if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
+                                        ptn, "/path/to/file.ext")) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+@end ignore
 
 @c page
 @node fs pathnames pathnames inspection
 @subsubsection Inspecting file system pathnames
 
 
-@deftypefun bool mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store in the variable referenced by @var{result_p} a pointer to the first octet in the array
 representing the file system pathname.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store in the variable referenced by @var{result_p} the number of characters in the pathname
 @var{ptn}.  A call to this function should never fail, so we can avoid checking its return value.
 
@@ -7709,7 +7849,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
 @subsubsection Comparing file system pathnames
 
 
-@deftypefun bool mmux_libc_file_system_pathname_compare (mmux_sint_t * @var{result_p}, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_compare (mmux_sint_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Compare the @asciiz{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store the
 result in the variable referenced by @var{result_p}.
 
@@ -7733,7 +7873,7 @@ assert(+1 == cmpnum);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are equal
 when compared as @asciiz{} strings; otherwise store @cfalse{}.
 
@@ -7751,31 +7891,31 @@ assert(true == eq);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are different
 when compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_less (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_less (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} < @varii{ptn}} when
 compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_greater (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_greater (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} > @varii{ptn}} when
 compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} <= @varii{ptn}} when
 compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * result_p, mmux_libc_file_system_pathname_t @vari{ptn}, mmux_libc_file_system_pathname_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} >= @varii{ptn}} when
 compared as @asciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
@@ -8080,7 +8220,7 @@ Examples of concatenation:
 the slash separator between prefix and suffix is inserted if needed.
 
 @example
-mmux_libc_file_system_pathname_t      prefix_ptn, suffix_ptn, result_ptn;
+mmux_libc_fs_ptn_arg_t      prefix_ptn, suffix_ptn, result_ptn;
 
 if        (mmux_libc_make_file_system_pathname(&prefix_ptn, "/path/to")) @{
   /* error */
@@ -8141,7 +8281,7 @@ such a way that the correct extension is determined.
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_extension_t
 @deftpx {Struct Typedef} mmux_libc_ptn_extension_t
 Data structure representing a file system pathname extension.  Sometimes it is meant to be
-associated to an object of type @objtype{mmux_libc_file_system_pathname_t} with which, usually, it
+associated to an object of type @objtype{mmux_libc_fs_ptn_arg_t} with which, usually, it
 shares memory.
 
 It has two fields:
@@ -8398,7 +8538,7 @@ Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} has ext
 otherwise store @cfalse{}.
 
 @example
-mmux_libc_file_system_pathname_t              ptn;
+mmux_libc_fs_ptn_arg_t              ptn;
 mmux_libc_file_system_pathname_extension_t    ext;
 bool                                          ptn_has_extension_ext;
 
@@ -8468,7 +8608,7 @@ correct segment is determined.
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_segment_t
 @deftpx {Struct Typedef} mmux_libc_ptn_segment_t
 Data structure representing a file system pathname segment.  Sometimes it is meant to be
-associated to an object of type @objtype{mmux_libc_file_system_pathname_t} with which, usually, it
+associated to an object of type @objtype{mmux_libc_fs_ptn_arg_t} with which, usually, it
 shares memory.
 
 It has two fields:
@@ -8758,7 +8898,7 @@ if (mmux_libc_malloc(&bufptr, 1 + buflen)) @{
 
 @noindent
 We can print a file system pathname to a file descriptor using the function
-@cfunc{mmux_libc_dprintf_libc_ptn}; @ref{mmux_libc_dprintf_libc_ptn} for details.
+@cfunc{mmux_libc_dprintf_fs_ptn}; @ref{mmux_libc_dprintf_fs_ptn} for details.
 
 @example
 mmux_libc_ptn_t         ptn;
@@ -8769,7 +8909,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   mmux_libc_fd_t        fd;
 
   mmux_libc_stdou(fd);
-  if (mmux_libc_dprintf_libc_ptn(fd, ptn)) @{
+  if (mmux_libc_dprintf_fs_ptn(fd, ptn)) @{
     /* error */
   @}
 @}
@@ -8869,7 +9009,7 @@ Getter for the field @code{d_fileno} of @objtype{mmux_libc_dirent_t}.
 @subsection Inspecting file system directories
 
 
-@deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 @MmuxCInterfaceGlibc{opendir, Opening a Directory}.
 
 @example
@@ -9005,7 +9145,7 @@ if (mmux_libc_readdir(&direntry, dirstream)) @{
 @subsection Creating file system directories
 
 
-@deftypefun bool mmux_libc_mkdir (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t mode)
+@deftypefun bool mmux_libc_mkdir (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t mode)
 @MmuxCInterface{mkdir}.
 
 @example
@@ -9020,7 +9160,7 @@ if (mmux_libc_mkdir(ptn, mode)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode})
 @MmuxCInterface{mkdirat}.
 
 @example
@@ -9041,7 +9181,7 @@ if (mmux_libc_mkdir(ptn, mode)) @{
 @subsection Deleting file system directories
 
 
-@deftypefun bool mmux_libc_rmdir (mmux_libc_file_system_pathname_t pathname)
+@deftypefun bool mmux_libc_rmdir (mmux_libc_fs_ptn_arg_t pathname)
 @MmuxCInterface{rmdir}.
 
 @example
@@ -9094,13 +9234,13 @@ if (mmux_libc_getcwd_malloc(&bufptr)) @{
 @end deftypefn
 
 
-@deftypefun bool mmux_libc_getcwd_pathname (mmux_libc_file_system_pathname_t * @var{result_p})
+@deftypefun bool mmux_libc_getcwd_pathname (mmux_libc_fs_ptn_arg_t * @var{result_p})
 Wrapper for @cfunc{mmux_libc_getcwd_malloc} that stores the memory block pointer in a
-@objtype{mmux_libc_file_system_pathname_t} object.  The pathname object must later be released using
+@objtype{mmux_libc_fs_ptn_arg_t} object.  The pathname object must later be released using
 @cfunc{mmux_libc_file_system_pathname_free}.
 
 @example
-mmux_libc_file_system_pathname_t    ptn;
+mmux_libc_fs_ptn_arg_t    ptn;
 
 if (mmux_libc_getcwd_pathname(&ptn)) @{
   /* error */
@@ -9112,11 +9252,11 @@ if (mmux_libc_getcwd_pathname(&ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_chdir (mmux_libc_file_system_pathname_t @var{dirptn})
+@deftypefun bool mmux_libc_chdir (mmux_libc_fs_ptn_arg_t @var{dirptn})
 @MmuxCInterfaceGlibc{chdir, Working Directory}.
 
 @example
-mmux_libc_file_system_pathname_t    ptn;
+mmux_libc_fs_ptn_arg_t    ptn;
 
 mmux_libc_make_file_system_pathname(&ptn, "..");
 if (mmux_libc_chdir(ptn)) @{
@@ -9133,7 +9273,7 @@ if (mmux_libc_chdir(ptn)) @{
 mmux_libc_file_descriptor_t           dirfd;
 
 @{
-  mmux_libc_file_system_pathname_t    ptn;
+  mmux_libc_fs_ptn_arg_t    ptn;
 
   if (mmux_libc_make_file_system_pathname(&ptn, "..")) @{
     /* error */
@@ -9175,12 +9315,12 @@ The following functions require the calling process to have special privileges. 
 in the @api{} of this package for completeness.
 
 
-@deftypefun bool mmux_libc_chroot (mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_chroot (mmux_libc_fs_ptn_arg_t @var{ptn})
 @MmuxCInterface{chroot}.
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_pivot_root (mmux_libc_file_system_pathname_t new_root_ptn, mmux_libc_file_system_pathname_t put_old_ptn)
+@deftypefn {Linux Function} bool mmux_libc_pivot_root (mmux_libc_fs_ptn_arg_t new_root_ptn, mmux_libc_fs_ptn_arg_t put_old_ptn)
 @MmuxCInterface{pivot_root}.
 @end deftypefn
 
@@ -9204,7 +9344,7 @@ in the @api{} of this package for completeness.
 @cindex Hard links, file system
 
 
-@deftypefun bool mmux_libc_link (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_link (mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_fs_ptn_arg_t @var{newname})
 @MmuxCInterface{link}.
 
 @example
@@ -9219,7 +9359,7 @@ if (mmux_libc_link(old_ptn, new_ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_linkat (mmux_libc_file_descriptor_t @var{oldfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_linkat (mmux_libc_file_descriptor_t @var{oldfd}, mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_file_descriptor_t @var{newfd}, mmux_libc_fs_ptn_arg_t @var{newname}, mmux_sint_t @var{flags})
 @MmuxCInterface{linkat}
 
 @example
@@ -9245,7 +9385,7 @@ if (mmux_libc_linkat(fd, src_ptn, fd, dst_ptn, flags)) @{
 @cindex Symbolic links, file system
 
 
-@deftypefun bool mmux_libc_symlink (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_symlink (mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_fs_ptn_arg_t @var{newname})
 @MmuxCInterface{symlink}.
 
 @example
@@ -9278,114 +9418,266 @@ if (mmux_libc_symlink(old_ptn, new_ptn)) @{
 @subsubsection Follow file system links by pathname
 
 
-@deftypefun bool mmux_libc_readlink (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
-@MmuxCInterface{readlink}.  It is usually better to use @cfunc{mmux_libc_readlink_malloc}.
+@deftypefun bool mmux_libc_readlink (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
+@MmuxCInterface{readlink}.
 
 @example
-mmux_libc_ptn_t 	org_ptn, rea_ptn;
+mmux_libc_fs_ptn_t  fs_ptn_link, fs_ptn_real;
 
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 @{
-  mmux_usize_t          provided_nbytes_with_nul = 1024;
-  char                  bufptr[provided_nbytes_with_nul];
-  mmux_usize_t          nbytes_done_no_nul;
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
-
-  if (mmux_libc_readlink(&nbytes_done_no_nul, lnk_ptn, bufptr, provided_nbytes_with_nul-1)) @{
-    /* error */
-  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
-    /* not enough bytes in the supplied buffer */
-  @}
-  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
+  mmux_libc_file_system_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn_link, fs_ptn_factory, "/path/to/symlink.ext")) @{
     /* error */
   @}
 @}
+
 @{
-  ... /* do something with "rea_ptn" */
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_readlink(fs_ptn_real, fs_ptn_factory, fs_ptn_link)) @{
+    /* error */
+  @}
 @}
-mmux_libc_file_system_pathname_free(rea_ptn);
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_readlink_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
-Like @cfunc{mmux_libc_readlink} but when successful: allocate a memory block, using
-@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
-the allocated memory using @cfunc{mmux_libc_free}.
+@deftypefun bool mmux_libc_readlink_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
+@MmuxCInterface{readlink}.
+
+Retrieve the real pathname of the symbolic link @var{fs_ptn_input_linkname} and store it in
+@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
+buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
+bytes.
+
+When successful: the number of bytes actually written to the output buffer is stored in the variable
+referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
+@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
+pathname without terminating nul byte; otherwise the buffer was not wide enough.
 
 @example
-mmux_libc_ptn_t	org_ptn, rea_ptn;
+mmux_libc_fs_ptn_t  fs_ptn_symlink;
 
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
-if (mmux_libc_readlink_malloc(&rea_ptn, org_ptn)) @{
-  /* error */
-@}
 @{
-  ... /* do something with "rea_ptn" */
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_static(fs_ptn_factory);
+  mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
 @}
-mmux_libc_file_system_pathname_free(rea_ptn);
-@end example
-@end deftypefun
 
-@c ------------------------------------------------------------------------
-
-@deftypefun bool mmux_libc_readlinkat (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
-@MmuxCInterface{readlinkat}.  It is usually better to use @cfunc{mmux_libc_readlinkat_malloc}.
-
-@example
-mmux_libc_ptn_t 	org_ptn, rea_ptn;
-
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 @{
-  mmux_usize_t          provided_nbytes_with_nul = 1024;
-  char                  bufptr[provided_nbytes_with_nul];
-  mmux_usize_t          nbytes_done_no_nul;
-  mmux_libc_fd_t        dirfd;
+  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
+  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
+  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
 
-  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
-
-  if (mmux_libc_readlinkat(&nbytes_done_no_nul, dirfd, lnk_ptn, bufptr, provided_nbytes_with_nul-1)) @{
+  if (mmux_libc_readlink_to_buffer(&nbytes_written_to_output_buffer_no_nul,
+                                   output_buffer_ascii,
+                                   output_buffer_provided_nbytes_no_nul,
+                                   input_linkname_asciiz)) @{
     /* error */
-  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
-    /* not enough bytes in the supplied buffer */
-  @}
-  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
-    /* error */
+  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
+    /* there was not enough room in the output buffer */
+  @} else @{
+    /* do something with the ASCII string in "output_buffer_ascii"
+       remembering that it is not nul-terminated */
   @}
 @}
-@{
-  ... /* do something with "rea_ptn" */
-@}
-mmux_libc_file_system_pathname_free(rea_ptn);
 @end example
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_readlinkat_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{linkname})
-Like @cfunc{mmux_libc_readlinkat} but when successful: allocate a memory block, using
-@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
-the allocated memory using @cfunc{mmux_libc_free}.
+@deftypefun bool mmux_libc_readlinkat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
+@MmuxCInterface{readlinkat}.  Retrieve the real pathname of the symbolic link
+@var{fs_ptn_input_linkname} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build
+the new pathname object.  The pathname @var{fs_ptn_input_linkname} is meant to be absolute or
+relative to @var{dirfd}.
 
 @example
-mmux_libc_ptn_t         org_ptn, rea_ptn;
-mmux_libc_fd_t          dirfd;
-
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
-mmux_libc_at_fdcwd(&dirfd);
-if (mmux_libc_readlinkat_malloc(&rea_ptn, dirfd, org_ptn)) @{
-  /* error */
-@}
+mmux_libc_fs_ptn_t  fs_ptn_link, fs_ptn_real;
 @{
-  ... /* do something with "rea_ptn" */
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_static(fs_ptn_factory);
+  mmux_libc_make_file_system_pathname(fs_ptn_link, fs_ptn_factory, "/path/to/file.ext");
 @}
-mmux_libc_file_system_pathname_free(rea_ptn);
+
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+  mmux_libc_dirfd_t           dirfd;
+
+  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
+  mmux_libc_at_fcwd(dirfd);
+  if (mmux_libc_readlinkat(fs_ptn_real, fs_ptn_factory, dirfd, fs_ptn_link)) @{
+    /* error */
+  @} else @{
+    /* do something with "fs_ptn_real" */
+  @}
+@}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_canonicalize_file_name (mmux_libc_file_system_pathname_t * @var{result_pathname_p}, mmux_libc_file_system_pathname_t @var{input_pathname})
+@deftypefun bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fd_arg_t @var{fd})
+@MmuxCInterface{readlinkat}.  Retrieve the real pathname of the symbolic link referenced by @var{fd}
+and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build the new pathname object.
+
+@example
+mmux_libc_fd_t  fd_symlink;
+
+/* Open the symbolic link. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn_symlink;
+
+  /* Build the pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_factory_static(fs_ptn_factory);
+    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
+  @}
+
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode_literal(0);
+
+    if (mmux_libc_open(&fd_symlink, fs_ptn_symlink, flags, mode)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Retrieve the real file system pathname. */
+@{
+  mmux_libc_fs_ptn_t          fs_ptn_real;
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd)) @{
+    /* error */
+  @} else @{
+    /* do something with "fs_ptn_real" */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_readlinkat_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
+@MmuxCInterface{readlinkat}.
+
+Retrieve the real pathname of the symbolic link @var{fs_ptn_input_linkname} and store it in
+@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
+buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
+bytes.
+
+The pathname @var{fs_ptn_input_linkname} is meant to be absolute or relative to @var{dirfd}.
+
+When successful: the number of bytes actually written to the output buffer is stored in the variable
+referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
+@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
+pathname without terminating nul byte; otherwise the buffer was not wide enough.
+
+@example
+mmux_libc_fs_ptn_t  fs_ptn_symlink;
+mmux_libc_dirfd_t   dirfd;
+
+mmux_libc_at_fcwd(dirfd);
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_static(fs_ptn_factory);
+  mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
+@}
+
+@{
+  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
+  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
+  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
+
+  if (mmux_libc_readlinkat_to_buffer(&nbytes_written_to_output_buffer_no_nul,
+                                     output_buffer_ascii,
+                                     output_buffer_provided_nbytes_no_nul,
+                                     dirfd,
+                                     input_linkname_asciiz)) @{
+    /* error */
+  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
+    /* there was not enough room in the output buffer */
+  @} else @{
+    /* do something with the ASCII string in "output_buffer_ascii"
+       remembering that it is not nul-terminated */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_readlinkfd_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_fd_arg_t @var{fd})
+@MmuxCInterface{readlinkat}.
+
+Retrieve the real pathname of the symbolic link referenced by @var{fd} and store it in
+@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
+buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
+bytes.
+
+When successful: the number of bytes actually written to the output buffer is stored in the variable
+referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
+@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
+pathname without terminating nul byte; otherwise the buffer was not wide enough.
+
+@example
+mmux_libc_fd_t      fd_symlink;
+
+/* Open the symbolic link. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn_symlink;
+
+  /* Build the pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_factory_static(fs_ptn_factory);
+    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
+  @}
+
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode_literal(0);
+
+    if (mmux_libc_open(&fd_symlink, fs_ptn_symlink, flags, mode)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Retrieve the real file system pathname. */
+@{
+  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
+  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
+  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
+
+  if (mmux_libc_readlinkat_to_buffer(&nbytes_written_to_output_buffer_no_nul,
+                                     output_buffer_ascii,
+                                     output_buffer_provided_nbytes_no_nul,
+                                     fd_symlink,
+                                     input_linkname_asciiz)) @{
+    /* error */
+  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
+    /* there was not enough room in the output buffer */
+  @} else @{
+    /* do something with the ASCII string in "output_buffer_ascii"
+       remembering that it is not nul-terminated */
+  @}
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_arg_t * @var{result_pathname_p}, mmux_libc_fs_ptn_arg_t @var{input_pathname})
 @MmuxCInterface{canonicalize_file_name}.  When successful: a memory buffer is allocated, using
 @cfunc{mmux_libc_malloc}, and the resulting pathname is stored in it, including the terminating nul;
 a pointer to the buffer is stored in the location referenced by @var{result_pathname_p}.  It is
@@ -9393,7 +9685,7 @@ responsibility of the caller to release the buffer with a call to @cfunc{mmux_li
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_realpath (mmux_asciizp_t * @var{result_pathname_p}, mmux_libc_file_system_pathname_t @var{input_pathname})
+@deftypefun bool mmux_libc_realpath (mmux_asciizp_t * @var{result_pathname_p}, mmux_libc_fs_ptn_arg_t @var{input_pathname})
 @MmuxCInterface{realpath}.  When successful: a memory buffer is allocated, using
 @cfunc{mmux_libc_malloc}, and the resulting pathname is stored in it, including the terminating nul;
 a pointer to the buffer is stored in the location referenced by @var{result_pathname_p}.  It is
@@ -9466,7 +9758,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 
 @c ------------------------------------------------------------------------
 
-@deftypefn {Linux Function} bool mmux_libc_readlinkfd_malloc (mmux_libc_file_system_pathname_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefn {Linux Function} bool mmux_libc_readlinkfd_malloc (mmux_libc_fs_ptn_arg_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
 Like @cfunc{mmux_libc_readlinkfd} but when successful: allocate a memory block, using
 @cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
 the allocated memory using @cfunc{mmux_libc_free}.
@@ -9514,7 +9806,7 @@ mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
 @section Deleting links
 
 
-@deftypefun bool mmux_libc_unlink (mmux_libc_file_system_pathname_t pathname)
+@deftypefun bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
 @MmuxCInterface{unlink}.
 
 @example
@@ -9528,7 +9820,7 @@ if (mmux_libc_unlink(ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd, mmux_libc_file_system_pathname_t pathname, mmux_sint_t flags)
+@deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t flags)
 @MmuxCInterface{unlinkat}.
 
 @example
@@ -9559,7 +9851,7 @@ if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_remove (mmux_libc_file_system_pathname_t pathname)
+@deftypefun bool mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
 @MmuxCInterface{remove}.
 
 @example
@@ -9577,7 +9869,7 @@ if (mmux_libc_remove(ptn)) @{
 @section Renaming links
 
 
-@deftypefun bool mmux_libc_rename (mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_rename (mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_fs_ptn_arg_t @var{newname})
 @MmuxCInterface{rename}.
 
 @example
@@ -9593,7 +9885,7 @@ if (mmux_libc_rename(src_ptn, dst_ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_renameat (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname})
+@deftypefun bool mmux_libc_renameat (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_fs_ptn_arg_t @var{newname})
 @MmuxCInterface{renameat}.
 
 @example
@@ -9611,7 +9903,7 @@ if (mmux_libc_renameat(dirfd, src_ptn, dirfd, dst_ptn)) @{
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_file_system_pathname_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_file_system_pathname_t @var{newname}, mmux_uint_t flags)
+@deftypefn {Linux Function} bool mmux_libc_renameat2 (mmux_libc_file_descriptor_t @var{olddirfd}, mmux_libc_fs_ptn_arg_t @var{oldname}, mmux_libc_file_descriptor_t @var{newdirfd}, mmux_libc_fs_ptn_arg_t @var{newname}, mmux_uint_t flags)
 @MmuxCInterface{renameat2}.
 
 @example
@@ -9634,7 +9926,7 @@ if (mmux_libc_renameat2(dirfd, src_ptn, dirfd, dst_ptn, flags)) @{
 @section File ownership
 
 
-@deftypefun bool mmux_libc_chown (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
+@deftypefun bool mmux_libc_chown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
 @MmuxCInterfaceGlibc{chown, File Owner}.
 
 @example
@@ -9730,12 +10022,12 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_lchown (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
+@deftypefun bool mmux_libc_lchown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
 @MmuxCInterface{lchown}.  This function does not dereference symbolic links.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fchownat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t flags);
+@deftypefun bool mmux_libc_fchownat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t flags);
 @MmuxCInterface{fchownat}.
 
 @example
@@ -9866,7 +10158,7 @@ mmux_libc_getumask(&cur_mask);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_chmod (mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_chmod (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode})
 @MmuxCInterfaceGlibc{chmod, Setting Permissions}.
 
 @example
@@ -9939,7 +10231,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_mode_t @var{mode}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode}, mmux_sint_t @var{flags})
 @MmuxCInterface{fchmodat}.
 
 @example
@@ -9965,7 +10257,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_access (bool * @var{access_is_permitted_p}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how})
+@deftypefun bool mmux_libc_access (bool * @var{access_is_permitted_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how})
 @MmuxCInterfaceGlibc{access, Testing File Access}.  When successful the access mode specified by
 @var{how} could be permitted or denied:
 
@@ -10003,7 +10295,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
 @MmuxCInterface{faccessat}.  When successful the access mode specified by
 @var{how} could be permitted or denied:
 
@@ -10043,7 +10335,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
 @MmuxCInterface{faccessat2}.  When successful the access mode specified by @var{how} could be
 permitted or denied:
 
@@ -10186,7 +10478,7 @@ struct stat->st_blksize = 4096
 @subsection The @cfunc{stat} functions
 
 
-@deftypefun bool mmux_libc_stat (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
+@deftypefun bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
 @MmuxCInterface{stat}.
 
 @example
@@ -10249,7 +10541,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_lstat (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
+@deftypefun bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
 @MmuxCInterface{lstat}.
 
 @example
@@ -10278,7 +10570,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fstatat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t flags)
+@deftypefun bool mmux_libc_fstatat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t flags)
 @MmuxCInterface{fstatat}.
 
 @example
@@ -10324,7 +10616,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t @var{flags})
 @MmuxCInterface{fstatat}.  This function invokes @cfunc{fstatat} with an empty file system pathname
 and adding @samp{MMUX_LIBC_AT_EMPTY_PATH} to the @var{flags} argument; this causes the function to
 operate on the file descriptor @var{fd}.
@@ -10416,7 +10708,7 @@ For all the following functions: the test is performed using @cfunc{mmux_libc_ls
 pathname itself is inspected without following symbolic links.
 
 
-@deftypefun bool mmux_libc_file_system_pathname_exists (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_exists (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry; otherwise store @cfalse{}.
 
@@ -10432,7 +10724,7 @@ if (mmux_libc_file_system_pathname_exists(&the_pathname_exists, ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_regular (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_regular (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a regular file; otherwise store @cfalse{}.
 
@@ -10448,7 +10740,7 @@ if (mmux_libc_file_system_pathname_is_regular(&the_pathname_exists_and_it_is_reg
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_symlink (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_symlink (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a symbolic link; otherwise store @cfalse{}.
 
@@ -10464,7 +10756,7 @@ if (mmux_libc_file_system_pathname_is_symlink(&the_pathname_exists_and_it_is_sym
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_directory (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_directory (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a directory; otherwise store @cfalse{}.
 
@@ -10480,7 +10772,7 @@ if (mmux_libc_file_system_pathname_is_directory(&the_pathname_exists_and_it_is_d
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_character_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_character_special (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a character special device; otherwise store @cfalse{}.
 
@@ -10496,7 +10788,7 @@ if (mmux_libc_file_system_pathname_is_character_special(&the_pathname_exists_and
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_block_special (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_block_special (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a block special device; otherwise store @cfalse{}.
 
@@ -10512,7 +10804,7 @@ if (mmux_libc_file_system_pathname_is_block_special(&the_pathname_exists_and_it_
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_fifo (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_fifo (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a FIFO; otherwise store @cfalse{}.
 
@@ -10528,7 +10820,7 @@ if (mmux_libc_file_system_pathname_is_fifo(&the_pathname_exists_and_it_is_fifo, 
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_socket (bool * @var{result_p}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_is_socket (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given pathname exists as a
 directory entry and it is a socket; otherwise store @cfalse{}.
 
@@ -10555,13 +10847,13 @@ variants; true control about the resulting values is possible only by explicitly
 following functions are simpler and sometimes they are enough.
 
 
-@deftypefun bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_fd_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_fd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Invoke @cfunc{mmux_libc_fstatat} (with flags set to zero) and retrieve the @code{st_size} field
 value of the resulting @objtype{mmux_libc_stat_t}.  Store such field value in the variable
 referenced by @var{result_p}, casting the @objtype{mmux_off_t} value to @objtype{mmux_usize_t}.
 
 @example
-mmux_libc_file_system_pathname_t        ptn;
+mmux_libc_fs_ptn_arg_t        ptn;
 mmux_libc_file_descriptor_t             dirfd;
 mmux_usize_t                            size;
 
@@ -10579,7 +10871,7 @@ if (mmux_libc_file_system_pathname_file_size_ref(&size, dirfd, ptn)) @{
 @section Truncating files
 
 
-@deftypefun bool mmux_libc_truncate (mmux_libc_file_system_pathname_t pathname, mmux_off_t len)
+@deftypefun bool mmux_libc_truncate (mmux_libc_fs_ptn_arg_t pathname, mmux_off_t len)
 @MmuxCInterface{truncate}.
 
 @example
@@ -10682,7 +10974,7 @@ mmux_libc_modtime_set (UTB, T2);
 @subsection Setting the file system times associated to files
 
 
-@deftypefun bool mmux_libc_utime (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_utimbuf_t @var{utimbuf})
+@deftypefun bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_utimbuf_t @var{utimbuf})
 @MmuxCInterface{utime}.
 
 @example
@@ -10711,7 +11003,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_utimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
+@deftypefun bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{utimes}.
 
 @example
@@ -10743,7 +11035,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
-@deftypefun bool mmux_libc_lutimes (mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
+@deftypefun bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{lutimes}.
 
 @example
@@ -10864,7 +11156,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_utimensat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_file_system_pathname_t @var{pathname}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_utimensat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec}, mmux_sint_t @var{flags})
 @MmuxCInterface{utimensat}.
 
 @example
@@ -11082,7 +11374,7 @@ Initialise the data structure referenced by @var{insix_addr_p} to the predefined
 @MmuxCStructOpaqueTypedef{sockaddr_un}
 @MmuxCStructPointerOpaqueTypedef{sockaddr_un}
 @MmuxSetterGetter{sockaddr_un, sun_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_un, sun_path,   mmux_libc_file_system_pathname_t}
+@MmuxSetterGetter{sockaddr_un, sun_path,   mmux_libc_fs_ptn_arg_t}
 @MmuxStructDumper{sockaddr_un}
 
 

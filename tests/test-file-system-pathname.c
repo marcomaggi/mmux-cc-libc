@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -32,7 +31,7 @@ print_file_system_pathname (void)
 
   mmux_asciizcp_t	ptn_asciiz = "/path/to/file.ext";
   mmux_usize_t		ptn_len;
-  mmux_libc_ptn_t	ptn;
+  mmux_libc_fs_ptn_t	ptn;
   mmux_libc_fd_t	fd;
 
   mmux_libc_strlen(&ptn_len, ptn_asciiz);
@@ -85,7 +84,7 @@ malloc_file_system_pathname (void)
   mmux_asciizcp_t	ptn_asciiz = "/path/to/file.ext";
   mmux_usize_t		buflen;
   mmux_asciizp_t	bufptr;
-  mmux_libc_ptn_t	ptn;
+  mmux_libc_fs_ptn_t	ptn;
 
   if (mmux_libc_strlen(&buflen, ptn_asciiz)) {
     handle_error();
@@ -123,7 +122,7 @@ test_mmux_libc_make_file_system_pathname_dynami_alloc (void)
   printf_message("running test: %s", __func__);
 
   mmux_asciizcp_t	ptn_asciiz = "/path/to/file.ext";
-  mmux_libc_ptn_t	ptn;
+  mmux_libc_fs_ptn_t	ptn;
 
   if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, ptn_asciiz)) {
     printf_error("error allocating");
@@ -155,7 +154,7 @@ test_mmux_libc_make_file_system_pathname2 (void)
   //                                  012345678
   mmux_asciizcp_t	ptn_asciiz = "/path/to/file.ext";
   mmux_usize_t		ptn_len    = 8;
-  mmux_libc_ptn_t	ptn;
+  mmux_libc_fs_ptn_t	ptn;
 
   if (mmux_libc_make_file_system_pathname2(&mmux_libc_file_system_pathname_dynami_class, &ptn, ptn_asciiz, ptn_len)) {
     printf_error("error allocating");
@@ -840,7 +839,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Determine the length of a file system pathname. */
   if (1) {
-    mmux_libc_ptn_t	ptn;
+    mmux_libc_fs_ptn_t	ptn;
     mmux_usize_t	len;
 
     //                                             012345678901234567
@@ -857,7 +856,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Compare two equal pathnames. */
   if (1) {
-    mmux_libc_ptn_t	ptn1, ptn2;
+    mmux_libc_fs_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/file.ext")) {
@@ -963,7 +962,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Compare two different pathnames: ptn1 < ptn2. */
   if (1) {
-    mmux_libc_ptn_t	ptn1, ptn2;
+    mmux_libc_fs_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/file.ext")) {
@@ -1069,7 +1068,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Compare two different pathnames: ptn1 > ptn2. */
   if (1) {
-    mmux_libc_ptn_t	ptn1, ptn2;
+    mmux_libc_fs_ptn_t	ptn1, ptn2;
     bool		cmpbool;
 
     if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn1, "/path/to/other-file.ext")) {

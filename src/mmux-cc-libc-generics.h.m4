@@ -33,8 +33,7 @@ m4_divert(-1)
 m4_define([[[DEFINE_COMPARISON]]],[[[m4_dnl
 #define mmux_libc_$1(VALUE1,VALUE2)					\
   (_Generic((VALUE1),							\
-     mmux_libc_errno_t:		mmux_libc_errno_$1,			\
-     mmux_libc_fd_t:		mmux_libc_fd_$1)((VALUE1),(VALUE2)))
+     mmux_libc_errno_t:		mmux_libc_errno_$1)((VALUE1),(VALUE2)))
 ]]])m4_dnl
 m4_divert(0)m4_dnl
 DEFINE_COMPARISON([[[equal]]])

@@ -33,11 +33,11 @@
  ** Global variables.
  ** ----------------------------------------------------------------- */
 
-mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_static_class = {
+mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_class_static = {
   .memory_allocator	= &mmux_libc_fake_memory_allocator,
 };
 
-mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_dynami_class = {
+mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_class_dynamic = {
   .memory_allocator	= &mmux_libc_default_memory_allocator,
 };
 
@@ -231,24 +231,24 @@ segment_is_special_directory (mmux_libc_ptn_segment_t S)
  ** ----------------------------------------------------------------- */
 
 static bool
-pathname_is_special_directory (mmux_libc_ptn_t ptn)
+pathname_is_special_directory (mmux_libc_fs_ptn_arg_t ptn)
 /* If possible: we want  to avoid applying "strlen()" to the  pathname.  We know that
  * "ptn" cannot have  zero length and its  string of bytes is always  terminated by a
  * zero byte.  This means:
  *
- * - "ptn.value[0]" cannot be the zero byte;
+ * - "ptn->value[0]" cannot be the zero byte;
  *
- * - it is always safe to access "ptn.value[1]", and it may be the zero byte;
+ * - it is always safe to access "ptn->value[1]", and it may be the zero byte;
  *
- * - once we have established that "ptn.value[1]" is not the zero byte: it is safe to
- *   access "ptn.value[2]" and it may be the zero byte.
+ * - once we have established  that "ptn->value[1]" is not the zero  byte: it is safe
+ *   to access "ptn->value[2]" and it may be the zero byte.
  *
  */
 {
-  if ('\0' == ptn.value[1]) {
+  if ('\0' == ptn->value[1]) {
     /* It is a standalone dot or slash. */
-    return (('.' == ptn.value[0]) || ('/' == ptn.value[0]))? true : false;
-  } else if (('\0' == ptn.value[2]) && ('.' == ptn.value[0]) && ('.' == ptn.value[1])) {
+    return (('.' == ptn->value[0]) || ('/' == ptn->value[0]))? true : false;
+  } else if (('\0' == ptn->value[2]) && ('.' == ptn->value[0]) && ('.' == ptn->value[1])) {
     /* It is a standalone double dot. */
     return true;
   } else {
@@ -262,12 +262,12 @@ pathname_is_special_directory (mmux_libc_ptn_t ptn)
   }
 }
 static inline bool
-pathname_is_standalone_slash (mmux_libc_ptn_t ptn)
+pathname_is_standalone_slash (mmux_libc_fs_ptn_arg_t ptn)
 {
-  return (('\0' == ptn.value[1]) && ('/' == ptn.value[0]))? true : false;
+  return (('\0' == ptn->value[1]) && ('/' == ptn->value[0]))? true : false;
 }
 static inline bool
-pathname_is_standalone_dot (mmux_libc_ptn_t ptn)
+pathname_is_standalone_dot (mmux_libc_fs_ptn_arg_t ptn)
 {
   if (pathname_is_standalone_slash(ptn)) {
     return false;
@@ -282,7 +282,7 @@ pathname_is_standalone_dot (mmux_libc_ptn_t ptn)
   }
 }
 static inline bool
-pathname_is_standalone_double_dot (mmux_libc_ptn_t ptn)
+pathname_is_standalone_double_dot (mmux_libc_fs_ptn_arg_t ptn)
 {
   if (pathname_is_standalone_slash(ptn)) {
     return false;
@@ -297,118 +297,350 @@ pathname_is_standalone_double_dot (mmux_libc_ptn_t ptn)
   }
 }
 static inline bool
-pathname_is_absolute (mmux_libc_ptn_t ptn)
+pathname_is_absolute (mmux_libc_fs_ptn_arg_t ptn)
 {
-  return (('/' == ptn.value[0])? true : false);
+  return (('/' == ptn->value[0])? true : false);
 }
 static inline bool
-pathname_is_relative (mmux_libc_ptn_t ptn)
+pathname_is_relative (mmux_libc_fs_ptn_arg_t ptn)
 {
-  return (('/' != ptn.value[0])? true : false);
+  return (('/' != ptn->value[0])? true : false);
 }
 
 
 /** --------------------------------------------------------------------
- ** File system types: pathnames.
+ ** Pathname length validation.
  ** ----------------------------------------------------------------- */
 
-#undef  MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT
-#define MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT		mmux_usize_literal(4096)
-
 bool
-mmux_libc_make_file_system_pathname (mmux_libc_file_system_pathname_class_t const * class,
-				     mmux_libc_file_system_pathname_t * result_p,
-				     mmux_asciizcp_t src_ptn_asciiz)
+mmux_libc_file_system_pathname_validate_length_with_nul (mmux_usize_t fs_ptn_len_plus_nil)
+/* Return true if the given length is not acceptable. */
 {
-  _Pragma("GCC diagnostic push");
-  _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
-  if ((NULL == src_ptn_asciiz) && ('\0' == src_ptn_asciiz[0]))  {
-    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+  if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_WITH_NUL_ARBITRARY_LIMIT, fs_ptn_len_plus_nil)) {
     return true;
   } else {
-    _Pragma("GCC diagnostic pop");
-    mmux_asciizcp_t	dst_ptn_asciiz;
-    mmux_usize_t	dst_ptn_len_plus;
+    return false;
+  }
+}
+bool
+mmux_libc_file_system_pathname_validate_length_no_nul (mmux_usize_t fs_ptn_len)
+/* Return true if the given length is not acceptable. */
+{
+  if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_NO_NUL_ARBITRARY_LIMIT, fs_ptn_len)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
-    mmux_libc_strlen_plus_nil(&dst_ptn_len_plus, src_ptn_asciiz);
-    if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT, dst_ptn_len_plus)) {
-      mmux_libc_errno_set(MMUX_LIBC_ERANGE);
-      return true;
-    } else if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
-							  &dst_ptn_asciiz, src_ptn_asciiz, dst_ptn_len_plus)) {
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: pathnames factory, static strings.
+ ** ----------------------------------------------------------------- */
+
+/* To construct a new file system pathname using the static factory we do:
+ *
+ *   mmux_asciizcp_t             fs_ptn_asciiz = "/path/to/file.ext";
+ *   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+ *   mmux_libc_fs_ptn_t          fs_ptn;
+ *
+ *   mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+ *   if (mmux_libc_make_file_system_pathname(pfs_ptn, fs_ptn_factory, fs_ptn_asciiz)) {
+ *     ... error ...
+ *   } else {
+ *     ...
+ *     mmux_libc_unmake_file_system_pathname(fs_ptn);
+ *   }
+ */
+
+static bool
+mmux_libc_file_system_pathname_factory_static_make_from_asciiz
+    (mmux_libc_fs_ptn_t fs_ptn_result,
+     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+     mmux_asciizcp_t src_ptn_asciiz)
+/* This function  is the  implementation of the  method "make_from_asciiz()"  for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_static".
+
+   Construct a new file  system pathname data structure and store  it in the variable
+   referenced by "fs_ptn_result".
+
+   The new file system pathname references  an already allocated and immutable ASCIIZ
+   string, for example a statically allocated string.
+
+   We expect  "ap" to  hold a  single additional  argument of  type "mmux_asciizcp_t"
+   representing a pointer to the statically allocated ASCIIZ string.
+*/
+{
+  /* Validate the arguments. */
+  {
+    {
+      _Pragma("GCC diagnostic push");
+      _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
+      if ((NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
+	mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+	return true;
+      }
+      _Pragma("GCC diagnostic pop");
+    }
+
+    {
+      mmux_usize_t	src_ptn_len;
+
+      mmux_libc_strlen(&src_ptn_len, src_ptn_asciiz);
+      MMUX_LIBC_FILE_SYSTEM_PATHNAME_VALIDATE_LENGTH_NO_NUL(src_ptn_len);
+    }
+  }
+
+  /* Construct the resulting data structure. */
+  {
+    fs_ptn_result->value = src_ptn_asciiz;
+    fs_ptn_result->class = &mmux_libc_file_system_pathname_class_static;
+    return false;
+  }
+}
+static bool
+mmux_libc_file_system_pathname_factory_static_make_from_ascii_len
+    (mmux_libc_fs_ptn_t			fs_ptn_result		MMUX_CC_LIBC_UNUSED,
+     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory		MMUX_CC_LIBC_UNUSED,
+     mmux_asciicp_t			src_ptn_ascii		MMUX_CC_LIBC_UNUSED,
+     mmux_usize_t			src_ptn_len_no_nul	MMUX_CC_LIBC_UNUSED)
+/* This function is the implementation  of the method "make_from_ascii_len()" for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_static". */
+{
+  return true;
+}
+static mmux_libc_file_system_pathname_factory_class_t const mmux_libc_file_system_pathname_factory_class_static = {
+  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_static_make_from_asciiz,
+  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_static_make_from_ascii_len,
+};
+static mmux_libc_file_system_pathname_factory_t const mmux_libc_file_system_pathname_factory_static_object = {
+  .class		= &mmux_libc_file_system_pathname_factory_class_static,
+};
+bool
+mmux_libc_file_system_pathname_factory_static (mmux_libc_fs_ptn_factory_t ptn_factory)
+{
+  ptn_factory[0] = mmux_libc_file_system_pathname_factory_static_object;
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: pathnames factory, dynamically allocated strings, default allocator.
+ ** ----------------------------------------------------------------- */
+
+/* To construct a new file system pathname using the dynamic factory we do:
+ *
+ *   mmux_asciizcp_t             fs_ptn_asciiz = "/path/to/file.ext";
+ *   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+ *   mmux_libc_fs_ptn_t          fs_ptn;
+ *
+ *   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+ *   if (mmux_libc_make_file_system_pathname(pfs_ptn, fs_ptn_factory, fs_ptn_asciiz)) {
+ *     ... error ...
+ *   } else {
+ *     ...
+ *     mmux_libc_unmake_file_system_pathname(fs_ptn);
+ *   }
+ */
+
+static bool
+mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz
+    (mmux_libc_fs_ptn_t fs_ptn_result,
+     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+     mmux_asciizcp_t src_ptn_asciiz)
+/* This function  is the  implementation of the  method "make_from_asciiz()"  for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_dynamic".
+
+   Construct a new file  system pathname data structure and store  it in the variable
+   referenced by "fs_ptn_result".
+
+   The  new file  system  pathname  references an  ASCIIZ  string  allocated by  this
+   constructor using the factory's memory allocator.
+
+   We expect  "ap" to  hold a  single additional  argument of  type "mmux_asciizcp_t"
+   representing a pointer to the statically allocated ASCIIZ string.
+*/
+{
+  mmux_usize_t		src_ptn_len_plus_nil;
+
+  /* Validate the arguments. */
+  {
+    {
+      _Pragma("GCC diagnostic push");
+      _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
+      if ((NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
+	mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+	return true;
+      }
+      _Pragma("GCC diagnostic pop");
+    }
+
+    {
+      mmux_libc_strlen_plus_nil(&src_ptn_len_plus_nil, src_ptn_asciiz);
+      MMUX_LIBC_FILE_SYSTEM_PATHNAME_VALIDATE_LENGTH_WITH_NUL(src_ptn_len_plus_nil);
+    }
+  }
+
+  /* Construct the resulting data structure. */
+  {
+    mmux_libc_file_system_pathname_class_t const *  class = &mmux_libc_file_system_pathname_class_dynamic;
+    mmux_asciizcp_t	dst_ptn_asciiz;
+
+    if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
+						   &dst_ptn_asciiz, src_ptn_asciiz,
+						   src_ptn_len_plus_nil)) {
       return true;
     } else {
-      result_p->value = dst_ptn_asciiz;
-      result_p->class = class;
+      fs_ptn_result->value = dst_ptn_asciiz;
+      fs_ptn_result->class = class;
       return false;
     }
   }
 }
-bool
-mmux_libc_make_file_system_pathname2 (mmux_libc_file_system_pathname_class_t const * class,
-				      mmux_libc_file_system_pathname_t * result_p,
-				      mmux_asciizcp_t src_ptn_asciiz, mmux_usize_t src_ptn_len)
-/* We have to assume that it is forbidden to access "src_ptn_asciiz[src_ptn_len]". */
-{
-  _Pragma("GCC diagnostic push");
-  _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
-  if (mmux_ctype_is_zero(src_ptn_len) || (NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
-    _Pragma("GCC diagnostic pop");
-    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
-    return true;
-  } else {
-    auto	dst_ptn_len_plus = mmux_ctype_incr(src_ptn_len);
+static bool
+mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len
+    (mmux_libc_fs_ptn_t fs_ptn_result,
+     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+     mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len_no_nul)
+/* This function is the implementation  of the method "make_from_ascii_len()" for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_dynamic".
 
-    if (mmux_ctype_less(MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_ARBITRARY_LIMIT, dst_ptn_len_plus)) {
-      mmux_libc_errno_set(MMUX_LIBC_ERANGE);
+   Construct a new file  system pathname data structure and store  it in the variable
+   referenced by "fs_ptn_result".
+
+   The  new file  system  pathname  references an  ASCIIZ  string  allocated by  this
+   constructor using the factory's memory allocator.
+
+   We expect  "ap" to  hold two  additional arguments  of type  "mmux_asciizcp_t" and
+   "mmux_usize_t"  representing   a  pointer  to   an  ASCII  string   (possibly  not
+   nil-terminated) and the number of characters in the string.
+*/
+{
+  auto	dst_ptn_len_with_nul = mmux_ctype_incr(src_ptn_len_no_nul);
+
+  /* Validate the arguments. */
+  {
+    {
+      _Pragma("GCC diagnostic push");
+      _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
+      if ((NULL == src_ptn_ascii) || ('\0' == src_ptn_ascii[0])) {
+	mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+	return true;
+      }
+      _Pragma("GCC diagnostic pop");
+    }
+
+    MMUX_LIBC_FILE_SYSTEM_PATHNAME_VALIDATE_LENGTH_WITH_NUL(dst_ptn_len_with_nul);
+  }
+
+  /* Construct the resulting data structure. */
+  {
+    mmux_libc_file_system_pathname_class_t const *  class = &mmux_libc_file_system_pathname_class_dynamic;
+    mmux_asciizp_t	dst_ptn_asciiz;
+
+    if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &dst_ptn_asciiz, dst_ptn_len_with_nul)) {
       return true;
     } else {
-      mmux_asciizp_t	dst_ptn_asciiz;
-
-      if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &dst_ptn_asciiz, dst_ptn_len_plus)) {
-	return true;
-      } else if (mmux_libc_memcpy(dst_ptn_asciiz, src_ptn_asciiz, src_ptn_len)) {
-	return true;
-      } else {
-	dst_ptn_asciiz[src_ptn_len.value] = '\0';
-	result_p->value = dst_ptn_asciiz;
-	result_p->class = class;
-	return false;
-      }
+      mmux_libc_memcpy(dst_ptn_asciiz, src_ptn_ascii, src_ptn_len_no_nul);
+      dst_ptn_asciiz[src_ptn_len_no_nul.value] = '\0';
+      fs_ptn_result->value = dst_ptn_asciiz;
+      fs_ptn_result->class = class;
+      return false;
     }
   }
 }
+static mmux_libc_file_system_pathname_factory_class_t mmux_libc_file_system_pathname_factory_class_dynamic = {
+  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz,
+  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len,
+};
+static mmux_libc_file_system_pathname_factory_t const mmux_libc_file_system_pathname_factory_dynamic_object = {
+  .class		= &mmux_libc_file_system_pathname_factory_class_dynamic,
+};
 bool
-mmux_libc_file_system_pathname_free (mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_t fs_ptn_factory)
 {
-  return ptn.class->memory_allocator->class->free(ptn.class->memory_allocator, (mmux_pointer_t)ptn.value);
+  fs_ptn_factory[0] = mmux_libc_file_system_pathname_factory_dynamic_object;
+  return false;
 }
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: constructors and destructors.
+ ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn,
+				     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory,
+				     mmux_asciizcp_t src_ptn_asciiz)
 {
-  *result_p = ptn.value;
+  return fs_ptn_factory->class->make_from_asciiz(fs_ptn, fs_ptn_factory, src_ptn_asciiz);
+}
+bool
+mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn,
+				      mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory,
+				      mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len_no_nul)
+{
+  return fs_ptn_factory->class->make_from_ascii_len(fs_ptn, fs_ptn_factory, src_ptn_ascii, src_ptn_len_no_nul);
+}
+bool
+mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn)
+{
+  if (fs_ptn->class->memory_allocator->class->free(fs_ptn->class->memory_allocator, (mmux_pointer_t)fs_ptn->value)) {
+    return true;
+  } else {
+    fs_ptn->value = NULL;
+    return false;
+  }
+}
+bool
+mmux_libc_unmake_file_system_pathname_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
+/* This is an experimental function to be used with the GCC extension "cleanup":
+ *
+ *   mmux_libc_fs_ptn_t  fs_ptn2 = fs_ptn1
+ *     __attribute__((__cleanup__(mmux_libc_unmake_file_system_pathname_variable)));
+ *
+ */
+{
+  return mmux_libc_unmake_file_system_pathname(*fs_ptn_p);
+}
+
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: accessors.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcpp_t ptn_asciiz_result_p, mmux_libc_fs_ptn_arg_t fs_ptn)
+{
+  *ptn_asciiz_result_p = fs_ptn->value;
   return false;
 }
 bool
-mmux_libc_file_system_pathname_len_ref (mmux_usize_t * result_p, mmux_libc_file_system_pathname_t ptn)
+mmux_libc_file_system_pathname_len_ref (mmux_usize_t * ptn_len_no_nul_result_p, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
-  return mmux_libc_strlen(result_p, ptn.value);
+  return mmux_libc_strlen(ptn_len_no_nul_result_p, fs_ptn->value);
+}
+bool
+mmux_libc_file_system_pathname_len_plus_nil_ref (mmux_usize_t * ptn_len_with_nul_result_p,
+						 mmux_libc_fs_ptn_arg_t fs_ptn)
+{
+  return mmux_libc_strlen_plus_nil(ptn_len_with_nul_result_p, fs_ptn->value);
 }
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: comparison operations.
+ ** ----------------------------------------------------------------- */
 
 bool
 mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
-					mmux_libc_file_system_pathname_t ptn1,
-					mmux_libc_file_system_pathname_t ptn2)
+					mmux_libc_fs_ptn_arg_t ptn1,
+					mmux_libc_fs_ptn_arg_t ptn2)
 {
-  mmux_standard_usize_t		ptn1_len = strlen(ptn1.value);
-  mmux_standard_usize_t		ptn2_len = strlen(ptn2.value);
+  mmux_standard_usize_t		ptn1_len = strlen(ptn1->value);
+  mmux_standard_usize_t		ptn2_len = strlen(ptn2->value);
   mmux_standard_usize_t		min_len  = (ptn1_len < ptn2_len)? ptn1_len : ptn2_len;
-  mmux_standard_sint_t		cmpnum   = strncmp(ptn1.value, ptn2.value, min_len);
+  mmux_standard_sint_t		cmpnum   = strncmp(ptn1->value, ptn2->value, min_len);
 
   if (0 == cmpnum) {
     if (ptn1_len == ptn2_len) {
@@ -425,11 +657,11 @@ mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
 }
 
 m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[bool
-mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_file_system_pathname_t ptn1, mmux_libc_file_system_pathname_t ptn2)
+mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_fs_ptn_arg_t ptn1, mmux_libc_fs_ptn_arg_t ptn2)
 {
   mmux_sint_t	cmpnum;
 
-  if (mmux_libc_strcmp(&cmpnum, ptn1.value, ptn2.value)) {
+  if (mmux_libc_strcmp(&cmpnum, ptn1->value, ptn2->value)) {
     return true;
   } else if ($2) {
     *result_p = true;
@@ -445,62 +677,66 @@ DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum.
 DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum.value]]])
 DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum.value]]])
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: predicates.
+ ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_file_system_pathname_is_special_directory (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_special_directory (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_special_directory(ptn);
   return false;
 }
 bool
-mmux_libc_file_system_pathname_is_standalone_dot (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_standalone_dot (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_standalone_dot(ptn);
   return false;
 }
 bool
-mmux_libc_file_system_pathname_is_standalone_double_dot (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_standalone_double_dot (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_standalone_double_dot(ptn);
   return false;
 }
 bool
-mmux_libc_file_system_pathname_is_standalone_slash (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_standalone_slash (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_standalone_slash(ptn);
   return false;
 }
 bool
-mmux_libc_file_system_pathname_is_absolute (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_absolute (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_absolute(ptn);
   return false;
 }
 bool
-mmux_libc_file_system_pathname_is_relative (bool * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_is_relative (bool * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   *result_p = pathname_is_relative(ptn);
   return false;
 }
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: components extraction.
+ ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_rootname (mmux_libc_file_system_pathname_class_t const * class,
-					      mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
-/* By applying this function  we imply that it is possible for  the pathname "ptn" to
-   have an extension; it is also possible  to attach a new extension to the resulting
-   rootname. */
+mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t		fs_ptn_result,
+					      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+					      mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
-  if (pathname_is_special_directory(ptn)) {
+  if (pathname_is_special_directory(fs_ptn_input)) {
     /* We cannot extract an extension from a special directory. */
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
   } else {
     mmux_libc_file_system_pathname_extension_t	ext;
 
-    if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) {
+    if (mmux_libc_make_file_system_pathname_extension(&ext, fs_ptn_input)) {
       return true;
     } else {
       bool	extension_is_empty;
@@ -508,72 +744,72 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_file_system_pathname_cla
       if (mmux_libc_file_system_pathname_extension_is_empty(&extension_is_empty, ext)) {
 	return true;
       } else if (extension_is_empty) {
-	mmux_usize_t	buflen;
+	mmux_usize_t	fs_ptn_result_len_no_nul;
 
-	/* Remember that: true == (buflen >= 1) */
-	mmux_libc_file_system_pathname_len_ref(&buflen, ptn);
+	/* Remember that: true == (fs_ptn_result_len_no_nul >= 1) */
+	mmux_libc_file_system_pathname_len_ref(&fs_ptn_result_len_no_nul, fs_ptn_input);
 
 	/* If the  pathname is "/path/to/directory/"  we do  not want to  include the
 	   ending slash in the rootname. */
-	if ('/' == ptn.value[buflen.value - 1]) {
-	  --buflen.value;
+	if ('/' == fs_ptn_input->value[fs_ptn_result_len_no_nul.value - 1]) {
+	  --fs_ptn_result_len_no_nul.value;
 	}
 
-	if (mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, buflen)) {
-	  return true;
-	}
-	return false;
+	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						    fs_ptn_input->value, fs_ptn_result_len_no_nul);
       } else {
 	/* The extension is not empty. */
-	mmux_usize_t	buflen;
+	mmux_usize_t	fs_ptn_result_len_no_nul;
 
-	mmux_libc_file_system_pathname_len_ref(&buflen, ptn);
-	buflen.value -= ext.len.value;
+	mmux_libc_file_system_pathname_len_ref(&fs_ptn_result_len_no_nul, fs_ptn_input);
+	fs_ptn_result_len_no_nul.value -= ext.len.value;
 
-	if (mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, buflen)) {
-	  return true;
-	}
-	return false;
+	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						    fs_ptn_input->value, fs_ptn_result_len_no_nul);
       }
     }
   }
 }
 bool
-mmux_libc_make_file_system_pathname_tailname (mmux_libc_file_system_pathname_class_t const * class,
-					      mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t		fs_ptn_result,
+					      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+					      mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
-  if (pathname_is_standalone_slash(ptn)) {
-    return mmux_libc_make_file_system_pathname(class, result_p, "/");
+  if (pathname_is_standalone_slash(fs_ptn_input)) {
+    return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, "/");
   } else {
-    mmux_libc_file_system_pathname_segment_t	seg;
+    mmux_libc_file_system_pathname_segment_t	last_segment;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
       return true;
     } else {
-      return mmux_libc_make_file_system_pathname2(class, result_p, seg.ptr, seg.len);
+      return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						  last_segment.ptr, last_segment.len);
     }
   }
 }
 bool
-mmux_libc_make_file_system_pathname_filename (mmux_libc_file_system_pathname_class_t const * class,
-					      mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t		fs_ptn_result,
+					      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+					      mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
-  if (pathname_is_standalone_slash(ptn)) {
+  if (pathname_is_standalone_slash(fs_ptn_input)) {
     goto invalid_pathname;
   } else {
-    mmux_standard_usize_t	len = strlen(ptn.value);
+    mmux_standard_usize_t	fs_ptn_len_no_nul = strlen(fs_ptn_input->value);
 
-    if ('/' == ptn.value[len-1]) {
+    if ('/' == fs_ptn_input->value[fs_ptn_len_no_nul - 1]) {
       goto invalid_pathname;
     } else {
-      mmux_libc_file_system_pathname_segment_t	seg;
+      mmux_libc_file_system_pathname_segment_t	last_segment;
 
-      if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+      if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
 	return true;
-      } else if (segment_is_dot(seg) || segment_is_double_dot(seg)) {
+      } else if (segment_is_dot(last_segment) || segment_is_double_dot(last_segment)) {
 	goto invalid_pathname;
       } else {
-	return mmux_libc_make_file_system_pathname2(class, result_p, seg.ptr, seg.len);
+	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						    last_segment.ptr, last_segment.len);
       }
     }
   }
@@ -583,59 +819,69 @@ mmux_libc_make_file_system_pathname_filename (mmux_libc_file_system_pathname_cla
   return true;
 }
 bool
-mmux_libc_make_file_system_pathname_dirname (mmux_libc_file_system_pathname_class_t const * class,
-					     mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t			fs_ptn_result,
+					     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+					     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
-  if (pathname_is_standalone_slash(ptn)) {
+  if (pathname_is_standalone_slash(fs_ptn_input)) {
     /* If the pathname is "/" just copy it as dirname. */
-    return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
+    goto just_copy_the_input_to_the_output;
   } else {
-    auto	len = mmux_usize(strlen(ptn.value));
+    mmux_usize_t	fs_ptn_len_no_nul;
 
-    if ('/' == ptn.value[len.value - 1]) {
+    mmux_libc_strlen(&fs_ptn_len_no_nul, fs_ptn_input->value);
+    if ('/' == fs_ptn_input->value[fs_ptn_len_no_nul.value - 1]) {
       /* If  the  pathname ends  with  "/"  just copy  it  as  dirname.  For  example
 	 "/path/to/directory/" is itself its dirname. */
-      return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
+      goto just_copy_the_input_to_the_output;
     } else {
-      mmux_libc_file_system_pathname_segment_t	seg;
+      mmux_libc_file_system_pathname_segment_t	last_segment;
 
-      if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+      if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
 	return true;
-      } else if (segment_is_dot(seg)) {
-	if (mmux_ctype_equal(len, seg.len)) {
+      } else if (segment_is_dot(last_segment)) {
+	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment.len)) {
 	  /* If the full pathname is "." just copy it as dirname. */
-	  return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
+	  goto just_copy_the_input_to_the_output;
 	} else {
-	  /* If the  pathname ends with  "." just copy  it as dirname,  stripping the
-	     ending dot. */
-	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, mmux_ctype_sub(len, seg.len));
+	  /* The pathname's last segment is "."  so copy it as dirname, stripping the
+	     ending  dot.   For example  the  dirname  of "/path/to/directory/."   is
+	     "/path/to/directory/". */
+	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
+						      fs_ptn_input->value,
+						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment.len));
 	}
-      } else if (segment_is_double_dot(seg)) {
-	/* If the pathname ends with ".." just copy it as dirname. */
-	return mmux_libc_make_file_system_pathname(class, result_p, ptn.value);
+      } else if (segment_is_double_dot(last_segment)) {
+	/* If the pathname's last segment is ".." just copy it as dirname. */
+	goto just_copy_the_input_to_the_output;
       } else {
-	if (mmux_ctype_equal(len, seg.len)) {
+	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment.len)) {
 	  /* If we are  here: the pathname has  a single segment and  such segment is
 	     not a special  directory; we establish the convention  that: its dirname
-	     is ".". */
-	  return mmux_libc_make_file_system_pathname(class, result_p, ".");
+	     is "."; for example the dirname of "file.ext" is ".". */
+	  return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, ".");
 	} else {
 	  /* If  we are  here: the  dirname  is the  pathname with  the last  segment
-	     removed. */
-	  return mmux_libc_make_file_system_pathname2(class, result_p, ptn.value, mmux_ctype_sub(len, seg.len));
+	     removed.    For   example   the   dirname   of   "path/to/file.ext"   is
+	     "path/to/". */
+	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value,
+						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment.len));
 	}
       }
     }
   }
+
+ just_copy_the_input_to_the_output:
+  return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value);
 }
 
 
 /** --------------------------------------------------------------------
- ** File system types: pathname extensions.
+ ** File system pathname extensions.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   if (pathname_is_standalone_slash(ptn) || pathname_is_standalone_dot(ptn) || pathname_is_standalone_double_dot(ptn)) {
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
@@ -650,7 +896,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
       return true;
     } else if (segment_is_empty(S)) {
       result_p->len	= mmux_usize_constant_zero();
-      result_p->ptr	= ptn.value + strlen(ptn.value);
+      result_p->ptr	= ptn->value + strlen(ptn->value);
       return false;
     } else {
       mmux_asciizcp_t	beg = S.ptr;
@@ -676,7 +922,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
 
       /* Extension not found in the last segment.  Return an empty extension. */
       {
-	mmux_asciizcp_t	p = ptn.value + strlen(ptn.value);
+	mmux_asciizcp_t	p = ptn->value + strlen(ptn->value);
 
 	result_p->len	= mmux_usize_constant_zero();
 	result_p->ptr	= (('/' == *(p-1))? (p-1) : p);
@@ -734,7 +980,7 @@ mmux_libc_file_system_pathname_extension_is_empty (bool * result_p, mmux_libc_pt
   return false;
 }
 bool
-mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_ptn_t ptn, mmux_libc_ptn_extension_t ext)
+mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_fs_ptn_arg_t ptn, mmux_libc_ptn_extension_t ext)
 {
   mmux_libc_ptn_extension_t	ptn_ext;
 
@@ -858,7 +1104,7 @@ mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p, mmux_li
 
 
 /** --------------------------------------------------------------------
- ** File system types: pathname segments.
+ ** File system pathname segments.
  ** ----------------------------------------------------------------- */
 
 bool
@@ -885,7 +1131,7 @@ mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
 /* Given an ASCIIZ  string representing a pathname (which cannot  be empty): find the
  * last segment in the pathname.  The resulting segment does not contain a leading or
  * ending slash.  The returned segment can be empty.  Examples:
@@ -897,8 +1143,8 @@ mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * resu
  *	".."			=> ".."
  */
 {
-  mmux_usize_t		len = mmux_usize(strlen(ptn.value));
-  mmux_asciizcp_t const	beg = ptn.value;
+  mmux_usize_t		len = mmux_usize(strlen(ptn->value));
+  mmux_asciizcp_t const	beg = ptn->value;
   mmux_asciizcp_t	end = beg + len.value;
 
   /* If the  last octet  in the  pathname is  the ASCII  representation of  the slash
@@ -1607,14 +1853,15 @@ done:
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_normalised (mmux_libc_file_system_pathname_class_t const * class,
-						mmux_libc_ptn_t * result_p, mmux_libc_ptn_t ptn)
+mmux_libc_make_file_system_pathname_normalised (mmux_libc_fs_ptn_t		fs_ptn_result,
+						mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+						mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
-  mmux_usize_t	ptn_len = mmux_usize(strlen(ptn.value));
-  char		one[1 + ptn_len.value];
+  auto		fs_ptn_input_len_no_nul = mmux_usize(strlen(fs_ptn_input->value));
+  char		one[1 + fs_ptn_input_len_no_nul.value];
   mmux_usize_t	one_len;
 
-  if (normalisation_pass_remove_useless_slashes(&one_len, one, ptn.value, ptn_len)) {
+  if (normalisation_pass_remove_useless_slashes(&one_len, one, fs_ptn_input->value, fs_ptn_input_len_no_nul)) {
     goto error_invalid_input_pathname;
   } else {
     char		two[1 + one_len.value];
@@ -1624,7 +1871,7 @@ mmux_libc_make_file_system_pathname_normalised (mmux_libc_file_system_pathname_c
       goto error_invalid_input_pathname;
     } else if (normalisation_pass_remove_double_dot_segments(&one_len, one, two, two_len)) {
       goto error_invalid_input_pathname;
-    } else if (mmux_libc_make_file_system_pathname2(class, result_p, one, one_len)) {
+    } else if (mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, one, one_len)) {
       return true;
     } else {
       return false;
@@ -1642,9 +1889,10 @@ mmux_libc_make_file_system_pathname_normalised (mmux_libc_file_system_pathname_c
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_concat (mmux_libc_file_system_pathname_class_t const * class,
-					    mmux_libc_ptn_t * result_p,
-					    mmux_libc_ptn_t prefix, mmux_libc_ptn_t suffix)
+mmux_libc_make_file_system_pathname_concat (mmux_libc_fs_ptn_t			fs_ptn_result,
+					    mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
+					    mmux_libc_fs_ptn_arg_t		fs_ptn_prefix,
+					    mmux_libc_fs_ptn_arg_t		fs_ptn_suffix)
 {
   /* The resulting length is the sum of  the original lengths, plus one for the slash
    * separator.
@@ -1655,11 +1903,11 @@ mmux_libc_make_file_system_pathname_concat (mmux_libc_file_system_pathname_class
    * If the suffix is relative: its first  octet is *not* the ASCII representation of
    * the slash separator; we will explicitly insert a separator.
    */
-  auto	prefix_len = mmux_usize(strlen(prefix.value));
-  auto	suffix_len = mmux_usize(strlen(suffix.value));
+  auto	prefix_len = mmux_usize(strlen(fs_ptn_prefix->value));
+  auto	suffix_len = mmux_usize(strlen(fs_ptn_suffix->value));
   auto	result_len = mmux_ctype_add(prefix_len, suffix_len);
 
-  if (! (('/' == suffix.value[0]) || ('/' == prefix.value[prefix_len.value - 1]))) {
+  if (! (('/' == fs_ptn_suffix->value[0]) || ('/' == fs_ptn_prefix->value[prefix_len.value - 1]))) {
     ++result_len.value;
   }
 
@@ -1669,36 +1917,40 @@ mmux_libc_make_file_system_pathname_concat (mmux_libc_file_system_pathname_class
     char *	ptr = result_ptr;
     bool	separator_inserted = false;
 
-    /* Copy the prefix. */
+    /* Copy the prefix-> */
     {
-      memcpy(ptr, prefix.value, prefix_len.value);
+      memcpy(ptr, fs_ptn_prefix->value, prefix_len.value);
       ptr += prefix_len.value;
-      if ('/' == prefix.value[prefix_len.value-1]) {
+      if ('/' == fs_ptn_prefix->value[prefix_len.value-1]) {
 	separator_inserted = true;
       }
     }
 
     /* Copy the suffix and add the terminating zero. */
     {
-      if ('/' == suffix.value[0]) {
+      if ('/' == fs_ptn_suffix->value[0]) {
 	separator_inserted = true;
       } else if (! separator_inserted) {
 	*ptr++ = '/';
       }
-      memcpy(ptr, suffix.value, suffix_len.value);
+      memcpy(ptr, fs_ptn_suffix->value, suffix_len.value);
       ptr += suffix_len.value;
       *ptr = '\0';
     }
 
     /* Make a pathname, then normalise it. */
     {
-      mmux_libc_file_system_pathname_t	result_ptn;
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory_static;
+      mmux_libc_fs_ptn_t		fs_ptn_result_not_normalised;
 
-      if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-					      &result_ptn, result_ptr)) {
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory_static);
+      if (mmux_libc_make_file_system_pathname(fs_ptn_result_not_normalised, fs_ptn_factory_static, result_ptr)) {
 	return true;
       } else {
-	return mmux_libc_make_file_system_pathname_normalised(class, result_p, result_ptn);
+	bool	rv = mmux_libc_make_file_system_pathname_normalised(fs_ptn_result, fs_ptn_factory,
+								    fs_ptn_result_not_normalised);
+	mmux_libc_unmake_file_system_pathname(fs_ptn_result_not_normalised);
+	return rv;
       }
     }
   }

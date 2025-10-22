@@ -563,26 +563,30 @@ mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 DEFINE_STRUCT_SETTER_GETTER(sockaddr_un, sun_family,	libc_socket_address_family)
 
 bool
-mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_file_system_pathname_t pathname)
+mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
   /* Check if the input pathname is too long  to fit in the data structure along with
      its terminating nul;  we do not want  to truncate it.  Notice  that the pathname
      stored in  the struct MUST be  terminated by a nul:  if it is not,  the standard
      functions will fail. */
-  if ((sizeof(P->sun_path) - 1) < strlen(pathname.value)) {
+  if ((sizeof(P->sun_path) - 1) < strlen(fs_ptn->value)) {
     return true;
   } else {
     /* This chunk comes from the documentation of GLIBC. */
-    strncpy(P->sun_path, pathname.value, sizeof(P->sun_path));
+    strncpy(P->sun_path, fs_ptn->value, sizeof(P->sun_path));
     P->sun_path[sizeof(P->sun_path) - 1] = '\0';
     return false;
   }
 }
 bool
-mmux_libc_sun_path_ref (mmux_libc_file_system_pathname_t * result_p, mmux_libc_sockaddr_un_t const * const P)
+mmux_libc_sun_path_ref (mmux_libc_fs_ptn_t fs_ptn_result, mmux_libc_sockaddr_un_t const * const P)
 {
-  return mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_dynami_class,
-					     result_p, P->sun_path);
+  /* FIXME  Add the  factory as  argument to  this function.   (Marco Maggi;  Oct 22,
+     2025) */
+  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, P->sun_path);
 }
 
 mmux_usize_t

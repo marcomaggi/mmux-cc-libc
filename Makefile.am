@@ -390,8 +390,8 @@ tests_test_processes_wait_group_id_LDADD		= $(mmux_cc_libc_tests_ldadd)
 tests_test_processes_wait_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# ## ------------------------------------------------------------------------
-# ## file descriptors
+## ------------------------------------------------------------------------
+## file descriptors
 
 # check_PROGRAMS	+= \
 # 	tests/test-file-descriptors-copy-file-range		\
@@ -459,10 +459,11 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 # tests_test_file_descriptors_file_size_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 # tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# ## ------------------------------------------------------------------------
-# ## file system
+## ------------------------------------------------------------------------
+## file system
 
 # check_PROGRAMS	+= \
+#	tests/test-file-system-pathname
 # 	tests/test-file-system-access				\
 # 	tests/test-file-system-chdir				\
 # 	tests/test-file-system-chmod				\
@@ -492,7 +493,6 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 # 	tests/test-file-system-mkdir				\
 # 	tests/test-file-system-mkdirat				\
 # 	tests/test-file-system-opendir-readdir-closedir		\
-# 	tests/test-file-system-pathname				\
 # 	tests/test-file-system-pathname-extensions		\
 # 	tests/test-file-system-pathname-segments		\
 # 	tests/test-file-system-pathname-file-size		\
