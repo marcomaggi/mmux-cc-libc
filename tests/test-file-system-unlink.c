@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-unlink.src.ext";
+static mmux_asciizcp_t	src_pathname_asciiz = "./test-file-system-unlink.src.ext";
 
 
 /** --------------------------------------------------------------------
@@ -49,14 +48,20 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Do it. */
   {
-    mmux_libc_ptn_t	ptn;
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-      handle_error();
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, src_pathname_asciiz)) {
+	handle_error();
+      }
     }
 
-    printf_message("unlinking");
-    if (mmux_libc_unlink(ptn)) {
+    printf_message("unlink-ing");
+    if (mmux_libc_unlink(fs_ptn)) {
+      printf_error("unlink-ing");
       handle_error();
     }
 
@@ -64,15 +69,20 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       bool	result;
 
-      if (mmux_libc_file_system_pathname_exists(&result, ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&result, fs_ptn)) {
 	printf_error("exists");
 	handle_error();
       } else if (! result) {
 	printf_message("link pathname has been unlinked");
       } else {
 	printf_error("link pathname has NOT been unlinked");
-	mmux_libc_exit_failure();
+	handle_error();
       }
+    }
+
+    /* Cleanup */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 

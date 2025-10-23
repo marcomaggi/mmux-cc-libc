@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-remove.src.ext";
+static mmux_asciizcp_t	src_pathname_asciiz = "./test-file-system-remove.src.ext";
 
 
 /** --------------------------------------------------------------------
@@ -49,22 +48,32 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Do it. */
   {
-    mmux_libc_ptn_t	ptn;
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-      handle_error();
+    /* Built the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, src_pathname_asciiz)) {
+	handle_error();
+      }
     }
 
-    printf_message("removeing");
-    if (mmux_libc_remove(ptn)) {
-      handle_error();
+    /* Remove the file. */
+    {
+      printf_message("remove-ing");
+      if (mmux_libc_remove(fs_ptn)) {
+	printf_error("remove-ing");
+	handle_error();
+      }
     }
 
     /* Check file existence. */
     {
       bool	result;
 
-      if (mmux_libc_file_system_pathname_exists(&result, ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&result, fs_ptn)) {
 	printf_error("exists");
 	handle_error();
       } else if (! result) {
@@ -73,6 +82,11 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_error("link pathname has NOT been removeed");
 	mmux_libc_exit_failure();
       }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 

@@ -556,11 +556,6 @@ mmux_libc_open_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_open_flags_t) { .value = value };
 }
-mmux_cc_libc_inline_decl mmux_libc_linkat_flags_t
-mmux_libc_linkat_flags (mmux_standard_sint_t value)
-{
-  return (mmux_libc_linkat_flags_t) { .value = value };
-}
 
 /* ------------------------------------------------------------------ */
 
@@ -1403,6 +1398,19 @@ mmux_cc_libc_decl bool mmux_libc_getgrent (mmux_libc_group_t * * result_group_pp
  ** File system.
  ** ----------------------------------------------------------------- */
 
+mmux_cc_libc_inline_decl mmux_libc_linkat_flags_t
+mmux_libc_linkat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_linkat_flags_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_unlinkat_flags_t
+mmux_libc_unlinkat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_unlinkat_flags_t) { .value = value };
+}
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_statically_allocated;
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_dynamically_allocated;
 
@@ -1816,7 +1824,8 @@ mmux_cc_libc_decl bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd,
-					   mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t flags)
+					   mmux_libc_fs_ptn_arg_t pathname,
+					   mmux_libc_unlinkat_flags_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_rmdir (mmux_libc_fs_ptn_arg_t pathname)
@@ -1828,12 +1837,12 @@ mmux_cc_libc_decl bool mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
 mmux_cc_libc_decl bool mmux_libc_rename (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
-					   mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname)
+mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+					   mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
-					    mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
+mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+					    mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
 					    mmux_uint_t flags)
   __attribute__((__warn_unused_result__));
 

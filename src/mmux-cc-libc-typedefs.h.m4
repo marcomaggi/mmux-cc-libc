@@ -122,7 +122,6 @@ typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
 typedef mmux_libc_memory_file_descriptor_t const *	mmux_libc_memfd_arg_t;
 
 typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
-typedef struct mmux_libc_linkat_flags_t	{ mmux_sint_t;	} mmux_libc_linkat_flags_t;
 
 
 /** --------------------------------------------------------------------
@@ -150,6 +149,11 @@ typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_n
 /** --------------------------------------------------------------------
  ** File system.
  ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_linkat_flags_t		{ mmux_sint_t;	} mmux_libc_linkat_flags_t;
+typedef struct mmux_libc_unlinkat_flags_t	{ mmux_sint_t;	} mmux_libc_unlinkat_flags_t;
+
+/* ------------------------------------------------------------------ */
 
 /* Forward type declarations. */
 typedef struct mmux_libc_file_system_pathname_class_t	mmux_libc_file_system_pathname_class_t;

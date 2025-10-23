@@ -9830,60 +9830,137 @@ mmux_libc_fs_ptn_t  fs_ptn_real;
 @section Deleting links
 
 
-@deftypefun bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
+@deftypefun bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t @var{pathname})
 @MmuxCInterface{unlink}.
 
 @example
-mmux_libc_ptn_t         ptn;
+mmux_libc_fs_ptn_t fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_unlink(ptn)) @{
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, "/path/to/file.ext")) @{
+    /* error */
+  @}
+@}
+
+if (mmux_libc_unlink(fs_ptn)) @{
   /* error */
 @}
+
+mmux_libc_unmake_file_system_pathname(fs_ptn);
 @end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t flags)
+@deftp {Struct Typedef} mmux_libc_unlinkat_flags_t
+Data structure representing a bitwise OR combination of flags for @cfunc{mmux_libc_unlinkat}.
+@end deftp
+
+
+@deftypefun mmux_libc_unlinkat_flags_t mmux_libc_unlinkat_flags (mmux_standard_sint_t @var{flags_num})
+Build and return a new object of type @objtype{mmux_libc_unlinkat_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags})
 @MmuxCInterface{unlinkat}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          dirfd;
-mmux_sint_t             flags = 0;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-mmux_libc_at_fdcwd(&dirfd);
-if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Unlink the file system pathname. */
+@{
+  mmux_libc_dirfd_t dirfd;
+  auto              flags = mmux_libc_unlinkat_flags(0);
+
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_unlinkat(dirfd, fs_ptn, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 
 We can remove directories with this function:
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          dirfd;
-mmux_sint_t             flags = MMUX_LIBC_AT_REMOVEDIR;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/directory.d";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/dirname");
-mmux_libc_at_fdcwd(&dirfd);
-if (mmux_libc_unlinkat(dirfd, ptn, flags)) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Unlink the file system pathname. */
+@{
+  mmux_libc_dirfd_t dirfd;
+  auto              flags = mmux_libc_unlinkat_flags(MMUX_LIBC_AT_REMOVEDIR);
+
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_unlinkat(dirfd, fs_ptn, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_remove (mmux_libc_fs_ptn_arg_t pathname)
+@deftypefun bool mmux_libc_remove (mmux_libc_fs_ptn_arg_t @var{pathname})
 @MmuxCInterface{remove}.
 
 @example
-mmux_libc_ptn_t         ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/directory.d";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-if (mmux_libc_remove(ptn)) @{
-  /* error */
+/* Built the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Remove the file. */
+@{
+  if (mmux_libc_remove(fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun

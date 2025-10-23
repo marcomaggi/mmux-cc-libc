@@ -536,7 +536,7 @@ mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_sint_t flags)
+mmux_libc_unlinkat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname, mmux_libc_unlinkat_flags_t flags)
 {
   int	rv = unlinkat(dirfd->value, pathname->value, flags.value);
 
@@ -564,16 +564,16 @@ mmux_libc_rename (mmux_libc_fs_ptn_arg_t oldname, mmux_libc_fs_ptn_arg_t newname
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_renameat (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
-		    mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname)
+mmux_libc_renameat (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+		    mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname)
 {
   int	rv = renameat(olddirfd->value, oldname->value, newdirfd->value, newname->value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_renameat2 (mmux_libc_fd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
-		     mmux_libc_fd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
+mmux_libc_renameat2 (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
+		     mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
 		     mmux_uint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
