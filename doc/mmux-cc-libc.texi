@@ -9674,68 +9674,6 @@ mmux_libc_fs_ptn_t  fs_ptn_symlink, fs_ptn_real;
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fd_arg_t @var{fd_symlink})
-@MmuxCInterface{readlinkat}.  Retrieve the real file system pathname of the symbolic link referenced
-by @var{fd_symlink} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build the new
-file system pathname object.
-
-@example
-mmux_asciizcp_t     ptn_symlink_asciiz = "/path/to/symlink.ext";
-mmux_libc_fd_t      fd_symlink;
-mmux_libc_fs_ptn_t  fs_ptn_real;
-
-/* Build the file descriptor associated to the symbolic link. */
-@{
-  mmux_libc_fs_ptn_t  fs_ptn_symlink;
-
-  /* Build the symbolic-link file-system-pathname. */
-  @{
-    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
-    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_symlink_asciiz);
-  @}
-
-  /* Open the symbolic-link. */
-  @{
-    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-    auto  mode  = mmux_libc_mode_constant_zero();
-
-    if (mmux_libc_open(fd_symlink, fs_ptn_symlink, flags, mode)) @{
-      /* error */
-    @}
-  @}
-
-  /* Local cleanup. */
-  @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
-  @}
-@}
-
-/* Retrieve the real file-system-pathname. */
-@{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
-  if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd_symlink)) @{
-    /* error */
-  @}
-@}
-
-@{
-  /* Do something with "fs_ptn_real". */
-@}
-
-/* Final cleanup. */
-@{
-  mmux_libc_close(fd_symlink);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
-@}
-@end example
-@end deftypefun
-
-@c ------------------------------------------------------------------------
-
 @deftypefn {@gnu{} Function} bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input})
 @deftypefnx {@gnu{} Function} bool mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input})
 @MmuxCInterface{canonicalize_file_name}.
@@ -9827,103 +9765,65 @@ representing the file system pathname set to the empty string.  This causes the 
 argument to be meant to represent the link to follow through to the real file description.
 
 
-@deftypefn {Linux Function} bool mmux_libc_readlinkfd (mmux_usize_t * @var{required_nbytes_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_asciizp_t @var{buffer}, mmux_usize_t @var{provided_nbytes})
-Wrapper for @cfunc{readlinkat} called with empty file system pathname.  It is usually better to use
-@cfunc{mmux_libc_readlinkfd_malloc}.
+@deftypefun bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fd_arg_t @var{fd_symlink})
+@MmuxCInterface{readlinkat}.  Retrieve the real file system pathname of the symbolic link referenced
+by @var{fd_symlink} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build the new
+file system pathname object.
 
 @example
-mmux_libc_ptn_t         org_ptn, rea_ptn;
-mmux_libc_fd_t          org_fd;
+mmux_asciizcp_t     ptn_symlink_asciiz = "/path/to/symlink.ext";
+mmux_libc_fd_t      fd_symlink;
+mmux_libc_fs_ptn_t  fs_ptn_real;
 
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
-
-/* Open the link. */
+/* Build the file descriptor associated to the symbolic link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_fs_ptn_t  fs_ptn_symlink;
 
-  if (mmux_libc_open(&org_fd, org_ptn, flags, mode)) @{
-    /* error */
+  /* Build the symbolic-link file-system-pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_symlink_asciiz);
   @}
-@}
 
-/* Read the link. */
-@{
-  mmux_usize_t          provided_nbytes_with_nul = 1024;
-  char                  bufptr[provided_nbytes_with_nul];
-  mmux_usize_t          nbytes_done_no_nul;
+  /* Open the symbolic-link. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode_constant_zero();
 
-  mmux_libc_memzero(bufptr, provided_nbytes_with_nul);
-
-  if (mmux_libc_readlinkfd(&nbytes_done_no_nul, org_fd, bufptr, provided_nbytes_with_nul-1)) @{
-    /* error */
-  @} else if (nbytes_done_no_nul == provided_nbytes_with_nul) @{
-    /* not enough bytes in the supplied buffer */
-  @}
-  if (mmux_libc_make_file_system_pathname_malloc(&rea_ptn, bufptr)) @{
-    /* error */
-  @}
-@}
-
-/* Do something with "rea_ptn". */
-@{
-  ...
-@}
-
-/* Release the asynchronous resources. */
-@{
-  mmux_libc_file_system_pathname_free(rea_ptn);
-  if (mmux_libc_close(org_fd)) @{
+    if (mmux_libc_open(fd_symlink, fs_ptn_symlink, flags, mode)) @{
       /* error */
+    @}
   @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
+  @}
+@}
+
+/* Retrieve the real file-system-pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd_symlink)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something with "fs_ptn_real". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_close(fd_symlink);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
 @}
 @end example
-@end deftypefn
-
-@c ------------------------------------------------------------------------
-
-@deftypefn {Linux Function} bool mmux_libc_readlinkfd_malloc (mmux_libc_fs_ptn_arg_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
-Like @cfunc{mmux_libc_readlinkfd} but when successful: allocate a memory block, using
-@cfunc{mmux_libc_malloc}, and store the resulting pathname @asciiz{} string in it; we must release
-the allocated memory using @cfunc{mmux_libc_free}.
-
-@example
-mmux_libc_ptn_t         org_ptn, rea_ptn;
-mmux_libc_fd_t          org_fd;
-
-mmux_libc_make_file_system_pathname(&org_ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
-
-  if (mmux_libc_open(&org_fd, org_ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-/* Read the link. */
-@{
-  if (mmux_libc_readlinkfd_malloc(&rea_ptn, org_fd)) @{
-    /* error */
-  @}
-@}
-
-/* Do something with "rea_ptn". */
-@{
-  ...
-@}
-
-/* Release the asynchronous resources. */
-@{
-  mmux_libc_file_system_pathname_free(rea_ptn);
-  if (mmux_libc_close(org_fd)) @{
-      /* error */
-  @}
-@}
-@end example
-@end deftypefn
+@end deftypefun
 
 @c page
 @node fs deleting
