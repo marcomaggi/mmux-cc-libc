@@ -384,7 +384,7 @@ mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer (mmux_usize_t *		nbytes_
  * Store   the  resulting   pathname  in   "output_buffer_ascii",  whose   length  is
  * "output_buffer_provided_nbytes_no_nul".
  *
- * If no  error occurs when calling  "readlinkat()" the result value  is "false", but
+ * If no error occurs when calling  "readlinkat()" the returned value is "false", but
  * the caller needs to check if the output buffer is wide enough to contain the whole
  * output pathname not nul-terminated.
  *

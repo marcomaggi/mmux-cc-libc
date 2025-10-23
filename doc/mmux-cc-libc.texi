@@ -9585,259 +9585,151 @@ mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
 @subsubsection Follow file system links by pathname
 
 
-@deftypefun bool mmux_libc_readlink (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
+@deftypefun bool mmux_libc_readlink (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_symbolic_link})
 @MmuxCInterface{readlink}.
 
 @example
-mmux_libc_fs_ptn_t  fs_ptn_link, fs_ptn_real;
+mmux_asciizcp_t     ptn_symlink_asciiz = "/path/to/symlink.ext";
+mmux_libc_fs_ptn_t  fs_ptn_symlink, fs_ptn_real;
 
+/* Build the symbolic link pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-  mmux_libc_file_system_factory_static(fs_ptn_factory);
-  if (mmux_libc_make_file_system_pathname(fs_ptn_link, fs_ptn_factory, "/path/to/symlink.ext")) @{
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_symlink_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Retrieve the real pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_readlink(fs_ptn_real, fs_ptn_factory, fs_ptn_symlink)) @{
     /* error */
   @}
 @}
 
 @{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
-  if (mmux_libc_readlink(fs_ptn_real, fs_ptn_factory, fs_ptn_link)) @{
-    /* error */
-  @}
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_readlink_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
-@MmuxCInterface{readlink}.
-
-Retrieve the real pathname of the symbolic link @var{fs_ptn_input_linkname} and store it in
-@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
-buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
-bytes.
-
-When successful: the number of bytes actually written to the output buffer is stored in the variable
-referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
-@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
-pathname without terminating nul byte; otherwise the buffer was not wide enough.
-
-@example
-mmux_libc_fs_ptn_t  fs_ptn_symlink;
-
-@{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-  mmux_libc_file_system_factory_static(fs_ptn_factory);
-  mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
+  /* Do something with "fs_ptn_real". */
 @}
 
+/* Final cleanup. */
 @{
-  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
-  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
-  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
-
-  if (mmux_libc_readlink_to_buffer(&nbytes_written_to_output_buffer_no_nul,
-                                   output_buffer_ascii,
-                                   output_buffer_provided_nbytes_no_nul,
-                                   input_linkname_asciiz)) @{
-    /* error */
-  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
-    /* there was not enough room in the output buffer */
-  @} else @{
-    /* do something with the ASCII string in "output_buffer_ascii"
-       remembering that it is not nul-terminated */
-  @}
+  mmux_unmake_file_system_pathname(fs_ptn_symlink);
+  mmux_unmake_file_system_pathname(fs_ptn_real);
 @}
 @end example
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_readlinkat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
-@MmuxCInterface{readlinkat}.  Retrieve the real pathname of the symbolic link
-@var{fs_ptn_input_linkname} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build
-the new pathname object.  The pathname @var{fs_ptn_input_linkname} is meant to be absolute or
-relative to @var{dirfd}.
+@deftypefun bool mmux_libc_readlinkat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_dirfd_arg_t @var{dirfd_symlink}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_symbolic_link})
+@MmuxCInterface{readlinkat}.  Retrieve the real file system pathname of the symbolic link
+@var{fs_ptn_input_symbolic_link} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to
+build the new file system pathname object.
+
+The file system pathname @var{fs_ptn_input_symbolic_link} is meant to be absolute or relative to
+@var{dirfd_symlink}.
 
 @example
-mmux_libc_fs_ptn_t  fs_ptn_link, fs_ptn_real;
+mmux_asciizcp_t     ptn_symlink_asciiz = "/path/to/symlink.ext";
+mmux_libc_fs_ptn_t  fs_ptn_symlink, fs_ptn_real;
+
+/* Create the symbolic-link file-system-pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
   mmux_libc_file_system_factory_static(fs_ptn_factory);
-  mmux_libc_make_file_system_pathname(fs_ptn_link, fs_ptn_factory, "/path/to/file.ext");
+  if (mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_symlink_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Retrieve the real file-system-pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+  mmux_libc_dirfd_t           dirfd_symlink;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  mmux_libc_at_fcwd(dirfd_symlink);
+  if (mmux_libc_readlinkat(fs_ptn_real, fs_ptn_factory, dirfd_symlink, fs_ptn_symlink)) @{
+    /* error */
+  @}
 @}
 
 @{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-  mmux_libc_dirfd_t           dirfd;
+  /* Do something with "fs_ptn_real". */
+@}
 
-  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
-  mmux_libc_at_fcwd(dirfd);
-  if (mmux_libc_readlinkat(fs_ptn_real, fs_ptn_factory, dirfd, fs_ptn_link)) @{
-    /* error */
-  @} else @{
-    /* do something with "fs_ptn_real" */
-  @}
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
 @}
 @end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fd_arg_t @var{fd})
-@MmuxCInterface{readlinkat}.  Retrieve the real pathname of the symbolic link referenced by @var{fd}
-and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build the new pathname object.
-
-@example
-mmux_libc_fd_t  fd_symlink;
-
-/* Open the symbolic link. */
-@{
-  mmux_libc_fs_ptn_t  fs_ptn_symlink;
-
-  /* Build the pathname. */
-  @{
-    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-    mmux_libc_file_system_factory_static(fs_ptn_factory);
-    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
-  @}
-
-  @{
-    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-    auto  mode  = mmux_libc_mode_literal(0);
-
-    if (mmux_libc_open(&fd_symlink, fs_ptn_symlink, flags, mode)) @{
-      /* error */
-    @}
-  @}
-@}
-
-/* Retrieve the real file system pathname. */
-@{
-  mmux_libc_fs_ptn_t          fs_ptn_real;
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
-  if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd)) @{
-    /* error */
-  @} else @{
-    /* do something with "fs_ptn_real" */
-  @}
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_readlinkat_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input_linkname})
-@MmuxCInterface{readlinkat}.
-
-Retrieve the real pathname of the symbolic link @var{fs_ptn_input_linkname} and store it in
-@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
-buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
-bytes.
-
-The pathname @var{fs_ptn_input_linkname} is meant to be absolute or relative to @var{dirfd}.
-
-When successful: the number of bytes actually written to the output buffer is stored in the variable
-referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
-@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
-pathname without terminating nul byte; otherwise the buffer was not wide enough.
+@deftypefun bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fd_arg_t @var{fd_symlink})
+@MmuxCInterface{readlinkat}.  Retrieve the real file system pathname of the symbolic link referenced
+by @var{fd_symlink} and store it in @var{fs_ptn_result}, using @var{fs_ptn_factory} to build the new
+file system pathname object.
 
 @example
-mmux_libc_fs_ptn_t  fs_ptn_symlink;
-mmux_libc_dirfd_t   dirfd;
-
-mmux_libc_at_fcwd(dirfd);
-@{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
-
-  mmux_libc_file_system_factory_static(fs_ptn_factory);
-  mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
-@}
-
-@{
-  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
-  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
-  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
-
-  if (mmux_libc_readlinkat_to_buffer(&nbytes_written_to_output_buffer_no_nul,
-                                     output_buffer_ascii,
-                                     output_buffer_provided_nbytes_no_nul,
-                                     dirfd,
-                                     input_linkname_asciiz)) @{
-    /* error */
-  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
-    /* there was not enough room in the output buffer */
-  @} else @{
-    /* do something with the ASCII string in "output_buffer_ascii"
-       remembering that it is not nul-terminated */
-  @}
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_readlinkfd_to_buffer (mmux_usize_t * @var{nbytes_written_to_output_buffer_no_nul_p}, mmux_asciip_t @var{output_buffer_ascii}, mmux_usize_t @var{output_buffer_provided_nbytes_no_nul}, mmux_libc_fd_arg_t @var{fd})
-@MmuxCInterface{readlinkat}.
-
-Retrieve the real pathname of the symbolic link referenced by @var{fd} and store it in
-@var{output_buffer_ascii} as an @mmuxascii{} string @strong{not} terminated by a nul byte.  The
-buffer @var{output_buffer_ascii} is meant to contain @var{output_buffer_provided_nbytes_no_nul}
-bytes.
-
-When successful: the number of bytes actually written to the output buffer is stored in the variable
-referenced by @var{nbytes_written_to_output_buffer_no_nul_p}; if this number is less than
-@var{output_buffer_provided_nbytes_no_nul}: the buffer was wide enough to contain the whole real
-pathname without terminating nul byte; otherwise the buffer was not wide enough.
-
-@example
+mmux_asciizcp_t     ptn_symlink_asciiz = "/path/to/symlink.ext";
 mmux_libc_fd_t      fd_symlink;
+mmux_libc_fs_ptn_t  fs_ptn_real;
 
-/* Open the symbolic link. */
+/* Build the file descriptor associated to the symbolic link. */
 @{
   mmux_libc_fs_ptn_t  fs_ptn_symlink;
 
-  /* Build the pathname. */
+  /* Build the symbolic-link file-system-pathname. */
   @{
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-    mmux_libc_file_system_factory_static(fs_ptn_factory);
-    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, "/path/to/symlink.ext");
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_symlink_asciiz);
   @}
 
+  /* Open the symbolic-link. */
   @{
     auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-    auto  mode  = mmux_libc_mode_literal(0);
+    auto  mode  = mmux_libc_mode_constant_zero();
 
-    if (mmux_libc_open(&fd_symlink, fs_ptn_symlink, flags, mode)) @{
+    if (mmux_libc_open(fd_symlink, fs_ptn_symlink, flags, mode)) @{
       /* error */
     @}
   @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
+  @}
 @}
 
-/* Retrieve the real file system pathname. */
+/* Retrieve the real file-system-pathname. */
 @{
-  auto  output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
-  char          output_buffer_ascii[output_buffer_provided_nbytes_no_nul.value];
-  mmux_usize_t  nbytes_written_to_output_buffer_no_nul;
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-  if (mmux_libc_readlinkat_to_buffer(&nbytes_written_to_output_buffer_no_nul,
-                                     output_buffer_ascii,
-                                     output_buffer_provided_nbytes_no_nul,
-                                     fd_symlink,
-                                     input_linkname_asciiz)) @{
+  mmux_libc_file_system_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd_symlink)) @{
     /* error */
-  @} else if (mmux_ctype_equal(output_buffer_provided_nbytes_no_nul, nbytes_written_to_output_buffer_no_nul)) @{
-    /* there was not enough room in the output buffer */
-  @} else @{
-    /* do something with the ASCII string in "output_buffer_ascii"
-       remembering that it is not nul-terminated */
   @}
+@}
+
+@{
+  /* Do something with "fs_ptn_real". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_close(fd_symlink);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
 @}
 @end example
 @end deftypefun

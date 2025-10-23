@@ -498,11 +498,8 @@ check_PROGRAMS	+= \
 	tests/test-file-system-pathname-segments		\
 	tests/test-file-system-pathname-file-size		\
 	tests/test-file-system-readlink				\
-	tests/test-file-system-readlink-malloc			\
 	tests/test-file-system-readlinkat			\
-	tests/test-file-system-readlinkat-malloc		\
 	tests/test-file-system-readlinkfd			\
-	tests/test-file-system-readlinkfd-malloc		\
 	tests/test-file-system-remove				\
 	tests/test-file-system-rename				\
 	tests/test-file-system-renameat				\
@@ -579,20 +576,11 @@ tests_test_file_system_renameat2_LDADD			= $(mmux_cc_libc_tests_ldadd)
 tests_test_file_system_readlink_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlink_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_file_system_readlink_malloc_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_readlink_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
-
 tests_test_file_system_readlinkat_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlinkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_file_system_readlinkat_malloc_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_readlinkat_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
-
 tests_test_file_system_readlinkfd_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlinkfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
-
-tests_test_file_system_readlinkfd_malloc_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_file_system_readlinkfd_malloc_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_stat_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_stat_LDADD			= $(mmux_cc_libc_tests_ldadd)
