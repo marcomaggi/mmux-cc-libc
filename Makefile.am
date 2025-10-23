@@ -500,6 +500,8 @@ check_PROGRAMS	+= \
 	tests/test-file-system-readlink				\
 	tests/test-file-system-readlinkat			\
 	tests/test-file-system-readlinkfd			\
+	tests/test-file-system-canonicalize-file-name		\
+	tests/test-file-system-realpath				\
 	tests/test-file-system-remove				\
 	tests/test-file-system-rename				\
 	tests/test-file-system-renameat				\
@@ -581,6 +583,12 @@ tests_test_file_system_readlinkat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_readlinkfd_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_readlinkfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_canonicalize_file_name_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_canonicalize_file_name_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_realpath_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_realpath_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_stat_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_stat_LDADD			= $(mmux_cc_libc_tests_ldadd)

@@ -49,6 +49,7 @@ void wait_for_some_time (void);
 void cleanfiles (void);
 void cleanfiles_register (mmux_asciizcp_t pathname_asciiz);
 bool test_create_data_file (mmux_asciizcp_t pathname_ascii);
+bool test_create_directory (mmux_asciizcp_t pathname_ascii);
 
 
 /** --------------------------------------------------------------------
@@ -290,6 +291,37 @@ test_create_data_file (mmux_asciizcp_t pathname_asciiz)
 
   if (mmux_libc_close(fd)) {
     handle_error();
+  }
+
+  return false;
+}
+bool
+test_create_directory (mmux_asciizcp_t pathname_asciiz)
+{
+  mmux_libc_fs_ptn_t		fs_ptn_directory;
+
+  /* Create directory file system pathname. */
+  {
+    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, pathname_asciiz)) {
+      handle_error();
+    }
+  }
+
+  /* Create the directory. */
+  {
+    auto	mode = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR);
+
+    if (mmux_libc_mkdir(fs_ptn_directory, mode)) {
+      handle_error();
+    }
+  }
+
+  /* Final cleanup. */
+  {
+    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
   }
 
   return false;

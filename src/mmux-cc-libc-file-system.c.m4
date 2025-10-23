@@ -489,7 +489,7 @@ mmux_libc_readlinkfd (mmux_libc_fs_ptn_t		fs_ptn_result,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
+mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
 				  mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
 				  mmux_libc_fs_ptn_arg_t	fs_ptn_input)
 {
@@ -504,6 +504,13 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
     return rv;
   }
 ]]])
+}
+bool
+mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
+				  mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+				  mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+{
+  return mmux_libc_canonicalise_file_name(fs_ptn_result, fs_ptn_factory, fs_ptn_input);
 }
 bool
 mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,

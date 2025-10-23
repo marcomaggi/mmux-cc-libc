@@ -9737,11 +9737,14 @@ mmux_libc_fs_ptn_t  fs_ptn_real;
 @c ------------------------------------------------------------------------
 
 @deftypefn {@gnu{} Function} bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input})
+@deftypefnx {@gnu{} Function} bool mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn_input})
 @MmuxCInterface{canonicalize_file_name}.
 
 @example
 mmux_asciizcp_t     ptn_asciiz = "/path/to/../../file.ext";
-mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_canonicalised;;
+mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_canonicalised;
+
+/* Build the original pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
@@ -9750,6 +9753,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_canonicalised;;
     /* error */
   @}
 @}
+
+/* Canonicalise the pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
@@ -9758,9 +9763,16 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_canonicalised;;
     /* error */
   @}
 @}
-... /* do something with the pathnames */
-mmux_libc_unmake_file_system_pathname(fs_ptn);
-mmux_libc_unmake_file_system_pathname(fs_ptn_canonicalised);
+
+@{
+  /* Do something with the "fs_ptn_canonicalised". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_canonicalised);
+@}
 @end example
 @end deftypefn
 
@@ -9771,6 +9783,8 @@ mmux_libc_unmake_file_system_pathname(fs_ptn_canonicalised);
 @example
 mmux_asciizcp_t     ptn_asciiz = "/path/to/../../file.ext";
 mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_real;;
+
+/* Build the original file system pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
@@ -9779,6 +9793,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_real;;
     /* error */
   @}
 @}
+
+/* Retrieve the real file system pathname. */
 @{
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
@@ -9787,9 +9803,16 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_real;;
     /* error */
   @}
 @}
-... /* do something with the pathnames */
-mmux_libc_unmake_file_system_pathname(fs_ptn);
-mmux_libc_unmake_file_system_pathname(fs_ptn_real);
+
+@{
+  /* Do something with "fs_ptn_real". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
+@}
 @end example
 @end deftypefun
 

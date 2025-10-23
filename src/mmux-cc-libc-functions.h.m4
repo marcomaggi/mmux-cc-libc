@@ -1802,6 +1802,11 @@ mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_
 							 mmux_libc_fs_ptn_arg_t		fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
+							 mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
+							 mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+
 mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,
 					   mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
 					   mmux_libc_fs_ptn_arg_t	fs_ptn_input)
