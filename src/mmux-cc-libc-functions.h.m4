@@ -1413,6 +1413,11 @@ mmux_libc_renameat2_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_renameat2_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_fchownat_flags_t
+mmux_libc_fchownat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_fchownat_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1869,11 +1874,13 @@ mmux_cc_libc_decl bool mmux_libc_lchown (mmux_libc_fs_ptn_arg_t pathname, mmux_l
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_fchownat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-					   mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
-  __attribute__((__warn_unused_result__));
+					   mmux_libc_uid_t uid, mmux_libc_gid_t gid,
+					   mmux_libc_fchownat_flags_t flags)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_fd_arg_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid, mmux_sint_t flags)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_chownfd (mmux_libc_fd_arg_t fd, mmux_libc_uid_t uid, mmux_libc_gid_t gid,
+					  mmux_sint_t flags)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
@@ -1914,51 +1921,57 @@ mmux_cc_libc_decl bool mmux_libc_ftruncate (mmux_libc_fd_arg_t fd, mmux_off_t le
 
 /* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mode,	mmux_libc_mode_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ino,		mmux_libc_ino_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_dev,		mmux_libc_dev_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_nlink,	mmux_libc_nlink_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_uid,		mmux_libc_uid_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_gid,		mmux_libc_gid_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_size,	mmux_off_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_atime_sec,	mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_atime_nsec,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mtime_sec,	mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_mtime_nsec,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ctime_sec,	mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_ctime_nsec,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blocks,	mmux_libc_blkcnt_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(stat,	st_blksize,	mmux_uint_t)
+m4_define([[[DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS]]],[[[m4_dnl
+mmux_cc_libc_decl bool mmux_libc_$1_set (mmux_libc_stat_t stat_p, $2 value)
+  __attribute__((__nonnull__(1)));
+mmux_cc_libc_decl bool mmux_libc_$1_ref ($2 * value_p, mmux_libc_stat_arg_t stat_p)
+  __attribute__((__nonnull__(1,2)));
+]]])
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_mode,	mmux_libc_mode_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_ino,		mmux_libc_ino_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_dev,		mmux_libc_dev_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_nlink,	mmux_libc_nlink_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_uid,		mmux_libc_uid_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_gid,		mmux_libc_gid_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_size,	mmux_off_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_atime_sec,	mmux_time_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_atime_nsec,	mmux_slong_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_mtime_sec,	mmux_time_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_mtime_nsec,	mmux_slong_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_ctime_sec,	mmux_time_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_ctime_nsec,	mmux_slong_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_blocks,	mmux_libc_blkcnt_t)
+DEFINE_STRUCT_STAT_SETTER_GETTER_PROTOS(st_blksize,	mmux_uint_t)
 
-mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_t const * stat_p,
+mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p,
 					    mmux_asciizcp_t struct_name)
-  __attribute__((__nonnull__(2)));
+  __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-					  mmux_libc_stat_t * stat_p, mmux_sint_t flags)
+					  mmux_libc_stat_t stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t * stat_p, mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p, mmux_sint_t flags)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_S_TYPEISMQ (bool * result_p, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_S_TYPEISMQ (bool * result_p, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_S_TYPEISSEM (bool * result_p, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_S_TYPEISSEM (bool * result_p, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_S_TYPEISSHM (bool * result_p, mmux_libc_stat_t * stat_p)
+mmux_cc_libc_decl bool mmux_libc_S_TYPEISSHM (bool * result_p, mmux_libc_stat_t stat_p)
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */

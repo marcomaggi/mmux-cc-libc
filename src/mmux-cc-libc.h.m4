@@ -55,10 +55,13 @@ typedef struct mmux_libc_fd_set_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_FD_SET
 typedef struct mmux_libc_rlimit_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_RLIMIT];   } mmux_libc_rlimit_t;
 typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD];   } mmux_libc_passwd_t;
 typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP];    } mmux_libc_group_t;
-typedef struct mmux_libc_stat_t     { mmux_uint8_t value[MMUX_LIBC_SIZEOF_STAT];     } mmux_libc_stat_t;
 typedef struct mmux_libc_utimbuf_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_UTIMBUF];  } mmux_libc_utimbuf_t;
 typedef struct mmux_libc_open_how_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW]; } mmux_libc_open_how_t;
 typedef struct mmux_libc_dirent_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_DIRENT];   } mmux_libc_dirent_t;
+
+typedef struct mmux_libc_file_system_stat_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_STAT];
+} mmux_libc_file_system_stat_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

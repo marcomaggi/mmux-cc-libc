@@ -10102,81 +10102,105 @@ mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
 @section File ownership
 
 
-@deftypefun bool mmux_libc_chown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
+@deftypefun bool mmux_libc_chown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid})
 @MmuxCInterfaceGlibc{chown, File Owner}.
 
 @example
-mmux_libc_ptn_t       ptn;
-mmux_libc_uid_t       uid;
-mmux_libc_gid_t       gid;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
+mmux_libc_uid_t	    uid;
+mmux_libc_gid_t	    gid;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t    fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-/* Acquire example UID and GID. */
+/* Acquire UID and GID. */
 @{
-  mmux_asciizcp_t             name;
-  mmux_libc_passwd_t *        PW;
+  mmux_asciizcp_t       name;
+  mmux_libc_passwd_t *  PW;
 
   if (mmux_libc_getlogin(&name)) @{
     /* error */
   @}
-
   if (mmux_libc_getpwnam(&PW, name)) @{
     /* error */
   @}
-
   mmux_libc_pw_uid_ref(&uid, PW);
   mmux_libc_pw_gid_ref(&gid, PW);
 @}
 
 /* Do it. */
 @{
-  if (mmux_libc_chown(ptn, uid, gid)) @{
+  if (mmux_libc_chown(fs_ptn, uid, gid)) @{
     /* error */
   @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fchown (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
+@deftypefun bool mmux_libc_fchown (mmux_libc_fs_arg_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid})
 @MmuxCInterfaceGlibc{fchown, File Owner}.
 
 @example
-mmux_libc_ptn_t       ptn;
-mmux_libc_fd_t        fd;
-mmux_libc_uid_t       uid;
-mmux_libc_gid_t       gid;
+mmux_asciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t   fd;
+mmux_libc_uid_t  uid;
+mmux_libc_gid_t  gid;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-/* Open the file. */
+/* Acquire the file descriptor. */
 @{
-  mmux_sint_t     flags    = MMUX_LIBC_O_RDWR;
-  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
-    /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
-/* Acquire example UID and GID. */
+/* Acquire UID and GID. */
 @{
-  mmux_asciizcp_t             name;
-  mmux_libc_passwd_t *        PW;
+  mmux_asciizcp_t       name;
+  mmux_libc_passwd_t *  PW;
 
   if (mmux_libc_getlogin(&name)) @{
     /* error */
   @}
-
   if (mmux_libc_getpwnam(&PW, name)) @{
     /* error */
   @}
-
   mmux_libc_pw_uid_ref(&uid, PW);
   mmux_libc_pw_gid_ref(&gid, PW);
 @}
@@ -10188,7 +10212,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   @}
 @}
 
-/* Close the file. */
+/* Final cleanup. */
 @{
   if (mmux_libc_close(fd)) @{
     /* error */
@@ -10198,56 +10222,78 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_lchown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid});
-@MmuxCInterface{lchown}.  This function does not dereference symbolic links.
+@deftypefun bool mmux_libc_lchown (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid})
+@MmuxCInterface{lchown}.  This function is like @cfunc{mmux_libc_chown} but it does not dereference
+symbolic links.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_fchownat_flags_t
+Data structure type representing a bitwise OR combination of flags for calls to
+@cfunc{mmux_libc_fchownat}.
+@end deftp
+
+
+@deftypefun mmux_libc_fchownat_flags_t mmux_libc_fchownat_flags (mmux_standard_sint_t @var{flags_num})
+Build and return an instance of @objtype{mmux_libc_fchownat_flags_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fchownat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t flags);
+@deftypefun bool mmux_libc_fchownat (mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_libc_fchownat_flags_t flags)
 @MmuxCInterface{fchownat}.
 
 @example
-mmux_libc_ptn_t       ptn;
-mmux_libc_uid_t       uid;
-mmux_libc_gid_t       gid;
+mmux_libc_fs_ptn_t  fs_ptn;
+mmux_libc_uid_t     uid;
+mmux_libc_gid_t     gid;
 
-if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-/* Acquire example UID and GID. */
+/* Acquire UID and GID. */
 @{
-  mmux_asciizcp_t             name;
-  mmux_libc_passwd_t *        PW;
+  mmux_asciizcp_t           name;
+  mmux_libc_passwd_t *      PW;
 
   if (mmux_libc_getlogin(&name)) @{
     /* error */
   @}
-
   if (mmux_libc_getpwnam(&PW, name)) @{
     /* error */
   @}
-
   mmux_libc_pw_uid_ref(&uid, PW);
   mmux_libc_pw_gid_ref(&gid, PW);
 @}
 
 /* Do it. */
 @{
-  mmux_libc_fd_t      dirfd;
-  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+  mmux_libc_dirfd_t  dirfd;
+  auto               flags = mmux_libc_fchownat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
 
-  mmux_libc_at_fdcwd(&dirfd);
-
-  if (mmux_libc_fchownat(dirfd, ptn, uid, gid, flags)) @{
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_fchownat(dirfd, fs_ptn, uid, gid, flags)) @{
     /* error */
   @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
+@c ------------------------------------------------------------------------
 
-@deftypefn {Linux Function} bool mmux_libc_chownfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_chownfd (mmux_libc_fs_arg_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{flags})
 Like @cfunc{mmux_libc_fchownat} but always add @code{MMUX_LIBC_AT_EMPTY_PATH} to @var{flags}, so it
 operates on @var{fd}.
 

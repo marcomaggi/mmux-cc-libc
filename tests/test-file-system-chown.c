@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-chown.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-chown.src.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,50 +33,61 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-chown";
-    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_uid_t	uid;
-  mmux_libc_gid_t	gid;
-
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Acquire UID and GID. */
   {
-    mmux_asciizcp_t		name;
-    mmux_libc_passwd_t *	PW;
+    mmux_libc_fs_ptn_t	fs_ptn;
+    mmux_libc_uid_t	uid;
+    mmux_libc_gid_t	gid;
 
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
 
-    if (mmux_libc_getlogin(&name)) {
-      handle_error();
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	handle_error();
+      }
     }
 
-    if (mmux_libc_getpwnam(&PW, name)) {
-      handle_error();
+    /* Acquire UID and GID. */
+    {
+      mmux_asciizcp_t		name;
+      mmux_libc_passwd_t *	PW;
+
+      if (mmux_libc_getlogin(&name)) {
+	handle_error();
+      }
+      if (mmux_libc_getpwnam(&PW, name)) {
+	handle_error();
+      }
+      mmux_libc_pw_uid_ref(&uid, PW);
+      mmux_libc_pw_gid_ref(&gid, PW);
     }
 
-    mmux_libc_pw_uid_ref(&uid, PW);
-    mmux_libc_pw_gid_ref(&gid, PW);
-  }
+    /* Do it. */
+    {
+      printf_message("chown-ing");
+      if (mmux_libc_chown(fs_ptn, uid, gid)) {
+	printf_error("chown-ing");
+	handle_error();
+      }
+    }
 
-  /* Do it. */
-  {
-    printf_message("chowning");
-    if (mmux_libc_chown(ptn, uid, gid)) {
-      handle_error();
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 
