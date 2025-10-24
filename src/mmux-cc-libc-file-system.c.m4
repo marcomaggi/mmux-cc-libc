@@ -574,7 +574,7 @@ mmux_libc_renameat (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldna
 bool
 mmux_libc_renameat2 (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
 		     mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
-		     mmux_uint_t flags)
+		     mmux_libc_renameat2_flags_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_RENAMEAT2]]],[[[
   int	rv = renameat2(olddirfd->value, oldname->value, newdirfd->value, newname->value, flags.value);

@@ -1408,6 +1408,11 @@ mmux_libc_unlinkat_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_unlinkat_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_renameat2_flags_t
+mmux_libc_renameat2_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_renameat2_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1843,7 +1848,7 @@ mmux_cc_libc_decl bool mmux_libc_renameat (mmux_libc_dirfd_arg_t olddirfd, mmux_
 
 mmux_cc_libc_decl bool mmux_libc_renameat2 (mmux_libc_dirfd_arg_t olddirfd, mmux_libc_fs_ptn_arg_t oldname,
 					    mmux_libc_dirfd_arg_t newdirfd, mmux_libc_fs_ptn_arg_t newname,
-					    mmux_uint_t flags)
+					    mmux_libc_renameat2_flags_t flags)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_mkdir (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_mode_t mode)

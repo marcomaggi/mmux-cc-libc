@@ -152,6 +152,7 @@ typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_n
 
 typedef struct mmux_libc_linkat_flags_t		{ mmux_sint_t;	} mmux_libc_linkat_flags_t;
 typedef struct mmux_libc_unlinkat_flags_t	{ mmux_sint_t;	} mmux_libc_unlinkat_flags_t;
+typedef struct mmux_libc_renameat2_flags_t	{ mmux_sint_t;	} mmux_libc_renameat2_flags_t;
 
 /* ------------------------------------------------------------------ */
 

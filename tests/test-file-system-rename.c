@@ -17,11 +17,10 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-rename.src.ext";
-static mmux_asciizcp_t		dst_pathname_asciiz = "./test-file-system-rename.dst.ext";
+static mmux_asciizcp_t	src_pathname_asciiz = "./test-file-system-rename.src.ext";
+static mmux_asciizcp_t	dst_pathname_asciiz = "./test-file-system-rename.dst.ext";
 
 
 /** --------------------------------------------------------------------
@@ -51,17 +50,23 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Do it. */
   {
-    mmux_libc_ptn_t	src_ptn, dst_ptn;
+    mmux_libc_fs_ptn_t	fs_ptn_src, fs_ptn_dst;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
-      handle_error();
-    }
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dst_ptn, dst_pathname_asciiz)) {
-      handle_error();
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn_src, fs_ptn_factory, src_pathname_asciiz)) {
+	handle_error();
+      }
+      if (mmux_libc_make_file_system_pathname(fs_ptn_dst, fs_ptn_factory, dst_pathname_asciiz)) {
+	handle_error();
+      }
     }
 
-    printf_message("renameing");
-    if (mmux_libc_rename(src_ptn, dst_ptn)) {
+    printf_message("rename-ing");
+    if (mmux_libc_rename(fs_ptn_src, fs_ptn_dst)) {
+      printf_error("rename-ing");
       handle_error();
     }
 
@@ -69,7 +74,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       bool	result;
 
-      if (mmux_libc_file_system_pathname_exists(&result, dst_ptn)) {
+      if (mmux_libc_file_system_pathname_exists(&result, fs_ptn_dst)) {
 	printf_error("exists");
 	handle_error();
       } else if (result) {
@@ -79,7 +84,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	mmux_libc_exit_failure();
       }
 
-      if (mmux_libc_file_system_pathname_is_regular(&result, dst_ptn)) {
+      if (mmux_libc_file_system_pathname_is_regular(&result, fs_ptn_dst)) {
 	printf_error("calling is_regular");
 	handle_error();
       } else if (result) {
@@ -88,6 +93,12 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_error("rename pathname is NOT a regular file");
 	mmux_libc_exit_failure();
       }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn_src);
+      mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
     }
   }
 
