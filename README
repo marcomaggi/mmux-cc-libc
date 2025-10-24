@@ -19,8 +19,10 @@ Topics
 1. Introduction
 ---------------
 
-This package  implements a  C11 language  library to  make it  easier to
-interface the GNU C Library to higher-level platforms.
+This package  installs a  C23 library, with  GNU C  Compiler extensions,
+which implements a  uniform API to the POSIX library  functions and some
+Linux extensions.  A possible use of the library is in foreign functions
+interfaces for higher--level languages.
 
   The package targets POSIX systems.
 

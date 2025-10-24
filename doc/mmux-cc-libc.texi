@@ -146,9 +146,10 @@ the data structure used in the description; when @cnull{}: it defaults to @samp{
 @c ------------------------------------------------------------
 
 @copying
-This document describes version @value{MmuxPkgSemanticVersion} of @value{PACKAGE}, a C11 language
-library implementing a wrapper to the @gnu{} C Library that makes it easier to interface it to
-high--level platforms.
+This document describes version @value{MmuxPkgSemanticVersion} of @value{PACKAGE}, a C23 library,
+with @gnu{} C Compiler extensions, which implements a uniform @api{} to the @posix{} library
+functions and some Linux extensions.  A possible use of the library is in foreign functions
+interfaces for higher--level languages.
 
 The package targets @posix{} platforms.
 
@@ -247,9 +248,10 @@ Indexes
 @chapter Overview of the package
 
 
-This document describes version @value{MmuxPkgSemanticVersion} of @value{PACKAGE}, a C11 language
-library implementing a wrapper to the @gnu{} C Library that makes it easier to interface it to
-high--level platforms.
+This document describes version @value{MmuxPkgSemanticVersion} of @value{PACKAGE}, a C23 library,
+with @gnu{} C Compiler extensions, which implements a uniform @api{} to the @posix{} library
+functions and some Linux extensions.  A possible use of the library is in foreign functions
+interfaces for higher--level languages.
 
 @cindex @value{PackageHeaderFile}, header file
 @cindex Header file @value{PackageHeaderFile}
@@ -10293,57 +10295,81 @@ mmux_libc_gid_t     gid;
 
 @c ------------------------------------------------------------------------
 
+@deftp {Struct Typedef} mmux_libc_chownfd_flags_t
+Data structure type representing a bitwise OR combination of flags for calls to
+@cfunc{mmux_libc_chownfd}.
+@end deftp
+
+
+@deftypefun mmux_libc_chownfd_flags_t mmux_libc_chownfd_flags (mmux_standard_sint_t @var{flags_num})
+Build and return an instance of @objtype{mmux_libc_chownfd_flags_t}.
+@end deftypefun
+
+
 @deftypefn {Linux Function} bool mmux_libc_chownfd (mmux_libc_fs_arg_t @var{fd}, mmux_libc_uid_t @var{uid}, mmux_libc_gid_t @var{gid}, mmux_sint_t @var{flags})
-Like @cfunc{mmux_libc_fchownat} but always add @code{MMUX_LIBC_AT_EMPTY_PATH} to @var{flags}, so it
-operates on @var{fd}.
+@MmuxCInterface{fchownat}.  Notice that this function always adds @code{MMUX_LIBC_AT_EMPTY_PATH} to
+@var{flags}, so it operates on @var{fd}.
 
 @example
-mmux_libc_ptn_t       ptn;
-mmux_libc_fd_t        fd;
-mmux_libc_uid_t       uid;
-mmux_libc_gid_t       gid;
+mmux_libc_fd_t   fd;
+mmux_libc_uid_t  uid;
+mmux_libc_gid_t  gid;
 
-if (mmux_libc_make_file_system_pathname(&ptn, src_pathname_asciiz)) @{
-  /* error */
-@}
-
-/* Open the file. */
+/* Obtain the file descriptor. */
 @{
-  mmux_sint_t     flags    = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
-    /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
-/* Acquire example UID and GID. */
+/* Acquire UID and GID. */
 @{
-  mmux_asciizcp_t             name;
-  mmux_libc_passwd_t *        PW;
+  mmux_asciizcp_t       name;
+  mmux_libc_passwd_t *  PW;
 
   if (mmux_libc_getlogin(&name)) @{
     /* error */
   @}
-
   if (mmux_libc_getpwnam(&PW, name)) @{
     /* error */
   @}
-
   mmux_libc_pw_uid_ref(&uid, PW);
   mmux_libc_pw_gid_ref(&gid, PW);
 @}
 
 /* Do it. */
 @{
-  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
+  auto  flags = mmux_libc_chownfd_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
 
   if (mmux_libc_chownfd(fd, uid, gid, flags)) @{
     /* error */
   @}
 @}
 
-/* Close the file. */
+/* Final cleanup. */
 @{
   if (mmux_libc_close(fd)) @{
     /* error */
