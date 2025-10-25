@@ -1433,6 +1433,11 @@ mmux_libc_access_how (mmux_standard_sint_t value)
 {
   return (mmux_libc_access_how_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_faccessat_flags_t
+mmux_libc_faccessat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_faccessat_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1921,13 +1926,13 @@ mmux_cc_libc_decl bool mmux_libc_access (bool * access_is_permitted_p, mmux_libc
 
 mmux_cc_libc_decl bool mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 					    mmux_libc_fs_ptn_arg_t pathname,
-					    mmux_libc_access_how_t how, mmux_sint_t flags)
+					    mmux_libc_access_how_t how, mmux_libc_faccessat_flags_t flags)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 					     mmux_libc_fs_ptn_arg_t pathname,
 					     mmux_libc_access_how_t how,
-					     mmux_sint_t flags)
+					     mmux_libc_faccessat_flags_t flags)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */

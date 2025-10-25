@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-faccessat.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-faccessat.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,7 +33,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-faccessat";
-    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
@@ -42,87 +41,103 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  mmux_libc_ptn_t	ptn;
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Set permissions. */
   {
-    mmux_mode_t		mode = 0600;
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    printf_message("chmoding");
-    if (mmux_libc_chmod(ptn, mode)) {
-      handle_error();
-    }
-  }
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
 
-  /* Check mode. */
-  {
-    mmux_libc_stat_t	ST[1];
-    mmux_libc_fd_t	fd;
-    mmux_mode_t	st_mode;
-
-    mmux_libc_stder(fd);
-    if (mmux_libc_stat(ptn, ST)) {
-      handle_error();
-    } else if (0 && mmux_libc_stat_dump(fd, ST, NULL)) {
-      handle_error();
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	handle_error();
+      }
     }
 
-    mmux_libc_st_mode_ref(&st_mode, ST);
+    /* Set permissions. */
+    {
+      auto	mode = mmux_libc_mode_literal(0600);
 
-    if (0600 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode)) {
-      printf_message("mode checks out");
-    } else {
-      printf_message("mode does NOT check out");
-      mmux_libc_exit_failure();
+      printf_message("chmod-ing");
+      if (mmux_libc_chmod(fs_ptn, mode)) {
+	printf_error("chmod-ing");
+	handle_error();
+      }
     }
-  }
 
-  /* Do it. */
-  if (1) {
-    mmux_libc_fd_t	dirfd;
-    mmux_sint_t		how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK;
-    mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
-    bool		access_is_permitted;
+    /* Check mode. */
+    {
+      mmux_libc_stat_t	stat;
+      mmux_libc_fd_t	fd;
+      mmux_libc_mode_t	st_mode;
 
-    mmux_libc_at_fdcwd(&dirfd);
+      mmux_libc_stder(fd);
+      if (mmux_libc_stat(fs_ptn, stat)) {
+	handle_error();
+      } else if (mmux_libc_stat_dump(fd, stat, NULL)) {
+	handle_error();
+      }
 
-    printf_message("faccessating first time");
-    if (mmux_libc_faccessat(&access_is_permitted, dirfd, ptn, how, flags)) {
-      handle_error();
-    } else if (access_is_permitted) {
-      printf_message("the read-write access is permitted");
-    } else {
-      print_error("the read-write access is DENIED");
-      mmux_libc_exit_failure();
+      mmux_libc_st_mode_ref(&st_mode, stat);
+
+      if (0600 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode.value)) {
+	printf_message("mode checks out");
+      } else {
+	printf_message("mode does NOT check out");
+	handle_error();
+      }
     }
-  }
 
-  /* Do it again. */
-  if (1) {
-    mmux_libc_fd_t	dirfd;
-    mmux_sint_t		how = MMUX_LIBC_X_OK;
-    mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
-    bool		access_is_permitted;
+    /* Do it. */
+    if (true) {
+      mmux_libc_dirfd_t	dirfd;
+      auto  how   = mmux_libc_access_how(MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK);
+      auto  flags = mmux_libc_faccessat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
+      bool  access_is_permitted;
 
-    mmux_libc_at_fdcwd(&dirfd);
+      mmux_libc_at_fdcwd(dirfd);
 
-    printf_message("faccessating second time");
-    if (mmux_libc_faccessat(&access_is_permitted, dirfd, ptn, how, flags)) {
-      handle_error();
-    } else if (! access_is_permitted) {
-      printf_message("the execution access is denied");
-    } else {
-      print_error("the execution access is PERMITTED");
-      mmux_libc_exit_failure();
+      printf_message("faccessat-ing first time");
+      if (mmux_libc_faccessat(&access_is_permitted, dirfd, fs_ptn, how, flags)) {
+	printf_error("faccessat-ing first time");
+	handle_error();
+      } else if (access_is_permitted) {
+	printf_message("the read-write access is permitted");
+      } else {
+	print_error("the read-write access is DENIED");
+	mmux_libc_exit_failure();
+      }
+    }
+
+    /* Do it again. */
+    if (true) {
+      mmux_libc_dirfd_t	dirfd;
+      auto  how   = mmux_libc_access_how(MMUX_LIBC_X_OK);
+      auto  flags = mmux_libc_faccessat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
+      bool  access_is_permitted;
+
+      mmux_libc_at_fdcwd(dirfd);
+
+      printf_message("faccessat-ing second time");
+      if (mmux_libc_faccessat(&access_is_permitted, dirfd, fs_ptn, how, flags)) {
+	printf_error("faccessat-ing second time");
+	handle_error();
+      } else if (! access_is_permitted) {
+	printf_message("the execution access is denied");
+      } else {
+	print_error("the execution access is PERMITTED");
+	mmux_libc_exit_failure();
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 

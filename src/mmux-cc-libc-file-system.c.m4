@@ -720,7 +720,7 @@ mmux_libc_access (bool * access_is_permitted_p, mmux_libc_fs_ptn_arg_t pathname,
 bool
 mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 		     mmux_libc_fs_ptn_arg_t pathname,
-		     mmux_libc_access_how_t how, mmux_sint_t flags)
+		     mmux_libc_access_how_t how, mmux_libc_faccessat_flags_t flags)
 {
   int	rv;
 
@@ -747,7 +747,7 @@ mmux_libc_faccessat (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 bool
 mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_libc_dirfd_arg_t dirfd,
 		      mmux_libc_fs_ptn_arg_t pathname,
-		      mmux_libc_access_how_t how, mmux_sint_t flags)
+		      mmux_libc_access_how_t how, mmux_libc_faccessat_flags_t flags)
 {
   int	rv;
 
