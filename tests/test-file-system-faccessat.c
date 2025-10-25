@@ -107,9 +107,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_error("faccessat-ing first time");
 	handle_error();
       } else if (access_is_permitted) {
-	printf_message("the read-write access is permitted");
+	printf_message("the read-write access is correctly permitted");
       } else {
-	print_error("the read-write access is DENIED");
+	print_error("the read-write access is wrongly DENIED");
 	mmux_libc_exit_failure();
       }
     }
@@ -128,9 +128,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_error("faccessat-ing second time");
 	handle_error();
       } else if (! access_is_permitted) {
-	printf_message("the execution access is denied");
+	printf_message("the execution access is correctly denied");
       } else {
-	print_error("the execution access is PERMITTED");
+	print_error("the execution access is wrongly PERMITTED");
 	mmux_libc_exit_failure();
       }
     }
