@@ -10784,39 +10784,58 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 
 @menu
-* fs attributes struct::        The @objtype{mmux_libc_stat_t} data structure.
-* fs attributes stat::          The @cfunc{stat} functions.
-* fs attributes mode::          Inspecting the mode field of @objtype{mmux_libc_stat_t}.
+* fs attributes types::         The @objtype{mmux_libc_stat_t} data type.
+* fs attributes inspection::    Inspecting file attributes.
+* fs attributes mode::          Inspecting the mode field of @objtype{mmux_libc_file_system_stat_t}.
 * fs attributes predicates::    File system pathname predicates.
 * fs attributes fields::        Fields inspection functions.
 @end menu
 
 @c page
-@node fs attributes struct
-@subsection The @objtype{mmux_libc_stat_t} data structure
-
+@node fs attributes types
+@subsection The @objtype{mmux_libc_stat_t} data type
 
 
 The standard @cfunc{stat} function and its variants inspect the file system to retrieve most of the
 informations associated to a directory entry; the informations are stored in data structures of type
-@objtype{mmux_libc_stat_t}.  The core function is @cfunc{mmux_libc_stat}, which we can use as
-follows:
+@objtype{mmux_libc_file_system_stat_t}.  The core function is @cfunc{mmux_libc_stat}, which we can
+use as follows:
+
+Usually we declare a local variable of type @objtype{mmux_libc_stat_t} which is a 1--element array
+of instances of @objtype{mmux_libc_file_system_stat_t}.
 
 @example
-mmux_libc_ptn_t     ptn;
-mmux_libc_stat_t    ST[1];
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_stat(ptn, ST)) @{
-  /* error */
-@} else @{
-  mmux_libc_fd_t    fd;
-
-  mmux_libc_stder(&fd);
-  if (mmux_libc_stat_dump(fd, ST, NULL)) @{
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
     /* error */
   @}
+@}
+
+@{
+  mmux_libc_stat_t  stat;
+
+  if (mmux_libc_stat(fs_ptn, stat)) @{
+    /* error */
+  @} else @{
+    mmux_libc_fd_t  fd;
+
+    mmux_libc_stder(fd);
+    if (mmux_libc_stat_dump(fd, stat, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 
@@ -10844,68 +10863,116 @@ struct stat->st_blksize = 4096
 @end example
 
 
-@MmuxCStructOpaqueTypedef{stat}
-@MmuxSetterGetter{stat, st_mode,        mmux_libc_mode_t}
-@MmuxSetterGetter{stat,	st_ino,		mmux_ino_t}
-@MmuxSetterGetter{stat,	st_dev,		mmux_dev_t}
-@MmuxSetterGetter{stat,	st_nlink,	mmux_nlink_t}
-@MmuxSetterGetter{stat,	st_uid,		mmux_libc_uid_t}
-@MmuxSetterGetter{stat,	st_gid,		mmux_libc_gid_t}
-@MmuxSetterGetter{stat,	st_size,	mmux_off_t}
-@MmuxSetterGetter{stat,	st_atime_sec,	mmux_time_t}
-@MmuxSetterGetter{stat,	st_atime_nsec,	mmux_slong_t}
-@MmuxSetterGetter{stat,	st_mtime_sec,	mmux_time_t}
-@MmuxSetterGetter{stat,	st_mtime_nsec,	mmux_slong_t}
-@MmuxSetterGetter{stat,	st_ctime_sec,	mmux_time_t}
-@MmuxSetterGetter{stat,	st_ctime_nsec,	mmux_slong_t}
-@MmuxSetterGetter{stat,	st_blocks,	mmux_blkcnt_t}
-@MmuxSetterGetter{stat,	st_blksize,	mmux_uint_t}
-@MmuxStructDumper{stat}
+@MmuxCStructOpaqueTypedef{file_system_stat}
+@MmuxSetterGetter{file_system_stat,     st_mode,        mmux_libc_mode_t}
+@MmuxSetterGetter{file_system_stat,	st_ino,		mmux_libc_ino_t}
+@MmuxSetterGetter{file_system_stat,	st_dev,		mmux_libc_dev_t}
+@MmuxSetterGetter{file_system_stat,	st_nlink,	mmux_libc_nlink_t}
+@MmuxSetterGetter{file_system_stat,	st_uid,		mmux_libc_uid_t}
+@MmuxSetterGetter{file_system_stat,	st_gid,		mmux_libc_gid_t}
+@MmuxSetterGetter{file_system_stat,	st_size,	mmux_off_t}
+@MmuxSetterGetter{file_system_stat,	st_atime_sec,	mmux_time_t}
+@MmuxSetterGetter{file_system_stat,	st_atime_nsec,	mmux_slong_t}
+@MmuxSetterGetter{file_system_stat,	st_mtime_sec,	mmux_time_t}
+@MmuxSetterGetter{file_system_stat,	st_mtime_nsec,	mmux_slong_t}
+@MmuxSetterGetter{file_system_stat,	st_ctime_sec,	mmux_time_t}
+@MmuxSetterGetter{file_system_stat,	st_ctime_nsec,	mmux_slong_t}
+@MmuxSetterGetter{file_system_stat,	st_blocks,	mmux_libc_blkcnt_t}
+@MmuxSetterGetter{file_system_stat,	st_blksize,	mmux_uint_t}
+@MmuxStructDumper{file_system_stat}
 
 
-@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@deftp {Array Type} mmux_libc_stat_t
+Array type defined as:
+
+@example
+typedef struct mmux_libc_file_system_stat_t  mmux_libc_stat_t[1];
+@end example
+@end deftp
+
+
+@deftp {Pointer Type} mmux_libc_stat_arg_t
+Pointer type defined as:
+
+@example
+typedef struct mmux_libc_file_system_stat_t const *  mmux_libc_stat_arg_t;
+@end example
+@end deftp
+
+
+@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{S_TYPESIMQ}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{S_TYPEISSEM}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_t * @var{stat_p})
+@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{S_TYPEISSHM}.
 @end deftypefun
 
 @c page
-@node fs attributes stat
-@subsection The @cfunc{stat} functions
+@node fs attributes inspection
+@subsection Inspecting file attributes
 
 
-@deftypefun bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
+@menu
+* fs attributes inspection stat::     Inspecting file attributes with @cfunc{mmux_libc_stat}.
+* fs attributes inspection fstat::    Inspecting file attributes with @cfunc{mmux_libc_fstat}.
+* fs attributes inspection lstat::    Inspecting file attributes with @cfunc{mmux_libc_lstat}.
+* fs attributes inspection fstatat::  Inspecting file attributes with @cfunc{mmux_libc_fstatat}.
+* fs attributes inspection statfd::   Inspecting file attributes with @cfunc{mmux_libc_statfd}.
+@end menu
+
+@c page
+@node fs attributes inspection stat
+@subsubsection Inspecting file attributes with @cfunc{mmux_libc_stat}
+
+
+@deftypefun bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{stat}.
 
 @example
-mmux_libc_ptn_t     ptn;
-mmux_libc_stat_t    ST[1];
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_stat(ptn, ST)) @{
-  /* error */
-@} else @{
-  mmux_libc_fd_t    fd;
-
-  mmux_libc_stder(&fd);
-  if (mmux_libc_stat_dump(fd, ST, NULL)) @{
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
     /* error */
   @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_stat_t  stat;
+
+  if (mmux_libc_stat(fs_ptn, stat)) @{
+    /* error */
+  @} else @{
+    /* Do something with "stat". */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs attributes inspection fstat
+@subsubsection Inspecting file attributes with @cfunc{mmux_libc_fstat}
 
-@deftypefun bool mmux_libc_fstat (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_stat_t * @var{stat_p})
+
+@deftypefun bool mmux_libc_fstat (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{fstat}.
 
 @example
@@ -10944,8 +11011,12 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs attributes inspection lstat
+@subsubsection Inspecting file attributes with @cfunc{mmux_libc_lstat}
 
-@deftypefun bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p})
+
+@deftypefun bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p})
 @MmuxCInterface{lstat}.
 
 @example
@@ -10973,8 +11044,12 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs attributes inspection fstatat
+@subsubsection Inspecting file attributes with @cfunc{mmux_libc_fstatat}
 
-@deftypefun bool mmux_libc_fstatat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t flags)
+
+@deftypefun bool mmux_libc_fstatat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p}, mmux_sint_t flags)
 @MmuxCInterface{fstatat}.
 
 @example
@@ -11019,8 +11094,12 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs attributes inspection statfd
+@subsubsection Inspecting file attributes with @cfunc{mmux_libc_statfd}
 
-@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_t * @var{stat_p}, mmux_sint_t @var{flags})
+
+@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p}, mmux_sint_t @var{flags})
 @MmuxCInterface{fstatat}.  This function invokes @cfunc{fstatat} with an empty file system pathname
 and adding @samp{MMUX_LIBC_AT_EMPTY_PATH} to the @var{flags} argument; this causes the function to
 operate on the file descriptor @var{fd}.
@@ -11066,7 +11145,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 
 @c page
 @node fs attributes mode
-@subsection Inspecting the mode field of @objtype{mmux_libc_stat_t}
+@subsection Inspecting the mode field of @objtype{mmux_libc_file_system_stat_t}
 
 
 @deftypefun bool mmux_libc_S_ISDIR (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
