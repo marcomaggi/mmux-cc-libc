@@ -5886,7 +5886,7 @@ Print to @var{fd} the string representation of @var{value}.
 @subsection Standard file descriptor opening
 
 
-@deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{open}.
 
 @example
@@ -5894,7 +5894,7 @@ mmux_libc_fs_ptn_t  pathname;
 mmux_libc_fs_t      fd;
 
 mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+mmux_libc_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
 if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
   /* error */
@@ -5907,7 +5907,7 @@ if (mmux_libc_open(&fd, pathname, flags, mode)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_openat (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_openat (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{openat}.
 
 @example
@@ -5916,7 +5916,7 @@ mmux_libc_file_descriptor_t      dirfd;
 mmux_libc_file_descriptor_t      fd;
 
 mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+mmux_libc_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
 if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
   /* error */
@@ -6682,7 +6682,7 @@ mmux_libc_file_descriptor_t     dst_fd;
   mmux_libc_fs_ptn_t    src_ptn;
   mmux_libc_fs_ptn_t    dst_ptn;
   mmux_sint_t  flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-  mmux_mode_t  mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_mode_t  mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
 
   if (mmux_libc_make_file_system_pathname(src_ptn, "source.ext")) @{
     /* error */
@@ -7339,7 +7339,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7367,7 +7367,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7395,7 +7395,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7423,7 +7423,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7451,7 +7451,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7479,7 +7479,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7507,7 +7507,7 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 /* Open the link. */
 @{
   mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -7542,7 +7542,7 @@ mmux_libc_fs_ptn_t        ptn;
 mmux_libc_file_descriptor_t             dirfd;
 mmux_libc_file_descriptor_t             fd;
 mmux_sint_t                             flags = MMUX_LIBC_O_RDWR;
-mmux_mode_t                             mode  = 0;
+mmux_libc_mode_t                             mode  = 0;
 mmux_usize_t                            size;
 
 mmux_libc_make_file_system_pathname(ptn, "/path/to/file.ext");
@@ -9042,7 +9042,7 @@ mmux_libc_dirstream_t               dirstream;
 @{
   mmux_libc_ptn_t   dirptn;
   mmux_sint_t       flags = MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_RDONLY;
-  mmux_mode_t       mode  = 0;
+  mmux_libc_mode_t       mode  = 0;
 
   if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
     /* error */
@@ -9147,12 +9147,12 @@ if (mmux_libc_readdir(&direntry, dirstream)) @{
 @subsection Creating file system directories
 
 
-@deftypefun bool mmux_libc_mkdir (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t mode)
+@deftypefun bool mmux_libc_mkdir (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t mode)
 @MmuxCInterface{mkdir}.
 
 @example
 mmux_libc_ptn_t         ptn;
-mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+mmux_libc_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
 if (mmux_libc_mkdir(ptn, mode)) @{
@@ -9162,13 +9162,13 @@ if (mmux_libc_mkdir(ptn, mode)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{mkdirat}.
 
 @example
 mmux_libc_ptn_t         ptn;
 mmux_libc_fd_t          dirfd;
-mmux_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+mmux_libc_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
 
 mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
 mmux_libc_at_fdcwd(&dirfd);
@@ -9284,7 +9284,7 @@ mmux_libc_file_descriptor_t           dirfd;
   /* Open the directory. */
   @{
     mmux_sint_t         flags = MMUX_LIBC_O_PATH;
-    mmux_mode_t         mode  = 0;
+    mmux_libc_mode_t         mode  = 0;
 
     if (mmux_libc_open(&dirfd, ptn, flags, mode)) @{
       /* error */
@@ -10383,129 +10383,228 @@ mmux_libc_gid_t  gid;
 @section File access permissions
 
 
-@deftypefun bool mmux_libc_umask (mmux_mode_t * @var{old_mask_p}, mmux_mode_t @var{new_mask})
+@menu
+* fs permissions umask::        File creation masks.
+* fs permissions change::       Changing file permissions.
+* fs permissions access::       Accessing file permissions.
+@end menu
+
+@c page
+@node fs permissions umask
+@subsection File creation masks
+
+
+@deftypefun bool mmux_libc_umask (mmux_libc_mode_t * @var{old_mask_p}, mmux_libc_mode_t @var{new_mask})
 @MmuxCInterfaceGlibc{umask, Setting Permissions}.
 
 @example
-mmux_mode_t     old_mask, new_mask = 0755;
+mmux_libc_mode_t  old_mask, new_mask = mmux_libc_mode_literal(0755);
 
 mmux_libc_umask(&old_mask, new_mask);
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_getumask (mmux_mode_t * @var{current_mask_p})
+@deftypefun bool mmux_libc_getumask (mmux_libc_mode_t * @var{current_mask_p})
 Store the current mask in the location referenced by @var{current_mask_p}.  Do not change the
 current mask.
 
 @example
-mmux_mode_t     cur_mask;
+mmux_libc_mode_t  cur_mask;
 
 mmux_libc_getumask(&cur_mask);
 @end example
 @end deftypefun
 
+@c page
+@node fs permissions change
+@subsection Changing file permissions
 
-@deftypefun bool mmux_libc_chmod (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode})
+
+@menu
+* fs permissions change chmod::     Changing file permissions with @cfunc{mmux_libc_chmod}.
+* fs permissions change fchmod::    Changing file permissions with @cfunc{mmux_libc_fchmod}.
+* fs permissions change fchmodat::  Changing file permissions with @cfunc{mmux_libc_fchmodat}.
+@end menu
+
+@c page
+@node fs permissions change chmod
+@subsubsection Changing file permissions with @cfunc{mmux_libc_chmod}
+
+
+@deftypefun bool mmux_libc_chmod (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t @var{mode})
 @MmuxCInterfaceGlibc{chmod, Setting Permissions}.
 
 @example
-mmux_libc_ptn_t     ptn;
-mmux_mode_t         mode = 0755;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-if (mmux_libc_chmod(ptn, mode)) @{
-  /* error */
-@}
-
-/* Check it. */
+/* Build the file system pathname. */
 @{
-  mmux_libc_stat_t  ST[1];
-  mmux_mode_t       st_mode;
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-  if (mmux_libc_stat(ptn, ST)) @{
-    handle_error();
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
   @}
+@}
 
-  mmux_libc_st_mode_ref(&st_mode, ST);
+/* Change the mode. */
+@{
+  auto  mode = mmux_libc_mode_literal(0755);
 
-  if ((MMUX_LIBC_S_IRWXU                       == (MMUX_LIBC_S_IRWXU & st_mode)) &&
-      ((MMUX_LIBC_S_IRGRP | MMUX_LIBC_S_IXGRP) == (MMUX_LIBC_S_IRWXG & st_mode)) &&
-      ((MMUX_LIBC_S_IROTH | MMUX_LIBC_S_IXOTH) == (MMUX_LIBC_S_IRWXO & st_mode))) @{
-    /* mode checks out */
+  if (mmux_libc_chmod(fs_ptn, mode)) @{
+    /* error */
   @}
+@}
 
-  if (0755 == ((MMUX_LIBC_S_IRWXU | MMUX_LIBC_S_IRWXG | MMUX_LIBC_S_IRWXO) & st_mode)) @{
-    /* mode checks out */
-  @}
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs permissions change fchmod
+@subsubsection Changing file permissions with @cfunc{mmux_libc_fchmod}
 
-@deftypefun bool mmux_libc_fchmod (mmux_libc_file_descriptor_t @var{fd}, mmux_mode_t @var{mode})
+
+@deftypefun bool mmux_libc_fchmod (mmux_libc_fd_arg_t @var{fd}, mmux_libc_mode_t @var{mode})
 @MmuxCInterfaceGlibc{fchmod, Setting Permissions}.
 
 @example
-mmux_libc_ptn_t       ptn;
-mmux_libc_fd_t        fd;
+mmux_asciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t   fd;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-/* Open the file. */
+/* Obtain the file descriptor. */
 @{
-  mmux_sint_t         flags = MMUX_LIBC_O_RDWR;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
-    /* error */
+  /* Build file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+    auto  mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
 /* Do it. */
 @{
-  mmux_mode_t         mode = 0755;
+  auto  mode = mmux_libc_mode_literal(0755);
 
   if (mmux_libc_fchmod(fd, mode)) @{
     /* error */
   @}
 @}
-@end example
-@end deftypefun
 
-
-@deftypefun bool mmux_libc_fchmodat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_mode_t @var{mode}, mmux_sint_t @var{flags})
-@MmuxCInterface{fchmodat}.
-
-@example
-mmux_libc_ptn_t       ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-/* Do it. */
+/* Final cleanup. */
 @{
-  mmux_libc_fd_t      dirfd;
-  mmux_mode_t         mode  = 0755;
-  mmux_sint_t         flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
-
-  mmux_libc_at_fdcwd(&dirfd);
-
-  if (mmux_libc_fchmodat(dirfd, ptn, mode, flags)) @{
+  if (mmux_libc_close(fd)) @{
     /* error */
   @}
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs permissions change fchmodat
+@subsubsection Changing file permissions with @cfunc{mmux_libc_fchmodat}
 
-@deftypefun bool mmux_libc_access (bool * @var{access_is_permitted_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how})
+
+@deftp {Struct Typedef} mmux_libc_fchmodat_flags_t
+Data structure type representing a bitwise OR combination of flags to be used in calls to
+@cfunc{mmux_libc_fchmodat}.
+@end deftp
+
+
+@deftypefun mmux_libc_fchmodat_flags_t mmux_libc_fchmodat_flags (mmux_standard_sint_t @var{flags_num})
+Build and return a new instance of @objtype{mmux_libc_fchmodat_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_fchmodat (mmux_libc_fd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t @var{mode}, mmux_libc_fchmodat_flags_t @var{flags})
+@MmuxCInterface{fchmodat}.
+
+@example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
+
+/* Build file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_dirfd_t  dirfd;
+  auto  mode  = mmux_libc_mode_literal(0755);
+  auto  flags = mmux_libc_fchmodat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
+
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_fchmodat(dirfd, fs_ptn, mode, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+@end deftypefun
+
+@c page
+@node fs permissions access
+@subsection Accessing file permissions
+
+
+@menu
+* fs permissions access access::      Accessing file permissions with @cfunc{mmux_libc_access}.
+* fs permissions access faccessat::   Accessing file permissions with @cfunc{mmux_libc_faccessat}.
+* fs permissions access faccessat2::  Accessing file permissions with @cfunc{mmux_libc_faccessat2}.
+@end menu
+
+@c page
+@node fs permissions access access
+@subsubsection Accessing file permissions with @cfunc{mmux_libc_access}
+
+
+@deftp {Struct Type} mmux_libc_access_how_t
+Data structure type representing the access mode for calls to @cfunc{mmux_libc_access},
+@cfunc{mmux_libc_faccessat}, @cfunc{mmux_libc_faccessat2}.
+@end deftp
+
+
+@deftypefun mmux_libc_access_how_t mmux_libc_access_how (mmux_standard_sint_t @var{how_num})
+Build and return an instance of @objtype{mmux_libc_access_how_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_access (bool * @var{access_is_permitted_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how})
 @MmuxCInterfaceGlibc{access, Testing File Access}.  When successful the access mode specified by
 @var{how} could be permitted or denied:
 
@@ -10520,30 +10619,45 @@ if the requested access is denied: the variable referenced by @var{access_is_per
 @end itemize
 
 @example
-mmux_libc_ptn_t       ptn;
+mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-/* Check: it is a file, it is readable, it is writable, it is executable. */
+/* Do it. */
 @{
-  mmux_sint_t         how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK | MMUX_LIBC_X_OK;
-  bool                access_is_permitted;
+  auto  how = mmux_libc_access_how(MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK);
+  bool  access_is_permitted;
 
-  if (mmux_libc_access(&access_is_permitted, ptn, how)) @{
+  if (mmux_libc_access(&access_is_permitted, fs_ptn, how)) @{
     /* error */
   @} else if (access_is_permitted) @{
-    /* access is permitted */
+    /* do something */
   @} else @{
-    /* access is denied */
+    /* do something else */
   @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs permissions access faccessat
+@subsubsection Accessing file permissions with @cfunc{mmux_libc_faccessat}
 
-@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+
+@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_sint_t @var{flags})
 @MmuxCInterface{faccessat}.  When successful the access mode specified by
 @var{how} could be permitted or denied:
 
@@ -10582,8 +10696,12 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs permissions access faccessat2
+@subsubsection Accessing file permissions with @cfunc{mmux_libc_faccessat2}
 
-@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{how}, mmux_sint_t @var{flags})
+
+@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_sint_t @var{flags})
 @MmuxCInterface{faccessat2}.  When successful the access mode specified by @var{how} could be
 permitted or denied:
 
@@ -10689,7 +10807,7 @@ struct stat->st_blksize = 4096
 
 
 @MmuxCStructOpaqueTypedef{stat}
-@MmuxSetterGetter{stat, st_mode,        mmux_mode_t}
+@MmuxSetterGetter{stat, st_mode,        mmux_libc_mode_t}
 @MmuxSetterGetter{stat,	st_ino,		mmux_ino_t}
 @MmuxSetterGetter{stat,	st_dev,		mmux_dev_t}
 @MmuxSetterGetter{stat,	st_nlink,	mmux_nlink_t}
@@ -10763,7 +10881,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -10832,7 +10950,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -10880,7 +10998,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -10913,37 +11031,37 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @subsection Inspecting the mode field of @objtype{mmux_libc_stat_t}
 
 
-@deftypefun bool mmux_libc_S_ISDIR (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISDIR (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISDIR}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISCHR (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISCHR (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISCHR}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISBLK (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISBLK (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISBLK}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISREG (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISREG (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISREG}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISFIFO (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISFIFO (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISFIFO}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISLNK (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISLNK (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISLNK}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_ISSOCK (bool * @var{result_p}, mmux_mode_t @var{mode})
+@deftypefun bool mmux_libc_S_ISSOCK (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISSOCK}.
 @end deftypefun
 
@@ -11155,7 +11273,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_RDWR;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -11330,7 +11448,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_RDONLY;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */
@@ -11374,7 +11492,7 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 /* Open the file. */
 @{
   mmux_sint_t         flags = MMUX_LIBC_O_RDONLY;
-  mmux_mode_t         mode  = 0;
+  mmux_libc_mode_t         mode  = 0;
 
   if (mmux_libc_open(&fd, ptn, flags, mode)) @{
     /* error */

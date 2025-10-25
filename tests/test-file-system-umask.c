@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -35,20 +34,20 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   {
-    mmux_mode_t		old_mask, new_mask = 0755;
+    mmux_libc_mode_t	old_mask, new_mask = mmux_libc_mode_literal(0755);
 
     if (mmux_libc_umask(&old_mask, new_mask)) {
       handle_error();
     }
 
-    printf_message("the old mask is: 0%lo", (mmux_ulong_t)old_mask);
+    printf_message("the old mask is: 0%lo", (mmux_standard_ulong_t)old_mask.value);
 
     new_mask = old_mask;
     if (mmux_libc_umask(&old_mask, new_mask)) {
       handle_error();
     }
 
-    printf_message("the old mask is: 0%lo", (mmux_ulong_t)old_mask);
+    printf_message("the old mask is: 0%lo", (mmux_standard_ulong_t)old_mask.value);
   }
 
   mmux_libc_exit_success();
