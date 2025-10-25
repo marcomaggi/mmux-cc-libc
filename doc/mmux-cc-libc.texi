@@ -10741,26 +10741,39 @@ if the requested access is denied: the variable referenced by @var{access_is_per
 @end itemize
 
 @example
-mmux_libc_ptn_t       ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-/* Check: it is a file, it is readable, it is writable, it is executable. */
+/* Do it. */
 @{
-  mmux_libc_fd_t  dirfd;
-  mmux_sint_t     how = MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK | MMUX_LIBC_X_OK;
-  mmux_sint_t     flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
-  bool            access_is_permitted;
+  mmux_libc_dirfd_t dirfd;
+  auto  how   = mmux_libc_access_how(MMUX_LIBC_F_OK | MMUX_LIBC_R_OK | MMUX_LIBC_W_OK);
+  auto  flags = mmux_libc_faccessat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
+  bool  access_is_permitted;
 
-  if (mmux_libc_faccessat2(&access_is_permitted, dirfd, ptn, how, flags)) @{
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_faccessat2(&access_is_permitted, dirfd, fs_ptn, how, flags)) @{
     /* error */
   @} else if (access_is_permitted) @{
-    /* access is permitted */
+    /* do something else */
   @} else @{
-    /* access is denied */
+    /* do something else */
   @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefn
