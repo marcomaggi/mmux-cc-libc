@@ -17,11 +17,10 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-lstat.src.ext";
-static mmux_asciizcp_t		dst_pathname_asciiz = "./test-file-system-lstat.dst.ext";
+static mmux_asciizcp_t	ptn_asciiz_original = "./test-file-system-lstat.original.ext";
+static mmux_asciizcp_t	ptn_asciiz_symlink  = "./test-file-system-lstat.symlink.ext";
 
 
 /** --------------------------------------------------------------------
@@ -35,52 +34,88 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-lstat";
-    cleanfiles_register(src_pathname_asciiz);
-    cleanfiles_register(dst_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz_original);
+    cleanfiles_register(ptn_asciiz_symlink);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	src_ptn, dst_ptn;
-
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz_original)) {
       handle_error();
     }
-  }
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &src_ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dst_ptn, dst_pathname_asciiz)) {
-    handle_error();
   }
 
   /* Create the symbolic link. */
   {
-    printf_message("create the symbolic link");
-    if (mmux_libc_symlink(src_ptn, dst_ptn)) {
-      handle_error();
+    mmux_libc_fs_ptn_t	fs_ptn_original, fs_ptn_symlink;
+
+    /* Build the file system pathnames. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn_original, fs_ptn_factory, ptn_asciiz_original)) {
+	handle_error();
+      }
+      if (mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_asciiz_symlink)) {
+	handle_error();
+      }
+    }
+
+    /* Do it. */
+    {
+      printf_message("create the symbolic link");
+      if (mmux_libc_symlink(fs_ptn_original, fs_ptn_symlink)) {
+	printf_error("creating the symbolic link");
+	handle_error();
+      }
+    }
+
+    /* Local cleanup */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn_original);
+      mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
     }
   }
 
-  /* Do it. */
+  /* Inspect the symbolic link. */
   {
-    mmux_libc_stat_t	ST[1];
+    mmux_libc_fs_ptn_t	fs_ptn_symlink;
 
-    printf_message("lstatting");
-    if (mmux_libc_lstat(dst_ptn, ST)) {
-      handle_error();
-    } else {
-      mmux_libc_fd_t	er;
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
 
-      mmux_libc_stder(&er);
-      if (mmux_libc_stat_dump(er, ST, NULL)) {
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn_symlink, fs_ptn_factory, ptn_asciiz_symlink)) {
 	handle_error();
       }
+    }
+
+    /* Do it. */
+    {
+      mmux_libc_stat_t	stat;
+
+      printf_message("lstat-ing");
+      if (mmux_libc_lstat(fs_ptn_symlink, stat)) {
+	printf_error("lstat-ing");
+	handle_error();
+      } else {
+	mmux_libc_fd_t	er;
+
+	mmux_libc_stder(er);
+	if (mmux_libc_stat_dump(er, stat, NULL)) {
+	  handle_error();
+	}
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
     }
   }
 
