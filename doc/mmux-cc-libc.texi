@@ -10787,6 +10787,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 * fs attributes types::         The @objtype{mmux_libc_stat_t} data type.
 * fs attributes inspection::    Inspecting file attributes.
 * fs attributes mode::          Inspecting the mode field of @objtype{mmux_libc_file_system_stat_t}.
+* fs attributes stat::          Inspecting the whole @objtype{mmux_libc_file_system_stat_t}.
 * fs attributes predicates::    File system pathname predicates.
 * fs attributes fields::        Fields inspection functions.
 @end menu
@@ -10898,21 +10899,6 @@ Pointer type defined as:
 typedef struct mmux_libc_file_system_stat_t const *  mmux_libc_stat_arg_t;
 @end example
 @end deftp
-
-
-@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
-@MmuxCInterface{S_TYPESIMQ}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
-@MmuxCInterface{S_TYPEISSEM}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
-@MmuxCInterface{S_TYPEISSHM}.
-@end deftypefun
 
 @c page
 @node fs attributes inspection
@@ -11219,6 +11205,55 @@ if (mmux_libc_statfd(dirfd, stat, flags)) @{
 @subsection Inspecting the mode field of @objtype{mmux_libc_file_system_stat_t}
 
 
+To inspect the field @code{st_mode} of @objtype{mmux_libc_file_system_stat_t} we do:
+
+@example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
+
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_stat_t  stat;
+
+  if (mmux_libc_stat(fs_ptn, stat)) @{
+    /* error */
+  @} else @{
+    mmux_libc_mode_t  st_mode;
+
+    mmux_libc_st_mode_ref(&st_mode, stat);
+
+    /* S_ISDIR */
+    @{
+      bool        result;
+
+      if (mmux_libc_S_ISDIR(&result, st_mode)) @{
+        /* Error, should not happen. */
+      @} else if (result) @{
+        /* The file system pathname references a directory. */
+      @} else @{
+        /* The file system pathname DOES NOT reference a directory. */
+      @}
+    @}
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+
+
 @deftypefun bool mmux_libc_S_ISDIR (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISDIR}.
 @end deftypefun
@@ -11251,6 +11286,72 @@ if (mmux_libc_statfd(dirfd, stat, flags)) @{
 
 @deftypefun bool mmux_libc_S_ISSOCK (bool * @var{result_p}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{S_ISSOCK}.
+@end deftypefun
+
+@c page
+@node fs attributes stat
+@subsection Inspecting the whole @objtype{mmux_libc_file_system_stat_t}
+
+
+To inspect the whole @objtype{mmux_libc_file_system_stat_t} objects we do:
+
+@example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
+
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_stat_t  stat;
+
+  if (mmux_libc_stat(fs_ptn, stat)) @{
+    /* error */
+  @} else @{
+
+    /* S_TYPEISMQ */
+    @{
+      bool        result;
+
+      if (mmux_libc_S_TYPEISMQ(&result, stat)) @{
+        /* Error, should not happen. */
+      @} else if (result) @{
+        /* The file system pathname references a POSIX message queue. */
+      @} else @{
+        /* The file system pathname DOES NOT reference a POSIX message queue. */
+      @}
+    @}
+
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@MmuxCInterface{S_TYPESIMQ}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@MmuxCInterface{S_TYPEISSEM}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@MmuxCInterface{S_TYPEISSHM}.
 @end deftypefun
 
 @c page
