@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-ftruncate.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-ftruncate.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,7 +33,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-ftruncate";
-    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
@@ -42,54 +41,92 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_fd_t	fd;
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Open the file. */
   {
-    mmux_sint_t		flags = MMUX_LIBC_O_RDWR;
-    mmux_mode_t		mode  = 0;
+    mmux_libc_fd_t	fd;
 
-    if (mmux_libc_open(&fd, ptn, flags, mode)) {
-      handle_error();
+    /* Obtain the file descriptor. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Open the file. */
+      {
+	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+	auto	mode  = mmux_libc_mode_constant_zero();
+
+	if (mmux_libc_open(fd, fs_ptn, flags, mode)) {
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn);
+      }
     }
-  }
 
-  /* Do it. */
-  {
-    mmux_off_t		len = 10;
+    /* Do it. */
+    {
+      auto	len = mmux_off_literal(10);
 
-    printf_message("ftruncateing");
-    if (mmux_libc_ftruncate(fd, len)) {
-      handle_error();
-    }
-  }
-
-  /* Check size. */
-  {
-    mmux_libc_fd_t	dirfd;
-    mmux_usize_t	len;
-
-    mmux_libc_at_fdcwd(&dirfd);
-
-    if (mmux_libc_file_system_pathname_file_size_ref(&len, dirfd, ptn)) {
-      handle_error();
-    } else {
-      printf_message("size check: %lu", len);
+      printf_message("ftruncate-ing");
+      if (mmux_libc_ftruncate(fd, len)) {
+	printf_error("ftruncate-ing");
+	handle_error();
+      }
     }
 
-    if (10 != len) {
-      print_error("wrong size");
-      mmux_libc_exit_failure();
+    /* Check size. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      {
+	mmux_libc_dirfd_t	dirfd;
+	mmux_usize_t	len;
+
+	mmux_libc_at_fdcwd(dirfd);
+	if (mmux_libc_file_system_pathname_file_size_ref(&len, dirfd, fs_ptn)) {
+	  handle_error();
+	} else {
+	  printf_message("size check: %lu", len.value);
+	}
+
+	if (10 != len.value) {
+	  print_error("wrong size");
+	  mmux_libc_exit_failure();
+	}
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      if (mmux_libc_close(fd)) {
+	handle_error();
+      }
     }
   }
 
