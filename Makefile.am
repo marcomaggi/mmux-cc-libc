@@ -465,6 +465,7 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 check_PROGRAMS	+= \
 	tests/test-file-system-pathname				\
 	tests/test-file-system-access				\
+	tests/test-file-system-attributes-mode			\
 	tests/test-file-system-chdir				\
 	tests/test-file-system-chmod				\
 	tests/test-file-system-chown				\
@@ -604,6 +605,9 @@ tests_test_file_system_fstatat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_statfd_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_statfd_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_attributes_mode_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_attributes_mode_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_pathname_file_size_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_pathname_file_size_LDADD		= $(mmux_cc_libc_tests_ldadd)
