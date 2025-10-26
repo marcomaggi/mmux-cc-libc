@@ -1438,6 +1438,16 @@ mmux_libc_faccessat_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_faccessat_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_fstatat_flags_t
+mmux_libc_fstatat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_fstatat_flags_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_statfd_flags_t
+mmux_libc_statfd_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_statfd_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -1938,10 +1948,10 @@ mmux_cc_libc_decl bool mmux_libc_faccessat2 (bool * access_is_permitted_p, mmux_
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_truncate (mmux_libc_fs_ptn_arg_t pathname, mmux_off_t len)
-  __attribute__((__warn_unused_result__));
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_ftruncate (mmux_libc_fd_arg_t fd, mmux_off_t len)
-  __attribute__((__warn_unused_result__));
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
@@ -1972,20 +1982,21 @@ mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_sta
   __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-					  mmux_libc_stat_t stat_p, mmux_sint_t flags)
-  __attribute__((__nonnull__(3),__warn_unused_result__));
+					  mmux_libc_stat_t stat_p, mmux_libc_fstatat_flags_t flags)
+     __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p, mmux_sint_t flags)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p,
+					 mmux_libc_statfd_flags_t flags)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 

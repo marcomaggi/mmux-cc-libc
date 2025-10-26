@@ -1299,19 +1299,16 @@ mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
 }
 bool
 mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-		   mmux_libc_stat_t stat_p, mmux_sint_t flags)
+		   mmux_libc_stat_t stat_p, mmux_libc_fstatat_flags_t flags)
 {
   int	rv = fstatat(dirfd->value, pathname->value, stat_p, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p, mmux_sint_t flags)
+mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p, mmux_libc_statfd_flags_t flags)
 {
-  int	rv;
-
-  flags.value |= MMUX_LIBC_AT_EMPTY_PATH;
-  rv = fstatat(fd->value, "", stat_p, flags.value);
+  int	rv = fstatat(fd->value, "", stat_p, (flags.value | MMUX_LIBC_AT_EMPTY_PATH));
 
   return ((0 == rv)? false : true);
 }
@@ -1475,17 +1472,18 @@ DEFINE_FILE_DESCRIPTOR_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn)
+mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p,
+					      mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn)
 {
-  mmux_libc_stat_t	ST;
-  auto			flags = mmux_sint_constant_zero();
+  mmux_libc_stat_t	stat;
+  auto			flags = mmux_libc_fstatat_flags(0);
 
-  if (mmux_libc_fstatat(dirfd, ptn, ST, flags)) {
+  if (mmux_libc_fstatat(dirfd, ptn, stat, flags)) {
     return true;
   } else {
     mmux_off_t		result;
 
-    mmux_libc_st_size_ref(&result, ST);
+    mmux_libc_st_size_ref(&result, stat);
     *result_p = mmux_usize(result.value);
     return false;
   }
@@ -1493,14 +1491,14 @@ mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc
 bool
 mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_arg_t fd)
 {
-  mmux_libc_stat_t	ST;
+  mmux_libc_stat_t	stat;
 
-  if (mmux_libc_fstat(fd, ST)) {
+  if (mmux_libc_fstat(fd, stat)) {
     return true;
   } else {
     mmux_off_t		result;
 
-    mmux_libc_st_size_ref(&result, ST);
+    mmux_libc_st_size_ref(&result, stat);
     *result_p = mmux_usize(result.value);
     return false;
   }

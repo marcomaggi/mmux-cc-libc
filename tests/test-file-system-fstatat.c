@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-fstatat.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-fstatat.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,46 +33,59 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-fstatat";
-    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	ptn;
-
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Do it. */
   {
-    mmux_libc_stat_t	ST[1];
-    mmux_sint_t		flags = MMUX_LIBC_AT_SYMLINK_NOFOLLOW;
-    mmux_libc_fd_t	dirfd;
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    mmux_libc_at_fdcwd(&dirfd);
-
-    printf_message("fstatatting");
-    if (mmux_libc_fstatat(dirfd, ptn, ST, flags)) {
-      handle_error();
-    }
-
+    /* Build the file system pathname. */
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
 
-      mmux_libc_stder(&er);
-      if (mmux_libc_stat_dump(er, ST, NULL)) {
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
 	handle_error();
       }
     }
+
+    /* Do it. */
+    {
+      mmux_libc_dirfd_t	dirfd;
+      auto		flags = mmux_libc_fstatat_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
+      mmux_libc_stat_t	stat;
+
+      mmux_libc_at_fdcwd(dirfd);
+
+      printf_message("fstatat-ing");
+      if (mmux_libc_fstatat(dirfd, fs_ptn, stat, flags)) {
+	printf_error("fstatat-ing");
+	handle_error();
+      } else {
+	mmux_libc_fd_t	er;
+
+	mmux_libc_stder(er);
+	if (mmux_libc_stat_dump(er, stat, NULL)) {
+	  handle_error();
+	}
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
+    }
+
   }
 
   mmux_libc_exit_success();
