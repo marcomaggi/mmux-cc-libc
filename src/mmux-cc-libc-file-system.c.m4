@@ -1491,9 +1491,10 @@ mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p,
 bool
 mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_arg_t fd)
 {
+  auto			flags = mmux_libc_statfd_flags(0);
   mmux_libc_stat_t	stat;
 
-  if (mmux_libc_fstat(fd, stat)) {
+  if (mmux_libc_statfd(fd, stat, flags)) {
     return true;
   } else {
     mmux_off_t		result;

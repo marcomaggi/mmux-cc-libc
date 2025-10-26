@@ -11449,27 +11449,108 @@ directory entry and it is a socket; otherwise store @cfalse{}.
 
 
 The functions documented in this section retrieve the value of some fields from
-@objtype{mmux_libc_stat_t} objects embedding the call to the standard @cfunc{stat} function and its
-variants; true control about the resulting values is possible only by explicitly selecting which
-@cfunc{stat} variant to call and which arguments to use in the function invocation.  But the
-following functions are simpler and sometimes they are enough.
+@objtype{mmux_libc_file_system_stat_t} objects embedding the call to the standard @cfunc{stat}
+function and its variants; true control about the resulting values is possible only by explicitly
+selecting which @cfunc{stat} variant to call and which arguments to use in the function invocation.
+But the following functions are simpler and sometimes they are enough.
 
 
 @deftypefun bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_fd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Invoke @cfunc{mmux_libc_fstatat} (with flags set to zero) and retrieve the @code{st_size} field
-value of the resulting @objtype{mmux_libc_stat_t}.  Store such field value in the variable
+value of the resulting @objtype{mmux_libc_file_system_stat_t}.  Store such field value in the
+variable referenced by @var{result_p}, casting the @objtype{mmux_off_t} value to
+@objtype{mmux_usize_t}.
+
+@example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
+
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Retrieve the file size. */
+@{
+  mmux_usize_t       st_size;
+  mmux_libc_dirfd_t  dirfd;
+
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_file_system_pathname_file_size_ref(&st_size, dirfd, fs_ptn)) @{
+    /* error */
+  @} else @{
+    /* Do something with "st_size". */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
+Invoke @cfunc{mmux_libc_statfd} (with flags set to zero) and retrieve the @code{st_size} field value
+of the resulting @objtype{mmux_libc_file_system_stat_t}.  Store such field value in the variable
 referenced by @var{result_p}, casting the @objtype{mmux_off_t} value to @objtype{mmux_usize_t}.
 
 @example
-mmux_libc_fs_ptn_arg_t        ptn;
-mmux_libc_file_descriptor_t             dirfd;
-mmux_usize_t                            size;
+mmux_asciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t   fd;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-mmux_libc_at_fdcwd(&dirfd);
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_file_system_pathname_file_size_ref(&size, dirfd, ptn)) @{
-  /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
+  @}
+@}
+
+/* Retrieve the file size. */
+@{
+  mmux_usize_t  st_size;
+
+  if (mmux_libc_file_descriptor_file_size_ref(&st_size, fd)) @{
+    /* error */
+  @} else @{
+    /* Do something with "st_size". */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd)) @{
+    handle_error();
+  @}
 @}
 @end example
 @end deftypefun

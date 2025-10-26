@@ -2083,12 +2083,13 @@ mmux_cc_libc_decl bool mmux_libc_file_descriptor_is_socket (bool * result_p, mmu
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p, mmux_libc_dirfd_arg_t dirfd,
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p,
+								     mmux_libc_dirfd_arg_t dirfd,
 								     mmux_libc_fs_ptn_arg_t ptn)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_arg_t fd)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
