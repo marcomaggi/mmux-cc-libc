@@ -265,9 +265,9 @@ typedef struct rlimit		mmux_libc_rlimit_t;
 typedef struct passwd		mmux_libc_passwd_t;
 typedef struct group		mmux_libc_group_t;
 typedef struct stat		mmux_libc_file_system_stat_t;
-typedef struct utimbuf		mmux_libc_utimbuf_t;
 typedef struct dirent		mmux_libc_dirent_t;
 
+typedef struct utimbuf		mmux_libc_file_system_utimbuf_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

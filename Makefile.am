@@ -520,6 +520,7 @@ check_PROGRAMS	+= \
 	tests/test-file-system-umask				\
 	tests/test-file-system-unlink				\
 	tests/test-file-system-unlinkat				\
+	tests/test-file-system-utimbuf				\
 	tests/test-file-system-utime				\
 	tests/test-file-system-utimes				\
 	tests/test-file-system-utimensat
@@ -685,6 +686,9 @@ tests_test_file_system_ftruncate_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_struct_utimbuf_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_struct_utimbuf_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_system_utimbuf_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_system_utimbuf_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_system_utime_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_system_utime_LDADD			= $(mmux_cc_libc_tests_ldadd)

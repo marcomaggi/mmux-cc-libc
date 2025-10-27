@@ -1510,13 +1510,38 @@ mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_a
  ** File times.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(utimbuf, actime,  time)
-DEFINE_STRUCT_SETTER_GETTER(utimbuf, modtime, time)
+bool
+mmux_libc_actime_set (mmux_libc_utimbuf_t utimbuf_p, mmux_time_t value)
+{
+  utimbuf_p->actime = value.value;
+  return false;
+}
+bool
+mmux_libc_modtime_set (mmux_libc_utimbuf_t utimbuf_p, mmux_time_t value)
+{
+  utimbuf_p->modtime = value.value;
+  return false;
+}
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * const utimbuf_p, char const * struct_name)
+mmux_libc_actime_ref (mmux_time_t * value_p, mmux_libc_utimbuf_arg_t utimbuf_p)
+{
+  *value_p = mmux_time(utimbuf_p->actime);
+  return false;
+}
+bool
+mmux_libc_modtime_ref (mmux_time_t * value_p, mmux_libc_utimbuf_arg_t utimbuf_p)
+{
+  *value_p = mmux_time(utimbuf_p->modtime);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_arg_t utimbuf_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct utimbuf";
@@ -1528,20 +1553,12 @@ mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * const
     mmux_time_t	actime;
 
     mmux_libc_actime_ref(&actime, utimbuf_p);
-    {
-      mmux_usize_t	required_nbytes;
-
-      if (mmux_time_sprint_size(&required_nbytes, actime)) {
-	return true;
-      } else {
-	char	str[required_nbytes.value];
-
-	mmux_time_sprint(str, required_nbytes, actime);
-	DPRINTF(fd, "%s->st_actime  = %s", struct_name, str);
-	if (mmux_libc_stat_dump_time(fd, actime)) {
-	  return true;
-	}
-      }
+    DPRINTF(fd, "%s->st_actime  = ", struct_name);
+    if (mmux_time_dprintf(fd->value, actime)) {
+      return true;
+    }
+    if (mmux_libc_stat_dump_time(fd, actime)) {
+      return true;
     }
   }
 
@@ -1549,20 +1566,12 @@ mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * const
     mmux_time_t	modtime;
 
     mmux_libc_modtime_ref(&modtime, utimbuf_p);
-    {
-      mmux_usize_t	required_nbytes;
-
-      if (mmux_time_sprint_size(&required_nbytes, modtime)) {
-	return true;
-      } else {
-	char	str[required_nbytes.value];
-
-	mmux_time_sprint(str, required_nbytes, modtime);
-	DPRINTF(fd, "%s->st_modtime  = %s", struct_name, str);
-	if (mmux_libc_stat_dump_time(fd, modtime)) {
-	  return true;
-	}
-      }
+    DPRINTF(fd, "%s->st_modtime = ", struct_name);
+    if (mmux_time_dprintf(fd->value, modtime)) {
+      return true;
+    }
+    if (mmux_libc_stat_dump_time(fd, modtime)) {
+      return true;
     }
   }
 
@@ -1572,9 +1581,9 @@ mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * const
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_t utimbuf)
+mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_arg_t utimbuf_p)
 {
-  int	rv = utime(pathname->value, &utimbuf);
+  int	rv = utime(pathname->value, utimbuf_p);
 
   return ((0 == rv)? false : true);
 }

@@ -2093,38 +2093,51 @@ mmux_cc_libc_decl bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * r
 
 /* ------------------------------------------------------------------ */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, actime,  mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(utimbuf, modtime, mmux_time_t)
+mmux_cc_libc_decl bool mmux_libc_actime_set (mmux_libc_utimbuf_t utimbuf_p, mmux_time_t value)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_t const * utimbuf_p,
+mmux_cc_libc_decl bool mmux_libc_modtime_set (mmux_libc_utimbuf_t utimbuf_p, mmux_time_t value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_actime_ref (mmux_time_t * value_p, mmux_libc_utimbuf_arg_t utimbuf_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_modtime_ref (mmux_time_t * value_p, mmux_libc_utimbuf_arg_t utimbuf_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t fd, mmux_libc_utimbuf_arg_t utimbuf_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_t utimbuf)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_arg_t utimbuf_p)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t pathname,
-					 mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
-  __attribute__((__warn_unused_result__));
+					 mmux_libc_timeval_t access_timeval,
+					 mmux_libc_timeval_t modification_timeval)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t pathname,
-					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
-  __attribute__((__warn_unused_result__));
+					  mmux_libc_timeval_t access_timeval,
+					  mmux_libc_timeval_t modification_timeval)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_fd_arg_t fd,
-					  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
-  __attribute__((__warn_unused_result__));
+					  mmux_libc_timeval_t access_timeval,
+					  mmux_libc_timeval_t modification_timeval)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_futimens (mmux_libc_fd_arg_t fd,
-					   mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec)
-  __attribute__((__warn_unused_result__));
+					   mmux_libc_timespec_t access_timespec,
+					   mmux_libc_timespec_t modification_timespec)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd,
 					    mmux_libc_fs_ptn_arg_t pathname,
 					    mmux_libc_timespec_t access_timespec,
 					    mmux_libc_timespec_t modification_timespec,
 					    mmux_sint_t flags)
-  __attribute__((__warn_unused_result__));
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

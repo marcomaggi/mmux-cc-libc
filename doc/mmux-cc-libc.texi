@@ -11664,66 +11664,147 @@ mmux_libc_fd_t  fd;
 @subsection Data structures of type @objtype{mmux_libc_utimbuf_t}
 
 
-If we want to toy with a @objtype{mmux_libc_utimbuf_t} objects, we do:
+In the @posix{} C language library: the data structure type @objtype{struct utimbuf} is used to set
+new access and modification times for a directory entry.  Under @value{PACKAGE}: the same data
+structure type is represented by @objtype{mmux_file_system_utimbuf_t}.
+
+If we want to toy with a @objtype{mmux_file_system_utimbuf_t} objects, we do:
 
 @example
-mmux_libc_utimbuf_t   UTB[1];
-mmux_time_t           T1, T2;
+mmux_libc_utimbuf_t  utimbuf;
+mmux_time_t          T1, T2;
 
 mmux_libc_time(&T1);
 mmux_libc_time(&T2);
 
-mmux_libc_actime_set  (UTB, T1);
-mmux_libc_modtime_set (UTB, T2);
+mmux_libc_actime_set  (utimbuf, T1);
+mmux_libc_modtime_set (utimbuf, T2);
 
 @{
   mmux_libc_fd_t      fd;
 
   mmux_libc_stdou(fd);
-  if (mmux_libc_utimbuf_dump(fd, UTB, NULL)) @{
+  if (mmux_libc_utimbuf_dump(fd, utimbuf, NULL)) @{
     /* error */
   @}
 @}
 @end example
 
+@noindent
+which will print something like:
 
-@MmuxCStructOpaqueTypedef{utimbuf}
-@MmuxSetterGetter{utimbuf, actime,  mmux_time_t}
-@MmuxSetterGetter{utimbuf, modtime, mmux_time_t}
-@MmuxStructDumper{utimbuf}
+@example
+struct utimbuf = 0x7ffe965b02e0
+struct utimbuf->st_actime  = 1761546147 (2025-10-27T06:22:27+0000)
+struct utimbuf->st_modtime = 1761546147 (2025-10-27T06:22:27+0000)
+@end example
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_file_system_utimbuf_t
+An opaque alias for @MmuxCStruct{utimbuf}.
+@end deftp
+
+@deftp {Opaque Struct Pointer Typedef} mmux_libc_utimbuf_t
+Type definition for the 1--element array defined as:
+
+@example
+typedef mmux_libc_file_system_utimbuf_t  mmux_libc_utimbuf_t[1];
+@end example
+@end deftp
+
+
+@deftp {Opaque Struct Pointer Typedef} mmux_libc_utimbuf_arg_t
+Type definition for a pointer to constant data structure defined as:
+
+@example
+typedef mmux_libc_file_system_utimbuf_t const *  mmux_libc_utimbuf_arg_t;
+@end example
+
+@noindent
+which is meat to be used as type of argument to functions.
+@end deftp
+
+
+@deftypefun bool mmux_libc_actime_set (mmux_libc_utimbuf_t @var{utimbuf_p}, mmux_time_t @var{actime})
+@deftypefunx bool mmux_libc_actime_ref (mmux_time_t * @var{result_p}, mmux_libc_utimbuf_arg_t @var{utimbuf_p})
+Setter and getter for the field @code{actime} of @objtype{mmux_libc_file_system_utimbuf_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_modtime_set (mmux_libc_utimbuf_t @var{utimbuf_p}, mmux_time_t @var{modtime})
+@deftypefunx bool mmux_libc_modtime_ref (mmux_time_t * @var{result_p}, mmux_libc_utimbuf_arg_t @var{utimbuf_p})
+Setter and getter for the field @code{modtime} of @objtype{mmux_libc_file_system_utimbuf_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_utimbuf_arg_t @var{utimbuf_p}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the object
+@objtype{mmux_libc_file_system_utimbuf_t} referenced by @var{utimbuf_p}.  @var{struct_name} must be
+a pointer to an @asciiz{} string representing the name of the data structure used in the
+description; when @cnull{} it defaults to @samp{struct utimbuf}.
+@end deftypefun
 
 @c page
 @node fs times setting
 @subsection Setting the file system times associated to files
 
 
-@deftypefun bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_utimbuf_t @var{utimbuf})
+@menu
+* fs times setting utime::      Setting file system times with @cfunc{mmux_libc_utime}.
+* fs times setting utimes::     Setting file system times with @cfunc{mmux_libc_utimes}.
+* fs times setting lutimes::    Setting file system times with @cfunc{mmux_libc_lutimes}.
+* fs times setting futimes::    Setting file system times with @cfunc{mmux_libc_futimes}.
+* fs times setting futimens::   Setting file system times with @cfunc{mmux_libc_futimens}.
+* fs times setting utimensat::  Setting file system times with @cfunc{mmux_libc_utimensat}.
+@end menu
+
+@c page
+@node fs times setting utime
+@subsubsection Setting file system times with @cfunc{mmux_libc_utime}
+
+
+@deftypefun bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_utimbuf_arg_t @var{utimbuf})
 @MmuxCInterface{utime}.
 
 @example
-mmux_libc_ptn_t       ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
 /* Do it. */
 @{
-  mmux_libc_utimbuf_t UTB;
-  mmux_time_t         T1, T2;
+  mmux_libc_utimbuf_t  utimbuf;
+  mmux_time_t          T1, T2;
 
   mmux_libc_time(&T1);
   mmux_libc_time(&T2);
 
-  mmux_libc_actime_set  (&UTB, T1);
-  mmux_libc_modtime_set (&UTB, T2);
+  mmux_libc_actime_set  (utimbuf, T1);
+  mmux_libc_modtime_set (utimbuf, T2);
 
-  if (mmux_libc_utime(ptn, UTB)) @{
+  if (mmux_libc_utime(fs_ptn, utimbuf)) @{
     /* error */
   @}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
+
+@c page
+@node fs times setting utimes
+@subsubsection Setting file system times with @cfunc{mmux_libc_utimes}
 
 
 @deftypefun bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
@@ -11758,6 +11839,11 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs times setting lutimes
+@subsubsection Setting file system times with @cfunc{mmux_libc_lutimes}
+
+
 @deftypefun bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
 @MmuxCInterface{lutimes}.
 
@@ -11789,6 +11875,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/symlink.ext")) @{
 @}
 @end example
 @end deftypefun
+
+@c page
+@node fs times setting futimes
+@subsubsection Setting file system times with @cfunc{mmux_libc_futimes}
 
 
 @deftypefun bool mmux_libc_futimes (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
@@ -11834,6 +11924,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @end example
 @end deftypefun
 
+@c page
+@node fs times setting futimens
+@subsubsection Setting file system times with @cfunc{mmux_libc_futimens}
+
 
 @deftypefun bool mmux_libc_futimens (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec})
 @MmuxCInterface{futimens}.
@@ -11877,6 +11971,10 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @}
 @end example
 @end deftypefun
+
+@c page
+@node fs times setting utimensat
+@subsubsection Setting file system times with @cfunc{mmux_libc_utimensat}
 
 
 @deftypefun bool mmux_libc_utimensat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec}, mmux_sint_t @var{flags})

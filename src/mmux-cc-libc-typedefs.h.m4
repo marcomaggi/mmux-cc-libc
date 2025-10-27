@@ -164,6 +164,9 @@ typedef struct mmux_libc_statfd_flags_t		{ mmux_sint_t;	} mmux_libc_statfd_flags
 typedef mmux_libc_file_system_stat_t		mmux_libc_stat_t[1];
 typedef mmux_libc_file_system_stat_t const *	mmux_libc_stat_arg_t;
 
+typedef mmux_libc_file_system_utimbuf_t		mmux_libc_utimbuf_t[1];
+typedef mmux_libc_file_system_utimbuf_t const *	mmux_libc_utimbuf_arg_t;
+
 /* ------------------------------------------------------------------ */
 
 /* Forward type declarations. */
