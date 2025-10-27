@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-futimens.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-futimens.ext";
 
 
 /** --------------------------------------------------------------------
@@ -34,7 +33,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-file-system-futimens";
-    cleanfiles_register(src_pathname_asciiz);
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
@@ -42,72 +41,110 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_fd_t	fd;
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Open the file. */
   {
-    mmux_sint_t		flags = MMUX_LIBC_O_RDONLY;
-    mmux_mode_t		mode  = 0;
+    mmux_libc_fd_t	fd;
 
-    printf_message("open the data file");
-    if (mmux_libc_open(&fd, ptn, flags, mode)) {
-      handle_error();
-    }
-  }
-
-  /* Do it. */
-  {
-    mmux_time_t			T1, T2;
-    mmux_slong_t		nanosecs1, nanosecs2;
-    mmux_libc_timespec_t	access_timespec, modification_timespec;
-
-    mmux_libc_time(&T1);
-    mmux_libc_time(&T2);
-
-    nanosecs1 = 123;
-    nanosecs2 = 456;
-
-    mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
-    mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
-
-    printf_message("futimensing");
-    if (mmux_libc_futimens(fd, access_timespec, modification_timespec)) {
-      handle_error();
-    }
-
+    /* Obtain the file descriptor. */
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_fs_ptn_t	fs_ptn;
 
-      mmux_libc_stdou(&er);
-      if (mmux_libc_timespec_dump(er, &modification_timespec, "access_timespec")) {
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Open the file. */
+      {
+	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDONLY);
+	auto	mode  = mmux_libc_mode_constant_zero();
+
+	printf_message("opening the data file");
+	if (mmux_libc_open(fd, fs_ptn, flags, mode)) {
+	  printf_error("opening the data file");
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn);
+      }
+    }
+
+    /* Do it. */
+    {
+      mmux_libc_timespec_t	access_timespec, modification_timespec;
+
+      /* Initialise the "timespec" values. */
+      {
+	mmux_time_t	T1, T2;
+	auto		nanosecs1 = mmux_slong_literal(123);
+	auto		nanosecs2 = mmux_slong_literal(456);
+
+	mmux_libc_time(&T1);
+	mmux_libc_time(&T2);
+	mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
+	mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+      }
+
+      printf_message("futimens-ing");
+      if (mmux_libc_futimens(fd, access_timespec, modification_timespec)) {
+	printf_error("futimens-ing");
 	handle_error();
       }
-      if (mmux_libc_timespec_dump(er, &modification_timespec, "modification_timespec")) {
+
+      {
+	mmux_libc_fd_t	er;
+
+	mmux_libc_stdou(er);
+	if (mmux_libc_timespec_dump(er, &access_timespec, "access_timespec")) {
+	  handle_error();
+	}
+	if (mmux_libc_timespec_dump(er, &modification_timespec, "modification_timespec")) {
+	  handle_error();
+	}
+      }
+    }
+
+    /* Check mode. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+      mmux_libc_stat_t		stat;
+      mmux_libc_fd_t		er;
+
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      mmux_libc_stder(er);
+      if (mmux_libc_stat(fs_ptn, stat)) {
+	handle_error();
+      } else if (mmux_libc_stat_dump(er, stat, NULL)) {
 	handle_error();
       }
     }
-  }
 
-  /* Check mode. */
-  {
-    mmux_libc_stat_t	ST[1];
-    mmux_libc_fd_t	er;
-
-    mmux_libc_stder(&er);
-    if (mmux_libc_stat(ptn, ST)) {
-      handle_error();
-    } else if (mmux_libc_stat_dump(er, ST, NULL)) {
-      handle_error();
+    /* Final cleanup. */
+    {
+      if (mmux_libc_close(fd)) {
+	handle_error();
+      }
     }
   }
 
