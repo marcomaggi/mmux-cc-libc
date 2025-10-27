@@ -1448,6 +1448,11 @@ mmux_libc_statfd_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_statfd_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_utimensat_flags_t
+mmux_libc_utimensat_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_utimensat_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -2136,7 +2141,7 @@ mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd,
 					    mmux_libc_fs_ptn_arg_t pathname,
 					    mmux_libc_timespec_t access_timespec,
 					    mmux_libc_timespec_t modification_timespec,
-					    mmux_sint_t flags)
+					    mmux_libc_utimensat_flags_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 

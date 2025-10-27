@@ -1626,7 +1626,7 @@ mmux_libc_futimens (mmux_libc_fd_arg_t fd,
 bool
 mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn,
 		     mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
-		     mmux_sint_t flags)
+		     mmux_libc_utimensat_flags_t flags)
 {
   mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
   int			rv   = utimensat(dirfd->value, ptn->value, T, flags.value);

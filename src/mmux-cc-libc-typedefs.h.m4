@@ -160,6 +160,7 @@ typedef struct mmux_libc_access_how_t		{ mmux_sint_t;	} mmux_libc_access_how_t;
 typedef struct mmux_libc_faccessat_flags_t	{ mmux_sint_t;	} mmux_libc_faccessat_flags_t;
 typedef struct mmux_libc_fstatat_flags_t	{ mmux_sint_t;	} mmux_libc_fstatat_flags_t;
 typedef struct mmux_libc_statfd_flags_t		{ mmux_sint_t;	} mmux_libc_statfd_flags_t;
+typedef struct mmux_libc_utimensat_flags_t	{ mmux_sint_t;	} mmux_libc_utimensat_flags_t;
 
 typedef mmux_libc_file_system_stat_t		mmux_libc_stat_t[1];
 typedef mmux_libc_file_system_stat_t const *	mmux_libc_stat_arg_t;
