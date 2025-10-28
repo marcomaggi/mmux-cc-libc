@@ -111,25 +111,25 @@ mmux_libc_pivot_root (mmux_libc_fs_ptn_arg_t new_root_ptn, mmux_libc_fs_ptn_arg_
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
+mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_arg_t DE)
 {
-  *result_p = DE->d_name;
+  *result_p = DE->value->d_name;
   return false;
 }
 bool
-mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
+mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_arg_t DE)
 {
-  *result_p = mmux_uintmax(DE->d_fileno);
+  *result_p = mmux_uintmax(DE->value->d_fileno);
   return false;
 }
 bool
-mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_t const * dirent_p, mmux_asciizcp_t struct_name)
+mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_arg_t dirent_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct dirent";
   }
 
-  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)dirent_p);
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)(dirent_p->value));
 
   {
     mmux_asciizcp_t		name;
@@ -151,45 +151,46 @@ mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_t const * dirent_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
+mmux_libc_opendir (mmux_libc_dirstream_t result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   DIR *		rv = opendir(ptn->value);
 
   if (rv) {
-    result_p->value = rv;
+    result_p->dirpointer = rv;
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_dirfd_arg_t dirfd)
+mmux_libc_fdopendir (mmux_libc_dirstream_t result_p, mmux_libc_dirfd_arg_t dirfd)
 {
   DIR *		rv = fdopendir(dirfd->value);
 
   if (rv) {
-    result_p->value = rv;
+    result_p->dirpointer = rv;
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_closedir (mmux_libc_dirstream_t DS)
+mmux_libc_closedir (mmux_libc_dirstream_arg_t dirstream)
 {
-  int	rv = closedir(DS.value);
+  int	rv = closedir(dirstream->dirpointer);
 
   return (0 == rv)? false : true;
 }
 bool
-mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
+mmux_libc_readdir (bool * there_are_more_entries_p, mmux_libc_dirent_t result_dirent_p,
+		   mmux_libc_dirstream_arg_t dirstream)
 {
-  mmux_libc_dirent_t *	rv;
+  mmux_libc_file_system_dirent_t *	rv;
 
-  /* Setting errno to zero  here is the only way to distinguish an  error from an end
-     of stream condition. */
+  /* Setting errno  to zero  here is  the only way  to distinguish  an error  from an
+     end-of-stream condition. */
   errno = 0;
-  rv    = readdir(DS.value);
+  rv    = readdir(dirstream->dirpointer);
 
   if (NULL == rv) {
     if (errno) {
@@ -197,18 +198,19 @@ mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t DS)
       return true;
     } else {
       /* No more entries from the stream. */
-      *result_p = NULL;
+      *there_are_more_entries_p = false;
       return false;
     }
   } else {
-    *result_p = rv;
+    *there_are_more_entries_p = true;
+    result_dirent_p->value = rv;
     return false;
   }
 }
 bool
-mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_t dirstream)
+mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_arg_t dirstream)
 {
-  int	rv = dirfd(dirstream.value);
+  int	rv = dirfd(dirstream->dirpointer);
 
   if (-1 == rv) {
     return true;
@@ -217,23 +219,23 @@ mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_t dirstream)
   }
 }
 bool
-mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream)
+mmux_libc_rewinddir (mmux_libc_dirstream_arg_t dirstream)
 {
-  rewinddir(dirstream.value);
+  rewinddir(dirstream->dirpointer);
   return false;
 }
 bool
-mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+mmux_libc_telldir (mmux_libc_dirstream_position_t * result_dirpos_p, mmux_libc_dirstream_arg_t dirstream)
 {
-  mmux_standard_slong_t	rv = telldir(dirstream.value);
+  mmux_standard_slong_t	rv = telldir(dirstream->dirpointer);
 
-  result_p->value = rv;
+  result_dirpos_p->value = rv;
   return false;
 }
 bool
-mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos)
+mmux_libc_seekdir (mmux_libc_dirstream_arg_t dirstream, mmux_libc_dirstream_position_t dirpos)
 {
-  seekdir(dirstream.value, dirpos.value);
+  seekdir(dirstream->dirpointer, dirpos.value);
   return false;
 }
 

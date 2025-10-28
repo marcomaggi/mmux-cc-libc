@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -35,46 +34,72 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   {
-    mmux_libc_ptn_t		dirptn;
+    mmux_asciizcp_t		ptn_asciiz = ".";
     mmux_libc_dirstream_t	dirstream;
-    mmux_libc_fd_t		dirfd;
+    mmux_libc_dirfd_t		dirfd;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dirptn, ".")) {
-      handle_error();
+    /* Open the directory stream. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn_directory;
+
+      /* Build file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Do it. */
+      {
+	printf_message("opening directory stream");
+	if (mmux_libc_opendir(dirstream, fs_ptn_directory)) {
+	  printf_error("opening directory stream");
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+      }
     }
 
-    printf_message("opening directory stream");
-    if (mmux_libc_opendir(&dirstream, dirptn)) {
-      handle_error();
-    }
-
-    printf_message("dirfding");
-    if (mmux_libc_dirfd(&dirfd, dirstream)) {
-      handle_error();
+    /* Obtain the directory file descriptor. */
+    {
+      printf_message("dirfd-ing");
+      if (mmux_libc_dirfd(dirfd, dirstream)) {
+	printf_error("dirfd-ing");
+	handle_error();
+      }
     }
 
     /* Print stat. */
     {
-      mmux_libc_stat_t	ST[1];
+      mmux_libc_stat_t	stat;
 
-      printf_message("fstatting");
-      if (mmux_libc_fstat(dirfd, ST)) {
+      printf_message("fstat-ing");
+      if (mmux_libc_fstat(dirfd, stat)) {
+	printf_error("fstat-ing");
 	handle_error();
-      }
-
-      {
+      } else {
 	mmux_libc_fd_t	er;
 
-	mmux_libc_stder(&er);
-	if (mmux_libc_stat_dump(er, ST, NULL)) {
+	mmux_libc_stder(er);
+	if (mmux_libc_stat_dump(er, stat, NULL)) {
 	  handle_error();
 	}
       }
     }
 
-    printf_message("closing directory stream");
-    if (mmux_libc_closedir(dirstream)) {
-      handle_error();
+    /* Final cleanup. */
+    {
+      printf_message("closing directory stream");
+      if (mmux_libc_closedir(dirstream)) {
+	handle_error();
+      }
     }
   }
 

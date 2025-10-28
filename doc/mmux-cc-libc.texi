@@ -9011,134 +9011,265 @@ Getter for the field @code{d_fileno} of @objtype{mmux_libc_dirent_t}.
 @subsection Inspecting file system directories
 
 
-@deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
+@menu
+* fs directories inspection opendir::     Opening a directory for inspection with @cfunc{mmux_libc_opendir}.
+* fs directories inspection fdopendir::   Opening a directory for inspection with @cfunc{mmux_libc_fdopendir}.
+* fs directories inspection dirfd::       Opening a directory for inspection with @cfunc{mmux_libc_dirfd}.
+* fs directories inspection operations::  Operations on a directory stream.
+@end menu
+
+@c page
+@node fs directories inspection opendir
+@subsubsection Opening a directory for inspection with @cfunc{mmux_libc_opendir}
+
+
+@deftypefun bool mmux_libc_opendir (mmux_libc_dirstream_t @var{result_dirstream_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 @MmuxCInterfaceGlibc{opendir, Opening a Directory}.
 
 @example
-mmux_libc_ptn_t         dirptn;
-mmux_libc_dirstream_t   dirstream;
+mmux_asciizcp_t        ptn_asciiz = "/path/to/directory.d";
+mmux_libc_dirstream_t  dirstream;
 
-if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
-  /* error */
+/* Open the directory stream. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn_directory;
+
+  /* Build file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Do it. */
+  @{
+    if (mmux_libc_opendir(dirstream, fs_ptn_directory)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+  @}
 @}
 
-if (mmux_libc_opendir(&dirstream, dirptn)) @{
-  /* error */
+/* Inspect the directory entries. */
+@{
+  mmux_libc_dirent_t  direntry;
+
+  for (;;) @{
+    bool  there_are_more_entries;
+
+    if (mmux_libc_readdir(&there_are_more_entries, direntry, dirstream)) @{
+      /* error */
+    @} else if (there_are_more_entries) @{
+      /* Do something with "direntry". */
+    @} else @{
+      /* No more entries. */
+    @}
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_closedir(dirstream)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs directories inspection fdopendir
+@subsubsection Opening a directory for inspection with @cfunc{mmux_libc_fdopendir}
 
-@deftypefun bool mmux_libc_fdopendir (mmux_libc_dirstream_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
-@MmuxCInterfaceGlibc{fdopendir, Opening a Directory}.  The descriptor @var{fd} will be closed if we
-apply @cfunc{mmux_libc_closedir} to the resulting @objtype{mmux_libc_dirent_t} object; so we do not
-need to close @var{fd} with @cfunc{mmux_libc_close}.
+
+@deftypefun bool mmux_libc_fdopendir (mmux_libc_dirstream_t @var{result_dirstream_p}, mmux_libc_fd_arg_t @var{fd})
+@MmuxCInterfaceGlibc{fdopendir, Opening a Directory}.
+
+Notice that the descriptor @var{fd} will be closed if we apply @cfunc{mmux_libc_closedir} to the
+resulting @objtype{mmux_libc_dirent_t} object; so we do not need to close @var{fd} with
+@cfunc{mmux_libc_close}.
 
 @example
-mmux_libc_file_descriptor_t         dirfd;
-mmux_libc_dirstream_t               dirstream;
+mmux_asciizcp_t        ptn_asciiz = "/path/to/directory.d";
+mmux_libc_dirstream_t  dirstream;
 
-/* Open the directory's file descriptor. */
+/* Obtain the directory stream. */
 @{
-  mmux_libc_ptn_t   dirptn;
-  mmux_sint_t       flags = MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_RDONLY;
-  mmux_libc_mode_t       mode  = 0;
+  mmux_libc_dirfd_t  dirfd;
 
-  if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
-    /* error */
+  /* Obtain the directory file descriptor. */
+  @{
+    mmux_libc_fs_ptn_t  fs_ptn_directory;
+
+    /* Build file system pathname. */
+    @{
+      mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) @{
+        /* error */
+      @}
+    @}
+
+    /* Open the directory file descriptor. */
+    @{
+      auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_RDONLY);
+      auto  mode  = mmux_libc_mode_constant_zero();
+
+      if (mmux_libc_open(dirfd, fs_ptn_directory, flags, mode)) @{
+        /* error */
+      @};
+    @}
+
+    /* Local cleanup. */
+    @{
+      mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+    @}
   @}
 
-  if (mmux_libc_open(&dirfd, dirptn, flags, mode)) @{
-    /* error */
+  /* Open the directory stream. */
+  @{
+    if (mmux_libc_fdopendir(dirstream, dirfd)) @{
+      /* error */
+    @}
   @}
 @}
 
-if (mmux_libc_fdopendir(&dirstream, dirfd)) @{
-  /* error */
+/* Inspect the directory entries. */
+@{
+  mmux_libc_dirent_t  direntry;
+
+  for (;;) @{
+    bool  there_are_more_entries;
+
+    if (mmux_libc_readdir(&there_are_more_entries, direntry, dirstream)) @{
+    /* error */
+    @} else if (there_are_more_entries) @{
+      /* Do something with "direntry". */
+    @} else @{
+      /* No more entries. */
+    @}
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_closedir(dirstream)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs directories inspection dirfd
+@subsubsection Opening a directory for inspection with @cfunc{mmux_libc_dirfd}
 
-@deftypefun bool mmux_libc_dirfd (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_dirstream_t @var{dirstream})
+
+@deftypefun bool mmux_libc_dirfd (mmux_libc_dirfd_t @var{result_dirfd_p}, mmux_libc_dirstream_arg_t @var{dirstream})
 @MmuxCInterfaceGlibc{dirfd, Opening a Directory}.  After retrieving the file descriptor, we can use
 it with functions like @cfunc{mmux_libc_fstat} and @cfunc{mmux_libc_fchdir}.
 
 @example
-mmux_libc_ptn_t             dirptn;
-mmux_libc_dirstream_t       dirstream;
-mmux_libc_fd_t              dirfd;
+mmux_asciizcp_t        ptn_asciiz = "/path/to/directory.d";
+mmux_libc_dirstream_t  dirstream;
+mmux_libc_dirfd_t      dirfd;
 
-if (mmux_libc_make_file_system_pathname(&dirptn, ".")) @{
-  /* error */
-@}
-
-if (mmux_libc_opendir(&dirstream, dirptn)) @{
-  /* error */
-@}
-
-if (mmux_libc_dirfd(&dirfd, dirstream)) @{
-  /* error */
-@}
-
-/* Retrieve a "mmux_libc_stat_t" object. */
+/* Open the directory stream. */
 @{
-  mmux_libc_stat_t  ST[1];
+  mmux_libc_fs_ptn_t  fs_ptn_directory;
 
-  if (mmux_libc_fstat(dirfd, ST)) @{
-    /* error */
+  /* Build file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
   @}
 
-  ...
+  /* Do it. */
+  @{
+    if (mmux_libc_opendir(dirstream, fs_ptn_directory)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+  @}
 @}
 
-if (mmux_libc_closedir(dirstream)) @{
-  /* error */
+/* Obtain the directory file descriptor. */
+@{
+  if (mmux_libc_dirfd(dirfd, dirstream)) @{
+    /* error */
+  @}
+@}
+
+/* Print stat. */
+@{
+  mmux_libc_stat_t  stat;
+
+  if (mmux_libc_fstat(dirfd, stat)) @{
+    /* error */
+  @} else @{
+    mmux_libc_fd_t  er;
+
+    mmux_libc_stder(er);
+    if (mmux_libc_stat_dump(er, stat, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_closedir(dirstream)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
 
+@c page
+@node fs directories inspection operations
+@subsubsection Operations on a directory stream
 
-@deftypefun bool mmux_libc_closedir (mmux_libc_dirstream_t @var{DS})
+
+@deftypefun bool mmux_libc_closedir (mmux_libc_dirstream_arg_t @var{dirstream})
 @MmuxCInterfaceGlibc{closedir, Reading/Closing Directory}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_readdir (mmux_libc_dirent_t ** @var{result_p}, mmux_libc_dirstream_t @var{DS})
+@deftypefun bool mmux_libc_readdir (bool * @var{there_are_more_entries_p}, mmux_libc_dirent_t @var{result_dirent}, mmux_libc_dirstream_arg_t @var{dirstream})
 @MmuxCInterfaceGlibc{readdir, Reading/Closing Directory}.
 
-@example
-mmux_libc_dirstream_t   dirstream = ...;
-mmux_libc_dirent_t *    direntry;
-
-if (mmux_libc_readdir(&direntry, dirstream)) @{
-  /* error */
-@} else if (direntry) @{
-  /* there is an entry available */
-  mmux_asciizcp_t     name;
-  mmux_uintmax_t      fileno;
-
-  mmux_libc_d_name_ref   (&name,   direntry);
-  mmux_libc_d_fileno_ref (&fileno, direntry);
-  ...
-@} else @{
-  /* no more entries are available */
-@}
-@end example
+When successful: if there is a directory entry to inspect in @var{result_dirent} the variable
+referenced by @var{there_are_more_entries_p} is set to @ctrue{}; if no more entries are available,
+it is set to @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream)
+@deftypefun bool mmux_libc_rewinddir (mmux_libc_dirstream_arg_t @var{dirstream})
 @MmuxCInterfaceGlibc{rewinddir, Random Access Directory}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+@deftypefun bool mmux_libc_telldir (mmux_libc_dirstream_position_t * @var{result_dirpos_p}, mmux_libc_dirstream_arg_t @var{dirstream})
 @MmuxCInterfaceGlibc{telldir, Random Access Directory}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos)
+@deftypefun bool mmux_libc_seekdir (mmux_libc_dirstream_arg_t @var{dirstream}, mmux_libc_dirstream_position_t @var{dirpos})
 @MmuxCInterfaceGlibc{seekdir, Random Access Directory}.
 @end deftypefun
 

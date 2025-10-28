@@ -243,8 +243,6 @@ extern "C" {
  ** Type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_libc_dirtream_t	{ DIR * value; } mmux_libc_dirstream_t;
-
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
 typedef struct tm		mmux_libc_tm_t;
@@ -265,9 +263,10 @@ typedef struct rlimit		mmux_libc_rlimit_t;
 typedef struct passwd		mmux_libc_passwd_t;
 typedef struct group		mmux_libc_group_t;
 typedef struct stat		mmux_libc_file_system_stat_t;
-typedef struct dirent		mmux_libc_dirent_t;
-
 typedef struct utimbuf		mmux_libc_file_system_utimbuf_t;
+
+typedef struct dirent		mmux_libc_file_system_dirent_t;
+typedef struct mmux_libc_file_system_dirtream_t	{ DIR * dirpointer; } mmux_libc_file_system_dirstream_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

@@ -1461,13 +1461,13 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_t const * DE)
+mmux_cc_libc_decl bool mmux_libc_d_name_ref (mmux_asciizcpp_t result_p, mmux_libc_dirent_arg_t DE)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_t const * DE)
+mmux_cc_libc_decl bool mmux_libc_d_fileno_ref (mmux_uintmax_t * result_p, mmux_libc_dirent_arg_t DE)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_t const * dirent_p,
+mmux_cc_libc_decl bool mmux_libc_dirent_dump (mmux_libc_fd_arg_t fd, mmux_libc_dirent_arg_t dirent_p,
 					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -1740,27 +1740,30 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_slash (bool * r
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_opendir (mmux_libc_dirstream_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
+mmux_cc_libc_decl bool mmux_libc_opendir (mmux_libc_dirstream_t result_p, mmux_libc_fs_ptn_arg_t ptn)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t result_p, mmux_libc_dirfd_arg_t dirfd)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_arg_t DS)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fdopendir (mmux_libc_dirstream_t * result_p, mmux_libc_dirfd_arg_t fd)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_readdir (bool * there_are_more_entries_p, mmux_libc_dirent_t result_p,
+					  mmux_libc_dirstream_arg_t dirstream)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_closedir (mmux_libc_dirstream_t DS)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_arg_t dirstream)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readdir (mmux_libc_dirent_t ** result_p, mmux_libc_dirstream_t dirstream)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_dirfd (mmux_libc_dirfd_t result_p, mmux_libc_dirstream_t dirstream)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_rewinddir (mmux_libc_dirstream_t dirstream);
-
-mmux_cc_libc_decl bool mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_t dirstream)
+mmux_cc_libc_decl bool mmux_libc_rewinddir (mmux_libc_dirstream_arg_t dirstream)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_seekdir (mmux_libc_dirstream_t dirstream, mmux_libc_dirstream_position_t dirpos);
+mmux_cc_libc_decl bool mmux_libc_telldir (mmux_libc_dirstream_position_t * result_p, mmux_libc_dirstream_arg_t dirstream)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_seekdir (mmux_libc_dirstream_arg_t dirstream, mmux_libc_dirstream_position_t dirpos)
+  __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
