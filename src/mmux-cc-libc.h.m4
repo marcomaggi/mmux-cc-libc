@@ -55,9 +55,9 @@ typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD
 typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP];    } mmux_libc_group_t;
 typedef struct mmux_libc_open_how_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW]; } mmux_libc_open_how_t;
 
-typedef struct mmux_libc_file_system_dirtream_t	{
+typedef struct mmux_libc_file_system_dirstream_ptr_t {
   mmux_pointer_t value;
-} mmux_libc_file_system_dirstream_t;
+} mmux_libc_file_system_dirstream_ptr_t;
 
 typedef struct mmux_libc_file_system_dirent_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_DIRENT];

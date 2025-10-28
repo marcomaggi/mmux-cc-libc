@@ -8937,53 +8937,45 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
 @subsection Directory inspection objects
 
 
-To open, then read, then close a directory inspection object we do:
+For an example of how to use and inspect data structures representing file system directories see,
+for example, @ref{fs directories inspection opendir, Opening a directory for inspection with
+@cfunc{mmux_libc_opendir}}.
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_file_system_dirstream_ptr_t
+An opaque data structure representing a pointer to directory stream, defined by the standard as
+@code{DIR *}.
+@end deftp
+
+
+@deftp {1--Element Array Typedef} mmux_libc_dirstream_t
+Type of 1--element array defines as:
 
 @example
-mmux_libc_ptn_t         dirptn;
-mmux_libc_dirstream_t   dirstream;
-
-if (mmux_libc_make_file_system_pathname(&dirptn, "/path/to/directory.d")) @{
-  /* error */
-@}
-
-if (mmux_libc_opendir(&dirstream, dirptn)) @{
-  /* error */
-@}
-
-for (;;) @{
-  mmux_libc_dirent_t *  direntry;
-
-  if (mmux_libc_readdir(&direntry, dirstream)) @{
-    /* error */
-  @} else if (direntry) @{
-    /* there is an entry available */
-    mmux_asciizcp_t     name;
-    mmux_uintmax_t      fileno;
-
-    mmux_libc_d_name_ref   (&name,   direntry);
-    mmux_libc_d_fileno_ref (&fileno, direntry);
-    ...
-  @} else @{
-    /* no more entries are available */
-    break;
-  @}
-@}
-
-if (mmux_libc_closedir(dirstream)) @{
-  /* error */
-@}
+typedef mmux_libc_file_system_dirstream_ptr_t  mmux_libc_dirstream_t[1];
 @end example
 
+@noindent
+it is meant to be used to define local variables and output arguments to functions.
+@end deftp
 
-@deftp {Opaque Struct Pointer} mmux_libc_dirstream_t
-Opaque alias to the standard type @code{DIR *}.
+
+@deftp {Pointer Typedef} mmux_libc_dirstream_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_system_dirstream_ptr_t const *  mmux_libc_dirstream_arg_t;
+@end example
+
+@noindent
+it is meant to be used as type of input arguments to function.
 @end deftp
 
 
 @deftp {Opaque Struct Type} mmux_libc_dirstream_position_t
 Opaque data structure used to represent the position in a directory stream retrieved with
-@cfunc{mmux_libc_telldir}.
+@cfunc{mmux_libc_telldir}, @ref{fs directories inspection operations, Operations on a directory
+stream}.
 @end deftp
 
 @c page
@@ -8991,20 +8983,68 @@ Opaque data structure used to represent the position in a directory stream retri
 @subsection Directory entry objects
 
 
-@MmuxCStructOpaqueTypedef{dirent}
+For an example of how to use and inspect data structures representing file system directory entries
+see, for example, @ref{fs directories inspection opendir, Opening a directory for inspection with
+@cfunc{mmux_libc_opendir}}.
 
-@deftypefun bool mmux_libc_d_name_ref (mmux_asciizcp_t * @var{RESULT_P}, mmux_libc_dirent_t const * @var{dirent_p})
-Getter for the field @code{d_name} of @objtype{mmux_libc_dirent_t}.
+
+@deftp {Opaque Struct Typedef} mmux_libc_file_system_dirent_t
+An opaque alias for the standard data structure type @code{struct direntry}.
+@end deftp
+
+
+@deftp {Struct Typedef} mmux_libc_file_system_dirent_ptr_t
+Type of data structures defined as:
+
+@example
+typedef struct mmux_libc_file_system_dirent_ptr_t @{
+  mmux_libc_file_system_dirent_t const *  value;
+@} mmux_libc_file_system_dirent_ptr_t;
+@end example
+@end deftp
+
+
+@deftp {1--Element Array Typedef} mmux_libc_dirent_t
+Type of 1--element array defined as:
+
+@example
+typedef mmux_libc_file_system_dirent_ptr_t  mmux_libc_dirent_t[1];
+@end example
+
+@noindent
+it is meant to be used as type of local variables and output arguments to function.
+@end deftp
+
+
+@deftp {Pointer Typedef} mmux_libc_dirent_arg_t
+Type of pointers defined as:
+
+@example
+typedef mmux_libc_file_system_dirent_ptr_t const *  mmux_libc_dirent_arg_t;
+@end example
+
+@noindent
+it is meant to be used as type of input arguments to function.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_d_name_ref (mmux_asciizcp_t * @var{RESULT_P}, mmux_libc_dirent_t @var{dirent})
+Getter for the field @code{d_name} of @objtype{mmux_libc_file_system_dirent_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_d_fileno_ref (mmux_uintmax_t * @var{result_p}, mmux_libc_dirent_t const * @var{dirent_p})
-Getter for the field @code{d_fileno} of @objtype{mmux_libc_dirent_t}.
+@deftypefun bool mmux_libc_d_fileno_ref (mmux_uintmax_t * @var{result_p}, mmux_libc_dirent_t @var{dirent})
+Getter for the field @code{d_fileno} of @objtype{mmux_libc_file_system_dirent_t}.
 @end deftypefun
 
 
-@MmuxStructDumper{dirent}
-
+@deftypefun bool mmux_libc_dirent_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_dirent_t @var{dirent}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the instance of
+@objtype{mmux_libc_file_system_dirent_t} referenced by @var{dirent}.  @var{struct_name} must be a
+pointer to an @asciiz{} string representing the name of the data structure used in the description;
+when @cnull{}: it defaults to @samp{struct dirent}.
+@end deftypefun
 
 @c page
 @node fs directories inspection
@@ -9481,8 +9521,8 @@ in the @api{} of this package for completeness.
 @MmuxCInterface{link}.
 
 @example
-mmux_asciizcp_t    ptn_asciiz_old = "/path/to/oldfile.ext";
-mmux_asciizcp_t    ptn_asciiz_new = "/path/to/newfile.ext";
+mmux_asciizcp_t     ptn_asciiz_old = "/path/to/oldfile.ext";
+mmux_asciizcp_t     ptn_asciiz_new = "/path/to/newfile.ext";
 mmux_libc_fs_ptn_t  fs_ptn_old, fs_ptn_new;
 
 @{

@@ -266,7 +266,9 @@ typedef struct stat		mmux_libc_file_system_stat_t;
 typedef struct utimbuf		mmux_libc_file_system_utimbuf_t;
 
 typedef struct dirent		mmux_libc_file_system_dirent_t;
-typedef struct mmux_libc_file_system_dirtream_t	{ DIR * dirpointer; } mmux_libc_file_system_dirstream_t;
+typedef struct mmux_libc_file_system_dirstream_ptr_t {
+  DIR * dirpointer;
+} mmux_libc_file_system_dirstream_ptr_t;
 
 typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;

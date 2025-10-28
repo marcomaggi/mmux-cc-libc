@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -26,16 +25,18 @@
  ** ----------------------------------------------------------------- */
 
 static bool
-read_directory (mmux_libc_dirstream_t dirstream)
+read_one_directory_entry (mmux_libc_dirstream_t dirstream)
 {
-  mmux_libc_dirent_t *		direntry;
+  mmux_libc_dirent_t	direntry;
+  bool			there_are_more_entries;
 
-  if (mmux_libc_readdir(&direntry, dirstream)) {
+  if (mmux_libc_readdir(&there_are_more_entries, direntry, dirstream)) {
+    printf_error("readdir-ing directory entry");
     handle_error();
-  } else if (direntry) {
+  } else if (there_are_more_entries) {
     mmux_libc_fd_t	er;
 
-    mmux_libc_stder(&er);
+    mmux_libc_stder(er);
     if (mmux_libc_dirent_dump(er, direntry, NULL)) {
       handle_error();
     }
@@ -60,18 +61,38 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   {
-    mmux_libc_ptn_t         dirptn;
-    mmux_libc_dirstream_t   dirstream;
+    mmux_asciizcp_t		ptn_asciiz = ".";
+    mmux_libc_dirstream_t	dirstream;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &dirptn, ".")) {
-      handle_error();
+    /* Obtain the directory stream. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn_directory;
+
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Open the directory stream. */
+      {
+	printf_message("opening directory stream");
+	if (mmux_libc_opendir(dirstream, fs_ptn_directory)) {
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+      }
     }
 
-    printf_message("opening directory stream");
-    if (mmux_libc_opendir(&dirstream, dirptn)) {
-      handle_error();
-    }
-
+    /* Perform directory stream operations. */
     {
       mmux_libc_dirstream_position_t	dirpos;
 
@@ -79,7 +100,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
 
-      if (read_directory(dirstream)) {
+      if (read_one_directory_entry(dirstream)) {
 	handle_error();
       }
 
@@ -87,7 +108,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
 
-      if (read_directory(dirstream)) {
+      if (read_one_directory_entry(dirstream)) {
 	handle_error();
       }
 
@@ -95,14 +116,18 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
 
-      if (read_directory(dirstream)) {
+      if (read_one_directory_entry(dirstream)) {
 	handle_error();
       }
     }
 
-    printf_message("closing directory stream");
-    if (mmux_libc_closedir(dirstream)) {
-      handle_error();
+    /* Final cleanup. */
+    {
+      printf_message("closing directory stream");
+      if (mmux_libc_closedir(dirstream)) {
+	printf_error("closing directory stream");
+	handle_error();
+      }
     }
   }
 

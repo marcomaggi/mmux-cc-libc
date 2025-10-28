@@ -168,8 +168,8 @@ typedef mmux_libc_file_system_stat_t const *	mmux_libc_stat_arg_t;
 typedef mmux_libc_file_system_utimbuf_t		mmux_libc_utimbuf_t[1];
 typedef mmux_libc_file_system_utimbuf_t const *	mmux_libc_utimbuf_arg_t;
 
-typedef mmux_libc_file_system_dirstream_t		mmux_libc_dirstream_t[1];
-typedef mmux_libc_file_system_dirstream_t const *	mmux_libc_dirstream_arg_t;
+typedef mmux_libc_file_system_dirstream_ptr_t		mmux_libc_dirstream_t[1];
+typedef mmux_libc_file_system_dirstream_ptr_t const *	mmux_libc_dirstream_arg_t;
 
 typedef struct mmux_libc_file_system_dirent_ptr_t {
   mmux_libc_file_system_dirent_t const *	value;
