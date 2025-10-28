@@ -9322,6 +9322,7 @@ it is set to @cfalse{}.
 @MmuxCInterface{mkdir}.
 
 @example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/directory.d";
 mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Build the file system pathname. */
@@ -9355,6 +9356,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @MmuxCInterface{mkdirat}.
 
 @example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/directory.d";
 mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Build file system pathname. */
@@ -9394,11 +9396,29 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @MmuxCInterface{rmdir}.
 
 @example
-mmux_libc_ptn_t         ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path/to/directory.d";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-if (mmux_libc_rmdir(ptn)) @{
-  /* error */
+/* Build file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  if (mmux_libc_rmdir(fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
