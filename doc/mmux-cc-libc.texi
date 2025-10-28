@@ -9322,12 +9322,30 @@ it is set to @cfalse{}.
 @MmuxCInterface{mkdir}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-if (mmux_libc_mkdir(ptn, mode)) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  auto  mode = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR);
+
+  if (mmux_libc_mkdir(fs_ptn, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -9337,14 +9355,32 @@ if (mmux_libc_mkdir(ptn, mode)) @{
 @MmuxCInterface{mkdirat}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          dirfd;
-mmux_libc_mode_t             mode = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR;
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/directory.d");
-mmux_libc_at_fdcwd(&dirfd);
-if (mmux_libc_mkdir(ptn, mode)) @{
-  /* error */
+/* Build file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  mmux_libc_dirfd_t  dirfd;
+  auto  mode = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR | MMUX_LIBC_S_IXUSR);
+
+  mmux_libc_at_fdcwd(dirfd);
+  if (mmux_libc_mkdirat(dirfd, fs_ptn, mode)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
