@@ -296,7 +296,7 @@ test_fake_allocator_malloc_and_copy (void)
 	}
 
 	for (mmux_ctype_loop_from_to(i,mmux_usize_constant_zero(),srclen)) {
-	  if (true) {
+	  if (false) {
 	    printf_message("dstptr[%lu]=%u", i.value, dstptr[i.value]);
 	  }
 	  if (srcptr[i.value] != dstptr[i.value]) {
