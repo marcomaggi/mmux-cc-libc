@@ -9428,58 +9428,54 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsection Handling the current working directory
 
 
-@deftypefun bool mmux_libc_getcwd (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
-@MmuxCInterfaceGlibc{getcwd, Working Directory}.  When successful: @var{bufptr} is filled with the
-@asciiz{} string representing the file system pathname of the current working directory, including
-the terminating null character.
+@deftypefun bool mmux_libc_getcwd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory})
+@MmuxCInterfaceGlibc{getcwd, Working Directory}.  Notice that @var{fs_ptn_factory} must dynamically
+allocate the memory required to contain the whole file system pathname.
 
 @example
-auto  buflen = mmux_usize_literal(4096);
+mmux_libc_fs_ptn_t          fs_ptn_cwd;
+
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_getcwd(fs_ptn_cwd, fs_ptn_factory)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something with "fs_ptn_cwd". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn_cwd);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getcwd_to_buffer (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
+@MmuxCInterfaceGlibc{getcwd, Working Directory}.
+
+When successful: @var{bufptr} is filled with the @asciiz{} string representing the file system
+pathname of the current working directory, including the terminating nul character.
+
+If an error occurs: we must inspect the value of @code{errno}.
+
+@example
+auto  buflen = mmux_usize_literal(128);
 char  bufptr[buflen.value];
 
-if (mmux_libc_getcwd(bufptr, buflen)) @{
+if (mmux_libc_getcwd_to_buffer(bufptr, buflen)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
-
-@deftypefn {@gnu{} Function} bool mmux_libc_getcwd_malloc (mmux_asciizcpp_t * @var{result_p})
-@MmuxCInterfaceGlibc{getcwd, Working Directory}.  When successful: a memory block has been
-dynamically allocated and filled with the @asciiz{} string representing the file system pathname of
-the current working directory, including the terminating null character; a pointer to such memory
-block is stored in the variable referenced by @var{result_p}.
-
-@example
-mmux_asciizcp_t     bufptr;
-
-if (mmux_libc_getcwd_malloc(&bufptr)) @{
-  /* error */
-@} else @{
-  /* do something with "bufptr" */
-  mmux_libc_free((mmux_pointer_t)bufptr);
-@}
-@end example
-@end deftypefn
-
-
-@deftypefun bool mmux_libc_getcwd_pathname (mmux_libc_fs_ptn_arg_t * @var{result_p})
-Wrapper for @cfunc{mmux_libc_getcwd_malloc} that stores the memory block pointer in a
-@objtype{mmux_libc_fs_ptn_arg_t} object.  The pathname object must later be released using
-@cfunc{mmux_libc_file_system_pathname_free}.
-
-@example
-mmux_libc_fs_ptn_arg_t    ptn;
-
-if (mmux_libc_getcwd_pathname(&ptn)) @{
-  /* error */
-@} else @{
-  /* do something with "ptn" */
-  mmux_libc_file_system_pathname_free(ptn);
-@}
-@end example
-@end deftypefun
-
+@c ------------------------------------------------------------------------
 
 @deftypefun bool mmux_libc_chdir (mmux_libc_fs_ptn_arg_t @var{dirptn})
 @MmuxCInterfaceGlibc{chdir, Working Directory}.

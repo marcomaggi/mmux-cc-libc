@@ -38,36 +38,35 @@ typedef bool mmux_libc_stat_mode_pred_t (bool * result_p, mmux_libc_mode_t mode)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_getcwd (mmux_asciizp_t bufptr, mmux_usize_t buflen)
+mmux_libc_getcwd_to_buffer (mmux_asciizp_t bufptr, mmux_usize_t buflen)
 {
   mmux_asciizp_t	rv = getcwd(bufptr, buflen.value);
 
   return (rv)? false : true;
 }
 bool
-mmux_libc_getcwd_malloc (mmux_asciizcpp_t result_p)
+mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
 {
-  mmux_asciizp_t	rv = getcwd(NULL, 0);
+  for (auto buflen = mmux_usize_literal(128); ; mmux_ctype_add_to_variable(buflen, mmux_usize_literal(128))) {
+    char		bufptr[buflen.value];
+    mmux_asciizcp_t	rv = getcwd(bufptr, buflen.value);
 
-  if (rv) {
-    *result_p = rv;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getcwd_pathname (mmux_libc_fs_ptn_t fs_ptn_result_p, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
-{
-  mmux_asciizcp_t	bufptr;
+    if (false) {
+      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("%s: buflen.value=%lu\n", __func__, buflen.value));
+    }
 
-  if (mmux_libc_getcwd_malloc(&bufptr)) {
-    return true;
-  } else if (mmux_libc_make_file_system_pathname(fs_ptn_result_p, fs_ptn_factory, bufptr)) {
-    mmux_libc_free((mmux_pointer_t)bufptr);
-    return true;
-  } else {
-    return false;
+    if (rv == bufptr) {
+      /* The  provided  buffer is  wide  enough  to  contain  the whole  file  system
+	 pathname, including the terminating nul character.  */
+      return mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, bufptr);
+    } else if (MMUX_LIBC_VALUEOF_ERANGE != errno) {
+      /* An unrecoverable error occurred. */
+      return true;
+    } else {
+      /* The provided  buffer is  NOT wide  enough to contain  the whole  file system
+	 pathname, including the terminating nul character.  */
+      mmux_libc_errno_clear();
+    }
   }
 }
 bool

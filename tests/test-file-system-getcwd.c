@@ -33,42 +33,42 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-file-system-getcwd";
   }
 
+  /* mmux_libc_getcwd_to_buffer() */
+  {
+    auto	buflen = mmux_usize_literal(4096);
+    char	bufptr[buflen.value];
+
+    printf_message("getting the current working directory: mmux_libc_getcwd_to_buffer");
+    if (mmux_libc_getcwd_to_buffer(bufptr, buflen)) {
+      handle_error();
+    } else {
+      printf_message("the current working directory is: \"%s\"", bufptr);
+    }
+  }
+
   /* mmux_libc_getcwd() */
   {
-    mmux_usize_t	buflen = 4096;
-    mmux_char_t		bufptr[buflen];
+    mmux_libc_fs_ptn_t		fs_ptn;
 
-    printf_message("getting the current working directory: mmux_libc_getcwd");
-    if (mmux_libc_getcwd(bufptr, buflen)) {
-      handle_error();
-    } else {
-      printf_message("the current working directory is: \"%s\"", bufptr);
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+
+      printf_message("getting the current working directory: mmux_libc_getcwd");
+      if (mmux_libc_getcwd(fs_ptn, fs_ptn_factory)) {
+	handle_error();
+      }
     }
-  }
 
-  /* mmux_libc_getcwd_malloc() */
-  {
-    mmux_asciizcp_t	bufptr;
-
-    printf_message("getting the current working directory: mmux_libc_getcwd_malloc");
-    if (mmux_libc_getcwd_malloc(&bufptr)) {
-      handle_error();
-    } else {
-      printf_message("the current working directory is: \"%s\"", bufptr);
-      mmux_libc_free((mmux_pointer_t)bufptr);
+    {
+      printf_message("the current working directory is: \"%s\"", fs_ptn->value);
     }
-  }
 
-  /* mmux_libc_getcwd_pathname() */
-  {
-    mmux_libc_file_system_pathname_t	ptn;
-
-    printf_message("getting the current working directory: mmux_libc_getcwd_pathname");
-    if (mmux_libc_getcwd_pathname(&ptn)) {
-      handle_error();
-    } else {
-      printf_message("the current working directory is: \"%s\"", ptn.value);
-      mmux_libc_file_system_pathname_free(ptn);
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 
