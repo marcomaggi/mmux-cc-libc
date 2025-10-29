@@ -72,6 +72,32 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
+  /* mmux_libc_get_current_dir_name() */
+  {
+    mmux_libc_fs_ptn_t		fs_ptn;
+
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+
+      printf_message("getting the current working directory: mmux_libc_get_current_dir_name");
+      if (mmux_libc_get_current_dir_name(fs_ptn, fs_ptn_factory)) {
+	handle_error();
+      }
+    }
+
+    {
+      printf_message("the current working directory is: \"%s\"", fs_ptn->value);
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
+    }
+  }
+
   mmux_libc_exit_success();
 }
 

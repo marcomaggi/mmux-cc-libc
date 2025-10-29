@@ -70,6 +70,24 @@ mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_p
   }
 }
 bool
+mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+{
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_GET_CURRENT_DIR_NAME]]],[[[
+  mmux_asciizp_t	bufptr = get_current_dir_name();
+
+  if (NULL != bufptr) {
+    bool	rv = mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, bufptr);
+    free(bufptr);
+    return rv;
+  } else {
+    return true;
+  }
+]]])
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
 mmux_libc_chdir (mmux_libc_fs_ptn_arg_t dirptn)
 {
   int	rv = chdir(dirptn->value);

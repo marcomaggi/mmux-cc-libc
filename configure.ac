@@ -91,6 +91,7 @@ AC_CHECK_HEADERS([linux/openat2.h])
 
 AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp strverscmp
                 rawmemchr memmem strchrnul basename dirname canonicalize_file_name
+                get_current_dir_name
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
                 wait waitid syscall memfd_create strerrorname_np strerrordesc_np
                 strerror_r strerror_l])

@@ -1773,6 +1773,10 @@ mmux_cc_libc_decl bool mmux_libc_getcwd_to_buffer (mmux_asciizp_t bufptr, mmux_u
 mmux_cc_libc_decl bool mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t fs_ptn,
+						       mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
 mmux_cc_libc_decl bool mmux_libc_chdir (mmux_libc_fs_ptn_arg_t dirptn)
   __attribute__((__warn_unused_result__));
 

@@ -9457,6 +9457,35 @@ mmux_libc_fs_ptn_t          fs_ptn_cwd;
 @end deftypefun
 
 
+@deftypefn {@gnu{} Function} bool mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory})
+@MmuxCInterfaceGlibc{get_current_dir_name, Working Directory}.  Notice that @var{fs_ptn_factory}
+must dynamically allocate the memory required to contain the whole file system pathname.
+
+@example
+mmux_libc_fs_ptn_t          fs_ptn_cwd;
+
+/* Build the file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_get_current_dir_name(fs_ptn_cwd, fs_ptn_factory)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something with "fs_ptn_cwd". */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn_cwd);
+@}
+@end example
+@end deftypefn
+
+
 @deftypefun bool mmux_libc_getcwd_to_buffer (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
 @MmuxCInterfaceGlibc{getcwd, Working Directory}.
 
