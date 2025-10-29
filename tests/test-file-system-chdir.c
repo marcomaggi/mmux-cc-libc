@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -36,24 +35,45 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* mmux_libc_chdir() */
   {
-    mmux_libc_file_system_pathname_t	ptn;
+    mmux_asciizcp_t	ptn_asciiz = "..";
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "..")) {
-      handle_error();
-    } else {
+    /* Build file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	handle_error();
+      }
+    }
+
+    /* Do it. */
+    {
       printf_message("changing the current working directory");
-      if (mmux_libc_chdir(ptn)) {
+      if (mmux_libc_chdir(fs_ptn)) {
+	printf_error("changing the current working directory");
+	handle_error();
+      }
+    }
+
+    /* Check the new current working directory. */
+    {
+      mmux_libc_fs_ptn_t		fs_ptn_cwd;
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+      if (mmux_libc_getcwd(fs_ptn_cwd, fs_ptn_factory)) {
 	handle_error();
       } else {
-	mmux_libc_file_system_pathname_t	new_ptn;
-
-	if (mmux_libc_getcwd_pathname(&new_ptn)) {
-	  handle_error();
-	} else {
-	  printf_message("the current working directory is: \"%s\"", new_ptn.value);
-	  mmux_libc_file_system_pathname_free(new_ptn);
-	}
+	printf_message("the current working directory is: \"%s\"", fs_ptn_cwd->value);
+	mmux_libc_unmake_file_system_pathname(fs_ptn_cwd);
       }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
     }
   }
 

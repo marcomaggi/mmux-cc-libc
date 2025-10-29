@@ -9428,6 +9428,16 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsection Handling the current working directory
 
 
+@menu
+* fs directories working retrieving::   Retrieving the current working directory.
+* fs directories working changing::     Changing the current working directory.
+@end menu
+
+@c page
+@node fs directories working retrieving
+@subsubsection Retrieving the current working directory
+
+
 @deftypefun bool mmux_libc_getcwd (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory})
 @MmuxCInterfaceGlibc{getcwd, Working Directory}.  Notice that @var{fs_ptn_factory} must dynamically
 allocate the memory required to contain the whole file system pathname.
@@ -9459,7 +9469,9 @@ mmux_libc_fs_ptn_t          fs_ptn_cwd;
 
 @deftypefn {@gnu{} Function} bool mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory})
 @MmuxCInterfaceGlibc{get_current_dir_name, Working Directory}.  Notice that @var{fs_ptn_factory}
-must dynamically allocate the memory required to contain the whole file system pathname.
+must dynamically allocate the memory required to contain the whole file system pathname.  Remember
+that this function attempts to build a resulting file system pathname that contains the symbolic
+links of the current working directory.
 
 @example
 mmux_libc_fs_ptn_t          fs_ptn_cwd;
@@ -9504,17 +9516,38 @@ if (mmux_libc_getcwd_to_buffer(bufptr, buflen)) @{
 @end example
 @end deftypefun
 
-@c ------------------------------------------------------------------------
+@c page
+@node fs directories working changing
+@subsubsection Changing the current working directory
+
 
 @deftypefun bool mmux_libc_chdir (mmux_libc_fs_ptn_arg_t @var{dirptn})
 @MmuxCInterfaceGlibc{chdir, Working Directory}.
 
 @example
-mmux_libc_fs_ptn_arg_t    ptn;
+mmux_asciizcp_t     ptn_asciiz = "..";
+mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_make_file_system_pathname(&ptn, "..");
-if (mmux_libc_chdir(ptn)) @{
-  /* error */
+/* Build file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do it. */
+@{
+  if (mmux_libc_chdir(fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -9524,23 +9557,36 @@ if (mmux_libc_chdir(ptn)) @{
 @MmuxCInterfaceGlibc{fchdir, Working Directory}.
 
 @example
-mmux_libc_file_descriptor_t           dirfd;
+mmux_asciizcp_t     ptn_asciiz = "..";
+mmux_libc_dirfd_t   dirfd;
 
+/* Obtain the file descriptor. */
 @{
-  mmux_libc_fs_ptn_arg_t    ptn;
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-  if (mmux_libc_make_file_system_pathname(&ptn, "..")) @{
-    /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
   @}
 
   /* Open the directory. */
   @{
-    mmux_sint_t         flags = MMUX_LIBC_O_PATH;
-    mmux_libc_mode_t         mode  = 0;
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH);
+    auto  mode  = mmux_libc_mode_constant_zero();
 
-    if (mmux_libc_open(&dirfd, ptn, flags, mode)) @{
+    if (mmux_libc_open(dirfd, fs_ptn, flags, mode)) @{
       /* error */
     @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
@@ -9551,7 +9597,7 @@ mmux_libc_file_descriptor_t           dirfd;
   @}
 @}
 
-/* Close the directory. */
+/* Final cleanup. */
 @{
   if (mmux_libc_close(dirfd)) @{
     /* error */
