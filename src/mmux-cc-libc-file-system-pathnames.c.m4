@@ -366,9 +366,6 @@ mmux_libc_file_system_pathname_factory_static_make_from_asciiz
 
    The new file system pathname references  an already allocated and immutable ASCIIZ
    string, for example a statically allocated string.
-
-   We expect  "ap" to  hold a  single additional  argument of  type "mmux_asciizcp_t"
-   representing a pointer to the statically allocated ASCIIZ string.
 */
 {
   /* Validate the arguments. */
@@ -456,9 +453,6 @@ mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz
 
    The  new file  system  pathname  references an  ASCIIZ  string  allocated by  this
    constructor using the factory's memory allocator.
-
-   We expect  "ap" to  hold a  single additional  argument of  type "mmux_asciizcp_t"
-   representing a pointer to the statically allocated ASCIIZ string.
 */
 {
   mmux_usize_t		src_ptn_len_plus_nil;
@@ -560,6 +554,80 @@ bool
 mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_t fs_ptn_factory)
 {
   fs_ptn_factory[0] = mmux_libc_file_system_pathname_factory_dynamic_object;
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** File system pathnames: pathnames factory, swallowed dynamically allocated strings, default allocator.
+ ** ----------------------------------------------------------------- */
+
+static bool
+mmux_libc_file_system_pathname_factory_swallow_make_from_asciiz
+    (mmux_libc_fs_ptn_t fs_ptn_result,
+     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+     mmux_asciizcp_t src_ptn_asciiz)
+/* This function  is the  implementation of the  method "make_from_asciiz()"  for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_swallow".
+
+   Construct a new file  system pathname data structure and store  it in the variable
+   referenced by "fs_ptn_result".
+
+   The new  file system pathname  swallows an ASCIIZ  string allocated by  some other
+   module using  the standard  "malloc()", taking exclusive  ownership of  the string
+   itself.  The string will be released  with the standard funcion "free()" using the
+   default memory allocator.
+*/
+{
+  mmux_usize_t		src_ptn_len_plus_nil;
+
+  /* Validate the arguments. */
+  {
+    {
+      _Pragma("GCC diagnostic push");
+      _Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"");
+      if ((NULL == src_ptn_asciiz) || ('\0' == src_ptn_asciiz[0])) {
+	mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+	return true;
+      }
+      _Pragma("GCC diagnostic pop");
+    }
+
+    {
+      mmux_libc_strlen_plus_nil(&src_ptn_len_plus_nil, src_ptn_asciiz);
+      MMUX_LIBC_FILE_SYSTEM_PATHNAME_VALIDATE_LENGTH_WITH_NUL(src_ptn_len_plus_nil);
+    }
+  }
+
+  /* Construct the resulting data structure. */
+  {
+    fs_ptn_result->value = src_ptn_asciiz;
+    fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
+    return false;
+  }
+}
+static bool
+mmux_libc_file_system_pathname_factory_swallow_make_from_ascii_len
+    (mmux_libc_fs_ptn_t			fs_ptn_result		MMUX_CC_LIBC_UNUSED,
+     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory		MMUX_CC_LIBC_UNUSED,
+     mmux_asciicp_t			src_ptn_ascii		MMUX_CC_LIBC_UNUSED,
+     mmux_usize_t			src_ptn_len_no_nul	MMUX_CC_LIBC_UNUSED)
+/* This function is the implementation  of the method "make_from_ascii_len()" for the
+   file system factory "mmux_libc_file_system_pathname_factory_class_swallow". */
+{
+  return true;
+}
+static mmux_libc_file_system_pathname_factory_class_t mmux_libc_file_system_pathname_factory_class_swallow = {
+  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_swallow_make_from_asciiz,
+  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_swallow_make_from_ascii_len,
+};
+static mmux_libc_file_system_pathname_factory_t const mmux_libc_file_system_pathname_factory_swallow_object = {
+  .class		= &mmux_libc_file_system_pathname_factory_class_swallow,
+};
+bool
+mmux_libc_file_system_pathname_factory_swallow (mmux_libc_fs_ptn_factory_t fs_ptn_factory)
+{
+  fs_ptn_factory[0] = mmux_libc_file_system_pathname_factory_swallow_object;
   return false;
 }
 

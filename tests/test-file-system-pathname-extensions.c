@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -29,18 +28,15 @@ static void
 making_an_extension_from_raw_arguments (void)
 {
   printf_message("running test: %s", __func__);
-  mmux_libc_ptn_t		ptn;
-  mmux_asciizcp_t		ptn_asciiz;
+  //                                          012345678901234567
+  mmux_asciizcp_t		ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_t		fs_ptn;
+  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
   mmux_libc_ptn_extension_t	ext;
   mmux_libc_fd_t		er;
 
-  //                                             012345678901234567
-  //                                                          ^
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, "/path/to/file.ext")) {
-    handle_error();
-  }
-
-  if (mmux_libc_file_system_pathname_ptr_ref(&ptn_asciiz, ptn)) {
+  mmux_libc_file_system_pathname_factory_static(ptn_factory);
+  if (mmux_libc_make_file_system_pathname(ptn, ptn_factory, ptn_asciiz)) {
     handle_error();
   }
 
@@ -53,7 +49,7 @@ making_an_extension_from_raw_arguments (void)
   if (mmux_libc_dprintfer("*** the pathname is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn(er, ptn)) {
+  if (mmux_libc_dprintf_fs_ptn(er, ptn)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
@@ -61,7 +57,7 @@ making_an_extension_from_raw_arguments (void)
   if (mmux_libc_dprintfer("*** the pathname extension is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn_extension(er, ext)) {
+  if (mmux_libc_dprintf_fs_ptn_extension(er, ext)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
@@ -92,7 +88,7 @@ making_an_extension_from_pathname (void)
   if (mmux_libc_dprintfer("*** the pathname is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn(er, ptn)) {
+  if (mmux_libc_dprintf_fs_ptn(er, ptn)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
@@ -100,7 +96,7 @@ making_an_extension_from_pathname (void)
   if (mmux_libc_dprintfer("*** the pathname extension is: ")) {
     handle_error();
   }
-  if (mmux_libc_dprintf_libc_ptn_extension(er, ext)) {
+  if (mmux_libc_dprintf_fs_ptn_extension(er, ext)) {
     handle_error();
   }
   if (mmux_libc_dprintfer_newline()) { handle_error(); }
