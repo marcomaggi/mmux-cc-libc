@@ -1666,26 +1666,26 @@ mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd, mmux_libc_int
   return mmux_sint_dprintf_p(fd->value, &value);
 }
 bool
-mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_ptn_extension_t E)
+mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_extension_arg_t E)
 {
   mmux_usize_t	nbytes_done;
 
-  if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
+  if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
     return true;
-  } else if (mmux_ctype_not_equal(nbytes_done, E.len)) {
+  } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
     return true;
   } else {
     return false;
   }
 }
 bool
-mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_ptn_segment_t E)
+mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_segment_arg_t E)
 {
   mmux_usize_t	nbytes_done;
 
-  if (mmux_libc_write(&nbytes_done, fd, E.ptr, E.len)) {
+  if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
     return true;
-  } else if (mmux_ctype_not_equal(nbytes_done, E.len)) {
+  } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
     return true;
   } else {
     return false;

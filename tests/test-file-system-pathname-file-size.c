@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-system-pathname-file-size.src.ext";
+static mmux_asciizcp_t	ptn_asciiz = "./test-file-system-pathname-file-size.ext";
 
 
 /** --------------------------------------------------------------------
@@ -33,39 +32,52 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-file-system-pathname-file-size.c";
-    cleanfiles_register(src_pathname_asciiz);
+    PROGNAME = "test-file-system-pathname-file-size";
+    cleanfiles_register(ptn_asciiz);
     cleanfiles();
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	ptn;
-
   /* Create the data file. */
   {
     printf_message("create the data file");
-    if (test_create_data_file(src_pathname_asciiz)) {
+    if (test_create_data_file(ptn_asciiz)) {
       handle_error();
     }
   }
 
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Do it. */
   {
-    mmux_libc_fd_t	dirfd;
-    mmux_usize_t	result;
+    mmux_libc_fs_ptn_t	fs_ptn;
 
-    mmux_libc_at_fdcwd(&dirfd);
+    /* Build the file system pathname. */
+    {
+      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
 
-    printf_message("file_system_pathname_file_size_refing");
-    if (mmux_libc_file_system_pathname_file_size_ref(&result, dirfd, ptn)) {
-      handle_error();
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	handle_error();
+      }
     }
 
-    printf_message("file size: %lu", result);
+    /* Do it. */
+    {
+      mmux_libc_dirfd_t	dirfd;
+      mmux_usize_t	result;
+
+      mmux_libc_at_fdcwd(dirfd);
+
+      printf_message("file_system_pathname_file_size_ref-ing");
+      if (mmux_libc_file_system_pathname_file_size_ref(&result, dirfd, fs_ptn)) {
+	handle_error();
+      } else {
+	printf_message("file size: %lu", result.value);
+      }
+    }
+
+    /* Final clenaup. */
+    {
+      mmux_libc_unmake_file_system_pathname(fs_ptn);
+    }
   }
 
   mmux_libc_exit_success();

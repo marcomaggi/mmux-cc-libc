@@ -273,10 +273,13 @@ mmux_libc_linkat (mmux_libc_dirfd_arg_t dirfd_old, mmux_libc_fs_ptn_arg_t oldnam
 		  mmux_libc_dirfd_arg_t dirfd_new, mmux_libc_fs_ptn_arg_t newname,
 		  mmux_libc_linkat_flags_t flags)
 {
+#ifdef MMUX_HAVE_LIBC_AT_EMPTY_PATH
   if (MMUX_LIBC_AT_EMPTY_PATH & flags.value) {
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
-  } else {
+  } else
+#endif
+  {
     int	rv = linkat(dirfd_old->value, oldname->value,
 		    dirfd_new->value, newname->value,
 		    flags.value);

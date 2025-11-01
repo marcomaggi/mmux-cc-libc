@@ -239,13 +239,16 @@ typedef struct mmux_libc_file_system_pathname_extension_t {
   mmux_usize_t		len;
 } mmux_libc_file_system_pathname_extension_t;
 
+typedef mmux_libc_file_system_pathname_extension_t		mmux_libc_fs_ptn_extension_t [1];
+typedef mmux_libc_file_system_pathname_extension_t const *	mmux_libc_fs_ptn_extension_arg_t;
+
 typedef struct mmux_libc_file_system_pathname_segment_t {
   mmux_asciicp_t	ptr;
   mmux_usize_t		len;
 } mmux_libc_file_system_pathname_segment_t;
 
-typedef mmux_libc_file_system_pathname_extension_t	mmux_libc_ptn_extension_t;
-typedef mmux_libc_file_system_pathname_segment_t	mmux_libc_ptn_segment_t;
+typedef mmux_libc_file_system_pathname_segment_t		mmux_libc_fs_ptn_segment_t[1];
+typedef mmux_libc_file_system_pathname_segment_t const *	mmux_libc_fs_ptn_segment_arg_t;
 
 /* ------------------------------------------------------------------ */
 

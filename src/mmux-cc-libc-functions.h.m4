@@ -76,6 +76,9 @@ mmux_libc_errno_equal (mmux_libc_errno_t errnum1, mmux_libc_errno_t errnum2)
 
 /* ------------------------------------------------------------------ */
 
+/* This is a duplicate of "mmux_libc_strerrorname_np()". */
+mmux_cc_libc_decl mmux_asciizcp_t mmux_libc_errno_to_name (mmux_libc_errno_t N);
+
 mmux_cc_libc_decl bool mmux_libc_errno_ref (mmux_libc_errno_t * result_errnum_p)
   __attribute__((__nonnull__(1)));
 
@@ -957,10 +960,10 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_libc_gid (mmux_libc_fd_arg_t fd, mmux_l
 mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_ptn_extension_t E)
+mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_extension_arg_t E)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_ptn_segment_t E)
+mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_segment_arg_t E)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd,
@@ -1539,7 +1542,7 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_len_plus_nil_ref (mmux_usi
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_compare (mmux_ternary_comparison_result_t * result_p,
 							       mmux_libc_fs_ptn_arg_t ptn1,
 							       mmux_libc_fs_ptn_arg_t ptn2)
   __attribute__((__nonnull__(1)));
@@ -1631,41 +1634,43 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_concat
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t result_p,
 								      mmux_libc_fs_ptn_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_ptn_extension_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_fs_ptn_extension_t result_p,
 									  mmux_asciizcp_t ptr, mmux_usize_t len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extension_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_fs_ptn_extension_t result_p,
 										 mmux_asciizcp_t ptr)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p,
-									 mmux_libc_file_system_pathname_extension_t E)
+									 mmux_libc_fs_ptn_extension_arg_t E)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p,
-									 mmux_libc_file_system_pathname_extension_t E)
+									 mmux_libc_fs_ptn_extension_arg_t E)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_is_empty (bool * result_p,
-									  mmux_libc_ptn_extension_t E)
+									  mmux_libc_fs_ptn_extension_arg_t E)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_has_extension (bool * result_p,
-								     mmux_libc_fs_ptn_arg_t ptn, mmux_libc_ptn_extension_t ext)
+								     mmux_libc_fs_ptn_arg_t ptn,
+								     mmux_libc_fs_ptn_extension_arg_t ext)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p,
-									 mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_compare (mmux_ternary_comparison_result_t * result_p,
+									 mmux_libc_fs_ptn_extension_arg_t E1,
+									 mmux_libc_fs_ptn_extension_arg_t E2)
   __attribute__((__nonnull__(1)));
 
 typedef bool mmux_libc_file_system_pathname_extension_comparison_predicate_t (bool * result_p,
-									      mmux_libc_ptn_extension_t E1,
-									      mmux_libc_ptn_extension_t E2);
+									      mmux_libc_fs_ptn_extension_arg_t E1,
+									      mmux_libc_fs_ptn_extension_arg_t E2);
 
 mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_t mmux_libc_file_system_pathname_extension_equal
   __attribute__((__nonnull__(1)));
@@ -1687,32 +1692,34 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_extension_comparison_predicate_
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_ptn_segment_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_fs_ptn_segment_t result_p,
 									mmux_asciizcp_t ptr, mmux_usize_t len)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * result_p,
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_fs_ptn_segment_t result_p,
 									       mmux_asciizcp_t ptr)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_fs_ptn_segment_t result_p,
+									 mmux_libc_fs_ptn_arg_t ptn)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciizcpp_t result_p,
-								       mmux_libc_file_system_pathname_segment_t E)
+								       mmux_libc_fs_ptn_segment_arg_t E)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * result_p,
-								       mmux_libc_file_system_pathname_segment_t E)
+								       mmux_libc_fs_ptn_segment_arg_t E)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * result_p,
-								       mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_compare (mmux_ternary_comparison_result_t * result_p,
+								       mmux_libc_fs_ptn_segment_arg_t E1,
+								       mmux_libc_fs_ptn_segment_arg_t E2)
   __attribute__((__nonnull__(1)));
 
 typedef bool mmux_libc_file_system_pathname_segment_comparison_predicate_t (bool * result_p,
-									      mmux_libc_ptn_segment_t E1,
-									      mmux_libc_ptn_segment_t E2);
+									    mmux_libc_fs_ptn_segment_arg_t E1,
+									    mmux_libc_fs_ptn_segment_arg_t E2);
 
 mmux_cc_libc_decl mmux_libc_file_system_pathname_segment_comparison_predicate_t mmux_libc_file_system_pathname_segment_equal
   __attribute__((__nonnull__(1)));
@@ -1732,13 +1739,13 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_segment_comparison_predicate_t 
 mmux_cc_libc_decl mmux_libc_file_system_pathname_segment_comparison_predicate_t mmux_libc_file_system_pathname_segment_greater_equal
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */

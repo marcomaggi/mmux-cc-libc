@@ -9733,6 +9733,9 @@ mmux_libc_unmake_file_system_pathname(fs_ptn_new);
 Notice that @samp{MMUX_LIBC_AT_EMPTY_PATH} is always added to @var{flags} with a bitwise OR
 operation.
 
+Notice that this function will fail test if the caller does not have the @code{CAP_DAC_READ_SEARCH}
+capability @manpage{capabilities, Capabilities}.
+
 @example
 mmux_asciizcp_t     ptn_asciiz_old = "/path/to/oldfile.ext";
 mmux_asciizcp_t     ptn_asciiz_new = "/path/to/newfile.ext";

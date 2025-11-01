@@ -1326,11 +1326,11 @@ one_concatenation_case (mmux_asciizcp_t prefix_ptn_asciiz, mmux_asciizcp_t suffi
     if (mmux_libc_file_system_pathname_ptr_ref(&result_ptn_asciiz, result_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	cmpnum;
+      mmux_ternary_comparison_result_t	cmpnum;
 
       if (mmux_libc_strcmp(&cmpnum, expected_result_ptn_asciiz, result_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(cmpnum)) {
+      } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
 	printf_message("the concatenation of '%s' and '%s' is '%s'",
 		       prefix_ptn_asciiz, suffix_ptn_asciiz, result_ptn_asciiz);
       } else {

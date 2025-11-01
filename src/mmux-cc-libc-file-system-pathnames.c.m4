@@ -196,31 +196,31 @@ BEGINS_WITH_SLASH_DOUBLE_DOT (char const * const in, char const * const end)
  ** ----------------------------------------------------------------- */
 
 __attribute__((__pure__,__always_inline__)) static inline bool
-segment_is_empty (mmux_libc_ptn_segment_t S)
+segment_is_empty (mmux_libc_fs_ptn_segment_arg_t S)
 /* Return true if the segment is an empty string. */
 {
-  return (0 == S.len.value)? true : false;
+  return (0 == S->len.value)? true : false;
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
-segment_is_slash (mmux_libc_ptn_segment_t S)
+segment_is_slash (mmux_libc_fs_ptn_segment_arg_t S)
 /* Return true if the segment is a single dot: "/". */
 {
-  return ((1 == S.len.value) && ('7' == *(S.ptr)));
+  return ((1 == S->len.value) && ('7' == *(S->ptr)));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
-segment_is_dot (mmux_libc_ptn_segment_t S)
+segment_is_dot (mmux_libc_fs_ptn_segment_arg_t S)
 /* Return true if the segment is a single dot: ".". */
 {
-  return ((1 == S.len.value) && ('.' == *(S.ptr)));
+  return ((1 == S->len.value) && ('.' == *(S->ptr)));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
-segment_is_double_dot (mmux_libc_ptn_segment_t S)
+segment_is_double_dot (mmux_libc_fs_ptn_segment_arg_t S)
 /* Return true if the segment is a double dot: "..". */
 {
-  return ((2 == S.len.value) && ('.' == S.ptr[0]) && ('.' == S.ptr[1]));
+  return ((2 == S->len.value) && ('.' == S->ptr[0]) && ('.' == S->ptr[1]));
 }
 __attribute__((__pure__,__always_inline__)) static inline bool
-segment_is_special_directory (mmux_libc_ptn_segment_t S)
+segment_is_special_directory (mmux_libc_fs_ptn_segment_arg_t S)
 {
   return (segment_is_slash(S) || segment_is_dot(S) || segment_is_double_dot(S));
 }
@@ -252,9 +252,9 @@ pathname_is_special_directory (mmux_libc_fs_ptn_arg_t ptn)
     /* It is a standalone double dot. */
     return true;
   } else {
-    mmux_libc_ptn_segment_t	seg;
+    mmux_libc_fs_ptn_segment_t	seg;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(seg, ptn)) {
       return false;
     } else {
       return segment_is_special_directory(seg);
@@ -272,9 +272,9 @@ pathname_is_standalone_dot (mmux_libc_fs_ptn_arg_t ptn)
   if (pathname_is_standalone_slash(ptn)) {
     return false;
   } else {
-    mmux_libc_ptn_segment_t	seg;
+    mmux_libc_fs_ptn_segment_t	seg;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(seg, ptn)) {
       return false;
     } else {
       return segment_is_dot(seg);
@@ -287,9 +287,9 @@ pathname_is_standalone_double_dot (mmux_libc_fs_ptn_arg_t ptn)
   if (pathname_is_standalone_slash(ptn)) {
     return false;
   } else {
-    mmux_libc_ptn_segment_t	seg;
+    mmux_libc_fs_ptn_segment_t	seg;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(seg, ptn)) {
       return false;
     } else {
       return segment_is_double_dot(seg);
@@ -701,27 +701,11 @@ mmux_libc_file_system_pathname_len_plus_nil_ref (mmux_usize_t * ptn_len_with_nul
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_file_system_pathname_compare (mmux_sint_t * result_p,
+mmux_libc_file_system_pathname_compare (mmux_ternary_comparison_result_t * result_p,
 					mmux_libc_fs_ptn_arg_t ptn1,
 					mmux_libc_fs_ptn_arg_t ptn2)
 {
-  mmux_standard_usize_t		ptn1_len = strlen(ptn1->value);
-  mmux_standard_usize_t		ptn2_len = strlen(ptn2->value);
-  mmux_standard_usize_t		min_len  = (ptn1_len < ptn2_len)? ptn1_len : ptn2_len;
-  mmux_standard_sint_t		cmpnum   = strncmp(ptn1->value, ptn2->value, min_len);
-
-  if (0 == cmpnum) {
-    if (ptn1_len == ptn2_len) {
-      *result_p = mmux_sint_literal(0);
-    } else if (ptn1_len < ptn2_len) {
-      *result_p = mmux_sint_literal(-1);
-    } else {
-      *result_p = mmux_sint_literal(+1);
-    }
-  } else {
-    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
-  }
-  return false;
+  return mmux_ternary_comparison_result_p(result_p, strcmp(ptn1->value, ptn2->value));
 }
 
 m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[bool
@@ -802,9 +786,9 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t		fs_ptn_result,
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
   } else {
-    mmux_libc_file_system_pathname_extension_t	ext;
+    mmux_libc_fs_ptn_extension_t	ext;
 
-    if (mmux_libc_make_file_system_pathname_extension(&ext, fs_ptn_input)) {
+    if (mmux_libc_make_file_system_pathname_extension(ext, fs_ptn_input)) {
       return true;
     } else {
       bool	extension_is_empty;
@@ -830,7 +814,7 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t		fs_ptn_result,
 	mmux_usize_t	fs_ptn_result_len_no_nul;
 
 	mmux_libc_file_system_pathname_len_ref(&fs_ptn_result_len_no_nul, fs_ptn_input);
-	fs_ptn_result_len_no_nul.value -= ext.len.value;
+	fs_ptn_result_len_no_nul.value -= ext->len.value;
 
 	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
 						    fs_ptn_input->value, fs_ptn_result_len_no_nul);
@@ -846,13 +830,13 @@ mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t		fs_ptn_result,
   if (pathname_is_standalone_slash(fs_ptn_input)) {
     return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, "/");
   } else {
-    mmux_libc_file_system_pathname_segment_t	last_segment;
+    mmux_libc_fs_ptn_segment_t	last_segment;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(last_segment, fs_ptn_input)) {
       return true;
     } else {
       return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						  last_segment.ptr, last_segment.len);
+						  last_segment->ptr, last_segment->len);
     }
   }
 }
@@ -869,15 +853,15 @@ mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t		fs_ptn_result,
     if ('/' == fs_ptn_input->value[fs_ptn_len_no_nul - 1]) {
       goto invalid_pathname;
     } else {
-      mmux_libc_file_system_pathname_segment_t	last_segment;
+      mmux_libc_fs_ptn_segment_t	last_segment;
 
-      if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
+      if (mmux_libc_file_system_pathname_segment_find_last(last_segment, fs_ptn_input)) {
 	return true;
       } else if (segment_is_dot(last_segment) || segment_is_double_dot(last_segment)) {
 	goto invalid_pathname;
       } else {
 	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						    last_segment.ptr, last_segment.len);
+						    last_segment->ptr, last_segment->len);
       }
     }
   }
@@ -903,12 +887,12 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t			fs_ptn_result,
 	 "/path/to/directory/" is itself its dirname. */
       goto just_copy_the_input_to_the_output;
     } else {
-      mmux_libc_file_system_pathname_segment_t	last_segment;
+      mmux_libc_fs_ptn_segment_t	last_segment;
 
-      if (mmux_libc_file_system_pathname_segment_find_last(&last_segment, fs_ptn_input)) {
+      if (mmux_libc_file_system_pathname_segment_find_last(last_segment, fs_ptn_input)) {
 	return true;
       } else if (segment_is_dot(last_segment)) {
-	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment.len)) {
+	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment->len)) {
 	  /* If the full pathname is "." just copy it as dirname. */
 	  goto just_copy_the_input_to_the_output;
 	} else {
@@ -917,13 +901,13 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t			fs_ptn_result,
 	     "/path/to/directory/". */
 	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
 						      fs_ptn_input->value,
-						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment.len));
+						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len));
 	}
       } else if (segment_is_double_dot(last_segment)) {
 	/* If the pathname's last segment is ".." just copy it as dirname. */
 	goto just_copy_the_input_to_the_output;
       } else {
-	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment.len)) {
+	if (mmux_ctype_equal(fs_ptn_len_no_nul, last_segment->len)) {
 	  /* If we are  here: the pathname has  a single segment and  such segment is
 	     not a special  directory; we establish the convention  that: its dirname
 	     is "."; for example the dirname of "file.ext" is ".". */
@@ -933,7 +917,7 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t			fs_ptn_result,
 	     removed.    For   example   the   dirname   of   "path/to/file.ext"   is
 	     "path/to/". */
 	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value,
-						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment.len));
+						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len));
 	}
       }
     }
@@ -949,15 +933,15 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t			fs_ptn_result,
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
+mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t result_p, mmux_libc_fs_ptn_arg_t ptn)
 {
   if (pathname_is_standalone_slash(ptn) || pathname_is_standalone_dot(ptn) || pathname_is_standalone_double_dot(ptn)) {
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
   } else {
-    mmux_libc_ptn_segment_t	S;
+    mmux_libc_fs_ptn_segment_t	S;
 
-    if (mmux_libc_file_system_pathname_segment_find_last(&S, ptn)) {
+    if (mmux_libc_file_system_pathname_segment_find_last(S, ptn)) {
       return true;
     } else if (segment_is_dot(S) || segment_is_double_dot(S)) {
       mmux_libc_errno_set(MMUX_LIBC_EINVAL);
@@ -967,8 +951,8 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
       result_p->ptr	= ptn->value + strlen(ptn->value);
       return false;
     } else {
-      mmux_asciizcp_t	beg = S.ptr;
-      mmux_asciizcp_t	end = beg + S.len.value;
+      mmux_asciizcp_t	beg = S->ptr;
+      mmux_asciizcp_t	end = beg + S->len.value;
       mmux_asciizcp_t	ptr = end - 1;
 
       for (; beg <= ptr; --ptr) {
@@ -1000,7 +984,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * resul
   }
 }
 bool
-mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_file_system_pathname_extension_t * result_p,
+mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_fs_ptn_extension_t result_p,
 						   mmux_asciizcp_t ptr, mmux_usize_t len)
 {
 _Pragma("GCC diagnostic push")
@@ -1019,7 +1003,7 @@ _Pragma("GCC diagnostic pop")
   }
 }
 bool
-mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extension_t * result_p, mmux_asciizcp_t ptr)
+mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_fs_ptn_extension_t result_p, mmux_asciizcp_t ptr)
 {
   return mmux_libc_make_file_system_pathname_extension_raw(result_p, ptr, mmux_usize(strlen(ptr)));
 }
@@ -1027,32 +1011,33 @@ mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extensio
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_file_system_pathname_extension_t E)
+mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_fs_ptn_extension_arg_t ext)
 {
-  *result_p = E.ptr;
+  *result_p = ext->ptr;
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p, mmux_libc_file_system_pathname_extension_t E)
+mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * result_p, mmux_libc_fs_ptn_extension_arg_t ext)
 {
-  *result_p = E.len;
+  *result_p = ext->len;
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_extension_is_empty (bool * result_p, mmux_libc_ptn_extension_t E)
+mmux_libc_file_system_pathname_extension_is_empty (bool * result_p, mmux_libc_fs_ptn_extension_arg_t ext)
 {
-  *result_p = (mmux_ctype_is_zero(E.len))? true : false;
+  *result_p = (mmux_ctype_is_zero(ext->len))? true : false;
   return false;
 }
 bool
-mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_fs_ptn_arg_t ptn, mmux_libc_ptn_extension_t ext)
+mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_fs_ptn_arg_t ptn,
+					      mmux_libc_fs_ptn_extension_arg_t ext)
 {
-  mmux_libc_ptn_extension_t	ptn_ext;
+  mmux_libc_fs_ptn_extension_t	ptn_ext;
 
-  if (mmux_libc_make_file_system_pathname_extension(&ptn_ext, ptn)) {
+  if (mmux_libc_make_file_system_pathname_extension(ptn_ext, ptn)) {
     return true;
   } else if (mmux_libc_file_system_pathname_extension_equal(result_p, ptn_ext, ext)) {
     return true;
@@ -1064,21 +1049,23 @@ mmux_libc_file_system_pathname_has_extension (bool * result_p, mmux_libc_fs_ptn_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_compare (mmux_ternary_comparison_result_t * result_p,
+						  mmux_libc_fs_ptn_extension_arg_t E1,
+						  mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_usize_t	minlen = mmux_ctype_min(E1.len, E2.len);
-  int		cmpnum = strncmp(E1.ptr, E2.ptr, minlen.value);
+  mmux_usize_t	minlen = mmux_ctype_min(E1->len, E2->len);
+  int		cmpnum = strncmp(E1->ptr, E2->ptr, minlen.value);
 
   if (0 == cmpnum) {
-    if (mmux_ctype_equal(E1.len, E2.len)) {
-      *result_p = mmux_sint_constant_zero();
-    } else if (mmux_ctype_less(E1.len, E2.len)) {
-      *result_p = mmux_sint_literal(-1);
+    if (mmux_ctype_equal(E1->len, E2->len)) {
+      *result_p = mmux_make_ternary_comparison_result_equal();
+    } else if (mmux_ctype_less(E1->len, E2->len)) {
+      *result_p = mmux_make_ternary_comparison_result_less();
     } else {
-      *result_p = mmux_sint_literal(+1);
+      *result_p = mmux_make_ternary_comparison_result_greater();
     }
   } else {
-    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
+    *result_p = (0 < cmpnum)? mmux_make_ternary_comparison_result_greater() : mmux_make_ternary_comparison_result_less();
   }
   return false;
 }
@@ -1086,13 +1073,15 @@ mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * result_p, mmux_l
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_extension_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_equal (bool * result_p,
+						mmux_libc_fs_ptn_extension_arg_t E1,
+						mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_zero(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1100,13 +1089,15 @@ mmux_libc_file_system_pathname_extension_equal (bool * result_p, mmux_libc_ptn_e
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_not_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_not_equal (bool * result_p,
+						    mmux_libc_fs_ptn_extension_arg_t E1,
+						    mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_zero(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     *result_p = false;
   } else {
     *result_p = true;
@@ -1114,13 +1105,15 @@ mmux_libc_file_system_pathname_extension_not_equal (bool * result_p, mmux_libc_p
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_less (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_less (bool * result_p,
+					       mmux_libc_fs_ptn_extension_arg_t E1,
+					       mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_negative(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_less(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1128,13 +1121,15 @@ mmux_libc_file_system_pathname_extension_less (bool * result_p, mmux_libc_ptn_ex
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_greater (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_greater (bool * result_p,
+						  mmux_libc_fs_ptn_extension_arg_t E1,
+						  mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_positive(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_greater(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1142,13 +1137,15 @@ mmux_libc_file_system_pathname_extension_greater (bool * result_p, mmux_libc_ptn
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_less_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_less_equal (bool * result_p,
+						     mmux_libc_fs_ptn_extension_arg_t E1,
+						     mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_non_positive(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_less_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1156,13 +1153,15 @@ mmux_libc_file_system_pathname_extension_less_equal (bool * result_p, mmux_libc_
   return false;
 }
 bool
-mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p, mmux_libc_ptn_extension_t E1, mmux_libc_ptn_extension_t E2)
+mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p,
+							mmux_libc_fs_ptn_extension_arg_t E1,
+							mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, E1, E2)) {
     return true;
-  } else if (mmux_ctype_is_non_negative(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_greater_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1176,7 +1175,7 @@ mmux_libc_file_system_pathname_extension_greater_equal (bool * result_p, mmux_li
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_file_system_pathname_segment_t * result_p,
+mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_fs_ptn_segment_t result_p,
 						 mmux_asciizcp_t ptr, mmux_usize_t len)
 {
 _Pragma("GCC diagnostic push")
@@ -1191,7 +1190,7 @@ _Pragma("GCC diagnostic pop")
   }
 }
 bool
-mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * result_p, mmux_asciizcp_t ptr)
+mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_fs_ptn_segment_t result_p, mmux_asciizcp_t ptr)
 {
   return mmux_libc_make_file_system_pathname_segment_raw(result_p, ptr, mmux_usize(strlen(ptr)));
 }
@@ -1199,7 +1198,7 @@ mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * result_p, mmux_libc_fs_ptn_arg_t ptn)
+mmux_libc_file_system_pathname_segment_find_last (mmux_libc_fs_ptn_segment_t result_p, mmux_libc_fs_ptn_arg_t ptn)
 /* Given an ASCIIZ  string representing a pathname (which cannot  be empty): find the
  * last segment in the pathname.  The resulting segment does not contain a leading or
  * ending slash.  The returned segment can be empty.  Examples:
@@ -1245,36 +1244,38 @@ mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * resu
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_file_system_pathname_segment_t E)
+mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_fs_ptn_segment_arg_t E)
 {
-  *result_p = E.ptr;
+  *result_p = E->ptr;
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * result_p, mmux_libc_file_system_pathname_segment_t E)
+mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * result_p, mmux_libc_fs_ptn_segment_arg_t E)
 {
-  *result_p = E.len;
+  *result_p = E->len;
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_compare (mmux_ternary_comparison_result_t * result_p,
+						mmux_libc_fs_ptn_segment_arg_t seg1,
+						mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_usize_t	minlen = mmux_ctype_min(E1.len, E2.len);
-  int		cmpnum = strncmp(E1.ptr, E2.ptr, minlen.value);
+  mmux_usize_t	minlen = mmux_ctype_min(seg1->len, seg2->len);
+  int		cmpnum = strncmp(seg1->ptr, seg2->ptr, minlen.value);
 
   if (0 == cmpnum) {
-    if (mmux_ctype_equal(E1.len, E2.len)) {
-      *result_p = mmux_sint_literal(0);
-    } else if (mmux_ctype_less(E1.len, E2.len)) {
-      *result_p = mmux_sint_literal(-1);
+    if (mmux_ctype_equal(seg1->len, seg2->len)) {
+      *result_p = mmux_make_ternary_comparison_result_equal();
+    } else if (mmux_ctype_less(seg1->len, seg2->len)) {
+      *result_p = mmux_make_ternary_comparison_result_less();
     } else {
-      *result_p = mmux_sint_literal(+1);
+      *result_p = mmux_make_ternary_comparison_result_greater();
     }
   } else {
-    *result_p = (0 < cmpnum)? mmux_sint_literal(+1) : mmux_sint_literal(-1);
+    *result_p = (0 < cmpnum)? mmux_make_ternary_comparison_result_greater() : mmux_make_ternary_comparison_result_less();
   }
   return false;
 }
@@ -1282,13 +1283,15 @@ mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * result_p, mmux_lib
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_equal (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_equal (bool * result_p,
+					      mmux_libc_fs_ptn_segment_arg_t seg1,
+					      mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_zero(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1296,13 +1299,15 @@ mmux_libc_file_system_pathname_segment_equal (bool * result_p, mmux_libc_ptn_seg
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_not_equal (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_not_equal (bool * result_p,
+						  mmux_libc_fs_ptn_segment_arg_t seg1,
+						  mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_zero(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     *result_p = false;
   } else {
     *result_p = true;
@@ -1310,13 +1315,15 @@ mmux_libc_file_system_pathname_segment_not_equal (bool * result_p, mmux_libc_ptn
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_less (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_less (bool * result_p,
+					     mmux_libc_fs_ptn_segment_arg_t seg1,
+					     mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_negative(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_less(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1324,13 +1331,15 @@ mmux_libc_file_system_pathname_segment_less (bool * result_p, mmux_libc_ptn_segm
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_greater (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_greater (bool * result_p,
+						mmux_libc_fs_ptn_segment_arg_t seg1,
+						mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_positive(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_greater(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1338,13 +1347,15 @@ mmux_libc_file_system_pathname_segment_greater (bool * result_p, mmux_libc_ptn_s
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_less_equal (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_less_equal (bool * result_p,
+						   mmux_libc_fs_ptn_segment_arg_t seg1,
+						   mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_non_positive(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_less_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1352,13 +1363,15 @@ mmux_libc_file_system_pathname_segment_less_equal (bool * result_p, mmux_libc_pt
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_greater_equal (bool * result_p, mmux_libc_ptn_segment_t E1, mmux_libc_ptn_segment_t E2)
+mmux_libc_file_system_pathname_segment_greater_equal (bool * result_p,
+						      mmux_libc_fs_ptn_segment_arg_t seg1,
+						      mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, E1, E2)) {
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) {
     return true;
-  } else if (mmux_ctype_is_non_negative(cmpnum)) {
+  } else if (mmux_ternary_comparison_result_is_greater_equal(cmpnum)) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1369,9 +1382,9 @@ mmux_libc_file_system_pathname_segment_greater_equal (bool * result_p, mmux_libc
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
 {
-  if (1 == seg.len.value && '.' == seg.ptr[0]) {
+  if (1 == seg->len.value && '.' == seg->ptr[0]) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1379,9 +1392,9 @@ mmux_libc_file_system_pathname_segment_is_dot (bool * result_p, mmux_libc_ptn_se
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
 {
-  if (2 == seg.len.value && '.' == seg.ptr[0] && '.' == seg.ptr[1]) {
+  if (2 == seg->len.value && '.' == seg->ptr[0] && '.' == seg->ptr[1]) {
     *result_p = true;
   } else {
     *result_p = false;
@@ -1389,9 +1402,9 @@ mmux_libc_file_system_pathname_segment_is_double_dot (bool * result_p, mmux_libc
   return false;
 }
 bool
-mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_ptn_segment_t seg)
+mmux_libc_file_system_pathname_segment_is_slash (bool * result_p, mmux_libc_fs_ptn_segment_arg_t seg)
 {
-  if (1 == seg.len.value && '/' == seg.ptr[0]) {
+  if (1 == seg->len.value && '/' == seg->ptr[0]) {
     *result_p = true;
   } else {
     *result_p = false;

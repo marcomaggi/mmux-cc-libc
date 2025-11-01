@@ -42,7 +42,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* Create the data file. */
   {
-    printf_message("create the data file");
+    printf_message("create the data file %s", ptn_asciiz_old);
     if (test_create_data_file(ptn_asciiz_old)) {
       handle_error();
     }
@@ -76,9 +76,34 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH);
 	auto	mode  = mmux_libc_mode_constant_zero();
 
-	printf_message("opening the old file");
+	printf_message("opening the old file %s", ptn_asciiz_old);
 	if (mmux_libc_open(fd_old, fs_ptn_old, flags, mode)) {
 	  printf_error("opening the old pathname");
+	  handle_error();
+	}
+      }
+
+      /* Check old file existence, because I have to debug. */
+      {
+	bool	result;
+
+	if (mmux_libc_file_system_pathname_exists(&result, fs_ptn_old)) {
+	  printf_error("exists");
+	  handle_error();
+	} else if (result) {
+	  printf_message("old link pathname exists as a directory entry");
+	} else {
+	  printf_error("old link pathname does NOT exist");
+	  handle_error();
+	}
+
+	if (mmux_libc_file_system_pathname_is_regular(&result, fs_ptn_old)) {
+	  printf_error("calling is_regular");
+	  handle_error();
+	} else if (result) {
+	  printf_message("old link pathname is a regular file");
+	} else {
+	  printf_error("old link pathname is NOT a regular file");
 	  handle_error();
 	}
       }
@@ -96,14 +121,25 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
       mmux_libc_at_fdcwd(dirfd_new);
 
-      printf_message("linkfd-ing");
+      printf_message("linkfd-ing ptn_new=%s", fs_ptn_new->value);
       if (mmux_libc_linkfd(fd_old, dirfd_new, fs_ptn_new, flags)) {
-	printf_error("linkfd-ing");
-	handle_error();
+	mmux_libc_errno_t	errnum;
+	mmux_asciizcp_t		errname;
+
+	mmux_libc_errno_ref(&errnum);
+	mmux_libc_strerrorname_np(&errname, errnum);
+	printf_error("linkfd-ing errno=%s", errname);
+	if (true) {
+	  // This test  fails if the  executor does not have  the CAP_DAC_READ_SEARCH
+	  // capability (see capabilities(7)) (Marco Maggi; Nov  1, 2025)
+	  mmux_libc_exit(mmux_libc_process_exit_status(77));
+	} else {
+	  handle_error();
+	}
       }
     }
 
-    /* Check file existence. */
+    /* Check new file existence. */
     {
       bool	result;
 
@@ -114,7 +150,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("link pathname exists as a directory entry");
       } else {
 	printf_error("link pathname does NOT exist");
-	mmux_libc_exit_failure();
+	handle_error();
       }
 
       if (mmux_libc_file_system_pathname_is_regular(&result, fs_ptn_new)) {
@@ -124,7 +160,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	printf_message("link pathname is a regular file");
       } else {
 	printf_error("link pathname is NOT a regular file");
-	mmux_libc_exit_failure();
+	handle_error();
       }
     }
 

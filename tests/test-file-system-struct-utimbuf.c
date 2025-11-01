@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -34,19 +33,19 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-struct-utimbuf";
   }
 
-  mmux_libc_utimbuf_t	UTB[1];
+  mmux_libc_utimbuf_t	utimbuf;
   mmux_time_t		T1, T2;
 
   mmux_libc_time(&T1);
   mmux_libc_time(&T2);
-  mmux_libc_actime_set  (UTB, T1);
-  mmux_libc_modtime_set (UTB, T2);
+  mmux_libc_actime_set  (utimbuf, T1);
+  mmux_libc_modtime_set (utimbuf, T2);
 
   {
     mmux_libc_fd_t	fd;
 
-    mmux_libc_stdou(&fd);
-    if (mmux_libc_utimbuf_dump(fd, UTB, NULL)) {
+    mmux_libc_stdou(fd);
+    if (mmux_libc_utimbuf_dump(fd, utimbuf, NULL)) {
       handle_error();
     }
   }
