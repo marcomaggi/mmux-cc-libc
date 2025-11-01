@@ -60,10 +60,10 @@ print_file_system_pathname (void)
       if (mmux_libc_memfd_read_buffer(mfd, bufptr, buflen)) {
 	handle_error();
       } else {
-	mmux_sint_t	result;
+	mmux_ternary_comparison_result_t	result;
 
 	mmux_libc_strcmp(&result, bufptr, ptn_asciiz);
-	if (mmux_ctype_is_zero(result)) {
+	if (mmux_ternary_comparison_result_is_equal(result)) {
 	  printf_message("successfully printed pathname to memfd: '%s'", bufptr);
 	} else {
 	  printf_error("wrong dprinting of file system pathname: '%s'", bufptr);
@@ -788,11 +788,11 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
     if (mmux_libc_file_system_pathname_ptr_ref(&root_ptn_asciiz, root_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	result;
+      mmux_ternary_comparison_result_t	result;
 
       if (mmux_libc_strcmp(&result, expected_root_ptn_asciiz, root_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(result)) {
+      } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the rootname of '%s' is '%s'", ptn_asciiz, root_ptn_asciiz);
 	mmux_libc_unmake_file_system_pathname(root_ptn);
       } else {
@@ -895,11 +895,11 @@ one_tailname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_tail_ptn
     if (mmux_libc_file_system_pathname_ptr_ref(&tail_ptn_asciiz, tail_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	result;
+      mmux_ternary_comparison_result_t	result;
 
       if (mmux_libc_strcmp(&result, expected_tail_ptn_asciiz, tail_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(result)) {
+      } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the tailname of '%s' is '%s'", ptn_asciiz, tail_ptn_asciiz);
 	mmux_libc_unmake_file_system_pathname(tail_ptn);
       } else {
@@ -975,11 +975,11 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_file_ptn
     if (mmux_libc_file_system_pathname_ptr_ref(&file_ptn_asciiz, file_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	result;
+      mmux_ternary_comparison_result_t	result;
 
       if (mmux_libc_strcmp(&result, expected_file_ptn_asciiz, file_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(result)) {
+      } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the filename of '%s' is '%s'", ptn_asciiz, file_ptn_asciiz);
 	mmux_libc_unmake_file_system_pathname(file_ptn);
       } else {
@@ -1081,11 +1081,11 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_dirname_p
     if (mmux_libc_file_system_pathname_ptr_ref(&dirname_ptn_asciiz, dirname_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	result;
+      mmux_ternary_comparison_result_t	result;
 
       if (mmux_libc_strcmp(&result, expected_dirname_ptn_asciiz, dirname_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(result)) {
+      } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the dirname of '%s' is '%s'", ptn_asciiz, dirname_ptn_asciiz);
 	mmux_libc_unmake_file_system_pathname(dirname_ptn);
       } else {
@@ -1161,11 +1161,11 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
     if (mmux_libc_file_system_pathname_ptr_ref(&normal_ptn_asciiz, normal_ptn)) {
       handle_error();
     } else {
-      mmux_sint_t	result;
+      mmux_ternary_comparison_result_t	result;
 
       if (mmux_libc_strcmp(&result, expected_normal_ptn_asciiz, normal_ptn_asciiz)) {
 	handle_error();
-      } else if (mmux_ctype_is_zero(result)) {
+      } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the normalisation of '%s' is '%s'", ptn_asciiz, normal_ptn_asciiz);
 	mmux_libc_unmake_file_system_pathname(normal_ptn);
       } else {

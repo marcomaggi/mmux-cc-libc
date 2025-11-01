@@ -168,38 +168,38 @@ mmux_libc_strnequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_strcmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_libc_strcmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
 {
-  *result_p = mmux_sint(strcmp(ptr2, ptr1));
+  *result_p = mmux_ternary_comparison_result(strcmp(ptr2, ptr1));
   return false;
 }
 bool
-mmux_libc_strncmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+mmux_libc_strncmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
 {
-  *result_p = mmux_sint(strncmp(ptr2, ptr1, len.value));
+  *result_p = mmux_ternary_comparison_result(strncmp(ptr2, ptr1, len.value));
   return false;
 }
 bool
-mmux_libc_strcasecmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_libc_strcasecmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRCASECMP]]],[[[
-  *result_p = mmux_sint(strcasecmp(ptr2, ptr1));
+  *result_p = mmux_ternary_comparison_result(strcasecmp(ptr2, ptr1));
   return false;
 ]]])
 }
 bool
-mmux_libc_strncasecmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+mmux_libc_strncasecmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRNCASECMP]]],[[[
-  *result_p = mmux_sint(strncasecmp(ptr2, ptr1, len.value));
+  *result_p = mmux_ternary_comparison_result(strncasecmp(ptr2, ptr1, len.value));
   return false;
 ]]])
 }
 bool
-mmux_libc_strverscmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_libc_strverscmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRVERSCMP]]],[[[
-  *result_p = mmux_sint(strverscmp(ptr2, ptr1));
+  *result_p = mmux_ternary_comparison_result(strverscmp(ptr2, ptr1));
   return false;
 ]]])
 }
@@ -210,9 +210,9 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_STRVERSCMP]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_strcoll (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_libc_strcoll (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
 {
-  *result_p = mmux_sint(strcoll(ptr2, ptr1));
+  *result_p = mmux_ternary_comparison_result(strcoll(ptr2, ptr1));
   return false;
 }
 bool

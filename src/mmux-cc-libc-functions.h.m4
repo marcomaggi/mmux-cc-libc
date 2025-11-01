@@ -155,19 +155,19 @@ mmux_cc_libc_decl bool mmux_libc_strncat (mmux_asciizp_t dst_ptr, mmux_asciizcp_
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_strcmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_cc_libc_decl bool mmux_libc_strcmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_strncmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+mmux_cc_libc_decl bool mmux_libc_strncmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_strcasecmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_cc_libc_decl bool mmux_libc_strcasecmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_strncasecmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
+mmux_cc_libc_decl bool mmux_libc_strncasecmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1, mmux_usize_t len)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_strverscmp (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_cc_libc_decl bool mmux_libc_strverscmp (mmux_ternary_comparison_result_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_strequ (bool * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
@@ -178,7 +178,8 @@ mmux_cc_libc_decl bool mmux_libc_strnequ (bool * result_p, mmux_asciizcp_t ptr2,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_strcoll (mmux_sint_t * result_p, mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
+mmux_cc_libc_decl bool mmux_libc_strcoll (mmux_ternary_comparison_result_t * result_p,
+					  mmux_asciizcp_t ptr2, mmux_asciizcp_t ptr1)
   __attribute__((__nonnull__(1,2,3)));
 
 mmux_cc_libc_decl bool mmux_libc_strxfrm (mmux_usize_t * result_size_p, mmux_asciizp_t dst_ptr, mmux_asciizcp_t src_ptr, mmux_usize_t len)

@@ -711,23 +711,21 @@ mmux_libc_file_system_pathname_compare (mmux_ternary_comparison_result_t * resul
 m4_define([[[DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE]]],[[[bool
 mmux_libc_file_system_pathname_$1 (bool * result_p, mmux_libc_fs_ptn_arg_t ptn1, mmux_libc_fs_ptn_arg_t ptn2)
 {
-  mmux_sint_t	cmpnum;
+  mmux_ternary_comparison_result_t	cmpnum;
 
   if (mmux_libc_strcmp(&cmpnum, ptn1->value, ptn2->value)) {
     return true;
-  } else if ($2) {
-    *result_p = true;
   } else {
-    *result_p = false;
+    *result_p = mmux_ternary_comparison_result_is_$1(cmpnum);
+    return false;
   }
-  return false;
 }]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[equal]]],		[[[0 == cmpnum.value]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[not_equal]]],	[[[0 != cmpnum.value]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]],		[[[0 >  cmpnum.value]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]],		[[[0 <  cmpnum.value]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]],	[[[0 >= cmpnum.value]]])
-DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]],	[[[0 <= cmpnum.value]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[equal]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[not_equal]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[less_equal]]])
+DEFINE_FILE_SYSTEM_PATHNAME_COMPARISON_PREDICATE([[[greater_equal]]])
 
 
 /** --------------------------------------------------------------------
