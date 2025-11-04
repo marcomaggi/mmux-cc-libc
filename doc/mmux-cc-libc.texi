@@ -7699,7 +7699,7 @@ a sequence dot, slash, segment can be normalised to the segment.
 * fs pathnames pathnames comparison::     Comparing file system pathnames.
 * fs pathnames pathnames predicates::     Predicates on file system pathnames.
 * fs pathnames pathnames components::     Components of file system pathnames.
-* fs pathnames pathnames normalisation::  Components of file system pathnames.
+* fs pathnames pathnames normalisation::  Normalising file system pathnames.
 * fs pathnames pathnames operations::     Operations on file system pathnames.
 @end menu
 
@@ -8019,53 +8019,43 @@ normalised, either with @cfunc{mmux_libc_make_file_system_pathname_normalised} o
 @cfunc{mmux_libc_realpath} and similar functions.
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_standalone_dot (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone dot
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_dot (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn} is a standalone dot
 (@file{.} or @file{/path/to/.}); otherwise store @cfalse{}.
-
-@example
-mmux_libc_ptn_t         ptn;
-bool                    result;
-
-mmux_libc_file_system_pathname_is_standalone_dot(&result, ptn);
-if (result) @{
-  ...
-@}
-@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_standalone_double_dot (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone double dot
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_double_dot (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn} is a standalone double dot
 (@file{..} or @file{/path/to/..}); otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_standalone_slash (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is a standalone slash
+@deftypefun bool mmux_libc_file_system_pathname_is_standalone_slash (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn} is a standalone slash
 (@file{/}); otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_special_directory (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} is on among: a standalone
+@deftypefun bool mmux_libc_file_system_pathname_is_special_directory (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn} is on among: a standalone
 slash, a standalone dot, a standalone double dot; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_absolute (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{ptn}
+@deftypefun bool mmux_libc_file_system_pathname_is_absolute (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{fs_ptn}
 @strong{does} represent an @MmuxAscii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
-octet represents an @MmuxAscii{} slash: the process of finding the file corresponding to @var{ptn} on
+octet represents an @MmuxAscii{} slash: the process of finding the file corresponding to @var{fs_ptn} on
 the file system, @strong{does not} depend on the current working directory.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_is_relative (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{ptn}
+@deftypefun bool mmux_libc_file_system_pathname_is_relative (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if the first octet in @var{fs_ptn}
 @strong{does not} represent an @MmuxAscii{} slash @samp{/}; otherwise store @cfalse{}.  If the first
 octet does not represent an @MmuxAscii{} slash: the process of finding the file corresponding to
-@var{ptn} on the file system, @strong{does} depend on the current working directory.
+@var{fs_ptn} on the file system, @strong{does} depend on the current working directory.
 @end deftypefun
 
 @c page
@@ -8073,16 +8063,58 @@ octet does not represent an @MmuxAscii{} slash: the process of finding the file 
 @subsubsection Components of file system pathnames
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_rootname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build a new file system pathname representing the rootname of @var{ptn}; store in the variable
-referenced by @var{result_p} the new pathname object.  The @dfn{rootname} of a file system pathname
-is the whole pathname with the extension stripped:
+All the following component--extracting functions have the same semantics; for example: to extract
+the rootname of a file system pathname, we do:
+
+@example
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_root;
+
+/* Build the source file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Build the root file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname_rootname(fs_ptn_root, fs_ptn_factory, fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_root);
+@}
+@end example
+
+Remember that we can print a file system pathname to a file descriptor using
+@cfunc{mmux_libc_dprintf_fs_ptn}, @ref{mmux_libc_dprintf_fs_ptn} for details.
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Build a new file system pathname representing the rootname of @var{fs_ptn}; store in the variable
+referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{rootname} of a file system
+pathname is the whole pathname with the extension stripped:
 
 @example
 /path/to/file.ext       @result{} /path/to/file
 /path/to/file           @result{} /path/to/file
 /path/to/dir/           @result{} /path/to/dir
-file.ext                @result{} file.ext
+file.ext                @result{} file
 .fvwmrc                 @result{} .fvwmrc
 .                       @error{} invalid argument
 ..                      @error{} invalid argument
@@ -8090,36 +8122,20 @@ file.ext                @result{} file.ext
 @end example
 
 @noindent
-if @var{ptn} is the root directory @file{/}, a standalone dot @file{.} or @file{/path/to/.}, a
+if @var{fs_ptn} is the root directory @file{/}, a standalone dot @file{.} or @file{/path/to/.}, a
 standalone double dot @file{..} or @file{/path/to/..}, then the function call fails: @code{errno} is
-set to @code{MMUX_LIBC_EINVAL} and the return value is true.
+set to @code{MMUX_LIBC_EINVAL} and the return value is @ctrue{}.
 
-The memory required to contain the rootname is allocated with @cfunc{mmux_libc_malloc}, to it must
-be released later with @cfunc{mmux_libc_file_system_pathname_free}.
-
-@example
-mmux_libc_ptn_t         ptn, root_ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_rootname(&root_ptn, ptn)) @{
-  /* error */
-@} else @{
-  ...
-  mmux_libc_file_system_pathname_free(root_ptn);
-@}
-@end example
-
-The main purpose of extracting the rootname from a pathname is to create a file pathname from a
-another file pathname by changing the extension, for example to build @file{/path/to/file.o} from
-@file{/path/to/file.c}.
+The main purpose of extracting the rootname from a file system pathname is to build a new file
+system pathname from an existing file system pathname by changing the extension, for example to
+build @file{/path/to/file.o} from @file{/path/to/file.c}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build a new file system pathname representing the dirname of @var{ptn}; store in the variable
-referenced by @var{result_p} the new pathname object.  The @dfn{dirname} of a file system pathname
+@deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Build a new file system pathname representing the dirname of @var{fs_ptn}; store in the variable
+referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{dirname} of a file system pathname
 is its directory part; if the pathname is itself a directory: its dirname is the full pathname
 itself.
 
@@ -8134,32 +8150,18 @@ file.ext                @result{} .
 /                       @result{} /
 @end example
 
-The memory required to contain the dirname is allocated with @cfunc{mmux_libc_malloc}, to it must be
-released later with @cfunc{mmux_libc_file_system_pathname_free}.
+Any file system pathname has a directory part.
 
-@example
-mmux_libc_ptn_t         ptn, dir_ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_dirname(&dir_ptn, ptn)) @{
-  /* error */
-@} else @{
-  ...
-  mmux_libc_file_system_pathname_free(dir_ptn);
-@}
-@end example
-
-The main purpose of extracting the dirname from a pathname is to create a file pathname from a
-another file pathname by changing the filename, for example to build @file{/path/to/other.ext} from
-@file{/path/to/some.ext}.
+The main purpose of extracting the dirname from a file system pathname is to build a new file system
+pathname from an existing file system pathname by changing the filename, for example to build
+@file{/path/to/other.ext} from @file{/path/to/some.ext}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_tailname (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build a new file system pathname representing the tailname of @var{ptn}; store in the variable
-referenced by @var{result_p} the new pathname object.  The @dfn{tailname} of a file system pathname
+@deftypefun bool mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Build a new file system pathname representing the tailname of @var{fs_ptn}; store in the variable
+referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{tailname} of a file system pathname
 is the last segment of the input pathname:
 
 @example
@@ -8171,32 +8173,16 @@ file.ext                @result{} file.ext
 /                       @result{} /
 @end example
 
-The memory required to contain the tailname is allocated with @cfunc{mmux_libc_malloc}, to it must
-be released later with @cfunc{mmux_libc_file_system_pathname_free}.
-
-@example
-mmux_libc_ptn_t         ptn, tail_ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_tailname(&tail_ptn, ptn)) @{
-  /* error */
-@} else @{
-  ...
-  mmux_libc_file_system_pathname_free(tail_ptn);
-@}
-@end example
-
-The main purpose of extracting the tailname from a pathname is to create a pathname from a another
-pathname using the same last segment, for example to build @file{/path/to/this} from
-@file{/path/from/that}.
+The main purpose of extracting the tailname from a file system pathname is to build a new file
+system pathname from an existing file system pathname using the same last segment, for example to
+build @file{/path/to/this} from @file{/path/from/this}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_filename (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build a new file system pathname representing the filename of @var{ptn}; store in the variable
-referenced by @var{result_p} the new pathname object.  The @dfn{filename} of a file system pathname
+@deftypefun bool mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Build a new file system pathname representing the filename of @var{fs_ptn}; store in the variable
+referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{filename} of a file system pathname
 is the relative pathname representing the last segment of the input pathname, if it does not
 represent a directory:
 
@@ -8210,33 +8196,17 @@ file.ext                @result{} file.ext
 @end example
 
 @noindent
-if @var{ptn} represents a directory, then the function call fails: @code{errno} is set to
-@code{MMUX_LIBC_EINVAL} and the return value is true.
+if @var{fs_ptn} represents a directory, then the function call fails: @code{errno} is set to
+@code{MMUX_LIBC_EINVAL} and the returned value is @ctrue{}.
 
-The memory required to contain the filename is allocated with @cfunc{mmux_libc_malloc}, to it must
-be released later with @cfunc{mmux_libc_file_system_pathname_free}.
-
-@example
-mmux_libc_ptn_t         ptn, file_ptn;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_filename(&file_ptn, ptn)) @{
-  /* error */
-@} else @{
-  ...
-  mmux_libc_file_system_pathname_free(file_ptn);
-@}
-@end example
-
-The main purpose of extracting the filename from a pathname is to create a pathname from a another
-pathname using the same filename, for example to build @file{/path/to/file.ext} from
-@file{/path/from/file.ext}.
+The main purpose of extracting the filename from a file system pathname is to build a new file
+system pathname from an existing file system pathname using the same filename, for example to build
+@file{/path/to/file.ext} from @file{/path/from/file.ext}.
 @end deftypefun
 
 @c page
 @node fs pathnames pathnames normalisation
-@subsubsection Components of file system pathnames
+@subsubsection Normalising of file system pathnames
 
 
 @cindex Normalising file system pathnames
@@ -8272,17 +8242,42 @@ path/../../../file.ext          @result{} ../../file.ext
 Most of the times we want to normalise a pathname before using it with this package.
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Make a new file system pathname value normalising the pathname @var{ptn}; the new pathname has
-memory allocated with @cfunc{mmux_libc_malloc}.
+@deftypefun bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Make a new file system pathname value normalising the pathname @var{fs_ptn}.  The given factory
+@var{fs_ptn_factory} must allocate a new string to contain the normalised file system pathname.
 
 @example
-mmux_libc_ptn_t         ptn, normal_ptn;
+mmux_asciizcp_t     ptn_asciiz = "/path///to/.././file.ext";
+mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_norm;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path///to/.//.//file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_normalised(&normal_ptn, ptn) @{
-  /* error */
+/* Build the source file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Build the normalised file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname_normalised(fs_ptn_norm, fs_ptn_factory, fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_norm);
 @}
 @end example
 @end deftypefun
@@ -8292,32 +8287,60 @@ if (mmux_libc_make_file_system_pathname(&ptn, "/path///to/.//.//file.ext")) @{
 @subsubsection Operations on file system pathnames
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_concat (mmux_libc_ptn_t * @var{result_p}, mmux_libc_ptn_t @var{prefix}, mmux_libc_ptn_t @var{suffix})
+@cindex Appending file system pathnames
+@cindex Concatenating file system pathnames
+@cindex Prefix file system pathnames
+@cindex Suffix file system pathnames
+@cindex File system pathnames, concatenation
+@cindex File system pathnames, appending
+@cindex File system pathnames, prefix
+@cindex File system pathnames, suffix
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_concat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{prefix}, mmux_libc_fs_ptn_arg_t @var{suffix})
 Make a new file system pathname by concatenating the @var{prefix} with the @var{suffix}; the new
-pathname has memory allocated with @cfunc{mmux_libc_malloc}.  The new pathname is normalised using
-@cfunc{mmux_libc_make_file_system_pathname_normalised}.
+pathname is normalised using @cfunc{mmux_libc_make_file_system_pathname_normalised}.
 
-Examples of concatenation:
-
-@example
-/path/to   +   file.ext     @result{} /path/to/file.ext
-/path/to/  +   file.ext     @result{} /path/to/file.ext
-/path/to   +   /file.ext    @result{} /path/to/file.ext
-@end example
-
-@noindent
-the slash separator between prefix and suffix is inserted if needed.
+The given factory @var{fs_ptn_factory} must allocate a new string to contain the normalised file
+system pathname.
 
 @example
-mmux_libc_fs_ptn_arg_t      prefix_ptn, suffix_ptn, result_ptn;
+mmux_asciizcp_t     ptn_asciiz_prefix = "/tmp/package-1.2.3";
+mmux_asciizcp_t     ptn_asciiz_suffix = "/usr/local/";
+mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_prefix, fs_ptn_suffix;
 
-if        (mmux_libc_make_file_system_pathname(&prefix_ptn, "/path/to")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname(&suffix_ptn, "this/file.ext")) @{
-  /* error */
-@} else if (mmux_libc_make_file_system_pathname_concat(&result_ptn, prefix_ptn, suffix_ptn)) @{
- printf_error("concatenating pathname prefix '%s' suffix '%s'", prefix_ptn_asciiz, suffix_ptn_asciiz);
-  /* error */
+/* Build the prefix and suffix file system pathnames. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn_prefix, fs_ptn_factory, ptn_asciiz_prefix)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_file_system_pathname(fs_ptn_suffix, fs_ptn_factory, ptn_asciiz_suffix)) @{
+    /* error */
+  @}
+@}
+
+/* Build the whole file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname_concat(fs_ptn, fs_ptn_factory, fs_ptn_prefix, fs_ptn_suffix)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_prefix);
+  mmux_libc_unmake_file_system_pathname(fs_ptn_suffix);
 @}
 @end example
 @end deftypefun
