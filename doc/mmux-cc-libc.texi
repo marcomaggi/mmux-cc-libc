@@ -7713,14 +7713,12 @@ examples for file system pathnames}.
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
 Structure data type representing a file system pathname as a non--@cnull{} pointer to non--empty
 @MmuxAsciiz{} string.
-@end deftp
 
-
-@deftp {Struct Pointer Type} mmux_libc_fs_ptn_t
-@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
-Pointer types defined as follows:
+The pointer types are defined as follows:
 
 @example
 typedef struct mmux_libc_file_system_pathname_t         mmux_libc_fs_ptn_t[1];
@@ -7730,18 +7728,33 @@ typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_arg_t[1
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_arg_t
 Structure data type representing a factory for file system pathnames.  It allows the selection of a
 memory allocation strategy to contain file system pathname strings.
-@end deftp
 
-
-@deftp {Struct Pointer Type} mmux_libc_fs_ptn_factory_t
-@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
-Pointer types defined as follows:
+The pointer types are defined as follows:
 
 @example
-typedef struct mmux_libc_file_system_pathname_t         mmux_libc_fs_ptn_factory_t[1];
-typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_factory_arg_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_t        mmux_libc_fs_ptn_factory_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_t const  mmux_libc_fs_ptn_factory_arg_t[1];
+@end example
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_file_system_pathname_factory_copying_t
+@deftpx {Parent Struct Typedef} mmux_libc_file_system_pathname_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_copying_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_copying_arg_t
+Structure data type representing a factory for file system pathnames.  It is like its parent type,
+but @strong{always} allocates new memory to contain the file system pathname @MmuxAsciiz{} string.
+
+The pointer types defined as follows:
+
+@example
+typedef struct mmux_libc_file_system_pathname_factory_copying_t        mmux_libc_fs_ptn_factory_copying_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_copying_t const  mmux_libc_fs_ptn_factory_copying_arg_t[1];
 @end example
 @end deftp
 
@@ -7765,7 +7778,7 @@ Fake memory allocator}.  We can use this factory to reference a hard--coded stri
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory})
+@deftypefun bool mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_copying_t @var{fs_ptn_factory})
 Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``dynamic''
 file system factory.
 
@@ -7801,7 +7814,7 @@ the string length must not be zero: the first character must not be null.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_asciicp_t @var{ptn_ascii}, mmux_usize_t @var{ptn_len_excluding_nul})
+@deftypefun bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_asciicp_t @var{ptn_ascii}, mmux_usize_t @var{ptn_len_excluding_nul})
 Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAscii{}
 string referenced by @var{ptn_ascii}, which must have length @var{ptn_len_excluding_nul} which
 itself cannot be zero.
@@ -8082,7 +8095,7 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_root;
 
 /* Build the root file system pathname. */
 @{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname_rootname(fs_ptn_root, fs_ptn_factory, fs_ptn)) @{
@@ -8105,7 +8118,7 @@ Remember that we can print a file system pathname to a file descriptor using
 @cfunc{mmux_libc_dprintf_fs_ptn}, @ref{mmux_libc_dprintf_fs_ptn} for details.
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+@deftypefun bool mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 Build a new file system pathname representing the rootname of @var{fs_ptn}; store in the variable
 referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{rootname} of a file system
 pathname is the whole pathname with the extension stripped:
@@ -8133,7 +8146,7 @@ build @file{/path/to/file.o} from @file{/path/to/file.c}.
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+@deftypefun bool mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 Build a new file system pathname representing the dirname of @var{fs_ptn}; store in the variable
 referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{dirname} of a file system pathname
 is its directory part; if the pathname is itself a directory: its dirname is the full pathname
@@ -8159,7 +8172,7 @@ pathname from an existing file system pathname by changing the filename, for exa
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+@deftypefun bool mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 Build a new file system pathname representing the tailname of @var{fs_ptn}; store in the variable
 referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{tailname} of a file system pathname
 is the last segment of the input pathname:
@@ -8180,7 +8193,7 @@ build @file{/path/to/this} from @file{/path/from/this}.
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+@deftypefun bool mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 Build a new file system pathname representing the filename of @var{fs_ptn}; store in the variable
 referenced by @var{fs_ptn_result} the new pathname object.  The @dfn{filename} of a file system pathname
 is the relative pathname representing the last segment of the input pathname, if it does not
@@ -8242,9 +8255,8 @@ path/../../../file.ext          @result{} ../../file.ext
 Most of the times we want to normalise a pathname before using it with this package.
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
-Make a new file system pathname value normalising the pathname @var{fs_ptn}.  The given factory
-@var{fs_ptn_factory} must allocate a new string to contain the normalised file system pathname.
+@deftypefun bool mmux_libc_make_file_system_pathname_normalised (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Make a new file system pathname value normalising the pathname @var{fs_ptn}.
 
 @example
 mmux_asciizcp_t     ptn_asciiz = "/path///to/.././file.ext";
@@ -8262,7 +8274,7 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_norm;
 
 /* Build the normalised file system pathname. */
 @{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname_normalised(fs_ptn_norm, fs_ptn_factory, fs_ptn)) @{
@@ -8297,12 +8309,9 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_norm;
 @cindex File system pathnames, suffix
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_concat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{prefix}, mmux_libc_fs_ptn_arg_t @var{suffix})
+@deftypefun bool mmux_libc_make_file_system_pathname_concat (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_libc_fs_ptn_arg_t @var{prefix}, mmux_libc_fs_ptn_arg_t @var{suffix})
 Make a new file system pathname by concatenating the @var{prefix} with the @var{suffix}; the new
 pathname is normalised using @cfunc{mmux_libc_make_file_system_pathname_normalised}.
-
-The given factory @var{fs_ptn_factory} must allocate a new string to contain the normalised file
-system pathname.
 
 @example
 mmux_asciizcp_t     ptn_asciiz_prefix = "/tmp/package-1.2.3";
@@ -8324,7 +8333,7 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_prefix, fs_ptn_suffix;
 
 /* Build the whole file system pathname. */
 @{
-  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname_concat(fs_ptn, fs_ptn_factory, fs_ptn_prefix, fs_ptn_suffix)) @{

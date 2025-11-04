@@ -583,7 +583,7 @@ mmux_libc_sun_path_ref (mmux_libc_fs_ptn_t fs_ptn_result, mmux_libc_sockaddr_un_
 {
   /* FIXME  Add the  factory as  argument to  this function.   (Marco Maggi;  Oct 22,
      2025) */
-  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+  mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, P->sun_path);

@@ -252,7 +252,7 @@ test_create_data_file (mmux_asciizcp_t pathname_asciiz)
     mmux_libc_fs_ptn_t	fs_ptn;
 
     {
-      mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+      mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
       mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
       if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, pathname_asciiz)) {

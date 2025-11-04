@@ -45,7 +45,7 @@ mmux_libc_getcwd_to_buffer (mmux_asciizp_t bufptr, mmux_usize_t buflen)
   return (rv)? false : true;
 }
 bool
-mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory)
 {
   for (auto buflen = mmux_usize_literal(128); ; mmux_ctype_add_to_variable(buflen, mmux_usize_literal(128))) {
     char		bufptr[buflen.value];
@@ -70,7 +70,7 @@ mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_p
   }
 }
 bool
-mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_GET_CURRENT_DIR_NAME]]],[[[
   mmux_asciizp_t	bufptr = get_current_dir_name();
@@ -340,9 +340,9 @@ mmux_libc_readlink_from_asciiz_buffer_to_ascii_buffer (mmux_usize_t *	nbytes_wri
   }
 }
 static bool
-mmux_libc_readlink_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t		fs_ptn_result,
-						 mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-						 mmux_asciizcp_t		input_linkname_asciiz)
+mmux_libc_readlink_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t			fs_ptn_result,
+						 mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+						 mmux_asciizcp_t			input_linkname_asciiz)
 {
   auto	output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
 
@@ -382,9 +382,9 @@ mmux_libc_readlink_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no
 							       fs_ptn_input_linkname->value);
 }
 bool
-mmux_libc_readlink (mmux_libc_fs_ptn_t			fs_ptn_result,
-		    mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-		    mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
+mmux_libc_readlink (mmux_libc_fs_ptn_t				fs_ptn_result,
+		    mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+		    mmux_libc_fs_ptn_arg_t			fs_ptn_input_linkname)
 {
   return mmux_libc_readlink_from_asciiz_buffer_to_fs_ptn(fs_ptn_result, fs_ptn_factory, fs_ptn_input_linkname->value);
 }
@@ -429,10 +429,10 @@ mmux_libc_readlinkat_from_asciiz_buffer_to_ascii_buffer (mmux_usize_t *		nbytes_
   }
 }
 static bool
-mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t			fs_ptn_result,
-						   mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-						   mmux_standard_sint_t			fd_num,
-						   mmux_asciizcp_t			input_linkname_asciiz)
+mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t				fs_ptn_result,
+						   mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+						   mmux_standard_sint_t			        fd_num,
+						   mmux_asciizcp_t				input_linkname_asciiz)
 {
   auto	output_buffer_provided_nbytes_no_nul = mmux_usize_literal(64);
 
@@ -487,10 +487,10 @@ mmux_libc_readlinkfd_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_
 								 "");
 }
 bool
-mmux_libc_readlinkat (mmux_libc_fs_ptn_t		fs_ptn_result,
-		      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-		      mmux_libc_dirfd_arg_t		dirfd,
-		      mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
+mmux_libc_readlinkat (mmux_libc_fs_ptn_t			fs_ptn_result,
+		      mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+		      mmux_libc_dirfd_arg_t			dirfd,
+		      mmux_libc_fs_ptn_arg_t			fs_ptn_input_linkname)
 {
   return mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn(fs_ptn_result,
 							   fs_ptn_factory,
@@ -498,9 +498,9 @@ mmux_libc_readlinkat (mmux_libc_fs_ptn_t		fs_ptn_result,
 							   fs_ptn_input_linkname->value);
 }
 bool
-mmux_libc_readlinkfd (mmux_libc_fs_ptn_t		fs_ptn_result,
-		      mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-		      mmux_libc_fd_arg_t		fd)
+mmux_libc_readlinkfd (mmux_libc_fs_ptn_t			fs_ptn_result,
+		      mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+		      mmux_libc_fd_arg_t			fd)
 {
   return mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn(fs_ptn_result,
 							   fs_ptn_factory,
@@ -511,9 +511,9 @@ mmux_libc_readlinkfd (mmux_libc_fs_ptn_t		fs_ptn_result,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
-				  mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-				  mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t			fs_ptn_result,
+				  mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+				  mmux_libc_fs_ptn_arg_t		fs_ptn_input)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
   mmux_asciizp_t	asciiz_output_pathname = canonicalize_file_name(fs_ptn_input->value);
@@ -528,16 +528,16 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_CANONICALIZE_FILE_NAME]]],[[[
 ]]])
 }
 bool
-mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
-				  mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-				  mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t				fs_ptn_result,
+				  mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+				  mmux_libc_fs_ptn_arg_t			fs_ptn_input)
 {
   return mmux_libc_canonicalise_file_name(fs_ptn_result, fs_ptn_factory, fs_ptn_input);
 }
 bool
-mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,
-		    mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-		    mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+mmux_libc_realpath (mmux_libc_fs_ptn_t				fs_ptn_result,
+		    mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+		    mmux_libc_fs_ptn_arg_t			fs_ptn_input)
 {
   mmux_asciizp_t	asciiz_output_pathname = realpath(fs_ptn_input->value, NULL);
 

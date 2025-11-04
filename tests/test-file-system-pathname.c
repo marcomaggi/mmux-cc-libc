@@ -163,7 +163,7 @@ test_file_system_pathname_factory_dynamic (void)
   mmux_libc_fs_ptn_t	fs_ptn;
 
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -201,7 +201,7 @@ test_file_system_pathname_factory_dynamic2 (void)
   mmux_libc_fs_ptn_t	fs_ptn;
 
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory, ptn_asciiz, ptn_len_no_nul)) {
@@ -769,7 +769,7 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -815,8 +815,8 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 static void
 one_rootname_error_case (mmux_asciizcp_t ptn_asciiz)
 {
-  mmux_libc_fs_ptn_t		ptn, root_ptn;
-  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+  mmux_libc_fs_ptn_t			ptn, root_ptn;
+  mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -876,7 +876,7 @@ one_tailname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_tail_ptn
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -956,7 +956,7 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_file_ptn
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -1002,8 +1002,8 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_file_ptn
 static void
 one_filename_error_case (mmux_asciizcp_t ptn_asciiz)
 {
-  mmux_libc_fs_ptn_t		ptn, file_ptn;
-  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+  mmux_libc_fs_ptn_t			ptn, file_ptn;
+  mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -1062,7 +1062,7 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_dirname_p
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -1142,7 +1142,7 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -1188,8 +1188,8 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
 static void
 one_normalisation_error_case (mmux_asciizcp_t ptn_asciiz)
 {
-  mmux_libc_fs_ptn_t		ptn, normal_ptn;
-  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+  mmux_libc_fs_ptn_t			ptn, normal_ptn;
+  mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname(ptn, fs_ptn_factory, ptn_asciiz)) {
@@ -1305,7 +1305,7 @@ one_concatenation_case (mmux_asciizcp_t prefix_ptn_asciiz, mmux_asciizcp_t suffi
 
   /* Build file system pathnames. */
   {
-    mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+    mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
     if (mmux_libc_make_file_system_pathname(prefix_ptn, fs_ptn_factory, prefix_ptn_asciiz)) {

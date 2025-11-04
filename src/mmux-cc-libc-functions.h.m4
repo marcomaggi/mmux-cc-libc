@@ -1504,7 +1504,7 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_validate_length_no_nul (mm
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_factory_static (mmux_libc_fs_ptn_factory_t ptn_factory)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_t ptn_factory)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_copying_t ptn_factory)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_factory_swallow (mmux_libc_fs_ptn_factory_t ptn_factory)
@@ -1516,7 +1516,7 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t f
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn_result,
-							     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory,
+							     mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory,
 							     mmux_asciicp_t src_ptn_ascii,
 							     mmux_usize_t   src_ptn_len_excluding_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
@@ -1597,40 +1597,40 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_is_relative (bool * result
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_rootname
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_dirname
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_tailname
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_filename
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_normalised
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_concat
-    (mmux_libc_fs_ptn_t			fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_prefix,
-     mmux_libc_fs_ptn_arg_t		fs_ptn_suffix)
+    (mmux_libc_fs_ptn_t				fs_ptn_result,
+     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_prefix,
+     mmux_libc_fs_ptn_arg_t			fs_ptn_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -1781,11 +1781,11 @@ mmux_cc_libc_decl bool mmux_libc_seekdir (mmux_libc_dirstream_arg_t dirstream, m
 mmux_cc_libc_decl bool mmux_libc_getcwd_to_buffer (mmux_asciizp_t bufptr, mmux_usize_t buflen)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+mmux_cc_libc_decl bool mmux_libc_getcwd (mmux_libc_fs_ptn_t fs_ptn, mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_get_current_dir_name (mmux_libc_fs_ptn_t fs_ptn,
-						       mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory)
+						       mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_chdir (mmux_libc_fs_ptn_arg_t dirptn)
@@ -1825,9 +1825,9 @@ mmux_cc_libc_decl bool mmux_libc_symlinkat (mmux_libc_fs_ptn_arg_t oldname,
 					    mmux_libc_fs_ptn_arg_t newname)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readlink (mmux_libc_fs_ptn_t			fs_ptn_result,
-					   mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-					   mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
+mmux_cc_libc_decl bool mmux_libc_readlink (mmux_libc_fs_ptn_t				fs_ptn_result,
+					   mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+					   mmux_libc_fs_ptn_arg_t			fs_ptn_input_linkname)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_readlink_to_buffer (mmux_usize_t *		nbytes_written_to_output_buffer_no_nul_p,
@@ -1851,32 +1851,32 @@ mmux_cc_libc_decl bool mmux_libc_readlinkfd_to_buffer (mmux_usize_t *		nbytes_wr
 						       mmux_libc_fd_arg_t	fd)
   __attribute__((__nonnull__(1,2,4),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readlinkat (mmux_libc_fs_ptn_t			fs_ptn_result,
-					     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-					     mmux_libc_dirfd_arg_t		dirfd,
-					     mmux_libc_fs_ptn_arg_t		fs_ptn_input_linkname)
+mmux_cc_libc_decl bool mmux_libc_readlinkat (mmux_libc_fs_ptn_t				fs_ptn_result,
+					     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+					     mmux_libc_dirfd_arg_t			dirfd,
+					     mmux_libc_fs_ptn_arg_t			fs_ptn_input_linkname)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t			fs_ptn_result,
-					     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory,
-					     mmux_libc_fd_arg_t			fd)
+mmux_cc_libc_decl bool mmux_libc_readlinkfd (mmux_libc_fs_ptn_t				fs_ptn_result,
+					     mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+					     mmux_libc_fd_arg_t				fd)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
-							 mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-							 mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+mmux_cc_libc_decl bool mmux_libc_canonicalize_file_name (mmux_libc_fs_ptn_t		      fs_ptn_result,
+							 mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+							 mmux_libc_fs_ptn_arg_t		      fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t		fs_ptn_result,
-							 mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-							 mmux_libc_fs_ptn_arg_t		fs_ptn_input)
+mmux_cc_libc_decl bool mmux_libc_canonicalise_file_name (mmux_libc_fs_ptn_t		      fs_ptn_result,
+							 mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+							 mmux_libc_fs_ptn_arg_t			fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_fs_ptn_t		fs_ptn_result,
-					   mmux_libc_fs_ptn_factory_t	fs_ptn_factory,
-					   mmux_libc_fs_ptn_arg_t	fs_ptn_input)
+mmux_cc_libc_decl bool mmux_libc_realpath (mmux_libc_fs_ptn_t			fs_ptn_result,
+					   mmux_libc_fs_ptn_factory_copying_arg_t	fs_ptn_factory,
+					   mmux_libc_fs_ptn_arg_t		fs_ptn_input)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_unlink (mmux_libc_fs_ptn_arg_t pathname)

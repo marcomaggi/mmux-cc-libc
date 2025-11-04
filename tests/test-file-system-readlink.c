@@ -94,7 +94,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     /* Retrieve the real pathname. */
     {
-      mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+      mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
 
       mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
 

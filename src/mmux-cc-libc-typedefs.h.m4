@@ -208,6 +208,7 @@ typedef mmux_libc_file_system_pathname_t const *	mmux_libc_fs_ptn_arg_t;
 /* Forward type declarations. */
 typedef struct mmux_libc_file_system_pathname_factory_class_t	mmux_libc_file_system_pathname_factory_class_t;
 typedef struct mmux_libc_file_system_pathname_factory_t		mmux_libc_file_system_pathname_factory_t;
+typedef struct mmux_libc_file_system_pathname_factory_copying_t mmux_libc_file_system_pathname_factory_copying_t;
 
 typedef bool mmux_libc_file_system_pathname_factory_make_from_asciiz_fun_t
    (mmux_libc_fs_ptn_t ptn_result, mmux_libc_file_system_pathname_factory_t const * fs_ptn_factory,
@@ -229,8 +230,15 @@ struct mmux_libc_file_system_pathname_factory_t {
   mmux_libc_file_system_pathname_factory_class_t const *	class;
 };
 
+struct mmux_libc_file_system_pathname_factory_copying_t {
+  mmux_libc_file_system_pathname_factory_t;
+};
+
 typedef mmux_libc_file_system_pathname_factory_t		mmux_libc_fs_ptn_factory_t[1];
 typedef mmux_libc_file_system_pathname_factory_t const *	mmux_libc_fs_ptn_factory_arg_t;
+
+typedef mmux_libc_file_system_pathname_factory_copying_t		mmux_libc_fs_ptn_factory_copying_t[1];
+typedef mmux_libc_file_system_pathname_factory_copying_t const *	mmux_libc_fs_ptn_factory_copying_arg_t;
 
 /* ------------------------------------------------------------------ */
 
