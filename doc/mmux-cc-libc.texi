@@ -878,6 +878,7 @@ Error code @code{\NAME\}.
 @MmuxLibcDefineErrnoConstant{ENAMETOOLONG}
 @MmuxLibcDefineErrnoConstant{ENOLCK}
 @MmuxLibcDefineErrnoConstant{ENOSYS}
+@MmuxLibcDefineErrnoConstant{ENOTSUP}
 @MmuxLibcDefineErrnoConstant{ENOTEMPTY}
 @MmuxLibcDefineErrnoConstant{ELOOP}
 @MmuxLibcDefineErrnoConstant{EWOULDBLOCK}
@@ -7593,16 +7594,21 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 
 A @dfn{file system pathname} is an array of octets terminated by a zero octet, to be interpreted as
-@MmuxAsciiz{} string; file system pathnames are naturally interpreted as representing a tree in the
-hierarchy of file systems.  By convention: we consider the bytes in a file system pathname as
-unsigned characters, so we refer to them as @dfn{octets}; even though their type, according to the
-Unix standards, is @code{char} which does not specify if they are signed or unsigned.  In this
-package a file system pathname is represented by the object type
+@MmuxAsciiz{} string; file system pathnames are naturally interpreted as representing a tree
+superimposed to the union of file systems.  By convention: we consider the bytes in a file system
+pathname as unsigned characters, so we refer to them as @dfn{octets}; even though their type,
+according to the Unix standards, is @code{char} which does not specify if they are signed or
+unsigned.  In this package a file system pathname is represented by the object type
 @objtype{mmux_libc_file_system_pathname_t}.
 
-For security and efficiency reasons: the constructors of the
+In this package: the empty string is @strong{not} a valid file system pathname representation; in
+other words: an array of one zero octet is @strong{not} a valid file system pathname representation.
+
+For security and efficiency reasons: in certain situations, the constructors of the
 @objtype{mmux_libc_file_system_pathname_t} object type enforce the arbitrary pathname length limit
-of @math{4095} octets plus the terminating zero octet; in total, @math{4096} octets.
+of @math{4095} octets plus the terminating zero octet; in total, a file system pathname cannot be
+loger than @math{4096} octets.  If a pathname is too long to be represented: an error is raised with
+@cerrno{} code @samp{MMUX_LIBC_ENAMETOOLONG}.
 
 Most pathnames are composed of @dfn{segments} separated by the slash character @file{/}, examples:
 
@@ -7662,7 +7668,7 @@ directory or a file.
 
 When a file system pathname begins with a slash character: it is an @dfn{absolute} pathname.
 Otherwise it is a @dfn{relative pathname} to be interpreted as child of the current working
-directory in the hierarchy of file systems.
+directory.
 
 The syntax of file system pathnames allows some freedom, which pushes us to ``normalise'' a pathname
 to simplify it and to make it more amenable to processing; examples:
@@ -7702,14 +7708,13 @@ a sequence dot, slash, segment can be normalised to the segment.
 @subsubsection File system pathname types
 
 
+For examples of how to build a file system pathname object, @ref{fs pathnames examples, Usage
+examples for file system pathnames}.
+
+
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
 Structure data type representing a file system pathname as a non--@cnull{} pointer to non--empty
-@MmuxAsciiz{} string.  It has the following public fields:
-
-@table @code
-@item mmux_asciizcp_t value
-Pointer to the first octet in the array of octets.
-@end table
+@MmuxAsciiz{} string.
 @end deftp
 
 
@@ -7723,14 +7728,68 @@ typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_arg_t[1
 @end example
 @end deftp
 
+
+@deftp {Struct Typedef} mmux_libc_file_system_pathname_factory_t
+Structure data type representing a factory for file system pathnames.  It allows the selection of a
+memory allocation strategy to contain file system pathname strings.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_fs_ptn_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
+Pointer types defined as follows:
+
+@example
+typedef struct mmux_libc_file_system_pathname_t         mmux_libc_fs_ptn_factory_t[1];
+typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_factory_arg_t[1];
+@end example
+@end deftp
+
 @c page
 @node fs pathnames pathnames constructors
 @subsubsection Building file system pathnames
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t @var{result}, mmux_asciizcp_t @var{ptn_asciiz})
-Make a new file system pathname value; the pointer @var{ptn_asciiz} is stored in the data structure
-referenced by @var{result}.  The @MmuxAsciiz{} string @var{ptn_asciiz} is validated:
+For examples of how to build a file system pathname object, @ref{fs pathnames examples, Usage
+examples for file system pathnames}.
+
+
+@deftypefun bool mmux_libc_file_system_pathname_factory_static (mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory})
+Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``static'' file
+system factory.
+
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+string must have been already allocated and initialised, and the new file system pathname object
+will reference it; this factory uses the ``fake'' memory allocator, @ref{memory allocators fake,
+Fake memory allocator}.  We can use this factory to reference a hard--coded string.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory})
+Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``dynamic''
+file system factory.
+
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+string is newly allocated using the default memory allocator, @ref{memory allocators default,
+Default memory allocator}.  We can use this factory when we need to build a file system pathname by
+creating a copy of an existing string.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_file_system_pathname_factory_swallow (mmux_libc_fs_ptn_factory_t @var{fs_ptn_factory})
+Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``swallow''
+file system factory.
+
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+string must have been already allocated using the default memory allocator, and the new file system
+pathname object will reference it; this factory uses the default memory allocator, @ref{memory
+allocators default, Default memory allocator}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_asciizcp_t @var{ptn_asciiz})
+Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAsciiz{}
+string referenced by @var{ptn_asciiz}.  The @MmuxAsciiz{} string @var{ptn_asciiz} is validated:
 
 @enumerate
 @item
@@ -7739,78 +7798,44 @@ referenced by @var{result}.  The @MmuxAsciiz{} string @var{ptn_asciiz} is valida
 @item
 the string length must not be zero: the first character must not be null.
 @end enumerate
-
-@example
-mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
-mmux_libc_fs_ptn_t  ptn;
-
-if (mmux_libc_make_file_system_pathname(ptn, ptn_asciiz)) @{
-  /* error */
-@}
-@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_malloc (mmux_libc_fs_ptn_t @var{result}, mmux_asciizcp_t @var{ptn_asciiz})
-Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
-the given pathname.
+@deftypefun bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_asciicp_t @var{ptn_ascii}, mmux_usize_t @var{ptn_len_excluding_nul})
+Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAscii{}
+string referenced by @var{ptn_ascii}, which must have length @var{ptn_len_excluding_nul} which
+itself cannot be zero.
 
-@example
-mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
-mmux_libc_fs_ptn_t  ptn;
-
-if (mmux_libc_make_file_system_pathname_malloc(ptn, ptn_asciiz)) @{
-  /* error */
-@}
-@{
-  ...
-@}
-if (mmux_libc_file_system_pathname_free(ptn)) @{
-  /* error */
-@}
-@end example
+This constructor always allocates new memory and makes a copy of the given @var{ptn_ascii} string,
+so the given @var{fs_ptn_factory} must support this operation, otherwise @ctrue{} is returned and
+@cerrno{} set to @code{MMUX_LIBC_ENOTSUP}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_malloc_from_buffer (mmux_libc_fs_ptn_t @var{result_p}, mmux_asciizcp_t @var{bufptr}, mmux_usize_t @var{buflen})
-Make a new file system pathname value by allocating memory with @cfunc{mmux_libc_malloc} and copying
-@var{buflen} octets from the given buffer referenced by @var{bufptr}.
-
-The argument @var{buflen} must @strong{not} include the terminating zero octet, but this function
-will allocate enough octets for the buffer and the terminating zero and it will set to zero the
-terminating octet.
-
-@example
-//                                  012345678
-mmux_asciizcp_t         bufptr[] = "/path/to/file.ext";
-mmux_usize_t            buflen   = 8;
-mmux_libc_ptn_t         ptn;
-
-if (mmux_libc_make_file_system_pathname_malloc_from_buffer(&ptn, bufptr, buflen)) @{
-  /* error */
-@}
-@end example
+@deftypefun bool mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t @var{fs_ptn})
+Finalise the file system pathname object referenced by @var{fs_ptn}, appropriately releasing all the
+referenced asynchronous resources.
 @end deftypefun
-
-
-@deftypefun bool mmux_libc_file_system_pathname_free (mmux_libc_fs_ptn_t @var{pathname})
-Release the memory holding the pathname as @MmuxAsciiz{} string using @cfunc{mmux_libc_free}.
-@end deftypefun
-
 
 @ignore
-What happens when an error occurs building the pathname?
+This is commented out because it is an experimental feature, not correctly implemented.  When using
+GCC's extension @code{__cleanup__}: what happens when an error occurs building the pathname?
 
 @deftypefun bool mmux_libc_file_system_pathname_free_variable (mmux_libc_fs_ptn_t * @var{pathname_p})
 Release the memory holding the pathname as @MmuxAsciiz{} string using @cfunc{mmux_libc_free}.
 
 @example
-mmux_libc_fs_ptn_t  ptn
+mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fs_ptn_t  fs_ptn
   __attribute__((__cleanup__(mmux_libc_file_system_pathname_free_variable)));
 
-if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-                                        ptn, "/path/to/file.ext")) @{
-  /* error */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
@@ -7824,25 +7849,43 @@ if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_c
 @deftypefun bool mmux_libc_file_system_pathname_ptr_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
 Store in the variable referenced by @var{result_p} a pointer to the first octet in the array
 representing the file system pathname.
+
+@example
+mmux_libc_fs_ptn_t  fs_ptn;
+mmux_asciiz_t       ptn_ptr;
+
+initialise_fs_ptn_in_some_way(fs_ptn);
+mmux_libc_file_system_pathname_ptr_ref(&ptr, ptn);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
-Store in the variable referenced by @var{result_p} the number of characters in the pathname
-@var{ptn}.  A call to this function should never fail, so we can avoid checking its return value.
+@deftypefun bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * @var{fs_ptn_len_result_p}, mmux_libc_fs_ptn_arg_t @var{ptn})
+Store in the variable referenced by @var{result_p} the number of octets in the pathname @var{fs_ptn}
+@strong{excluding} the terminating nul.  A call to this function should never fail, so we can avoid
+checking its return value.
 
 @example
-mmux_asciizcp_t         ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t         ptn;
+mmux_libc_fs_ptn_t  fs_ptn;
+mmux_usize_t        len_excluding_nul;
 
-if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
-  /* error */
-@} else @{
-  mmux_usize_t          len;
+initialise_fs_ptn_in_some_way(fs_ptn);
+mmux_libc_file_system_pathname_len_ref(&len_excluding_nul, fs_ptn);
+@end example
+@end deftypefun
 
-  mmux_libc_file_system_pathname_len_ref(&len, ptn);
-  ...
-@}
+
+@deftypefun bool mmux_libc_file_system_pathname_len_including_nul_ref (mmux_usize_t * @var{fs_ptn_len_including_nul_result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Store in the variable referenced by @var{result_p} the number of octets in the pathname @var{fs_ptn}
+@strong{including} the terminating nul.  A call to this function should never fail, so we can avoid
+checking its return value.
+
+@example
+mmux_libc_fs_ptn_t  fs_ptn;
+mmux_usize_t        len_including_nul;
+
+initialise_fs_ptn_in_some_way(fs_ptn);
+mmux_libc_file_system_pathname_len_including_nul_ref(&len_including_nul, fs_ptn);
 @end example
 @end deftypefun
 
@@ -7851,74 +7894,118 @@ if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
 @subsubsection Comparing file system pathnames
 
 
-@deftypefun bool mmux_libc_file_system_pathname_compare (mmux_sint_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Compare the @MmuxAsciiz{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store the
-result in the variable referenced by @var{result_p}.
+@deftypefun bool mmux_libc_file_system_pathname_compare (mmux_ternary_comparison_result_t * @var{cmpnum_result_p}, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
+Compare the @MmuxAsciiz{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store
+the result in the variable referenced by @var{cmpnum_result_p}.
 
 @example
-mmux_libc_ptn_t         ptn1, ptn2;
-mmux_sint_t             cmpnum;
+mmux_asciizcp_t     ptn_asciiz_1 = "AAA";
+mmux_asciizcp_t     ptn_asciiz_2 = "BBB";
+mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
-mmux_libc_make_file_system_pathname(&ptn1, "AAA");
-mmux_libc_make_file_system_pathname(&ptn2, "BBB");
+/* Build the file system pathnames. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_file_system_pathname_compare(&cmpnum, ptn1, ptn2)) @{
-  /* error */
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn1, fs_ptn_factory, ptn_asciiz_1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_file_system_pathname(fs_ptn2, fs_ptn_factory, ptn_asciiz_2)) @{
+    /* error */
+  @}
 @}
-assert(-1 == cmpnum);
 
-if (mmux_libc_file_system_pathname_compare(&cmpnum, ptn2, ptn1)) @{
-  /* error */
+/* Compare the file system pathnames. */
+@{
+  mmux_ternary_comparison_result_t  cmpnum;
+
+  if (mmux_libc_file_system_pathname_compare(&cmpnum, ptn1, ptn2)) @{
+    /* error */
+  @}
+  if (mmux_ternary_comparison_result_is_equal(cmpnum)) @{
+    ...
+  @}
 @}
-assert(+1 == cmpnum);
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn1);
+  mmux_libc_unmake_file_system_pathname(fs_ptn2);
+@}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are equal
 when compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-bool                    eq;
+mmux_asciizcp_t     ptn_asciiz_1 = "AAA";
+mmux_asciizcp_t     ptn_asciiz_2 = "BBB";
+mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
+/* Build the file system pathnames. */
+@{
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-if (mmux_libc_file_system_pathname_compare(&eq, ptn, ptn)) @{
-  /* error */
+  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn1, fs_ptn_factory, ptn_asciiz_1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_file_system_pathname(fs_ptn2, fs_ptn_factory, ptn_asciiz_2)) @{
+    /* error */
+  @}
 @}
-assert(true == eq);
+
+/* Compare the file system pathnames. */
+@{
+  bool  result;
+
+  if (mmux_libc_file_system_pathname_equal(&result, ptn1, ptn2)) @{
+    /* error */
+  @}
+  if (result) @{
+    ...
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn1);
+  mmux_libc_unmake_file_system_pathname(fs_ptn2);
+@}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
+@deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are different
 when compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_less (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} < @varii{ptn}} when
+@deftypefun bool mmux_libc_file_system_pathname_less (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} < @varii{fs_ptn}} when
 compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_greater (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} > @varii{ptn}} when
+@deftypefun bool mmux_libc_file_system_pathname_greater (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} > @varii{fs_ptn}} when
 compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} <= @varii{ptn}} when
+@deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} <= @varii{fs_ptn}} when
 compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * result_p, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{ptn} >= @varii{ptn}} when
+@deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} >= @varii{fs_ptn}} when
 compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
 @end deftypefun
 

@@ -483,6 +483,10 @@ Revised^6 Report on the algorithmic language Scheme
 @code{false}
 @end macro
 
+@macro cerrno{}
+@code{errno}
+@end macro
+
 @macro struct{}
 @code{struct}
 @end macro

@@ -404,6 +404,7 @@ mmux_libc_file_system_pathname_factory_static_make_from_ascii_len
 /* This function is the implementation  of the method "make_from_ascii_len()" for the
    file system factory "mmux_libc_file_system_pathname_factory_class_static". */
 {
+  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 static mmux_libc_file_system_pathname_factory_class_t const mmux_libc_file_system_pathname_factory_class_static = {
@@ -615,6 +616,7 @@ mmux_libc_file_system_pathname_factory_swallow_make_from_ascii_len
 /* This function is the implementation  of the method "make_from_ascii_len()" for the
    file system factory "mmux_libc_file_system_pathname_factory_class_swallow". */
 {
+  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 static mmux_libc_file_system_pathname_factory_class_t mmux_libc_file_system_pathname_factory_class_swallow = {
@@ -689,10 +691,10 @@ mmux_libc_file_system_pathname_len_ref (mmux_usize_t * ptn_len_no_nul_result_p, 
   return mmux_libc_strlen(ptn_len_no_nul_result_p, fs_ptn->value);
 }
 bool
-mmux_libc_file_system_pathname_len_plus_nil_ref (mmux_usize_t * ptn_len_with_nul_result_p,
-						 mmux_libc_fs_ptn_arg_t fs_ptn)
+mmux_libc_file_system_pathname_len_including_nul_ref (mmux_usize_t * ptn_len_including_nul_result_p,
+						      mmux_libc_fs_ptn_arg_t fs_ptn)
 {
-  return mmux_libc_strlen_plus_nil(ptn_len_with_nul_result_p, fs_ptn->value);
+  return mmux_libc_strlen_plus_nil(ptn_len_including_nul_result_p, fs_ptn->value);
 }
 
 

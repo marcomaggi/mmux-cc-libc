@@ -1537,8 +1537,8 @@ mmux_cc_libc_decl bool mmux_libc_file_system_pathname_len_ref (mmux_usize_t * re
 							       mmux_libc_fs_ptn_arg_t ptn)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_len_plus_nil_ref (mmux_usize_t * fs_ptn_len_plus_nil_result_p,
-									mmux_libc_fs_ptn_arg_t fs_ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_len_including_nul_ref
+    (mmux_usize_t * fs_ptn_len_including_nul_result_p, mmux_libc_fs_ptn_arg_t fs_ptn)
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */
