@@ -243,7 +243,7 @@ typedef mmux_libc_file_system_pathname_factory_copying_t const *	mmux_libc_fs_pt
 /* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_file_system_pathname_extension_t {
-  mmux_asciizcp_t	ptr;
+  mmux_asciicp_t	ptr;
   mmux_usize_t		len;
 } mmux_libc_file_system_pathname_extension_t;
 

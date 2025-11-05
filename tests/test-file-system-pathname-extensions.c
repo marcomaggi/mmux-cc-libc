@@ -48,7 +48,7 @@ making_an_extension_from_raw_arguments (void)
     mmux_asciizcp_t	ext_ptr = ptn_asciiz + 13;
     auto		ext_len = mmux_usize_literal(4);
 
-    if (mmux_libc_make_file_system_pathname_extension_raw(ext, ext_ptr, ext_len)) {
+    if (mmux_libc_make_file_system_pathname_extension2(ext, ext_ptr, ext_len)) {
       handle_error();
     }
   }
@@ -170,7 +170,7 @@ extension_accessors (void)
     auto		ext_len = mmux_usize_literal(4);
     mmux_asciizcp_t	ext_ptr = ptn_asciiz + 13;
 
-    if (mmux_libc_make_file_system_pathname_extension_raw(fs_ptn_ext, ext_ptr, ext_len)) {
+    if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext, ext_ptr, ext_len)) {
       handle_error();
     }
   }
@@ -254,7 +254,7 @@ one_common_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_asciiz)
     mmux_usize_t	expected_asciiz_len;
 
     mmux_libc_strlen(&expected_asciiz_len, expected_asciiz);
-    if (mmux_libc_make_file_system_pathname_extension_raw(fs_ptn_ext_expected, expected_asciiz, expected_asciiz_len)) {
+    if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext_expected, expected_asciiz, expected_asciiz_len)) {
       handle_error();
     }
   }
@@ -602,7 +602,7 @@ one_pathname_has_extension (bool expected_result, mmux_asciizcp_t ptn_asciiz, mm
     mmux_usize_t	ext_len;
 
     mmux_libc_strlen(&ext_len, ext_asciiz);
-    if (mmux_libc_make_file_system_pathname_extension_raw(fs_ptn_ext, ext_asciiz, ext_len)) {
+    if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext, ext_asciiz, ext_len)) {
       handle_error();
     }
   }
@@ -642,11 +642,341 @@ pathname_has_extension (void)
 
 
 /** --------------------------------------------------------------------
+ ** Extension from ASCII array.
+ ** ----------------------------------------------------------------- */
+
+static void
+extension_from_ascii_array (void)
+{
+  printf_message("running test: %s", __func__);
+  {
+    auto				ext_len      = mmux_usize_literal(4);
+    char				ext_ascii[4] = { '.', 'e', 'x', 't' };
+    mmux_libc_fs_ptn_extension_t	fs_ptn_ext;
+
+    if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext, ext_ascii, ext_len)) {
+      printf_error("building the file system pathname extension");
+      handle_error();
+    }
+
+    /* Check emptyness. */
+    {
+      bool	is_empty;
+
+      if (mmux_libc_file_system_pathname_extension_is_empty(&is_empty, fs_ptn_ext)) {
+	printf_error("checkingif the file system pathname extension is empty");
+	handle_error();
+      }
+      if (is_empty) {
+	printf_error("wrong result checking for emptyness a non-empty extension");
+	handle_error();
+      }
+    }
+
+    /* Check if a file system pathname has this extension. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_asciizcp_t			ptn_asciiz = "/path/to/file.ext";
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  printf_error("building the file system pathname");
+	  handle_error();
+	}
+      }
+
+      {
+	bool	has_this_extension;
+
+	if (mmux_libc_file_system_pathname_has_extension(&has_this_extension, fs_ptn, fs_ptn_ext)) {
+	  handle_error();
+	}
+	if (has_this_extension) {
+	  printf_message("correct result checking if '%s' has extension '.ext'", fs_ptn->value);
+	} else {
+	  printf_error("WRONG result checking if '%s' has extension '.ext'", fs_ptn->value);
+	  handle_error();
+	}
+      }
+    }
+
+    /* Printing the file system pathname extension to stdout. */
+    {
+      mmux_libc_fd_t	ou;
+
+      mmux_libc_stdou(ou);
+      if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
+	handle_error();
+      }
+      if (mmux_libc_dprintf_fs_ptn_extension(ou, fs_ptn_ext)) {
+	printf_error("printing file system pathname extension to stdout");
+	handle_error();
+      }
+      if (mmux_libc_dprintf(ou, "'\n")) {
+	handle_error();
+      }
+    }
+  }
+}
+
+
+/** --------------------------------------------------------------------
+ ** Extension from ASCIIZ array.
+ ** ----------------------------------------------------------------- */
+
+static void
+extension_from_asciiz_array (void)
+{
+  printf_message("running test: %s", __func__);
+  {
+    mmux_asciizcp_t			ext_asciiz = ".ext";
+    mmux_libc_fs_ptn_extension_t	fs_ptn_ext;
+
+    if (mmux_libc_make_file_system_pathname_extension1(fs_ptn_ext, ext_asciiz)) {
+      printf_error("building the file system pathname extension");
+      handle_error();
+    }
+
+    /* Check emptyness. */
+    {
+      bool	is_empty;
+
+      if (mmux_libc_file_system_pathname_extension_is_empty(&is_empty, fs_ptn_ext)) {
+	printf_error("checkingif the file system pathname extension is empty");
+	handle_error();
+      }
+      if (is_empty) {
+	printf_error("wrong result checking for emptyness a non-empty extension");
+	handle_error();
+      }
+    }
+
+    /* Check if a file system pathname has this extension. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_asciizcp_t			ptn_asciiz = "/path/to/file.ext";
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  printf_error("building the file system pathname");
+	  handle_error();
+	}
+      }
+
+      {
+	bool	has_this_extension;
+
+	if (mmux_libc_file_system_pathname_has_extension(&has_this_extension, fs_ptn, fs_ptn_ext)) {
+	  handle_error();
+	}
+	if (has_this_extension) {
+	  printf_message("correct result checking if '%s' has extension '.ext'", fs_ptn->value);
+	} else {
+	  printf_error("WRONG result checking if '%s' has extension '.ext'", fs_ptn->value);
+	  handle_error();
+	}
+      }
+    }
+
+    /* Printing the file system pathname extension to stdout. */
+    {
+      mmux_libc_fd_t	ou;
+
+      mmux_libc_stdou(ou);
+      if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
+	handle_error();
+      }
+      if (mmux_libc_dprintf_fs_ptn_extension(ou, fs_ptn_ext)) {
+	printf_error("printing file system pathname extension to stdout");
+	handle_error();
+      }
+      if (mmux_libc_dprintf(ou, "'\n")) {
+	handle_error();
+      }
+    }
+  }
+}
+
+
+/** --------------------------------------------------------------------
+ ** Empty extension from ASCII array.
+ ** ----------------------------------------------------------------- */
+
+static void
+empty_extension_from_ascii_array (void)
+{
+  printf_message("running test: %s", __func__);
+  {
+    auto				ext_len      = mmux_usize_literal(0);
+    mmux_asciicp_t			ext_ascii    = NULL;
+    mmux_libc_fs_ptn_extension_t	fs_ptn_ext;
+
+    if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext, ext_ascii, ext_len)) {
+      printf_error("building the file system pathname extension");
+      handle_error();
+    }
+
+    /* Check emptyness. */
+    {
+      bool	is_empty;
+
+      if (mmux_libc_file_system_pathname_extension_is_empty(&is_empty, fs_ptn_ext)) {
+	printf_error("checkingif the file system pathname extension is empty");
+	handle_error();
+      }
+      if (! is_empty) {
+	printf_error("wrong result checking for emptyness a an empty extension");
+	handle_error();
+      }
+    }
+
+    /* Check if a file system pathname has this extension. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_asciizcp_t			ptn_asciiz = "/path/to/file";
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  printf_error("building the file system pathname");
+	  handle_error();
+	}
+      }
+
+      {
+	bool	has_this_extension;
+
+	if (mmux_libc_file_system_pathname_has_extension(&has_this_extension, fs_ptn, fs_ptn_ext)) {
+	  handle_error();
+	}
+	if (has_this_extension) {
+	  printf_message("correct result checking if '%s' has extension '.ext'", fs_ptn->value);
+	} else {
+	  printf_error("WRONG result checking if '%s' has extension '.ext'", fs_ptn->value);
+	  handle_error();
+	}
+      }
+    }
+
+    /* Printing the file system pathname extension to stdout. */
+    {
+      mmux_libc_fd_t	ou;
+
+      mmux_libc_stdou(ou);
+      if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
+	handle_error();
+      }
+      if (mmux_libc_dprintf_fs_ptn_extension(ou, fs_ptn_ext)) {
+	printf_error("printing file system pathname extension to stdout");
+	handle_error();
+      }
+      if (mmux_libc_dprintf(ou, "'\n")) {
+	handle_error();
+      }
+    }
+  }
+}
+
+
+/** --------------------------------------------------------------------
+ ** Empty extension from ASCIIZ array.
+ ** ----------------------------------------------------------------- */
+
+static void
+empty_extension_from_asciiz_array (void)
+{
+  printf_message("running test: %s", __func__);
+  {
+    mmux_asciizcp_t			ext_asciiz = "";
+    mmux_libc_fs_ptn_extension_t	fs_ptn_ext;
+
+    if (mmux_libc_make_file_system_pathname_extension1(fs_ptn_ext, ext_asciiz)) {
+      printf_error("building the file system pathname extension");
+      handle_error();
+    }
+
+    /* Check emptyness. */
+    {
+      bool	is_empty;
+
+      if (mmux_libc_file_system_pathname_extension_is_empty(&is_empty, fs_ptn_ext)) {
+	printf_error("checkingif the file system pathname extension is empty");
+	handle_error();
+      }
+      if (! is_empty) {
+	printf_error("wrong result checking for emptyness an empty extension");
+	handle_error();
+      }
+    }
+
+    /* Check if a file system pathname has this extension. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
+
+      /* Build the file system pathname. */
+      {
+	mmux_asciizcp_t			ptn_asciiz = "/path/to/file";
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	  printf_error("building the file system pathname");
+	  handle_error();
+	}
+      }
+
+      {
+	bool	has_this_extension;
+
+	if (mmux_libc_file_system_pathname_has_extension(&has_this_extension, fs_ptn, fs_ptn_ext)) {
+	  handle_error();
+	}
+	if (has_this_extension) {
+	  printf_message("correct result checking if '%s' has extension '.ext'", fs_ptn->value);
+	} else {
+	  printf_error("WRONG result checking if '%s' has extension '.ext'", fs_ptn->value);
+	  handle_error();
+	}
+      }
+    }
+
+    /* Printing the file system pathname extension to stdout. */
+    {
+      mmux_libc_fd_t	ou;
+
+      mmux_libc_stdou(ou);
+      if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
+	handle_error();
+      }
+      if (mmux_libc_dprintf_fs_ptn_extension(ou, fs_ptn_ext)) {
+	printf_error("printing file system pathname extension to stdout");
+	handle_error();
+      }
+      if (mmux_libc_dprintf(ou, "'\n")) {
+	handle_error();
+      }
+    }
+  }
+}
+
+
+/** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
 
 int
-main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED)
+main (int argc MMUX_CC_LIBC_UNUSED, char const * const argv[] MMUX_CC_LIBC_UNUSED)
 {
   /* Initialisation. */
   {
@@ -662,6 +992,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	comparison_functions();				}
   if (1) {	comparison_predicate_functions();		}
   if (1) {	pathname_has_extension();			}
+  if (1) {	extension_from_ascii_array();			}
+  if (1) {	extension_from_asciiz_array();			}
+  if (1) {	empty_extension_from_ascii_array();		}
+  if (1) {	empty_extension_from_asciiz_array();		}
 
   mmux_libc_exit_success();
 }

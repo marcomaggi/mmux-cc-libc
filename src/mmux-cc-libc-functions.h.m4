@@ -1639,15 +1639,15 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension (mmux_libc_
 								      mmux_libc_fs_ptn_arg_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_fs_ptn_extension_t result_p,
-									  mmux_asciizcp_t ptr, mmux_usize_t len)
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension2 (mmux_libc_fs_ptn_extension_t result_p,
+								       mmux_asciicp_t ptr, mmux_usize_t len)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension1 (mmux_libc_fs_ptn_extension_t result_p,
+								       mmux_asciizcp_t ptr)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_fs_ptn_extension_t result_p,
-										 mmux_asciizcp_t ptr)
-  __attribute__((__nonnull__(1,2),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p,
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciicpp_t result_p,
 									 mmux_libc_fs_ptn_extension_arg_t E)
   __attribute__((__nonnull__(1)));
 

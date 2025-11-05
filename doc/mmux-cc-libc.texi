@@ -134,7 +134,7 @@ Setter and getter for the field @code{\FIELDNAME\} of @objtype{mmux_libc_\STRUCT
 @macro MmuxStructDumperTwo{STRUCTNAME,STRUCTTYPE}
 @deftypefun bool mmux_libc_\STRUCTNAME\_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_\STRUCTNAME\_t const * @var{struct_p}, mmux_asciizcp_t @var{struct_name})
 Write to @var{fd} a description of the fields of the @MmuxCStruct{\STRUCTNAME\} referenced by
-@var{struct_p}.  @var{struct_name} must be a pointer to an @MmuxAsciiz{} string representing the name of
+@var{struct_p}.  @var{struct_name} must be a pointer to an @MmuxAsciiZ{} string representing the name of
 the data structure used in the description; when @cnull{}: it defaults to @samp{\STRUCTTYPE\}.
 @end deftypefun
 
@@ -627,7 +627,7 @@ Libtool's versioning system, libtool, Shared library support for @gnu{}}.
 
 
 @deftypefun {mmux_asciizcp_t} mmux_cc_libc_version_string (void)
-Return a pointer to a statically allocated @MmuxAsciiz{} string representing the interface version
+Return a pointer to a statically allocated @MmuxAsciiZ{} string representing the interface version
 number.
 @end deftypefun
 
@@ -1138,7 +1138,7 @@ for (mmux_standard_usize_t i=0; i<buflen.value; ++i) @{
 mmux_libc_free(dstbuf);
 @end example
 
-To copy an @MmuxAsciiz{} string we do:
+To copy an @MmuxAsciiZ{} string we do:
 
 @example
 mmux_standard_char_t *    srcbuf = "the colour of water";
@@ -1919,18 +1919,18 @@ spiffy_memory_allocator_ref (mmux_libc_mall_t * result_p)
 
 
 @menu
-* strings inspection::          Inspecting @MmuxAsciiz{} strings.
-* strings duplication::         Duplicating @MmuxAsciiz{} strings.
-* strings concatenation::       Concatenating @MmuxAsciiz{} strings.
-* strings comparison::          Comparing @MmuxAsciiz{} strings.
-* strings collation::           Collation builtins for @MmuxAsciiz{} strings.
-* strings searching::           Searching in @MmuxAsciiz{} strings.
-* strings tokens::              Finding tokens in @MmuxAsciiz{} strings.
+* strings inspection::          Inspecting @MmuxAsciiZ{} strings.
+* strings duplication::         Duplicating @MmuxAsciiZ{} strings.
+* strings concatenation::       Concatenating @MmuxAsciiZ{} strings.
+* strings comparison::          Comparing @MmuxAsciiZ{} strings.
+* strings collation::           Collation builtins for @MmuxAsciiZ{} strings.
+* strings searching::           Searching in @MmuxAsciiZ{} strings.
+* strings tokens::              Finding tokens in @MmuxAsciiZ{} strings.
 @end menu
 
 @c page
 @node strings inspection
-@section Inspecting @MmuxAsciiz{} strings
+@section Inspecting @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strlen (mmux_usize_t * @var{result_len_p}, mmux_asciizcp_t @var{ptr})
@@ -1970,7 +1970,7 @@ if (mmux_libc_strnlen(&buflen, bufptr, maxlen)) @{
 
 @c page
 @node strings duplication
-@section Duplicating @MmuxAsciiz{} strings
+@section Duplicating @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strcpy (mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr})
@@ -2070,7 +2070,7 @@ if (mmux_libc_strndup(&dstptr, srcptr, dstlen)) @{
 
 @c page
 @node strings concatenation
-@section Concatenating @MmuxAsciiz{} strings
+@section Concatenating @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strcat (mmux_asciizp_t @var{dst_ptr}, mmux_asciizcp_t @var{src_ptr})
@@ -2122,7 +2122,7 @@ assert('\0' == dstptr[35]);
 
 @c page
 @node strings comparison
-@section Comparing @MmuxAsciiz{} strings
+@section Comparing @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strequ (bool * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
@@ -2335,7 +2335,7 @@ are equal according to @cfunc{strncmp}; otherwise store @cfalse{}.
 
 @c page
 @node strings collation
-@section Collation builtins for @MmuxAsciiz{} strings
+@section Collation builtins for @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strcoll (mmux_sint_t * @var{result_p}, mmux_asciizcp_t @vari{ptr}, mmux_asciizcp_t @varii{ptr})
@@ -2359,7 +2359,7 @@ assert(mmux_ctype_is_positive(result));
 
 @c page
 @node strings searching
-@section Searching in @MmuxAsciiz{} strings
+@section Searching in @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strchr (mmux_asciizcp_t * @var{result_p}, mmux_asciizcp_t @var{ptr}, mmux_schar_t @var{schar})
@@ -2551,7 +2551,7 @@ assert( (mmux_standard_ptrdiff_t)(result - haystack_ptr) == 4);
 
 @c page
 @node strings tokens
-@section Finding tokens in @MmuxAsciiz{} strings
+@section Finding tokens in @MmuxAsciiZ{} strings
 
 
 @deftypefun bool mmux_libc_strtok (mmux_asciizp_t * @var{result_p}, mmux_asciizp_t @var{newstring}, mmux_asciizcp_t @var{delimiters})
@@ -3637,7 +3637,7 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 
 @deftp {Struct Typedef} mmux_libc_sysconf_string_parameter_t
 Data structure type representing the selector of a configurable parameter whose value is represented
-by an @MmuxAsciiz{} string.  The constants @code{MMUX_LIBC__CS_*} are expressions which evaluate to
+by an @MmuxAsciiZ{} string.  The constants @code{MMUX_LIBC__CS_*} are expressions which evaluate to
 instances of this type.
 @end deftp
 
@@ -5184,7 +5184,7 @@ successful store the result in the variable referenced by @var{ipxsig_p}, then r
 otherwise leave @var{ipxsig_p} untouched and return @ctrue{}.
 
 In case of failure: if @var{who} is not @cnull{}, print on @stderr{} a message describing the
-parsing error; @var{who} must reference an @MmuxAsciiz{} string representing the entity that requested
+parsing error; @var{who} must reference an @MmuxAsciiZ{} string representing the entity that requested
 the parsing operation, for example: the name of a C function.
 
 @example
@@ -5721,7 +5721,7 @@ Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{
 
 @anchor{mmux_libc_dprintf_strerror}
 @deftypefun bool mmux_libc_dprintf_strerror (mmux_libc_fd_t @var{fd}, mmux_sint_t @var{errnum})
-Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @MmuxAsciiz{} string resulting from a
+Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @MmuxAsciiZ{} string resulting from a
 call to @cfunc{mmux_libc_strerror}.
 @end deftypefun
 
@@ -5849,8 +5849,8 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_ptn_extension}
-@deftypefun bool mmux_libc_dprintf_libc_ptn_extension (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_extension_t @var{value})
+@anchor{mmux_libc_dprintf_fs_ptn_extension}
+@deftypefun bool mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_extension_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -6836,7 +6836,7 @@ struct flock.l_pid = "0"
 
 @deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* @var{str_p}, mmux_sshort_t @var{flag})
 Identify @var{flag} as a value for the field @code{l_type} of @objtype{mmux_libc_flock_t}; store in
-the variable referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiz{} string
+the variable referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiZ{} string
 representing the name of the value.
 @end deftypefun
 
@@ -6864,7 +6864,7 @@ Pointer to a variable representing a parameter that can be input or output depen
 
 @deftypefun bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* @var{str_p}, mmux_sint_t @var{command})
 Identify @var{command} as a command argument for @cfunc{mmux_libc_fcntl}; store in the variable
-referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiz{} string representing a string
+referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiZ{} string representing a string
 representation of the @var{command}.
 @end deftypefun
 
@@ -7172,7 +7172,7 @@ if (mmux_libc_memfd_length(&buflen, mfd)) @{
 this operation should not fail.
 
 If the data in the device is to be interpreted as an @MmuxAscii{} string, we can allocate a buffer
-to contain it as @MmuxAsciiz{} string as follows:
+to contain it as @MmuxAsciiZ{} string as follows:
 
 @example
 mmux_libc_fd_t  mfd;
@@ -7285,7 +7285,7 @@ current position.  The return value is @ctrue{} if less than @var{buflen} bytes 
 
 
 @deftypefun bool mmux_libc_memfd_write_asciiz (mmux_libc_file_descriptor_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
-Write the @MmuxAsciiz{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
+Write the @MmuxAsciiZ{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
 current position.  The return value is @ctrue{} if less than the whole string is written to
 @var{mfd}.
 @end deftypefun
@@ -7594,7 +7594,7 @@ if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
 
 
 A @dfn{file system pathname} is an array of octets terminated by a zero octet, to be interpreted as
-@MmuxAsciiz{} string; file system pathnames are naturally interpreted as representing a tree
+@MmuxAsciiZ{} string; file system pathnames are naturally interpreted as representing a tree
 superimposed to the union of file systems.  By convention: we consider the bytes in a file system
 pathname as unsigned characters, so we refer to them as @dfn{octets}; even though their type,
 according to the Unix standards, is @code{char} which does not specify if they are signed or
@@ -7716,13 +7716,13 @@ examples for file system pathnames}.
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
 Structure data type representing a file system pathname as a non--@cnull{} pointer to non--empty
-@MmuxAsciiz{} string.
+@MmuxAsciiZ{} string.
 
 The pointer types are defined as follows:
 
 @example
-typedef struct mmux_libc_file_system_pathname_t         mmux_libc_fs_ptn_t[1];
-typedef struct mmux_libc_file_system_pathname_t const   mmux_libc_fs_ptn_arg_t[1];
+typedef struct mmux_libc_file_system_pathname_t          mmux_libc_fs_ptn_t[1];
+typedef struct mmux_libc_file_system_pathname_t const *  mmux_libc_fs_ptn_arg_t;
 @end example
 @end deftp
 
@@ -7736,8 +7736,8 @@ memory allocation strategy to contain file system pathname strings.
 The pointer types are defined as follows:
 
 @example
-typedef struct mmux_libc_file_system_pathname_factory_t        mmux_libc_fs_ptn_factory_t[1];
-typedef struct mmux_libc_file_system_pathname_factory_t const  mmux_libc_fs_ptn_factory_arg_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_t          mmux_libc_fs_ptn_factory_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_t const *  mmux_libc_fs_ptn_factory_arg_t;
 @end example
 @end deftp
 
@@ -7748,13 +7748,13 @@ typedef struct mmux_libc_file_system_pathname_factory_t const  mmux_libc_fs_ptn_
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_copying_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_copying_arg_t
 Structure data type representing a factory for file system pathnames.  It is like its parent type,
-but @strong{always} allocates new memory to contain the file system pathname @MmuxAsciiz{} string.
+but @strong{always} allocates new memory to contain the file system pathname @MmuxAsciiZ{} string.
 
 The pointer types defined as follows:
 
 @example
-typedef struct mmux_libc_file_system_pathname_factory_copying_t        mmux_libc_fs_ptn_factory_copying_t[1];
-typedef struct mmux_libc_file_system_pathname_factory_copying_t const  mmux_libc_fs_ptn_factory_copying_arg_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_copying_t          mmux_libc_fs_ptn_factory_copying_t[1];
+typedef struct mmux_libc_file_system_pathname_factory_copying_t const *  mmux_libc_fs_ptn_factory_copying_arg_t;
 @end example
 @end deftp
 
@@ -7771,7 +7771,7 @@ examples for file system pathnames}.
 Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``static'' file
 system factory.
 
-When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiZ{}
 string must have been already allocated and initialised, and the new file system pathname object
 will reference it; this factory uses the ``fake'' memory allocator, @ref{memory allocators fake,
 Fake memory allocator}.  We can use this factory to reference a hard--coded string.
@@ -7782,7 +7782,7 @@ Fake memory allocator}.  We can use this factory to reference a hard--coded stri
 Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``dynamic''
 file system factory.
 
-When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiZ{}
 string is newly allocated using the default memory allocator, @ref{memory allocators default,
 Default memory allocator}.  We can use this factory when we need to build a file system pathname by
 creating a copy of an existing string.
@@ -7793,7 +7793,7 @@ creating a copy of an existing string.
 Store in the variable referenced by @var{fs_ptn_factory} a reference to the prebuilt ``swallow''
 file system factory.
 
-When building file system pathnames with this factory: the memory containing the @MmuxAsciiz{}
+When building file system pathnames with this factory: the memory containing the @MmuxAsciiZ{}
 string must have been already allocated using the default memory allocator, and the new file system
 pathname object will reference it; this factory uses the default memory allocator, @ref{memory
 allocators default, Default memory allocator}.
@@ -7801,8 +7801,8 @@ allocators default, Default memory allocator}.
 
 
 @deftypefun bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_asciizcp_t @var{ptn_asciiz})
-Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAsciiz{}
-string referenced by @var{ptn_asciiz}.  The @MmuxAsciiz{} string @var{ptn_asciiz} is validated:
+Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAsciiZ{}
+string referenced by @var{ptn_asciiz}.  The @MmuxAsciiZ{} string @var{ptn_asciiz} is validated:
 
 @enumerate
 @item
@@ -7835,7 +7835,7 @@ This is commented out because it is an experimental feature, not correctly imple
 GCC's extension @code{__cleanup__}: what happens when an error occurs building the pathname?
 
 @deftypefun bool mmux_libc_file_system_pathname_free_variable (mmux_libc_fs_ptn_t * @var{pathname_p})
-Release the memory holding the pathname as @MmuxAsciiz{} string using @cfunc{mmux_libc_free}.
+Release the memory holding the pathname as @MmuxAsciiZ{} string using @cfunc{mmux_libc_free}.
 
 @example
 mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
@@ -7908,7 +7908,7 @@ mmux_libc_file_system_pathname_len_including_nul_ref(&len_including_nul, fs_ptn)
 
 
 @deftypefun bool mmux_libc_file_system_pathname_compare (mmux_ternary_comparison_result_t * @var{cmpnum_result_p}, mmux_libc_fs_ptn_arg_t @vari{ptn}, mmux_libc_fs_ptn_arg_t @varii{ptn})
-Compare the @MmuxAsciiz{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store
+Compare the @MmuxAsciiZ{} strings of two file system pathnames using @cfunc{mmux_libc_strcmp}, store
 the result in the variable referenced by @var{cmpnum_result_p}.
 
 @example
@@ -7952,7 +7952,7 @@ mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
 @deftypefun bool mmux_libc_file_system_pathname_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are equal
-when compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+when compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 
 @example
 mmux_asciizcp_t     ptn_asciiz_1 = "AAA";
@@ -7995,31 +7995,31 @@ mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
 @deftypefun bool mmux_libc_file_system_pathname_not_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if the two given pathnames are different
-when compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+when compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_file_system_pathname_less (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} < @varii{fs_ptn}} when
-compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_file_system_pathname_greater (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} > @varii{fs_ptn}} when
-compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_file_system_pathname_less_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} <= @varii{fs_ptn}} when
-compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_file_system_pathname_greater_equal (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @vari{fs_ptn}, mmux_libc_fs_ptn_arg_t @varii{fs_ptn})
 Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{fs_ptn} >= @varii{fs_ptn}} when
-compared as @MmuxAsciiz{} strings; otherwise store @cfalse{}.
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
@@ -8360,7 +8360,7 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_prefix, fs_ptn_suffix;
 
 
 Given that a file system pathname is an array of octets terminated by a zero octet, to be interpreted
-as @MmuxAsciiz{} string: a file system pathname extension is also an array of octets to be interpreted an
+as @MmuxAsciiZ{} string: a file system pathname extension is also an array of octets to be interpreted an
 @MmuxAscii{} string, but it is @strong{not} necessarily terminated by a zero octet.
 
 Examples defining what a file system pathname extension is:
@@ -8379,6 +8379,11 @@ Examples defining what a file system pathname extension is:
 /path/to/.                      @error{} <invalid pathname>
 /path/to/..                     @error{} <invalid pathname>
 @end example
+
+@noindent
+attempting to extract the extension from some file system pathnames will result in an error, because
+those special pathnames are defined to not have an extension.  A file system pathname extension is
+empty if it has length equal to zero.
 
 Under @value{PACKAGE}: file system pathname extensions are represented with objects of type
 @objtype{mmux_libc_file_system_pathname_extension_t}.  Some constructors of this object attempt to
@@ -8400,32 +8405,44 @@ such a way that the correct extension is determined.
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_extension_t
-@deftpx {Struct Typedef} mmux_libc_ptn_extension_t
-Data structure representing a file system pathname extension.  Sometimes it is meant to be
-associated to an object of type @objtype{mmux_libc_fs_ptn_arg_t} with which, usually, it
-shares memory.
+@deftpx {Struct Pointer Typedef} mmux_libc_fs_ptn_extension_t
+@deftpx {Struct Pointer Typedef} mmux_libc_fs_ptn_extension_arg_t
+Data structure representing a file system pathname extension.  Instances of this type @strong{do
+not} own the memory they reference, either:
 
-It has two fields:
+@itemize
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_extension_t} references memory from an object
+of type @objtype{mmux_libc_file_system_pathname_t};
 
-@table @code
-@item mmux_asciizcp_t ptr
-Pointer to the first octet in the file pathname extension.  It cannot be @cnull{}: if this object
-represents the empty extension, this field must reference the null character at the end of the
-pathname.
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_extension_t} references memory from a
+statically allocated array of characters;
 
-@item mmux_usize_t len
-Number of octets in the file pathname extension.  It can be zero if the associated pathname has
-empty extension.
-@end table
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_extension_t} references memory from some
+@MmuxAscii{} string whose memory is owned by some other object;
+@end itemize
 
-In a correctly built @objtype{mmux_libc_file_system_pathname_extension_t} object, the following
-expression is true:
+@noindent
+so this type has constructors but not destructors, instances of this type do not need to be
+finalised to release asynchronous resources.
+
+The pointer types are defined as follows:
 
 @example
-(NULL != ptr)                           \
-&& ('\0' == ptr[0]   || '.' == ptr[0])  \
-&& ('\0' == ptr[len] || '/' == ptr[len])
+typedef struct mmux_libc_file_system_pathname_extension_t          mmux_libc_fs_ptn_extension_t[1];
+typedef struct mmux_libc_file_system_pathname_extension_t const *  mmux_libc_fs_ptn_extension_arg_t;
 @end example
+
+@noindent
+the type @objtype{mmux_libc_fs_ptn_extension_t} is used for automatic variables and mutable
+arguments to function; the type @objtype{mmux_libc_fs_ptn_extension_arg_t} is used for immutable
+arguments to function.
+
+We need to remember that we can print a file system pathname extension to a file descriptor using
+the function @cfunc{mmux_libc_dprintf_fs_ptn_extension}, @ref{mmux_libc_dprintf_fs_ptn_extension}
+for details.
 @end deftp
 
 @c page
@@ -8433,45 +8450,54 @@ expression is true:
 @subsubsection File system pathname extensions inspection
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t @var{result_p}, mmux_libc_file_system_pathname_extension_t @var{ext})
-Accessor for the field @code{ptr} of @var{E}.
+To inspect the @MmuxAscii{} string and its length in a file system pathname extension, we do:
 
 @example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_extension_t       ext;
-mmux_asciizcp_t                 ptr;
+mmux_libc_fs_ptn_t            fs_ptn;
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_asciizcp_t                     ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
-  /* error */
+/* Build the file system pathname extension. */
+@{
+  if (mmux_libc_make_file_system_pathname_extension(fs_ptn_ext, fs_ptn)) @{
+    /* error */
+  @}
 @}
 
-mmux_libc_file_system_pathname_extension_ptr_ref(&ptr, ext);
+/* Inspect the fields. */
+@{
+  mmux_asciicp_t  ptr;
+  mmux_usize_t    len;
+
+  mmux_libc_file_system_pathname_extension_ptr_ref(&ptr, fs_ptn_ext);
+  mmux_libc_file_system_pathname_extension_len_ref(&len, fs_ptn_ext);
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
 @end example
+
+
+@deftypefun bool mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciicpp_t @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @var{fs_ptn_ext})
+Accessor for the pointer to string of @var{fs_ptn_ext}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_extension_t @var{ext})
-Accessor for the field @code{len} of @var{E}.
-
-@example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_extension_t       ext;
-mmux_usize_t                    len;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
-  /* error */
-@}
-
-mmux_libc_file_system_pathname_extension_len_ref(&len, ext);
-@end example
+@deftypefun bool mmux_libc_file_system_pathname_extension_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @var{fs_ptn_ext})
+Accessor for the number of characters in the string of @var{fs_ptn_ext}.
 @end deftypefun
 
 @c page
@@ -8479,76 +8505,74 @@ mmux_libc_file_system_pathname_extension_len_ref(&len, ext);
 @subsubsection Building file system pathnames extensions
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_extension (mmux_libc_ptn_extension_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build an already allocated @objtype{mmux_libc_file_system_pathname_extension_t} object from a file
-system pathname object.  The resulting extension object shares memory with the pathname object.
+For all the following constructors: if the pathname is a special directory (@file{/} or @file{.} or
+@file{..} or @file{/path/to/.} or @file{/path/to/..}), the constructor sets @code{errno} to
+@samp{MMUX_LIBC_EINVAL}, then returns true.
 
-If the pathname is a special directory (@file{/} or @file{.} or @file{..} or @file{/path/to/.} or
-@file{/path/to/..}): this function sets @code{errno} to @samp{MMUX_LIBC_EINVAL}, then returns true.
+
+@deftypefun bool mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t @var{fs_ptn_ext_result}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
+Build a new @objtype{mmux_libc_file_system_pathname_extension_t} object from a file system pathname
+object @var{fs_ptn}.  The resulting extension object shares memory with the pathname object.
 
 @example
-mmux_asciizcp_t                 ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_extension_t       ext;
+mmux_libc_fs_ptn_t            fs_ptn;
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
-if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_asciizcp_t                     ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
+/* Build the file system pathname extension. */
+@{
+  if (mmux_libc_make_file_system_pathname_extension(fs_ptn_ext, fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_extension2 (mmux_libc_ptn_extension_t * @var{result_p}, mmux_asciicp_t ptr, mmux_usize_t @var{len})
+Build a new @objtype{mmux_libc_file_system_pathname_extension_t} object from an @MmuxAscii{} string.
+The resulting extension object shares memory with the string itself.
+
+@example
+auto  ext_len = mmux_usize_literal(4);
+char  ext_ascii[ext_len.value] = @{ '.', 'e', 'x', 't' @};
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
+
+if (mmux_libc_make_file_system_pathname_extension2(fs_ptn_ext, ext_ascii, ext_len)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_ptn_extension_t * @var{result_p}, mmux_asciizcp_t ptr, mmux_usize_t @var{len})
-Build an already allocated @objtype{mmux_libc_file_system_pathname_extension_t} object from raw
-values.
+@deftypefun bool mmux_libc_make_file_system_pathname_extension1 (mmux_libc_ptn_extension_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
+Build a new @objtype{mmux_libc_file_system_pathname_extension_t} object from an @MmuxAsciiZ{}
+string.  The resulting extension object shares memory with the string itself.
 
 @example
-//                                            012345678901234567
-//                                                         ^
-mmux_asciizcp_t                 ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_extension_t       ext;
+mmux_asciizcp_t               ext_asciiz = ".ext";
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
-if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
-  /* error */
-@}
-
-if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 3)) @{
-  /* error */
-@}
-@end example
-
-For a pathname that has no extension:
-
-@example
-//                                            01234567890123
-//                                                         ^
-mmux_asciizcp_t                 ptn_asciiz = "/path/to/file";
-mmux_libc_ptn_extension_t       ext;
-
-if (mmux_libc_make_file_system_pathname(&ptn, ptn_asciiz)) @{
-  /* error */
-@}
-
-if (mmux_libc_make_file_system_pathname_extension_raw(&ext, ptn_asciiz + 13, 0)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_ptn_extension_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
-Build an already allocated file system pathname extension from the raw pointer to an @MmuxAsciiz{}
-string.
-
-@example
-mmux_libc_file_system_pathname_extension_t      ext;
-
-if (mmux_libc_make_file_system_pathname_extension_raw_asciiz(&ext, ".ext")) @{
+if (mmux_libc_make_file_system_pathname_extension1(fs_ptn_ext, ext_asciiz)) @{
   /* error */
 @}
 @end example
@@ -8666,7 +8690,7 @@ bool                                          ptn_has_extension_ext;
 if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
   /* error */
 @}
-if (mmux_libc_make_file_system_pathname_extension_raw_asciiz(&ext, ".ext")) @{
+if (mmux_libc_make_file_system_pathname_extension1(&ext, ".ext")) @{
   /* error */
 @}
 mmux_libc_file_system_pathname_has_extension(&ptn_has_extension_ext, ptn, ext);
@@ -8704,7 +8728,7 @@ a single @samp{/} character, its only segment is a single @samp{/} character.  F
 segments cannot be empty strings.
 
 Given that a file system pathname is an array of octets terminated by a zero octet, to be
-interpreted as @MmuxAsciiz{} string: a file system pathname segment is also an array of octets to be
+interpreted as @MmuxAsciiZ{} string: a file system pathname segment is also an array of octets to be
 interpreted an @MmuxAscii{} string, but it is @strong{not} necessarily terminated by a zero octet.
 
 Under @value{PACKAGE}: file system pathname segments are represented with objects of type
@@ -8824,7 +8848,7 @@ if (mmux_libc_make_file_system_pathname_segment_raw(&seg, ptn_asciiz + 9, 8)) @{
 
 
 @deftypefun bool mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
-Build an already allocated file system pathname segment from the raw pointer to an @MmuxAsciiz{} string.
+Build an already allocated file system pathname segment from the raw pointer to an @MmuxAsciiZ{} string.
 
 @example
 mmux_libc_file_system_pathname_segment_t        seg;
@@ -8953,7 +8977,7 @@ segment @samp{/}; otherwise store @cfalse{}.
 @subsection Usage examples for file system pathnames
 
 
-Build a file system pathname from an @MmuxAsciiz{} string (@strong{with} terminating
+Build a file system pathname from an @MmuxAsciiZ{} string (@strong{with} terminating
 nul--character), by allocating dynamic memory and copying the source string into it:
 
 @example
@@ -9018,7 +9042,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 @c ------------------------------------------------------------------------
 
-Allocate a buffer containing the file system pathname as @MmuxAsciiz{} string (@strong{with}
+Allocate a buffer containing the file system pathname as @MmuxAsciiZ{} string (@strong{with}
 terminating nul--character), then swallow the buffer in the file system pathname object:
 
 @example
@@ -9225,7 +9249,7 @@ Getter for the field @code{d_fileno} of @objtype{mmux_libc_file_system_dirent_t}
 @deftypefun bool mmux_libc_dirent_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_dirent_t @var{dirent}, mmux_asciizcp_t @var{struct_name})
 Write to @var{fd} a description of the fields of the instance of
 @objtype{mmux_libc_file_system_dirent_t} referenced by @var{dirent}.  @var{struct_name} must be a
-pointer to an @MmuxAsciiz{} string representing the name of the data structure used in the description;
+pointer to an @MmuxAsciiZ{} string representing the name of the data structure used in the description;
 when @cnull{}: it defaults to @samp{struct dirent}.
 @end deftypefun
 
@@ -9684,7 +9708,7 @@ mmux_libc_fs_ptn_t          fs_ptn_cwd;
 @deftypefun bool mmux_libc_getcwd_to_buffer (mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen})
 @MmuxCInterfaceGlibc{getcwd, Working Directory}.
 
-When successful: @var{bufptr} is filled with the @MmuxAsciiz{} string representing the file system
+When successful: @var{bufptr} is filled with the @MmuxAsciiZ{} string representing the file system
 pathname of the current working directory, including the terminating nul character.
 
 If an error occurs: we must inspect the value of @code{errno}.
@@ -10246,7 +10270,7 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_real;;
 
 
 The following functions are wrappers for @cfunc{readlinkat}, @MmuxCFuncpage{readlinkat}.  They are
-invoked in the special way supported by the latest Linux kernels: with the @MmuxAsciiz{} string
+invoked in the special way supported by the latest Linux kernels: with the @MmuxAsciiZ{} string
 representing the file system pathname set to the empty string.  This causes the file descriptor
 argument to be meant to represent the link to follow through to the real file description.
 
@@ -12224,7 +12248,7 @@ Setter and getter for the field @code{modtime} of @objtype{mmux_libc_file_system
 @deftypefun bool mmux_libc_utimbuf_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_utimbuf_arg_t @var{utimbuf_p}, mmux_asciizcp_t @var{struct_name})
 Write to @var{fd} a description of the fields of the object
 @objtype{mmux_libc_file_system_utimbuf_t} referenced by @var{utimbuf_p}.  @var{struct_name} must be
-a pointer to an @MmuxAsciiz{} string representing the name of the data structure used in the
+a pointer to an @MmuxAsciiZ{} string representing the name of the data structure used in the
 description; when @cnull{} it defaults to @samp{struct utimbuf}.
 @end deftypefun
 
@@ -12772,8 +12796,8 @@ Initialise the data structure referenced by @var{insix_addr_p} to the predefined
 
 The file system pathname associated to an address of format @objtype{mmux_libc_sockaddr_un_t} is
 embedded in the data structure itself; it has maximum length of fixed size, hard--coded in the data
-structure definition.  The pathname must be an @MmuxAsciiz{} string and the terminating nul must be
-included in the embedded @MmuxAsciiz{} string.
+structure definition.  The pathname must be an @MmuxAsciiZ{} string and the terminating nul must be
+included in the embedded @MmuxAsciiZ{} string.
 
 If we want to allocate a block of memory wide enough to contain a pathname of maximum length we have
 to take the @cfunc{sizeof} of the data structure type.  If we want to compute the address size
@@ -13127,7 +13151,7 @@ if (mmux_libc_getnetbyaddr(&netent_p, host_byteorder_n_net, MMUX_LIBC_AF_INET)) 
 @deftypefun bool mmux_libc_inet_pton (mmux_pointer_t @var{ouput_addr_p}, mmux_sint_t @var{input_af_family}, mmux_asciizcp_t @var{input_presentation_p})
 @MmuxCInterface{inet_pton}.
 
-Convert the @MmuxAsciiz{} Internet address presentation referenced by @var{input_presentation_p} into a
+Convert the @MmuxAsciiZ{} Internet address presentation referenced by @var{input_presentation_p} into a
 binary data structure; the presentation is expected to represent an address in the format specified
 by @var{input_af_family}, for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}.
 
@@ -13169,7 +13193,7 @@ if (mmux_libc_inet_pton(&address, MMUX_LIBC_AF_INET6, presentation)) @{
 @deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{ouput_presentation_p}, mmux_usize_t @var{ouput_presentation_provided_nchars}, mmux_sint_t @var{input_af_family}, mmux_pointer_t @var{input_addr_p})
 @MmuxCInterface{inet_ntop}.
 
-Convert the Internet address data structure referenced by @var{input_addr_p} in its @MmuxAsciiz{}
+Convert the Internet address data structure referenced by @var{input_addr_p} in its @MmuxAsciiZ{}
 presentation and copy it into the buffer referenced by @var{ouput_presentation_p}; the data
 structure is expected to represent an address in the format specified by @var{input_af_family}, for
 example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}; when @var{input_af_family} equals:
@@ -13182,7 +13206,7 @@ The referenced data structure must be of type @objtype{mmux_libc_in_addr_t}.
 The referenced data structure must be of type @objtype{mmux_libc_insix_addr_t}.
 @end table
 
-If the length of the @MmuxAsciiz{} presentation, including its terminating nul, is less than or equal to
+If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or equal to
 @var{ouput_presentation_provided_nchars}: the whole string, including its terminating nul, is
 written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written and
 the return value is @ctrue{}.
@@ -13237,7 +13261,7 @@ if (mmux_libc_make_insix_addr_loopback(&address)) @{
 @deftypefun bool mmux_libc_inet_aton (mmux_libc_in_addr_ptr_t @var{ouput_addr_p}, mmux_asciizcp_t @var{input_presentation_p})
 @MmuxCInterface{inet_aton}.
 
-Convert the dotted--quad @MmuxAsciiz{} representation of an IPv4 address referenced by
+Convert the dotted--quad @MmuxAsciiZ{} representation of an IPv4 address referenced by
 @var{input_presentation_p} into a data structure of type @objtype{mmux_libc_in_addr_t}; store the
 result in the data structure referenced by @var{ouput_addr_p}.
 
@@ -13255,10 +13279,10 @@ if (mmux_libc_inet_aton(&address, dotted_quad)) @{
 @deftypefun bool mmux_libc_inet_ntoa (mmux_asciizp_t @var{ouput_presentation_p}, mmux_usize_t @var{ouput_presentation_provided_nchars}, mmux_libc_in_addr_t * @var{input_addr_p})
 @MmuxCInterface{inet_ntoa}.
 
-Convert the IPv4 address referenced by @var{input_addr_p} in its dotted--quad @MmuxAsciiz{} presentation
+Convert the IPv4 address referenced by @var{input_addr_p} in its dotted--quad @MmuxAsciiZ{} presentation
 and copy it into the buffer referenced by @var{ouput_presentation_p}.
 
-If the length of the @MmuxAsciiz{} presentation, including its terminating nul, is less than or equal to
+If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or equal to
 @var{ouput_presentation_provided_nchars}: the whole string, including its terminating nul, is
 written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written and
 the return value is @ctrue{}.
@@ -13795,7 +13819,7 @@ Data structure representing an interface specification.
 
 @table @code
 @item mmux_asciizcp_t is_name
-Pointer to a, possibly statically--allocated, @MmuxAsciiz{} string representing the name of this
+Pointer to a, possibly statically--allocated, @MmuxAsciiZ{} string representing the name of this
 interface; there are no constraints on the string's format.
 
 @item mmux_standard_uint_t is_current

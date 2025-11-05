@@ -951,9 +951,9 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t resu
       result_p->ptr	= ptn->value + strlen(ptn->value);
       return false;
     } else {
-      mmux_asciizcp_t	beg = S->ptr;
-      mmux_asciizcp_t	end = beg + S->len.value;
-      mmux_asciizcp_t	ptr = end - 1;
+      mmux_asciicp_t	beg = S->ptr;
+      mmux_asciicp_t	end = beg + S->len.value;
+      mmux_asciicp_t	ptr = end - 1;
 
       for (; beg <= ptr; --ptr) {
 	if ('.' == *ptr) {
@@ -974,7 +974,7 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t resu
 
       /* Extension not found in the last segment.  Return an empty extension. */
       {
-	mmux_asciizcp_t	p = ptn->value + strlen(ptn->value);
+	mmux_asciicp_t	p = ptn->value + strlen(ptn->value);
 
 	result_p->len	= mmux_usize_constant_zero();
 	result_p->ptr	= (('/' == *(p-1))? (p-1) : p);
@@ -984,34 +984,23 @@ mmux_libc_make_file_system_pathname_extension (mmux_libc_fs_ptn_extension_t resu
   }
 }
 bool
-mmux_libc_make_file_system_pathname_extension_raw (mmux_libc_fs_ptn_extension_t result_p,
-						   mmux_asciizcp_t ptr, mmux_usize_t len)
+mmux_libc_make_file_system_pathname_extension2 (mmux_libc_fs_ptn_extension_t result_p,
+						   mmux_asciicp_t ptr, mmux_usize_t len)
 {
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wnonnull-compare\"")
-  if ((NULL != ptr)
-      /* Either the extension is empty, or it begins with a dot. */
-      && (('\0' == ptr[0]) || ('.' == ptr[0]))
-      /* Either the extension ends with a zero byte, or it ends with a slash. */
-      && ('\0' == ptr[len.value] || '/' == ptr[len.value])) {
-_Pragma("GCC diagnostic pop")
-    result_p->ptr = ptr;
-    result_p->len = len;
-    return false;
-  } else {
-    return true;
-  }
+  result_p->ptr = ptr;
+  result_p->len = len;
+  return false;
 }
 bool
-mmux_libc_make_file_system_pathname_extension_raw_asciiz (mmux_libc_fs_ptn_extension_t result_p, mmux_asciizcp_t ptr)
+mmux_libc_make_file_system_pathname_extension1 (mmux_libc_fs_ptn_extension_t result_p, mmux_asciizcp_t ptr)
 {
-  return mmux_libc_make_file_system_pathname_extension_raw(result_p, ptr, mmux_usize(strlen(ptr)));
+  return mmux_libc_make_file_system_pathname_extension2(result_p, ptr, mmux_usize(strlen(ptr)));
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciizcpp_t result_p, mmux_libc_fs_ptn_extension_arg_t ext)
+mmux_libc_file_system_pathname_extension_ptr_ref (mmux_asciicpp_t result_p, mmux_libc_fs_ptn_extension_arg_t ext)
 {
   *result_p = ext->ptr;
   return false;
@@ -1053,10 +1042,12 @@ mmux_libc_file_system_pathname_extension_compare (mmux_ternary_comparison_result
 						  mmux_libc_fs_ptn_extension_arg_t E1,
 						  mmux_libc_fs_ptn_extension_arg_t E2)
 {
-  mmux_usize_t	minlen = mmux_ctype_min(E1->len, E2->len);
-  int		cmpnum = strncmp(E1->ptr, E2->ptr, minlen.value);
+  mmux_usize_t				minlen = mmux_ctype_min(E1->len, E2->len);
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (0 == cmpnum) {
+  if (mmux_libc_strncmp(&cmpnum, E1->ptr, E2->ptr, minlen)) {
+    return true;
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     if (mmux_ctype_equal(E1->len, E2->len)) {
       *result_p = mmux_make_ternary_comparison_result_equal();
     } else if (mmux_ctype_less(E1->len, E2->len)) {
@@ -1065,7 +1056,7 @@ mmux_libc_file_system_pathname_extension_compare (mmux_ternary_comparison_result
       *result_p = mmux_make_ternary_comparison_result_greater();
     }
   } else {
-    *result_p = (0 < cmpnum)? mmux_make_ternary_comparison_result_greater() : mmux_make_ternary_comparison_result_less();
+    *result_p = cmpnum;
   }
   return false;
 }
