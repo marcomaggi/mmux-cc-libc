@@ -8583,19 +8583,9 @@ if (mmux_libc_make_file_system_pathname_extension1(fs_ptn_ext, ext_asciiz)) @{
 @subsubsection Comparing file system pathname extensions
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_compare (mmux_sint_t * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
-Compare two extensions and store in the variable referenced by @var{result_p} the value:
-
-@table @code
-@item 0
-when @code{@vari{ext} == @varii{ext}};
-@item -1
-when @code{@vari{ext} < @varii{ext}};
-@item +1
-when @code{@vari{ext} > @varii{ext}};
-@end table
-
-The file system pathname extensions are compared as strings, using the standard @cfunc{strncmp}:
+@deftypefun bool mmux_libc_file_system_pathname_extension_compare (mmux_ternary_comparison_result_t * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
+Compare two extensions and store in the variable referenced by @var{result_p}.  The file system
+pathname extensions are compared as strings, using the standard @cfunc{strncmp}:
 
 @itemize
 @item
@@ -8606,6 +8596,35 @@ if the extensions have different length, @cfunc{strncmp} is applied to portion o
 maximum common length; if these substrings are equal: the shortest is considered less than the
 longest.
 @end itemize
+
+@example
+mmux_asciizcp_t               ext_asciiz1 = ".bak";
+mmux_asciizcp_t               ext_asciiz2 = ".cpp";
+mmux_libc_fs_ptn_extension_t  ext1, ext2;
+
+/* Build the extensions. */
+@{
+  if (mmux_libc_make_file_system_pathname_extension1(ext1, ext_asciiz1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_file_system_pathname_extension1(ext2, ext_asciiz2)) @{
+    /* error */
+  @}
+@}
+
+/* Compare the extensions. */
+@{
+  mmux_ternary_comparison_result_t  cmpnum;
+
+  if (mmux_libc_file_system_pathname_extension_compare(&cmpnum, ext1, ext2)) @{
+    /* error */
+  @}
+
+  if (mmux_ternary_comparison_result_is_equal(cmpnum)) @{
+    ...
+  @}
+@}
+@end example
 @end deftypefun
 
 
@@ -8613,37 +8632,37 @@ For all the functions below the comparison is performed using
 @cfunc{mmux_libc_file_system_pathname_extension_compare}.
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_equal (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} == @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_not_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_not_equal (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} != @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_less (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_less (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} < @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_greater (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_greater (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} > @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_less_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_less_equal (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} <= @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_greater_equal (bool * @var{result_p}, mmux_libc_ptn_extension_t @vari{ext}, mmux_libc_ptn_extension_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_greater_equal (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @vari{ext}, mmux_libc_fs_ptn_extension_arg_t @varii{ext})
 Compare the file system pathname extensions and store @ctrue{} in the variable referenced by
 @var{result_p} if @code{@vari{ext} >= @varii{ext}}; otherwise store @cfalse{}.
 @end deftypefun
@@ -8653,51 +8672,87 @@ Compare the file system pathname extensions and store @ctrue{} in the variable r
 @subsubsection Predicates for file system pathname extensions
 
 
-@deftypefun bool mmux_libc_file_system_pathname_extension_is_empty (bool * @var{result_p}, mmux_libc_ptn_extension_t @var{ext})
+@deftypefun bool mmux_libc_file_system_pathname_extension_is_empty (bool * @var{result_p}, mmux_libc_fs_ptn_extension_arg_t @var{ext})
 Store @ctrue{} in the variable referenced by @var{result_p} if @var{ext} represents the empty file
 system pathname extension; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_extension_t       ext;
-bool                            is_empty;
+mmux_libc_fs_ptn_t            fs_ptn;
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build file system pathname. */
+@{
+  mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-if (mmux_libc_make_file_system_pathname_extension(&ext, ptn)) @{
-  /* error */
+/* Build file system pathname extension. */
+@{
+  if (mmux_libc_make_file_system_pathname_extension(fs_ptn_ext, fs_ptn)) @{
+    /* error */
+  @}
 @}
 
-mmux_libc_file_system_pathname_extension_is_empty(&is_empty, ext);
-if (is_empty) @{
-  ...
+@{
+  bool  extension_is_empty;
+
+  mmux_libc_file_system_pathname_extension_is_empty(&extension_is_empty, fs_ptn_ext);
+  if (extension_is_empty) @{
+    ...
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_has_extension (bool * @var{result_p}, mmux_libc_ptn_t @var{ptn}, mmux_libc_ptn_extension_t @var{ext})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{ptn} has extension @var{ext};
-otherwise store @cfalse{}.
+@deftypefun bool mmux_libc_file_system_pathname_has_extension (bool * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_fs_ptn_extension_arg_t @var{fs_ptn_ext})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn} has extension
+@var{fs_ptn_ext}; otherwise store @cfalse{}.
 
 @example
-mmux_libc_fs_ptn_arg_t              ptn;
-mmux_libc_file_system_pathname_extension_t    ext;
-bool                                          ptn_has_extension_ext;
+mmux_libc_fs_ptn_t            fs_ptn;
+mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build file system pathname. */
+@{
+  mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
-if (mmux_libc_make_file_system_pathname_extension1(&ext, ".ext")) @{
-  /* error */
+
+/* Build file system pathname extension. */
+@{
+  if (mmux_libc_make_file_system_pathname_extension(fs_ptn_ext, fs_ptn)) @{
+    /* error */
+  @}
 @}
-mmux_libc_file_system_pathname_has_extension(&ptn_has_extension_ext, ptn, ext);
-if (ptn_has_extension_ext) @{
-   /* it has */
-@} else @{
-   /* it has not */
+
+@{
+  bool  has_this_extension;
+
+  mmux_libc_file_system_pathname_has_extension(&has_thi_extension, fs_ptn_ext);
+  if (has_thi_extension) @{
+    ...
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
 @}
 @end example
 @end deftypefun
