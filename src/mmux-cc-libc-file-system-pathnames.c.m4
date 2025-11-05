@@ -1254,10 +1254,12 @@ mmux_libc_file_system_pathname_segment_compare (mmux_ternary_comparison_result_t
 						mmux_libc_fs_ptn_segment_arg_t seg1,
 						mmux_libc_fs_ptn_segment_arg_t seg2)
 {
-  mmux_usize_t	minlen = mmux_ctype_min(seg1->len, seg2->len);
-  int		cmpnum = strncmp(seg1->ptr, seg2->ptr, minlen.value);
+  mmux_usize_t				minlen = mmux_ctype_min(seg1->len, seg2->len);
+  mmux_ternary_comparison_result_t	cmpnum;
 
-  if (0 == cmpnum) {
+  if (mmux_libc_strncmp(&cmpnum, seg1->ptr, seg2->ptr, minlen)) {
+    return true;
+  } else if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
     if (mmux_ctype_equal(seg1->len, seg2->len)) {
       *result_p = mmux_make_ternary_comparison_result_equal();
     } else if (mmux_ctype_less(seg1->len, seg2->len)) {
@@ -1266,7 +1268,7 @@ mmux_libc_file_system_pathname_segment_compare (mmux_ternary_comparison_result_t
       *result_p = mmux_make_ternary_comparison_result_greater();
     }
   } else {
-    *result_p = (0 < cmpnum)? mmux_make_ternary_comparison_result_greater() : mmux_make_ternary_comparison_result_less();
+    *result_p = cmpnum;
   }
   return false;
 }

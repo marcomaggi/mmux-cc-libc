@@ -5855,8 +5855,8 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_ptn_segment}
-@deftypefun bool mmux_libc_dprintf_libc_ptn_segment (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_segment_t @var{value})
+@anchor{mmux_libc_dprintf_fs_ptn_segment}
+@deftypefun bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_segment_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -8806,32 +8806,44 @@ correct segment is determined.
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_segment_t
-@deftpx {Struct Typedef} mmux_libc_ptn_segment_t
-Data structure representing a file system pathname segment.  Sometimes it is meant to be
-associated to an object of type @objtype{mmux_libc_fs_ptn_arg_t} with which, usually, it
-shares memory.
+@deftpx {Struct Pointer Typedef} mmux_libc_fs_ptn_segment_t
+@deftpx {Struct Pointer Typedef} mmux_libc_fs_ptn_segment_arg_t
+Data structure representing a file system pathname segment.  Instances of this type @strong{do not}
+own the memory they reference, either:
 
-It has two fields:
+@itemize
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_segment_t} references memory from an object
+of type @objtype{mmux_libc_file_system_pathname_t};
 
-@table @code
-@item mmux_asciizcp_t ptr
-Pointer to the first octet in the file pathname segment.  It cannot be @cnull{}: if this object
-represents the empty segment, this field must reference the null character at the end of the
-pathname.
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_segment_t} references memory from a
+statically allocated array of characters;
 
-@item mmux_usize_t len
-Number of octets in the file pathname segment.  It can be zero if the associated pathname has
-empty segment.
-@end table
+@item
+an instance of @objtype{mmux_libc_file_system_pathname_segment_t} references memory from some
+@MmuxAscii{} string whose memory is owned by some other object;
+@end itemize
 
-In a correctly built @objtype{mmux_libc_file_system_pathname_segment_t} object, the following
-expression is true:
+@noindent
+so this type has constructors but not destructors, instances of this type do not need to be
+finalised to release asynchronous resources.
+
+The pointer types are defined as follows:
 
 @example
-(NULL != ptr)                           \
-&& ('\0' == ptr[0]   || '.' == ptr[0])  \
-&& ('\0' == ptr[len] || '/' == ptr[len])
+typedef struct mmux_libc_file_system_pathname_segment_t          mmux_libc_fs_ptn_segment_t[1];
+typedef struct mmux_libc_file_system_pathname_segment_t const *  mmux_libc_fs_ptn_segment_arg_t;
 @end example
+
+@noindent
+the type @objtype{mmux_libc_fs_ptn_segment_t} is used for automatic variables and mutable arguments
+to function; the type @objtype{mmux_libc_fs_ptn_segment_arg_t} is used for immutable arguments to
+function.
+
+We need to remember that we can print a file system pathname segment to a file descriptor using
+the function @cfunc{mmux_libc_dprintf_fs_ptn_segment}, @ref{mmux_libc_dprintf_fs_ptn_segment}
+for details.
 @end deftp
 
 @c page
@@ -8839,45 +8851,54 @@ expression is true:
 @subsubsection File system pathname segments inspection
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciizcpp_t @var{result_p}, mmux_libc_file_system_pathname_segment_t @var{seg})
-Accessor for the field @code{ptr} of @var{E}.
+To inspect the @MmuxAscii{} string and its length in a file system pathname segment, we do:
 
 @example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_segment_t         seg;
-mmux_asciizcp_t                 ptr;
+mmux_libc_fs_ptn_t          fs_ptn;
+mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Build the file system pathname. */
+@{
+  mmux_asciizcp_t                     ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
 @}
 
-if (mmux_libc_make_file_system_pathname_segment(&seg, ptn)) @{
-  /* error */
+/* Build the file system pathname segment. */
+@{
+  if (mmux_libc_file_system_pathname_segment_find_last(fs_ptn_seg, fs_ptn)) @{
+    /* error */
+  @}
 @}
 
-mmux_libc_file_system_pathname_segment_ptr_ref(&ptr, seg);
+/* Inspect the fields. */
+@{
+  mmux_asciicp_t  ptr;
+  mmux_usize_t    len;
+
+  mmux_libc_file_system_pathname_segment_ptr_ref(&ptr, fs_ptn_seg);
+  mmux_libc_file_system_pathname_segment_len_ref(&len, fs_ptn_seg);
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
 @end example
+
+
+@deftypefun bool mmux_libc_file_system_pathname_segment_ptr_ref (mmux_asciicpp_t @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @var{seg})
+Accessor for the pointer to string of @var{fs_ptn_seg}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_system_pathname_segment_t @var{seg})
-Accessor for the field @code{len} of @var{E}.
-
-@example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_segment_t         seg;
-mmux_usize_t                    len;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-if (mmux_libc_make_file_system_pathname_segment(&seg, ptn)) @{
-  /* error */
-@}
-
-mmux_libc_file_system_pathname_segment_len_ref(&len, seg);
-@end example
+@deftypefun bool mmux_libc_file_system_pathname_segment_len_ref (mmux_usize_t * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @var{seg})
+Accessor for the string length of @var{fs_ptn_seg}.
 @end deftypefun
 
 @c page
@@ -8885,53 +8906,71 @@ mmux_libc_file_system_pathname_segment_len_ref(&len, seg);
 @subsubsection Building file system pathnames segments
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_segment_raw (mmux_libc_ptn_segment_t * @var{result_p}, mmux_asciizcp_t ptr, mmux_usize_t @var{len})
-Build an already allocated @objtype{mmux_libc_file_system_pathname_segment_t} object from raw
-values.
+@deftypefun bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg_result}, mmux_libc_fs_ptn_t @var{fs_ptn})
+Build a new @objtype{mmux_libc_file_system_pathname_segment_t} object from a file system pathname
+object @var{fs_ptn}.  The resulting segment object shares memory with the pathname object.
 
 @example
-//                                            012345678901234567
-//                                                     ^
-mmux_asciizcp_t                 ptn_asciiz = "/path/to/file.ext";
-mmux_libc_ptn_segment_t         seg;
+mmux_libc_fs_ptn_t          fs_ptn;
+mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
-if (mmux_libc_make_file_system_pathname_segment_raw(&seg, ptn_asciiz + 9, 8)) @{
+/* Build the file system pathname. */
+@{
+  mmux_asciizcp_t                     ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Build the file system pathname segment. */
+@{
+  if (mmux_libc_file_system_pathname_segment_find_last(fs_ptn_seg, fs_ptn)) @{
+    /* error */
+  @}
+@}
+
+@{
+  /* Do something. */
+@}
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_file_system_pathname(fs_ptn);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_file_system_pathname_segment2 (mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg_result}, mmux_asciicp_t ptr, mmux_usize_t @var{len})
+Build a new @objtype{mmux_libc_file_system_pathname_segment_t} object from an @MmuxAscii{} string.
+The resulting segment object shares memory with the string itself.
+
+@example
+auto  seg_len = mmux_usize_literal(4);
+char  seg_ascii[seg_len.value] = @{ 'c', 'i', 'a', 'o' @};
+mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
+
+if (mmux_libc_make_file_system_pathname_segment2(fs_ptn_seg, seg_ascii, seg_len)) @{
   /* error */
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname_segment_raw_asciiz (mmux_libc_ptn_segment_t * @var{result_p}, mmux_asciizcp_t @var{ptr})
-Build an already allocated file system pathname segment from the raw pointer to an @MmuxAsciiZ{} string.
+@deftypefun bool mmux_libc_make_file_system_pathname_segment1 (mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg_result}, mmux_asciizcp_t @var{ptr})
+Build a new @objtype{mmux_libc_file_system_pathname_segment_t} object from an @MmuxAsciiZ{} string.
+The resulting segment object shares memory with the string itself.
 
 @example
-mmux_libc_file_system_pathname_segment_t        seg;
+mmux_asciizcp_t             seg_asciiz = "ciao";
+mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
-if (mmux_libc_make_file_system_pathname_segment_raw_asciiz(&seg, "file.ext")) @{
+if (mmux_libc_make_file_system_pathname_segment1(fs_ptn_seg, seg_asciiz)) @{
   /* error */
 @}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_file_system_pathname_segment_find_last (mmux_libc_ptn_segment_t * @var{result_p}, mmux_libc_ptn_t @var{ptn})
-Build an already allocated file system pathname segment representing the last segment in a given
-file system pathname.
-
-@example
-mmux_libc_ptn_t                 ptn;
-mmux_libc_ptn_segment_t         seg;
-
-if (mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext")) @{
-  /* error */
-@}
-
-if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) @{
-  /* error */
-@}
-
-/* Here "seg" references the segment "file.ext". */
 @end example
 @end deftypefun
 
@@ -8940,19 +8979,9 @@ if (mmux_libc_file_system_pathname_segment_find_last(&seg, ptn)) @{
 @subsubsection Comparing file system pathname segments
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_compare (mmux_sint_t * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
-Compare two segments and store in the variable referenced by @var{result_p} the value:
-
-@table @code
-@item 0
-when @code{@vari{ext} == @varii{ext}};
-@item -1
-when @code{@vari{ext} < @varii{ext}};
-@item +1
-when @code{@vari{ext} > @varii{ext}};
-@end table
-
-The file system pathname segments are compared as strings, using the standard @cfunc{strncmp}:
+@deftypefun bool mmux_libc_file_system_pathname_segment_compare (mmux_ternary_comparison_result_t * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
+Compare two segments and store in the variable referenced by @var{result_p}.  The file system
+pathname segments are compared as strings, using the standard @cfunc{strncmp}:
 
 @itemize
 @item
@@ -8963,6 +8992,35 @@ if the segments have different length, @cfunc{strncmp} is applied to portion of 
 maximum common length; if these substrings are equal: the shortest is considered less than the
 longest.
 @end itemize
+
+@example
+mmux_asciizcp_t             seg_asciiz1 = "ciao";
+mmux_asciizcp_t             seg_asciiz2 = "hello";
+mmux_libc_fs_ptn_segment_t  seg1, seg2;
+
+/* Build the segments. */
+@{
+  if (mmux_libc_make_file_system_pathname_segment1(seg1, seg_asciiz1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_file_system_pathname_segment1(seg2, seg_asciiz2)) @{
+    /* error */
+  @}
+@}
+
+/* Compare the segments. */
+@{
+  mmux_ternary_comparison_result_t  cmpnum;
+
+  if (mmux_libc_file_system_pathname_segment_compare(&cmpnum, seg1, seg2)) @{
+    /* error */
+  @}
+
+  if (mmux_ternary_comparison_result_is_equal(cmpnum)) @{
+    ...
+  @}
+@}
+@end example
 @end deftypefun
 
 
@@ -8970,39 +9028,39 @@ For all the functions below the comparison is performed using
 @cfunc{mmux_libc_file_system_pathname_segment_compare}.
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_equal (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} == @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} == @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_not_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_not_equal (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} != @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} != @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_less (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_less (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} < @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} < @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_greater (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_greater (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} > @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} > @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_less_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_less_equal (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} <= @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} <= @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_greater_equal (bool * @var{result_p}, mmux_libc_ptn_segment_t @vari{ext}, mmux_libc_ptn_segment_t @varii{ext})
+@deftypefun bool mmux_libc_file_system_pathname_segment_greater_equal (bool * @var{result_p}, mmux_libc_fs_ptn_segment_arg_t @vari{seg}, mmux_libc_fs_ptn_segment_arg_t @varii{seg})
 Compare the file system pathname segments and store @ctrue{} in the variable referenced by
-@var{result_p} if @code{@vari{ext} >= @varii{ext}}; otherwise store @cfalse{}.
+@var{result_p} if @code{@vari{seg} >= @varii{seg}}; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
@@ -9010,21 +9068,21 @@ Compare the file system pathname segments and store @ctrue{} in the variable ref
 @subsubsection Predicates on file system pathname segments
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_is_dot (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the single dot
-segment @samp{.}; otherwise store @cfalse{}.
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_dot (bool * @var{result_p}, mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn_seg} represents the
+single dot segment @samp{.}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_is_double_dot (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the double dot
-@samp{..}; otherwise store @cfalse{}.
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_double_dot (bool * @var{result_p}, mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn_seg} represents the
+double dot @samp{..}; otherwise store @cfalse{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_system_pathname_segment_is_slash (bool * @var{result_p}, mmux_libc_ptn_segment_t @var{seg})
-Store @ctrue{} in the variable referenced by @var{result_p} if @var{seg} represents the single slash
-segment @samp{/}; otherwise store @cfalse{}.
+@deftypefun bool mmux_libc_file_system_pathname_segment_is_slash (bool * @var{result_p}, mmux_libc_fs_ptn_segment_t @var{fs_ptn_seg})
+Store @ctrue{} in the variable referenced by @var{result_p} if @var{fs_ptn_seg} represents the
+single slash segment @samp{/}; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
