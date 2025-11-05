@@ -81,7 +81,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       mmux_libc_stat_t	stat;
 
       printf_message("fstat-ing");
-      if (mmux_libc_fstat(dirfd, stat)) {
+      if (mmux_libc_fstat(stat, dirfd)) {
 	printf_error("fstat-ing");
 	handle_error();
       } else {

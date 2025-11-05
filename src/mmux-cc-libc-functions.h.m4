@@ -2000,20 +2000,21 @@ mmux_cc_libc_decl bool mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_sta
 					    mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
+mmux_cc_libc_decl bool mmux_libc_stat (mmux_libc_stat_t stat_result, mmux_libc_fs_ptn_arg_t fs_ptn)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p)
+mmux_cc_libc_decl bool mmux_libc_fstat (mmux_libc_stat_t stat_result, mmux_libc_fd_arg_t fd)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
+mmux_cc_libc_decl bool mmux_libc_lstat (mmux_libc_stat_t stat_result, mmux_libc_fs_ptn_arg_t fs_ptn)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-					  mmux_libc_stat_t stat_p, mmux_libc_fstatat_flags_t flags)
+mmux_cc_libc_decl bool mmux_libc_fstatat (mmux_libc_stat_t stat_result,
+					  mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
+					  mmux_libc_fstatat_flags_t flags)
      __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p,
+mmux_cc_libc_decl bool mmux_libc_statfd (mmux_libc_stat_t stat_result, mmux_libc_fd_arg_t fd,
 					 mmux_libc_statfd_flags_t flags)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 

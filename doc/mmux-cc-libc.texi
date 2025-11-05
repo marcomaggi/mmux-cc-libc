@@ -9579,7 +9579,7 @@ mmux_libc_dirfd_t      dirfd;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_fstat(dirfd, stat)) @{
+  if (mmux_libc_fstat(stat, dirfd)) @{
     /* error */
   @} else @{
     mmux_libc_fd_t  er;
@@ -11443,7 +11443,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_stat(fs_ptn, stat)) @{
+  if (mmux_libc_stat(stat, fs_ptn)) @{
     /* error */
   @} else @{
     mmux_libc_fd_t  fd;
@@ -11539,7 +11539,7 @@ typedef struct mmux_libc_file_system_stat_t const *  mmux_libc_stat_arg_t;
 @subsubsection Inspecting file attributes with @cfunc{mmux_libc_stat}
 
 
-@deftypefun bool mmux_libc_stat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_stat (mmux_libc_stat_t @var{stat_result}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 @MmuxCInterface{stat}.
 
 @example
@@ -11560,7 +11560,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_stat(fs_ptn, stat)) @{
+  if (mmux_libc_stat(stat, fs_ptn)) @{
     /* error */
   @} else @{
     /* Do something with "stat". */
@@ -11579,7 +11579,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsubsection Inspecting file attributes with @cfunc{mmux_libc_fstat}
 
 
-@deftypefun bool mmux_libc_fstat (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_fstat (mmux_libc_stat_t @var{stat_result}, mmux_libc_fd_arg_t @var{fd})
 @MmuxCInterface{fstat}.
 
 @example
@@ -11620,7 +11620,7 @@ mmux_libc_fd_t   fd;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_fstat(fd, stat)) @{
+  if (mmux_libc_fstat(stat, fd)) @{
     /* error */
   @} else @{
     /* Do something with "stat". */
@@ -11641,7 +11641,7 @@ mmux_libc_fd_t   fd;
 @subsubsection Inspecting file attributes with @cfunc{mmux_libc_lstat}
 
 
-@deftypefun bool mmux_libc_lstat (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_lstat (mmux_libc_stat_t @var{stat_result}, mmux_libc_fs_ptn_arg_t @var{fs_ptn})
 @MmuxCInterface{lstat}.
 
 @example
@@ -11662,7 +11662,7 @@ mmux_libc_fs_ptn_t  fs_ptn_symlink;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_lstat(fs_ptn_symlink, stat)) @{
+  if (mmux_libc_lstat(stat, fs_ptn_symlink)) @{
     /* error */
   @} else @{
     /* Do something with "stat". */
@@ -11691,7 +11691,7 @@ Build and return a new instance of @objtype{mmux_libc_fstatat_flags_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fstatat (mmux_libc_fd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p}, mmux_libc_fstatat_flags_t @var{flags})
+@deftypefun bool mmux_libc_fstatat (mmux_libc_stat_t @var{stat_result}, mmux_libc_fd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_fstatat_flags_t @var{flags})
 @MmuxCInterface{fstatat}.
 
 @example
@@ -11715,7 +11715,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
   mmux_libc_stat_t   stat;
 
   mmux_libc_at_fdcwd(dirfd);
-  if (mmux_libc_fstatat(dirfd, fs_ptn, stat, flags)) @{
+  if (mmux_libc_fstatat(stat, dirfd, fs_ptn, flags)) @{
     /* error */
   @} else @{
     /* Do something with "stat". */
@@ -11744,7 +11744,7 @@ Build and return a new instance of @objtype{mmux_libc_statfd_flags_t}.
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_stat_arg_t @var{stat_p}, mmux_libc_statfd_flags_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_statfd (mmux_libc_stat_t @var{stat_result}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_statfd_flags_t @var{flags})
 @MmuxCInterface{fstatat}.  This function invokes @cfunc{fstatat} with an empty file system pathname
 and adding @samp{MMUX_LIBC_AT_EMPTY_PATH} to the @var{flags} argument; this causes the function to
 operate on the file descriptor @var{fd}.
@@ -11790,7 +11790,7 @@ mmux_libc_fd_t   fd;
   mmux_libc_stat_t  stat;
   auto              flags = mmux_libc_statfd_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
 
-  if (mmux_libc_statfd(fd, stat, flags)) @{
+  if (mmux_libc_statfd(stat, fd, flags)) @{
     /* error */
   @} else @{
     /* Do something with "stat". */
@@ -11813,7 +11813,7 @@ mmux_libc_stat_t   stat;
 auto               flags = mmux_libc_statfd_flags(0);
 
 mmux_libc_at_fdcwd(dirfd);
-if (mmux_libc_statfd(dirfd, stat, flags)) @{
+if (mmux_libc_statfd(stat, dirfd, flags)) @{
   /* error */
 @} else @{
   /* Do something with "stat". */
@@ -11846,7 +11846,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_stat(fs_ptn, stat)) @{
+  if (mmux_libc_stat(stat, fs_ptn)) @{
     /* error */
   @} else @{
     mmux_libc_mode_t  st_mode;
@@ -11934,7 +11934,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @{
   mmux_libc_stat_t  stat;
 
-  if (mmux_libc_stat(fs_ptn, stat)) @{
+  if (mmux_libc_stat(stat, fs_ptn)) @{
     /* error */
   @} else @{
 
@@ -11961,17 +11961,17 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @end example
 
 
-@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_S_TYPEISMQ (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat})
 @MmuxCInterface{S_TYPESIMQ}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_S_TYPEISSEM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat})
 @MmuxCInterface{S_TYPEISSEM}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat_p})
+@deftypefun bool mmux_libc_S_TYPEISSHM (bool * @var{result_p}, mmux_libc_stat_arg_t @var{stat})
 @MmuxCInterface{S_TYPEISSHM}.
 @end deftypefun
 

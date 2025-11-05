@@ -68,7 +68,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       mmux_libc_at_fdcwd(dirfd);
 
       printf_message("fstatat-ing");
-      if (mmux_libc_fstatat(dirfd, fs_ptn, stat, flags)) {
+      if (mmux_libc_fstatat(stat, dirfd, fs_ptn, flags)) {
 	printf_error("fstatat-ing");
 	handle_error();
       } else {

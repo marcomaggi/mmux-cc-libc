@@ -99,7 +99,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       mmux_libc_fd_t	fd;
 
       mmux_libc_stder(fd);
-      if (mmux_libc_stat(fs_ptn, stat)) {
+      if (mmux_libc_stat(stat, fs_ptn)) {
 	handle_error();
       } else if (mmux_libc_stat_dump(fd, stat, NULL)) {
 	handle_error();

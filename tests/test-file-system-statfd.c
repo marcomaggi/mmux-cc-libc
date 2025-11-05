@@ -76,7 +76,7 @@ test_data_file (void)
       auto		flags = mmux_libc_statfd_flags(MMUX_LIBC_AT_SYMLINK_NOFOLLOW);
 
       printf_message("statfd-ing");
-      if (mmux_libc_statfd(fd, stat, flags)) {
+      if (mmux_libc_statfd(stat, fd, flags)) {
 	printf_error("statfd-ing");
 	handle_error();
       } else {
@@ -114,7 +114,7 @@ test_current_directory (void)
   mmux_libc_at_fdcwd(dirfd);
 
   printf_message("statfd-ing");
-  if (mmux_libc_statfd(dirfd, stat, flags)) {
+  if (mmux_libc_statfd(stat, dirfd, flags)) {
     printf_error("statfd-ing");
     handle_error();
   } else {

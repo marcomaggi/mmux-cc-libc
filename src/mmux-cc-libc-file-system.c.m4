@@ -1299,38 +1299,39 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_stat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
+mmux_libc_stat (mmux_libc_stat_t stat_result, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
-  int	rv = stat(pathname->value, stat_p);
+  int	rv = stat(fs_ptn->value, stat_result);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fstat (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p)
+mmux_libc_fstat (mmux_libc_stat_t stat_result, mmux_libc_fd_arg_t fd)
 {
-  int	rv = fstat(fd->value, stat_p);
+  int	rv = fstat(fd->value, stat_result);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_lstat (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_stat_t stat_p)
+mmux_libc_lstat (mmux_libc_stat_t stat_result, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
-  int	rv = lstat(pathname->value, stat_p);
+  int	rv = lstat(fs_ptn->value, stat_result);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_fstatat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t pathname,
-		   mmux_libc_stat_t stat_p, mmux_libc_fstatat_flags_t flags)
+mmux_libc_fstatat (mmux_libc_stat_t stat_result,
+		   mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t fs_ptn,
+		   mmux_libc_fstatat_flags_t flags)
 {
-  int	rv = fstatat(dirfd->value, pathname->value, stat_p, flags.value);
+  int	rv = fstatat(dirfd->value, fs_ptn->value, stat_result, flags.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_statfd (mmux_libc_fd_arg_t fd, mmux_libc_stat_t stat_p, mmux_libc_statfd_flags_t flags)
+mmux_libc_statfd (mmux_libc_stat_t stat_result, mmux_libc_fd_arg_t fd, mmux_libc_statfd_flags_t flags)
 {
-  int	rv = fstatat(fd->value, "", stat_p, (flags.value | MMUX_LIBC_AT_EMPTY_PATH));
+  int	rv = fstatat(fd->value, "", stat_result, (flags.value | MMUX_LIBC_AT_EMPTY_PATH));
 
   return ((0 == rv)? false : true);
 }
@@ -1372,7 +1373,7 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_fs_ptn_arg_t p
 
   /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
      symlinks. */
-  if (mmux_libc_lstat(ptn, ST)) {
+  if (mmux_libc_lstat(ST, ptn)) {
     mmux_libc_errno_t	errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -1406,7 +1407,7 @@ mmux_libc_file_system_pathname_is_predicate (bool * result_p, mmux_libc_fs_ptn_a
 
   /* We  use "lstat()",  rather  than "stat()",  because  we do  not  want to  follow
      symlinks. */
-  if (mmux_libc_lstat(ptn, ST)) {
+  if (mmux_libc_lstat(ST, ptn)) {
     mmux_libc_errno_t		errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -1452,7 +1453,7 @@ mmux_libc_file_descriptor_is_predicate (bool * result_p, mmux_libc_fd_arg_t fd, 
 {
   mmux_libc_stat_t	ST;
 
-  if (mmux_libc_fstat(fd, ST)) {
+  if (mmux_libc_fstat(ST, fd)) {
     mmux_libc_errno_t		errnum;
 
     mmux_libc_errno_consume(&errnum);
@@ -1495,12 +1496,12 @@ DEFINE_FILE_DESCRIPTOR_PREDICATE([[[socket]]],			[[[S_ISSOCK]]])
 
 bool
 mmux_libc_file_system_pathname_file_size_ref (mmux_usize_t * result_p,
-					      mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn)
+					      mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
   mmux_libc_stat_t	stat;
   auto			flags = mmux_libc_fstatat_flags(0);
 
-  if (mmux_libc_fstatat(dirfd, ptn, stat, flags)) {
+  if (mmux_libc_fstatat(stat, dirfd, fs_ptn, flags)) {
     return true;
   } else {
     mmux_off_t		result;
@@ -1516,7 +1517,7 @@ mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * result_p, mmux_libc_fd_a
   auto			flags = mmux_libc_statfd_flags(0);
   mmux_libc_stat_t	stat;
 
-  if (mmux_libc_statfd(fd, stat, flags)) {
+  if (mmux_libc_statfd(stat, fd, flags)) {
     return true;
   } else {
     mmux_off_t		result;
