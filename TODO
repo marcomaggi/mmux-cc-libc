@@ -1,5 +1,11 @@
 -*- coding: utf-8-unix -*-
 
+* FIXME Cleanup the messy code in "mmux-libc-file-system-pathnames.c": rationalise the definition of
+  helper macros and inline functions.
+
+* FIXME Enforce the arbitrary limit on maximum file system pathname length, everywhere a pathname is
+  constructed.
+
 * Add functions interfacing functions in the "endian(3)" manual page?
 
 * Add a builtin interfacing "flock(2)"? (Documented in a manual page.)
