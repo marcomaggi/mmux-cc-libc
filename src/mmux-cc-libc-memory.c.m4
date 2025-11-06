@@ -146,9 +146,10 @@ mmux_libc_memmove (mmux_pointer_t dst_ptr, mmux_pointer_t src_ptr, mmux_usize_t 
   return false;
 }
 bool
-mmux_libc_memcmp (mmux_sint_t * result_p, mmux_pointerc_t ptr1, mmux_pointerc_t ptr2, mmux_usize_t nbytes)
+mmux_libc_memcmp (mmux_ternary_comparison_result_t * result_p,
+		  mmux_pointerc_t ptr1, mmux_pointerc_t ptr2, mmux_usize_t nbytes)
 {
-  *result_p = mmux_sint(memcmp(ptr1, ptr2, nbytes.value));
+  *result_p = mmux_ternary_comparison_result(memcmp(ptr1, ptr2, nbytes.value));
   return false;
 }
 bool

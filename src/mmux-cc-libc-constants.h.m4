@@ -668,6 +668,70 @@ m4_ifelse(mmux_libc_VALUEOF_RLIM_INFINITY,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 
 
 /** --------------------------------------------------------------------
+ ** File lock type.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	(mmux_libc_file_lock_type(mmux_libc_VALUEOF_$1))]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT(F_RDLCK)
+MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT(F_UNLCK)
+MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT(F_WRLCK)
+
+
+/** --------------------------------------------------------------------
+ ** Seek whence.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	(mmux_libc_seek_whence(mmux_libc_VALUEOF_$1))]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_CUR)
+MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_DATA)
+MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_END)
+MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_HOLE)
+MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_SET)
+
+
+/** --------------------------------------------------------------------
+ ** Fcntl command.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	(mmux_libc_fcntl_command(mmux_libc_VALUEOF_$1))]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_DUPFD)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_GETFD)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_GETFL)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_GETLK)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_GETOWN)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_OFD_SETLK)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_OFD_SETLKW)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_OFD_GETLK)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_OK)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETFD)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETFL)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETLK)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETLKW)
+MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETOWN)
+
+
+/** --------------------------------------------------------------------
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
@@ -749,23 +813,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(EOF)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(FD_CLOEXEC)
 
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_DUPFD)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_GETFD)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_GETFL)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_GETLK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_GETOWN)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_OFD_SETLK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_OFD_SETLKW)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_OFD_GETLK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_OK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_RDLCK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_SETFD)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_SETFL)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_SETLK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_SETLKW)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_SETOWN)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_UNLCK)
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(F_WRLCK)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(FD_SETSIZE)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MAXSYMLINKS)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(O_ACCMODE)
@@ -918,23 +965,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(WCONTINUED)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(WUNTRACED)
 
 } mmux_libc_constant_t;
-
-
-/** --------------------------------------------------------------------
- ** Integer constant.
- ** ----------------------------------------------------------------- */
-
-m4_divert(-1)
-m4_define([[[MMUX_LIBC_DEFINE_SINT_CONSTANT]]],[[[m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
-static const mmux_sint_t MMUX_LIBC_$1 = { .value = mmux_libc_VALUEOF_$1 };]]])]]])
-m4_divert(0)m4_dnl
-MMUX_LIBC_DEFINE_SINT_CONSTANT(SEEK_CUR)
-MMUX_LIBC_DEFINE_SINT_CONSTANT(SEEK_DATA)
-MMUX_LIBC_DEFINE_SINT_CONSTANT(SEEK_END)
-MMUX_LIBC_DEFINE_SINT_CONSTANT(SEEK_HOLE)
-MMUX_LIBC_DEFINE_SINT_CONSTANT(SEEK_SET)
 
 
 /** --------------------------------------------------------------------

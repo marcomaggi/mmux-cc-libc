@@ -393,71 +393,71 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 ## file descriptors
 
-# check_PROGRAMS	+= \
-# 	tests/test-file-descriptors-copy-file-range		\
-# 	tests/test-file-descriptors-fcntl-flock			\
-# 	tests/test-file-descriptors-memfd			\
-# 	tests/test-file-descriptors-open-pwrite-pread-close	\
-# 	tests/test-file-descriptors-open-write-read-close	\
-# 	tests/test-file-descriptors-openat-write-read-close	\
-# 	tests/test-file-descriptors-openat2-write-read-close	\
-# 	tests/test-file-descriptors-preadv-pwritev		\
-# 	tests/test-file-descriptors-preadv2-pwritev2		\
-# 	tests/test-file-descriptors-readv-writev		\
-# 	tests/test-file-descriptors-select			\
-# 	tests/test-file-descriptors-select-fd			\
-# 	tests/test-file-descriptors-struct-flock		\
-# 	tests/test-file-descriptors-struct-iovec		\
-# 	tests/test-file-descriptors-struct-iovec-array		\
-# 	tests/test-file-descriptors-file-size
+check_PROGRAMS	+= \
+	tests/test-file-descriptors-copy-file-range		\
+	tests/test-file-descriptors-fcntl-flock			\
+	tests/test-file-descriptors-memfd			\
+	tests/test-file-descriptors-open-pwrite-pread-close	\
+	tests/test-file-descriptors-open-write-read-close	\
+	tests/test-file-descriptors-openat-write-read-close	\
+	tests/test-file-descriptors-openat2-write-read-close	\
+	tests/test-file-descriptors-preadv-pwritev		\
+	tests/test-file-descriptors-preadv2-pwritev2		\
+	tests/test-file-descriptors-readv-writev		\
+	tests/test-file-descriptors-select			\
+	tests/test-file-descriptors-select-fd			\
+	tests/test-file-descriptors-struct-flock		\
+	tests/test-file-descriptors-struct-iovec		\
+	tests/test-file-descriptors-struct-iovec-array		\
+	tests/test-file-descriptors-file-size
 
-# tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_select_fd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_select_fd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_select_fd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_select_fd_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_open_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_open_write_read_close_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_open_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_open_write_read_close_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_open_pwrite_pread_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_open_pwrite_pread_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_open_pwrite_pread_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_open_pwrite_pread_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_openat_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_openat_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_openat_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_openat_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_openat2_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_openat2_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_openat2_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_openat2_write_read_close_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_memfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_memfd_LDADD					= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_memfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_memfd_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_struct_iovec_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_struct_iovec_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_struct_iovec_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_struct_iovec_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_struct_iovec_array_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_struct_iovec_array_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_struct_iovec_array_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_struct_iovec_array_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_readv_writev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_readv_writev_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_readv_writev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_readv_writev_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_preadv_pwritev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_preadv_pwritev_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_preadv_pwritev_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_preadv_pwritev_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_preadv2_pwritev2_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_preadv2_pwritev2_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_preadv2_pwritev2_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_preadv2_pwritev2_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_copy_file_range_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_copy_file_range_LDADD			= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_copy_file_range_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_copy_file_range_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_struct_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_struct_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_struct_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_struct_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_fcntl_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_fcntl_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_fcntl_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
-# tests_test_file_descriptors_file_size_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
-# tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
+tests_test_file_descriptors_file_size_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system

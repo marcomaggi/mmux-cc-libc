@@ -247,27 +247,28 @@ test_memcmp (void)
     auto			buflen = mmux_usize_literal(5);
     mmux_standard_octet_t	bufptr1[buflen.value];
     mmux_standard_octet_t	bufptr2[buflen.value];
-    mmux_sint_t			ternary_result;
+    mmux_ternary_comparison_result_t  cmpnum;
 
     init_buffer_with_octets(bufptr1, buflen);
     init_buffer_with_octets(bufptr2, buflen);
-    if (mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen)) {
+    if (mmux_libc_memcmp(&cmpnum, bufptr1, bufptr2, buflen)) {
       handle_error();
     }
-    assert(0 == ternary_result.value);
+    assert(0 == cmpnum.value);
+    assert(mmux_ternary_comparison_result_is_equal(cmpnum));
   }
   {
     mmux_standard_char_t *	bufptr1 = "the colour of water";
     mmux_standard_char_t *	bufptr2 = "the colour of water and quicksilver";
     mmux_usize_t		buflen;
-    mmux_sint_t			ternary_result;
+    mmux_ternary_comparison_result_t  cmpnum;
 
     mmux_libc_strlen(&buflen, bufptr1);
-    if (mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen)) {
+    if (mmux_libc_memcmp(&cmpnum, bufptr1, bufptr2, buflen)) {
       handle_error();
     }
-    assert(0 == ternary_result.value);
-    assert(mmux_ctype_is_zero(ternary_result));
+    assert(0 == cmpnum.value);
+    assert(mmux_ternary_comparison_result_is_equal(cmpnum));
   }
   printf_string(" DONE\n");
 }

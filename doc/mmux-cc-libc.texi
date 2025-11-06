@@ -1294,7 +1294,7 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memcmp (mmux_sint_t * @var{result_p}, mmux_pointerc_t @vari{ptr}, mmux_pointerc_t @varii{ptr}, mmux_usize_t @var{nbytes})
+@deftypefun bool mmux_libc_memcmp (mmux_ternary_comparison_result_t * @var{result_p}, mmux_pointerc_t @vari{ptr}, mmux_pointerc_t @varii{ptr}, mmux_usize_t @var{nbytes})
 @MmuxCInterface{memcmp}.
 
 @example
@@ -1302,22 +1302,24 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
   auto                   buflen = mmux_usize_literal(5);
   mmux_standard_octet_t  bufptr1[buflen.value];
   mmux_standard_octet_t  bufptr2[buflen.value];
-  mmux_sint_t            ternary_result;
+  mmux_ternary_comparison_result_t  cmpnum;
 
   ...
-  mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen);
-  examine_the_value_of(ternary_result);
+  mmux_libc_memcmp(&cmpnum, bufptr1, bufptr2, buflen);
+  if (mmux_ternary_comparison_result_is_less(cmpnum)) @{
+    ...
+  @}
 @}
 
 @{
   mmux_standard_char_t *  bufptr1 = "the colour of water";
   mmux_standard_char_t *  bufptr2 = "the colour of water and quicksilver";
   mmux_usize_t            buflen;
-  mmux_sint_t             ternary_result;
+  mmux_ternary_comparison_result_t  cmpnum;
 
   mmux_libc_strlen(&buflen, bufptr1);
-  mmux_libc_memcmp(&ternary_result, bufptr1, bufptr2, buflen);
-  assert(mmux_ctype_is_zero(ternary_result));
+  mmux_libc_memcmp(&cmpnum, bufptr1, bufptr2, buflen);
+  assert(mmux_ternary_comparison_result_is_equal(cmpnum));
 @}
 @end example
 @end deftypefun
@@ -5481,7 +5483,9 @@ and output facilities.  As simple example, to write a formatted string to @stdou
 mmux_libc_fd_t  fd;
 
 mmux_libc_stdou(fd);
-mmux_libc_dprintf(fd, "the integer is: %d\n", 123);
+if (mmux_libc_dprintf(fd, "the integer is: %d\n", 123)) @{
+  /* error */
+@}
 @end example
 
 @menu
@@ -5518,30 +5522,29 @@ Data structure type representing file descriptors.
 @end deftp
 
 
-@deftp {Pointer Type} mmux_libc_fd_t
-Pointer types defined as:
+@deftp {Struct Pointer Type} mmux_libc_fd_t
+Pointer type defined as:
 
 @example
 typedef mmux_libc_file_descriptor_t  mmux_libc_fd_t[1];
 @end example
 
 @noindent
-it is meant to be used as type of result in function calls that open a new file descriptor or
-retrieve an already opened file descriptor, so the referenced @objtype{mmux_libc_file_descriptor_t}
-instance must be mutable.
+it is meant to be used to define local variables and as type of result in function calls that open a
+new file descriptor or retrieve an already opened file descriptor, so the referenced
+@objtype{mmux_libc_file_descriptor_t} instance must be mutable.
 @end deftp
 
 
-@deftp {Pointer Type} mmux_libc_fd_arg_t
-Pointer types defined as:
+@deftp {Struct Pointer Type} mmux_libc_fd_arg_t
+Pointer type defined as:
 
 @example
-typedef mmux_libc_file_descriptor_t const  mmux_libc_fd_arg_t[1];
+typedef mmux_libc_file_descriptor_t const *  mmux_libc_fd_arg_t;
 @end example
 
 @noindent
-it is meant to be used as type of arguments in function calls that make use of a file descriptor, so
-the referenced @objtype{mmux_libc_file_descriptor_t} instance must be immutable.
+it is meant to be used as type of immutable arguments to functions.
 @end deftp
 
 
@@ -5552,9 +5555,9 @@ return value is @ctrue{}.
 @example
 mmux_libc_fd_t  in, ou, er;
 
-mmux_libc_make_fd(&in, 0);
-mmux_libc_make_fd(&ou, 1);
-mmux_libc_make_fd(&er, 2);
+mmux_libc_make_fd(&in, STDIN_FILENO);
+mmux_libc_make_fd(&ou, STDOUT_FILENO);
+mmux_libc_make_fd(&er, STDERR_FILENO);
 @end example
 @end deftypefun
 
@@ -5576,37 +5579,35 @@ Data structure type representing directory file descriptors.
 @end deftp
 
 
-@deftp {Pointer Type} mmux_libc_dirfd_t
-Pointer types defined as:
+@deftp {Struct Pointer Type} mmux_libc_dirfd_t
+Pointer type defined as:
 
 @example
 typedef mmux_libc_directory_file_descriptor_t  mmux_libc_dirfd_t[1];
 @end example
 
 @noindent
-it is meant to be used as type of result in function calls that open a new directory file descriptor
-or retrieve an already opened file descriptor, so the referenced
+it is meant to be used to define local variables and as type of result in function calls that open a
+new directory file descriptor or retrieve an already opened file descriptor, so the referenced
 @objtype{mmux_libc_directory_file_descriptor_t} instance must be mutable.
 @end deftp
 
 
-@deftp {Pointer Type} mmux_libc_dirfd_arg_t
-Pointer types defined as:
+@deftp {Struct Pointer Type} mmux_libc_dirfd_arg_t
+Pointer type defined as:
 
 @example
-typedef mmux_libc_directory_file_descriptor_t const  mmux_libc_dirfd_arg_t[1];
+typedef mmux_libc_directory_file_descriptor_t const *  mmux_libc_dirfd_arg_t;
 @end example
 
 @noindent
-it is meant to be used as type of arguments in function calls that make use of a directory file
-descriptor, so the referenced @objtype{mmux_libc_directory_file_descriptor_t} instance must be
-immutable.
+it is meant to be used as type of immutable arguments to functions.
 @end deftp
 
 
 @deftypefun bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t @var{dirfd})
-Store in the variable referenced by @var{dirfd} directory file descriptor associated to the constant
-@code{AT_FDCWD}.  We can use it with @cfunc{mmux_libc_openat} and similar functions.
+Store in the variable referenced by @var{dirfd} the directory file descriptor associated to the
+constant @code{AT_FDCWD}.  We can use it with @cfunc{mmux_libc_openat} and similar functions.
 @end deftypefun
 
 
@@ -5650,28 +5651,56 @@ Retrieve the file descriptor value associated to the standard error.
 @section Printing formatted output
 
 
-@deftypefun bool mmux_libc_dprintf (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, ...)
-@deftypefunx bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
-@deftypefunx bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
-@MmuxCInterface{dprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
-
-To print to a file descriptor:
+To print a formatted string to a file descriptor, we do:
 
 @example
-mmux_libc_fs_ptn_t  ptn;
-mmux_libc_fd_t      fd;
-auto                flags = mmux_libc_open_flags(MMUX_LIBC_O_RDONLY);
-auto                mode  = mmux_libc_mode_literal(0);
+mmux_libc_fd_t  fd;
 
-if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class,
-                                        ptn, "/path/to/file.ext")) @{
-  /* error */
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+
+  /* Build the file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open an existing file for writing. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_WRONLY);
+    auto  mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
 @}
-if (mmux_libc_open(fd, ptn, flags, mode)) @{
-  /* error */
+
+/* Print something to the file. */
+@{
+  if (mmux_libc_dprintf(fd, "the number is %d\n", 123)) @{
+    /* error */
+  @}
 @}
-if (mmux_libc_dprintf(fd, "the number is %d\n", 123)) @{
-  /* error */
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
 @}
 @end example
 
@@ -5685,10 +5714,16 @@ if (mmux_libc_dprintfer("the number is %d\n", 456)) @{
   /* error */
 @}
 @end example
+
+
+@deftypefun bool mmux_libc_dprintf (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, ...)
+@deftypefunx bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
+@deftypefunx bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
+@MmuxCInterface{dprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_vdprintf (mmux_libc_file_descriptor_t @var{fd}, mmux_asciizcp_t @var{template}, va_list @var{ap})
+@deftypefun bool mmux_libc_vdprintf (mmux_libc_fs_arg_t @var{fd}, mmux_asciizcp_t @var{template}, va_list @var{ap})
 @deftypefunx bool mmux_libc_vdprintfou (mmux_asciizcp_t @var{template}, va_list @var{ap})
 @deftypefunx bool mmux_libc_vdprintfer (mmux_asciizcp_t @var{template}, va_list @var{ap})
 @MmuxCInterface{vdprintf}.  Print the message to, respectively: @var{fd}, @stdout{}, @stderr{}.
@@ -5712,7 +5747,7 @@ my_print_error (mmux_asciizcp_t template, ...)
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dprintf_newline (mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_dprintf_newline (mmux_libc_fd_arg_t @var{fd})
 @deftypefunx bool mmux_libc_dprintfou_newline (void)
 @deftypefunx bool mmux_libc_dprintfer_newline (void)
 Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{}.
@@ -5720,15 +5755,15 @@ Print a single newline character to, respectively: @var{fd}, @stdout{}, @stderr{
 
 
 @anchor{mmux_libc_dprintf_strerror}
-@deftypefun bool mmux_libc_dprintf_strerror (mmux_libc_fd_t @var{fd}, mmux_sint_t @var{errnum})
-Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @MmuxAsciiZ{} string resulting from a
-call to @cfunc{mmux_libc_strerror}.
+@deftypefun bool mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t @var{fd}, mmux_libc_errno_t @var{errnum})
+Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the @MmuxAsciiZ{} string resulting
+from a call to @cfunc{mmux_libc_strerror}.
 @end deftypefun
 
 
 @anchor{mmux_libc_dprintf_strftime}
-@deftypefun bool mmux_libc_dprintf_strftime (mmux_libc_fd_t @var{fd}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
-Wrapper for @cfunc{mmux_libc_printf} that prints to @var{fd} the timestamp representation of
+@deftypefun bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the timestamp representation of
 @var{BT} formatted according to @var{template} using @cfunc{mmux_libc_strftime},
 @ref{mmux_libc_strftime} for details.
 @end deftypefun
@@ -5736,7 +5771,8 @@ Wrapper for @cfunc{mmux_libc_printf} that prints to @var{fd} the timestamp repre
 @c ------------------------------------------------------------------------
 
 @macro MmuxDefineTypePrinterFunc{STEM}
-@deftypefun bool mmux_libc_dprintf_\STEM\ (mmux_libc_file_descriptor_t @var{fd}, mmux_\STEM\_t @var{value})
+@anchor{mmux_libc_dprintf_\STEM\}
+@deftypefun bool mmux_libc_dprintf_\STEM\ (mmux_libc_fd_arg_t @var{fd}, mmux_\STEM\_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -5764,38 +5800,6 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{sint64}
 @MmuxDefineTypePrinterFunc{uint64}
 
-@MmuxDefineTypePrinterFunc{float}
-@MmuxDefineTypePrinterFunc{double}
-@MmuxDefineTypePrinterFunc{ldouble}
-
-@MmuxDefineTypePrinterFunc{float32}
-@MmuxDefineTypePrinterFunc{float64}
-@MmuxDefineTypePrinterFunc{float128}
-
-@MmuxDefineTypePrinterFunc{float32x}
-@MmuxDefineTypePrinterFunc{float64x}
-@MmuxDefineTypePrinterFunc{float128x}
-
-@MmuxDefineTypePrinterFunc{decimal32}
-@MmuxDefineTypePrinterFunc{decimal64}
-@MmuxDefineTypePrinterFunc{decimal128}
-
-@MmuxDefineTypePrinterFunc{complexf}
-@MmuxDefineTypePrinterFunc{complexd}
-@MmuxDefineTypePrinterFunc{complexld}
-
-@MmuxDefineTypePrinterFunc{complexf32}
-@MmuxDefineTypePrinterFunc{complexf64}
-@MmuxDefineTypePrinterFunc{complexf128}
-
-@MmuxDefineTypePrinterFunc{complexf32x}
-@MmuxDefineTypePrinterFunc{complexf64x}
-@MmuxDefineTypePrinterFunc{complexf128x}
-
-@MmuxDefineTypePrinterFunc{complexd32}
-@MmuxDefineTypePrinterFunc{complexd64}
-@MmuxDefineTypePrinterFunc{complexd128}
-
 @MmuxDefineTypePrinterFunc{usize}
 @MmuxDefineTypePrinterFunc{ssize}
 
@@ -5804,47 +5808,61 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{sintptr}
 @MmuxDefineTypePrinterFunc{uintptr}
 @MmuxDefineTypePrinterFunc{ptrdiff}
-@MmuxDefineTypePrinterFunc{mode}
+@MmuxDefineTypePrinterFunc{libc_mode}
 @MmuxDefineTypePrinterFunc{off}
-@MmuxDefineTypePrinterFunc{pid}
-@MmuxDefineTypePrinterFunc{uid}
-@MmuxDefineTypePrinterFunc{gid}
+@MmuxDefineTypePrinterFunc{libc_pid}
+@MmuxDefineTypePrinterFunc{libc_uid}
+@MmuxDefineTypePrinterFunc{libc_gid}
 @MmuxDefineTypePrinterFunc{wchar}
 @MmuxDefineTypePrinterFunc{wint}
 @MmuxDefineTypePrinterFunc{time}
-@MmuxDefineTypePrinterFunc{socklen}
-@MmuxDefineTypePrinterFunc{rlim}
-@MmuxDefineTypePrinterFunc{ino}
-@MmuxDefineTypePrinterFunc{dev}
-@MmuxDefineTypePrinterFunc{nlink}
-@MmuxDefineTypePrinterFunc{blkcnt}
+@MmuxDefineTypePrinterFunc{libc_socklen}
+@MmuxDefineTypePrinterFunc{libc_rlim}
+@MmuxDefineTypePrinterFunc{libc_ino}
+@MmuxDefineTypePrinterFunc{libc_dev}
+@MmuxDefineTypePrinterFunc{libc_nlink}
+@MmuxDefineTypePrinterFunc{libc_blkcnt}
+
+@MmuxDefineTypePrinterFunc{flonumfl}
+@MmuxDefineTypePrinterFunc{flonumdb}
+@MmuxDefineTypePrinterFunc{flonumldb}
+
+@MmuxDefineTypePrinterFunc{flonumf32}
+@MmuxDefineTypePrinterFunc{flonumf64}
+@MmuxDefineTypePrinterFunc{flonumf128}
+
+@MmuxDefineTypePrinterFunc{flonumf32x}
+@MmuxDefineTypePrinterFunc{flonumf64x}
+@MmuxDefineTypePrinterFunc{flonumf128x}
+
+@MmuxDefineTypePrinterFunc{flonumd32}
+@MmuxDefineTypePrinterFunc{flonumd64}
+@MmuxDefineTypePrinterFunc{flonumd128}
+
+@MmuxDefineTypePrinterFunc{flonumcfl}
+@MmuxDefineTypePrinterFunc{flonumcdb}
+@MmuxDefineTypePrinterFunc{flonumcldb}
+
+@MmuxDefineTypePrinterFunc{flonumcf32}
+@MmuxDefineTypePrinterFunc{flonumcf64}
+@MmuxDefineTypePrinterFunc{flonumcf128}
+
+@MmuxDefineTypePrinterFunc{flonumcf32x}
+@MmuxDefineTypePrinterFunc{flonumcf64x}
+@MmuxDefineTypePrinterFunc{flonumcf128x}
+
+@MmuxDefineTypePrinterFunc{flonumcd32}
+@MmuxDefineTypePrinterFunc{flonumcd64}
+@MmuxDefineTypePrinterFunc{flonumcd128}
 
 @anchor{mmux_libc_dprintf_libc_fd}
-@deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_descriptor_t @var{value})
-Print to @var{fd} the string representation of @var{value}.
-@end deftypefun
-
-
-@anchor{mmux_libc_dprintf_libc_pid}
-@deftypefun bool mmux_libc_dprintf_libc_pid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_pid_t @var{value})
-Print to @var{fd} the string representation of @var{value}.
-@end deftypefun
-
-
-@anchor{mmux_libc_dprintf_libc_uid}
-@deftypefun bool mmux_libc_dprintf_libc_uid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_uid_t @var{value})
-Print to @var{fd} the string representation of @var{value}.
-@end deftypefun
-
-
-@anchor{mmux_libc_dprintf_libc_gid}
-@deftypefun bool mmux_libc_dprintf_libc_gid (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_gid_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
 @anchor{mmux_libc_dprintf_fs_ptn}
-@deftypefun bool mmux_libc_dprintf_fs_ptn (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{value})
+@deftypefun bool mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -5856,19 +5874,19 @@ Print to @var{fd} the string representation of @var{value}.
 
 
 @anchor{mmux_libc_dprintf_fs_ptn_segment}
-@deftypefun bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_file_system_pathname_segment_t @var{value})
+@deftypefun bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_segment_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
 @anchor{mmux_libc_dprintf_libc_process_completion_status}
-@deftypefun bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_process_completion_status_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t @var{fd}, mmux_libc_process_completion_status_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
 @anchor{mmux_libc_dprintf_libc_interprocess_signal}
-@deftypefun bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
+@deftypefun bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -5887,46 +5905,118 @@ Print to @var{fd} the string representation of @var{value}.
 @subsection Standard file descriptor opening
 
 
-@deftypefun bool mmux_libc_open (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_libc_mode_t @var{mode})
+@deftp {Struct Type} mmux_libc_open_flags_t
+Data structure representing a bitwise OR combination of flags for opening file descriptors.
+@end deftp
+
+
+@deftypefun mmux_libc_open_flags_t mmux_libc_open_flags (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_open_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_open (mmux_libc_fd_t @var{fd_result}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_open_flags_t @var{flags}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{open}.
 
 @example
-mmux_libc_fs_ptn_t  pathname;
-mmux_libc_fs_t      fd;
+mmux_libc_fd_t  fd;
 
-mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-mmux_libc_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
-  /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open a file for writing. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
 @}
 
-if (mmux_libc_open(&fd, pathname, flags, mode)) @{
-  /* error */
+@{
+  /* Do something with "fd". */
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_openat (mmux_libc_file_descriptor_t * @var{result_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags}, mmux_libc_mode_t @var{mode})
+@deftypefun bool mmux_libc_openat (mmux_libc_fd_t @var{fd_result}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_open_flags_t @var{flags}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{openat}.
 
 @example
-mmux_libc_fs_ptn_t      pathname;
-mmux_libc_file_descriptor_t      dirfd;
-mmux_libc_file_descriptor_t      fd;
+mmux_libc_fd_t  fd;
 
-mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-mmux_libc_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_make_file_system_pathname(pathname, "/path/to/file.ext")) @{
-  /* error */
+  /* Build the file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open a file for writing. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    mmux_libc_at_fdcwd(&dirfd);
+    if (mmux_libc_openat(fd, dirfd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
 @}
 
-mmux_libc_at_fdcwd(&dirfd);
+@{
+  /* Do something with "fd". */
+@}
 
-if (mmux_libc_openat(&fd, dirfd, pathname, flags, mode)) @{
-  /* error */
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
@@ -5943,17 +6033,17 @@ implemented by the Linux kernel.
 @MmuxCStructOpaqueTypedef{open_how}
 
 
-@MmuxSetterGetter{open_how, flags,   mmux_uint64_t}
-@MmuxSetterGetter{open_how, mode,    mmux_uint64_t}
-@MmuxSetterGetter{open_how, resolve, mmux_uint64_t}
+@MmuxSetterGetter{open_how, open_how_flags,   mmux_uint64_t}
+@MmuxSetterGetter{open_how, open_how_mode,    mmux_uint64_t}
+@MmuxSetterGetter{open_how, open_how_resolve, mmux_uint64_t}
 @MmuxStructDumper{open_how}
 
 
 To dump the contents of @code{mmux_libc_open_how_t} we can do:
 
 @example
-mmux_libc_file_descriptor_t     fder;
-mmux_libc_open_how_t            open_how;
+mmux_libc_fd_t        er;
+mmux_libc_open_how_t  open_how;
 
 mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
 
@@ -5969,8 +6059,8 @@ mmux_libc_open_how_resolve_set(&open_how, \
   | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
   | MMUX_LIBC_RESOLVE_NO_XDEV);
 
-mmux_libc_stder(&fder);
-if (mmux_libc_open_how_dump(fder, &open_how, NULL)) @{
+mmux_libc_stder(er);
+if (mmux_libc_open_how_dump(er, &open_how, NULL)) @{
   /* error */
 @}
 @end example
@@ -5981,44 +6071,69 @@ prints:
 
 @example
 struct open_how = 0x7ffca7af5b80
-struct open_how->flags = 194 (O_ACCMODE | O_CREAT | O_EXCL | O_RDWR)
+struct open_how->flags = 194 (O_CREAT | O_EXCL | O_RDWR)
 struct open_how->mode = 384 (S_IRUSR | S_IRWXU | S_IWUSR)
 struct open_how->resolve = 15 (RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS | RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV)
 @end example
 
 
-@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_file_descriptor_t * @var{fd}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_open_how_t const * const @var{how_p})
+@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_fd_t @var{fd_result}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_open_how_t const * @var{how_p})
 @MmuxCInterface{openat2}.
 
 @example
-mmux_libc_fs_ptn_t      ptn;
-mmux_libc_file_descriptor_t           dirfd;
-mmux_libc_file_descriptor_t           fd;
-mmux_libc_open_how_t                  open_how;
+mmux_libc_fd_t  fd;
 
-/* required by the Linux kernel */
-mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-mmux_libc_open_how_flags_set(&open_how, \
-  MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+  /* Build the file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-mmux_libc_open_how_mode_set(&open_how, \
-  MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
 
-mmux_libc_open_how_resolve_set(&open_how, \
-  MMUX_LIBC_RESOLVE_BENEATH               \
-  | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
-  | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
-  | MMUX_LIBC_RESOLVE_NO_XDEV);
+  /* Open a file for writing. */
+  @{
+    mmux_libc_open_how_t  open_how;
 
-if (mmux_libc_make_file_system_pathname(ptn, "./file.ext")) @{
-  /* error */
+    /* Required by the Linux kernel. */
+    mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+
+    mmux_libc_open_how_flags_set   (&open_how, MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    mmux_libc_open_how_mode_set    (&open_how, MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+    mmux_libc_open_how_resolve_set (&open_how, MMUX_LIBC_RESOLVE_BENEATH \
+                                               | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
+                                               | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
+                                               | MMUX_LIBC_RESOLVE_NO_XDEV);
+    mmux_libc_at_fdcwd(dirfd);
+    if (mmux_libc_openat2(fd, dirfd, fs_ptn, &open_how)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
 @}
 
-mmux_libc_at_fdcwd(&dirfd);
+@{
+  /* Do something with "fd". */
+@}
 
-if (mmux_libc_openat2(&fd, dirfd, ptn, &open_how)) @{
-  /* error */
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefn
@@ -6028,7 +6143,7 @@ if (mmux_libc_openat2(&fd, dirfd, ptn, &open_how)) @{
 @section Closing file descriptors
 
 
-@deftypefun bool mmux_libc_close (mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_close (mmux_libc_fd_t @var{fd})
 @MmuxCInterface{close}.
 @end deftypefun
 
@@ -6037,16 +6152,16 @@ if (mmux_libc_openat2(&fd, dirfd, ptn, &open_how)) @{
 @section Reading from file descriptors
 
 
-@deftypefun bool mmux_libc_read (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_read (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen})
 @MmuxCInterface{read}.
 
 @example
-mmux_libc_file_descriptor_t     fd;
-mmux_usize_t                    nbytes_done;
-mmux_usize_t                    buflen = 4096;
-mmux_uint8_t                    bufptr[buflen];
+mmux_libc_fd_t         fd;
+mmux_usize_t           nbytes_done;
+auto                   buflen = mmux_usize_literal(4096);
+mmux_standard_octet_t  bufptr[buflen.value];
 
-mmux_libc_stdin(&fd);
+mmux_libc_stdin(fd);
 if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
   /* error */
 @}
@@ -6054,7 +6169,7 @@ if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pread (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
+@deftypefun bool mmux_libc_pread (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
 @MmuxCInterface{pread}.
 @end deftypefun
 
@@ -6799,8 +6914,8 @@ mmux_libc_make_pid_zero(&pid); /* should not fail */
 
 mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_RDLCK);
 mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-mmux_libc_l_start_set  (&flo, 11);
-mmux_libc_l_len_set    (&flo, 33);
+mmux_libc_l_start_set  (&flo, mmux_off_literal(11));
+mmux_libc_l_len_set    (&flo, mmux_off_literal(33));
 mmux_libc_l_pid_set    (&flo, pid);
 
 @{
@@ -6827,14 +6942,14 @@ struct flock.l_pid = "0"
 
 
 @MmuxCStructOpaqueTypedef{flock}
-@MmuxSetterGetter{flock, l_type,   mmux_sshort_t}
-@MmuxSetterGetter{flock, l_whence, mmux_sshort_t}
+@MmuxSetterGetter{flock, l_type,   mmux_libc_file_lock_type_t}
+@MmuxSetterGetter{flock, l_whence, mmux_libc_seek_whence_t}
 @MmuxSetterGetter{flock, l_start,  mmux_off_t}
 @MmuxSetterGetter{flock, l_len,    mmux_off_t}
 @MmuxSetterGetter{flock, l_pid,    mmux_libc_pid_t}
 @MmuxStructDumper{flock}
 
-@deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcp_t* @var{str_p}, mmux_sshort_t @var{flag})
+@deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcpp_t @var{str_p}, mmux_libc_file_lock_type_t @var{flag})
 Identify @var{flag} as a value for the field @code{l_type} of @objtype{mmux_libc_flock_t}; store in
 the variable referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiZ{} string
 representing the name of the value.

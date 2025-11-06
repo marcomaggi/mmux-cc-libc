@@ -111,9 +111,9 @@ typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_inter
  ** Input output.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_libc_file_descriptor_t		{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
-typedef mmux_libc_file_descriptor_t			mmux_libc_fd_t[1];
-typedef mmux_libc_file_descriptor_t const *		mmux_libc_fd_arg_t;
+typedef struct mmux_libc_file_descriptor_t	{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
+typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t[1];
+typedef mmux_libc_file_descriptor_t const *	mmux_libc_fd_arg_t;
 
 typedef struct mmux_libc_memory_file_descriptor_t {
   mmux_libc_file_descriptor_t;
@@ -121,7 +121,17 @@ typedef struct mmux_libc_memory_file_descriptor_t {
 typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
 typedef mmux_libc_memory_file_descriptor_t const *	mmux_libc_memfd_arg_t;
 
-typedef struct mmux_libc_open_flags_t	{ mmux_sint_t;	} mmux_libc_open_flags_t;
+typedef struct mmux_libc_directory_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_directory_file_descriptor_t;
+
+typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
+typedef mmux_libc_directory_file_descriptor_t const *	mmux_libc_dirfd_arg_t;
+
+typedef struct mmux_libc_open_flags_t		{ mmux_sint_t;	 } mmux_libc_open_flags_t;
+typedef struct mmux_libc_file_lock_type_t	{ mmux_sshort_t; } mmux_libc_file_lock_type_t;
+typedef struct mmux_libc_seek_whence_t		{ mmux_sshort_t; } mmux_libc_seek_whence_t;
+typedef struct mmux_libc_fcntl_command_t	{ mmux_sint_t;   } mmux_libc_fcntl_command_t;
 
 
 /** --------------------------------------------------------------------
@@ -261,13 +271,6 @@ typedef mmux_libc_file_system_pathname_segment_t const *	mmux_libc_fs_ptn_segmen
 /* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_dirstream_position_t	{ mmux_slong_t;	} mmux_libc_dirstream_position_t;
-
-typedef struct mmux_libc_directory_file_descriptor_t {
-  mmux_libc_file_descriptor_t;
-} mmux_libc_directory_file_descriptor_t;
-
-typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
-typedef mmux_libc_directory_file_descriptor_t const *	mmux_libc_dirfd_arg_t;
 
 
 /** --------------------------------------------------------------------
