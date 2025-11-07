@@ -6219,6 +6219,19 @@ if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
 
 @deftypefun bool mmux_libc_pread (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
 @MmuxCInterface{pread}.
+
+@example
+mmux_libc_fd_t         fd;
+mmux_usize_t           nbytes_done;
+auto                   buflen = mmux_usize_literal(4096);
+mmux_standard_octet_t  bufptr[buflen.value];
+auto                   offset = mmux_off_literal(123);
+
+gimme_an_fd(fd);
+if (mmux_libc_pread(&nbytes_done, fd, bufptr, buflen, offset)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c page
@@ -6230,10 +6243,10 @@ if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
 @MmuxCInterface{write}.
 
 @example
-mmux_libc_file_descriptor_t     fd;
-mmux_usize_t                    nbytes_done;
-mmux_usize_t                    buflen;
-mmux_asciizcp_t                 bufptr = "ciao";
+mmux_libc_fd_t   fd;
+mmux_usize_t     nbytes_done;
+mmux_usize_t     buflen;
+mmux_asciizcp_t  bufptr = "ciao";
 
 mmux_libc_strlen(&buflen, bufptr);
 mmux_libc_stdou(fd);
@@ -6246,6 +6259,20 @@ if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
 
 @deftypefun bool mmux_libc_pwrite (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
 @MmuxCInterface{pwrite}.
+
+@example
+mmux_libc_fd_t   fd;
+mmux_usize_t     nbytes_done;
+mmux_usize_t     buflen;
+mmux_asciizcp_t  bufptr = "ciao";
+auto             offset = mmux_off_literal(123);
+
+mmux_libc_strlen(&buflen, bufptr);
+gimme_an_fd(fd);
+if (mmux_libc_pwrite(&nbytes_done, fd, bufptr, buflen, offset)) @{
+  /* error */
+@}
+@end example
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -6260,8 +6287,10 @@ otherwise return @ctrue{}.
 These functions exist mostly as tools in debugging code.
 
 @example
-mmux_usize_t    buflen;
-mmux_uint8_t    bufptr[buflen];
+mmux_usize_t     buflen;
+mmux_asciizcp_t  bufptr = "ciao";
+
+mmux_libc_strlen(&buflen, bufptr);
 
 if (mmux_libc_write_buffer_to_stdou(bufptr, buflen)) @{
   /* error */
