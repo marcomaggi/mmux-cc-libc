@@ -600,24 +600,24 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_pipe (mmux_libc_file_descriptor_t fds[2])
+mmux_libc_pipe (mmux_libc_fd_t fds[2])
 {
   int	fdvals[2];
   int	rv = pipe(fdvals);
 
   if (-1 != rv) {
-    fds[0].value = fdvals[0];
-    fds[1].value = fdvals[1];
+    fds[0][0].value = fdvals[0];
+    fds[1][0].value = fdvals[1];
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_close_pipe (mmux_libc_file_descriptor_t const fds[2])
+mmux_libc_close_pipe (mmux_libc_fd_t fds[2])
 {
-  bool	rv1 = mmux_libc_close(&(fds[0]));
-  bool	rv2 = mmux_libc_close(&(fds[1]));
+  bool	rv1 = mmux_libc_close(fds[0]);
+  bool	rv2 = mmux_libc_close(fds[1]);
 
   return ((rv1 || rv2)? true : false);
 }

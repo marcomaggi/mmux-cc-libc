@@ -717,10 +717,10 @@ mmux_cc_libc_decl bool mmux_libc_dup2 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_a
 mmux_cc_libc_decl bool mmux_libc_dup3 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_file_descriptor_t fds[2])
+mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_fd_t fds[2])
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_file_descriptor_t const fds[2])
+mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_fd_t fds[2])
   __attribute__((__warn_unused_result__));
 
 

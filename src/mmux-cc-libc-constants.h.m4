@@ -44,6 +44,12 @@
 #define MMUX_HAVE_LIBC_WAIT_MYPGRP	1
 #define MMUX_LIBC_WAIT_MYPGRP		((mmux_libc_pid_t){ .value = mmux_libc_VALUEOF_WAIT_MYPGRP })
 
+/* ------------------------------------------------------------------ */
+
+#define MMUX_HAVE_LIBC_FD_SETSIZE	1
+#define MMUX_LIBC_VALUEOF_FD_SETSIZE	mmux_libc_VALUEOF_FD_SETSIZE
+#define MMUX_LIBC_FD_SETSIZE		((mmux_uint_t){ .value = mmux_libc_VALUEOF_FD_SETSIZE })
+
 
 /** --------------------------------------------------------------------
  ** Sockets address family.
@@ -813,7 +819,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(EOF)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(FD_CLOEXEC)
 
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(FD_SETSIZE)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MAXSYMLINKS)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(O_ACCMODE)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(O_APPEND)

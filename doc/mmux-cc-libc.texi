@@ -6432,7 +6432,7 @@ mmux_libc_fd_t      fd1, fd2;
 @section Opening file descriptor pipes
 
 
-@deftypefun bool mmux_libc_pipe (mmux_libc_file_descriptor_t @var{fds}[2])
+@deftypefun bool mmux_libc_pipe (mmux_libc_fd_t @var{fds}[2])
 @MmuxCInterface{pipe}.
 
 @example
@@ -6474,7 +6474,7 @@ child_play (mmux_libc_fd_arg_t read_fr_paren_fd, mmux_libc_fd_arg_t writ_to_pare
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_close_pipe (mmux_libc_file_descriptor_t @var{fds}[2])
+@deftypefun bool mmux_libc_close_pipe (mmux_libc_fd_t @var{fds}[2])
 Close both the file descriptors in @var{fds}.  If both closures succeed: return @cfalse{}; otherwise
 return @ctrue{}.  If closing the first fails: this function still closes the second.
 
@@ -6491,7 +6491,7 @@ Example:
 @example
 mmux_libc_fd_set_t      read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
 mmux_uint_t             nfds_ready;
-mmux_uint_t             maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
+auto                 maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
 mmux_libc_timeval_t     timeout[1];
 mmux_libc_fd_t          in, ou;
 bool                    isset;
@@ -6529,6 +6529,11 @@ if (isset) @{
   /* do something */
 @}
 @end example
+
+
+@deftypevar mmux_uint_t MMUX_LIBC_FD_SETSIZE
+Constant value representing the standard constant @code{FD_SETSIZE}.
+@end deftypevar
 
 
 @deftypefun bool mmux_libc_FD_ZERO (mmux_libc_fd_set_t * @var{fd_set_p})
