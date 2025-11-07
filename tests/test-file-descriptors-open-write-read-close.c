@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		pathname_asciiz = "./test-file-descriptors-open-write-read-close.file.ext";
+static mmux_asciizcp_t	pathname_asciiz = "./test-file-descriptors-open-write-read-close.file.ext";
 
 
 /** --------------------------------------------------------------------
@@ -39,77 +38,115 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_file_system_pathname_t	ptn;
-  mmux_libc_file_descriptor_t		fd;
-
-  mmux_sint_t     flags    = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-  mmux_mode_t     mode     = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
-
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, pathname_asciiz)) {
-    handle_error();
-  };
-
-  if (mmux_libc_open(&fd, ptn, flags, mode)) {
-    handle_error();
-  }
-
-  /* writing */
   {
-    mmux_usize_t	nbytes_done;
-    mmux_asciizcp_t	bufptr = "ciao";
-    mmux_usize_t	buflen;
+    mmux_libc_fd_t	fd;
 
-    mmux_libc_strlen(&buflen, bufptr);
-
-    if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
-      handle_error();
-    }
-  }
-
-  /* seeking */
-  {
-    mmux_off_t		offset = 0;
-    mmux_sint_t		whence = MMUX_LIBC_SEEK_SET;
-
-    if (mmux_libc_lseek(fd, &offset, whence)) {
-      handle_error();
-    }
-  }
-
-  /* reading */
-  {
-    mmux_usize_t	expected_nbytes_done	= 4;
-    mmux_asciizcp_t	expected_bufptr		= "ciao";
-
-    mmux_usize_t	nbytes_done;
-    mmux_usize_t	buflen = 4096;
-    mmux_uint8_t	bufptr[buflen];
-
-    if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) {
-      handle_error();
-    }
-
-    if (expected_nbytes_done != nbytes_done) {
-      MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("wrong expected nbytes done: expected %lu got %lu\n", expected_nbytes_done, nbytes_done));
-      handle_error();
-    }
-
+    /* Obtain the file descriptor. */
     {
-      mmux_sint_t	result;
+      mmux_libc_fs_ptn_t	fs_ptn;
 
-      mmux_libc_memcmp(&result, expected_bufptr, bufptr, buflen);
-      if (0 == result) {
-	print_error("wrong bufptr");
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, pathname_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Open the file. */
+      {
+	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+	auto	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+	printf_message("opening the file");
+	if (mmux_libc_open(fd, fs_ptn, flags, mode)) {
+	  printf_error("opening the file");
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn);
+      }
+    }
+
+    /* Writing. */
+    {
+      mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+      mmux_usize_t	buflen;
+      mmux_usize_t	nbytes_done;
+
+      mmux_libc_strlen(&buflen, bufptr);
+
+      printf_message("write-ing");
+      if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) {
+	printf_error("write-ing");
+	handle_error();
+      }
+    }
+
+    /* Seeking to the beginning of the file. */
+    {
+      auto	offset = mmux_off_constant_zero();
+      auto	whence = MMUX_LIBC_SEEK_SET;
+
+      printf_message("lseek-ing to the beginning of the file");
+      if (mmux_libc_lseek(fd, &offset, whence)) {
+	printf_error("lseek-ing to the beginning of the file");
+	handle_error();
+      }
+    }
+
+    /* Reading. */
+    {
+      mmux_usize_t		nbytes_done;
+      auto			buflen = mmux_usize_literal(4096);
+      mmux_standard_uint8_t	bufptr[buflen.value];
+
+      printf_message("read-ing");
+      if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) {
+	printf_error("read-ing");
+	handle_error();
+      }
+
+      bufptr[nbytes_done.value] = '\0';
+
+      /* Checking the read buffer. */
+      {
+	mmux_usize_t	expected_nbytes_done;
+	mmux_asciizcp_t	expected_bufptr = "the colour of water and quicksilver";
+
+	mmux_libc_strlen(&expected_nbytes_done, expected_bufptr);
+
+	if (mmux_ctype_not_equal(expected_nbytes_done, nbytes_done)) {
+	  MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("wrong expected nbytes done: expected %lu got %lu\n",
+						      expected_nbytes_done.value, nbytes_done.value));
+	  handle_error();
+	} else {
+	  mmux_ternary_comparison_result_t	cmpnum;
+
+	  mmux_libc_memcmp(&cmpnum, expected_bufptr, bufptr, nbytes_done);
+	  if (mmux_ternary_comparison_result_is_equal(cmpnum)) {
+	    printf_message("correct bufptr '%s'", bufptr);
+	  } else {
+	    printf_error("wrong bufptr '%s'", bufptr);
+	    handle_error();
+	  }
+	}
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      if (mmux_libc_close(fd)) {
 	handle_error();
       }
     }
   }
 
-  if (mmux_libc_close(fd)) {
-    handle_error();
-  }
-
-  cleanfiles();
   mmux_libc_exit_success();
 }
 

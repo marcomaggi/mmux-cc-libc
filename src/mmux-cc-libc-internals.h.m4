@@ -248,15 +248,6 @@ typedef struct timespec		mmux_libc_timespec_t;
 typedef struct tm		mmux_libc_tm_t;
 
 typedef struct iovec		mmux_libc_iovec_t;
-#if ((defined HAVE_OPEN_HOW) && (1 == HAVE_OPEN_HOW))
-typedef struct open_how		mmux_libc_open_how_t;
-#else
-typedef struct mmux_libc_open_how_t {
-  mmux_standard_uint64_t	flags;
-  mmux_standard_uint64_t	mode;
-  mmux_standard_uint64_t	resolve;
-} mmux_libc_open_how_t;
-#endif
 typedef struct flock		mmux_libc_flock_t;
 typedef fd_set			mmux_libc_fd_set_t;
 typedef struct rlimit		mmux_libc_rlimit_t;
@@ -274,6 +265,16 @@ typedef struct mmux_libc_iovec_array_t {
   mmux_libc_iovec_t *	iova_base;
   mmux_standard_usize_t	iova_len;
 } mmux_libc_iovec_array_t;
+
+#if ((defined HAVE_OPEN_HOW) && (1 == HAVE_OPEN_HOW))
+typedef struct open_how		mmux_libc_file_descriptor_open_how_t;
+#else
+typedef struct mmux_libc_file_descriptor_open_how_t {
+  mmux_standard_uint64_t	flags;
+  mmux_standard_uint64_t	mode;
+  mmux_standard_uint64_t	resolve;
+} mmux_libc_file_descriptor_open_how_t;
+#endif
 
 typedef struct mmux_libc_in_addr_t	{ struct in_addr  value; } mmux_libc_in_addr_t;
 typedef struct mmux_libc_insix_addr_t	{ struct in6_addr value; } mmux_libc_insix_addr_t;

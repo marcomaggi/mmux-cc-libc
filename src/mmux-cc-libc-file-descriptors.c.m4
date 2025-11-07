@@ -369,13 +369,13 @@ mmux_libc_openat (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
 /* ------------------------------------------------------------------ */
 
 m4_define([[[DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER]]],[[[bool
-mmux_libc_open_how_$1_set (mmux_libc_open_how_t * const P, mmux_$2_t value)
+mmux_libc_open_how_$1_set (mmux_libc_open_how_t P, mmux_$2_t value)
 {
   P->$1 = value.value;
   return false;
 }
 bool
-mmux_libc_open_how_$1_ref (mmux_$2_t * result_p, mmux_libc_open_how_t const * const P)
+mmux_libc_open_how_$1_ref (mmux_$2_t * result_p, mmux_libc_open_how_arg_t P)
 {
   *result_p = mmux_$2(P->$1);
   return false;
@@ -386,7 +386,13 @@ DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(mode,	uint64)
 DEFINE_STRUCT_OPEN_HOW_SETTER_GETTER(resolve,	uint64)
 
 bool
-mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_t const * const open_how_p,
+mmux_libc_open_how_memzero (mmux_libc_open_how_t OH)
+{
+  mmux_libc_memzero(OH, mmux_usize(sizeof(mmux_libc_file_descriptor_open_how_t)));
+  return false;
+}
+bool
+mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_arg_t open_how_p,
 			 mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
@@ -448,7 +454,7 @@ mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_t const * con
 
 bool
 mmux_libc_openat2 (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
-		   mmux_libc_fs_ptn_arg_t pathname, mmux_libc_open_how_t const * const how_p)
+		   mmux_libc_fs_ptn_arg_t pathname, mmux_libc_open_how_arg_t how_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
   mmux_standard_slong_t	fdval = syscall(SYS_openat2, dirfd->value, pathname->value, how_p, sizeof(mmux_libc_open_how_t));

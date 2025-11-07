@@ -128,6 +128,9 @@ typedef struct mmux_libc_directory_file_descriptor_t {
 typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
 typedef mmux_libc_directory_file_descriptor_t const *	mmux_libc_dirfd_arg_t;
 
+typedef mmux_libc_file_descriptor_open_how_t		mmux_libc_open_how_t[1];
+typedef mmux_libc_file_descriptor_open_how_t const *	mmux_libc_open_how_arg_t;
+
 typedef struct mmux_libc_open_flags_t		{ mmux_sint_t;	 } mmux_libc_open_flags_t;
 typedef struct mmux_libc_file_lock_type_t	{ mmux_sshort_t; } mmux_libc_file_lock_type_t;
 typedef struct mmux_libc_seek_whence_t		{ mmux_sshort_t; } mmux_libc_seek_whence_t;

@@ -6027,41 +6027,35 @@ mmux_libc_fd_t  fd;
 
 
 The function @cfunc{openat2} and the data structure @code{struct open_how} are system extensions
-implemented by the Linux kernel.
+implemented by the Linux kernel.  Under @value{PACKAGE}: the data structure type is aliased by the
+object type @objtype{mmux_libc_file_descriptor_open_how_t}.
 
-
-@MmuxCStructOpaqueTypedef{open_how}
-
-
-@MmuxSetterGetter{open_how, open_how_flags,   mmux_uint64_t}
-@MmuxSetterGetter{open_how, open_how_mode,    mmux_uint64_t}
-@MmuxSetterGetter{open_how, open_how_resolve, mmux_uint64_t}
-@MmuxStructDumper{open_how}
-
-
-To dump the contents of @code{mmux_libc_open_how_t} we can do:
+To define then dump the contents of @code{mmux_libc_file_descriptor_open_how_t} we can do:
 
 @example
-mmux_libc_fd_t        er;
 mmux_libc_open_how_t  open_how;
 
-mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+mmux_libc_open_how_memzero(open_how);
 
-mmux_libc_open_how_flags_set(&open_how, \
+mmux_libc_open_how_flags_set(open_how, \
   MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
 
-mmux_libc_open_how_mode_set(&open_how, \
+mmux_libc_open_how_mode_set(open_how, \
   MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
-mmux_libc_open_how_resolve_set(&open_how, \
-  MMUX_LIBC_RESOLVE_BENEATH               \
-  | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
-  | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
-  | MMUX_LIBC_RESOLVE_NO_XDEV);
+mmux_libc_open_how_resolve_set(open_how,  \
+  MMUX_LIBC_RESOLVE_BENEATH             | \
+  MMUX_LIBC_RESOLVE_NO_MAGICLINKS       | \
+  MMUX_LIBC_RESOLVE_NO_SYMLINKS         | \
+  MMUX_LIBC_RESOLVE_NO_XDEV);
 
-mmux_libc_stder(er);
-if (mmux_libc_open_how_dump(er, &open_how, NULL)) @{
-  /* error */
+@{
+  mmux_libc_fd_t  er;
+
+  mmux_libc_stder(er);
+  if (mmux_libc_open_how_dump(er, open_how, NULL)) @{
+    /* error */
+  @}
 @}
 @end example
 
@@ -6077,19 +6071,69 @@ struct open_how->resolve = 15 (RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS | RESOLVE
 @end example
 
 
-@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_fd_t @var{fd_result}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_open_how_t const * @var{how_p})
+@deftp {Opaque Struct Typedef} mmux_libc_file_descriptor_open_how_t
+@deftpx {Struct Pointer Typedef} mmux_libc_open_how_t
+@deftpx {Struct Pointer Typedef} mmux_libc_open_how_arg_t
+An opaque alias for @MmuxCStruct{open_how}.  The pointer types are defined as:
+
+@example
+typedef mmux_libc_file_descriptor_open_how_t            mmux_libc_open_how_t[1];
+typedef mmux_libc_file_descriptor_open_how_t const *    mmux_libc_open_how_arg_t;
+@end example
+
+@noindent
+the type @objtype{mmux_libc_open_how_t} is used to define local variables and to declare mutable
+arguments to functions; the type @objtype{mmux_libc_open_how_arg_t} is used to declare immutable
+arguments to functions.
+@end deftp
+
+
+@deftypefun bool mmux_libc_open_how_flags_set (mmux_libc_open_how_t @var{open_how}, mmux_uint64_t @var{flags})
+@deftypefunx bool mmux_libc_open_how_flags_ref (mmux_uint64_t * @var{result_p}, mmux_libc_open_how_arg_t @var{open_how})
+Setter and getter for the field @code{flags} of @objtype{mmux_libc_file_descriptor_open_how_t_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_open_how_mode_set (mmux_libc_open_how_t @var{open_how}, mmux_uint64_t @var{mode})
+@deftypefunx bool mmux_libc_open_how_mode_ref (mmux_uint64_t * @var{result_p}, mmux_libc_open_how_arg_t @var{open_how})
+Setter and getter for the field @code{mode} of @objtype{mmux_libc_file_descriptor_open_how_t_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_open_how_resolve_set (mmux_libc_open_how_t @var{open_how}, mmux_uint64_t @var{resolve})
+@deftypefunx bool mmux_libc_open_how_resolve_ref (mmux_uint64_t * @var{result_p}, mmux_libc_open_how_arg_t @var{open_how})
+Setter and getter for the field @code{resolve} of @objtype{mmux_libc_file_descriptor_open_how_t_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_open_how_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_open_how_arg_t @var{open_how}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the @MmuxCStruct{open_how} referenced by
+@var{open_how}.  @var{struct_name} must be a pointer to an @MmuxAsciiZ{} string representing the
+name of the data structure used in the description; when @cnull{}: it defaults to
+@samp{struct open_how}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_open_how_memzero (mmux_libc_open_how_t @var{open_how})
+Reset to zero the whole data structure referenced by @var{open_how}.  This is demanded by the Linux
+kernel before using the data structure itself.
+@end deftypefun
+
+
+@deftypefn {Linux Function} bool mmux_libc_openat2 (mmux_libc_fd_t @var{fd_result}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{fs_ptn}, mmux_libc_open_how_arg_t @var{open_how})
 @MmuxCInterface{openat2}.
 
 @example
-mmux_libc_fd_t  fd;
+mmux_acsciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t    fd;
 
 /* Obtain the file descriptor. */
 @{
-  mmux_libc_fs_ptn_t  fs_ptn;
+  mmux_libc_fs_ptn_t    fs_ptn;
+  mmux_libc_open_how_t  open_how;
 
   /* Build the file system pathname. */
   @{
-    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
@@ -6098,35 +6142,39 @@ mmux_libc_fd_t  fd;
     @}
   @}
 
-  /* Open a file for writing. */
+  /* Configure the opening. */
   @{
-    mmux_libc_open_how_t  open_how;
+    mmux_libc_open_how_memzero(open_how);
 
-    /* Required by the Linux kernel. */
-    mmux_libc_memzero(&open_how, sizeof(mmux_libc_open_how_t));
+    mmux_libc_open_how_flags_set(open_how,
+      mmux_uint64(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL));
+    mmux_libc_open_how_mode_set(open_how,
+      mmux_uint64(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR));
+    mmux_libc_open_how_resolve_set(open_how,
+      mmux_uint64(MMUX_LIBC_RESOLVE_BENEATH        | \
+                  MMUX_LIBC_RESOLVE_NO_MAGICLINKS  | \
+                  MMUX_LIBC_RESOLVE_NO_SYMLINKS    | \
+                  MMUX_LIBC_RESOLVE_NO_XDEV));
+  @}
 
-    mmux_libc_open_how_flags_set   (&open_how, MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
-    mmux_libc_open_how_mode_set    (&open_how, MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
-    mmux_libc_open_how_resolve_set (&open_how, MMUX_LIBC_RESOLVE_BENEATH \
-                                               | MMUX_LIBC_RESOLVE_NO_MAGICLINKS       \
-                                               | MMUX_LIBC_RESOLVE_NO_SYMLINKS         \
-                                               | MMUX_LIBC_RESOLVE_NO_XDEV);
+  /* Open the file. */
+  @{
+    mmux_libc_dirfd_t       dirfd;
+
     mmux_libc_at_fdcwd(dirfd);
-    if (mmux_libc_openat2(fd, dirfd, fs_ptn, &open_how)) @{
+    if (mmux_libc_openat2(fd, dirfd, fs_ptn, open_how)) @{
       /* error */
     @}
   @}
 
-  /* Local cleanup. */
+  /* Local cleanup */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
-      /* error */
-    @}
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
 @{
-  /* Do something with "fd". */
+  /* Do something with "fd". a*/
 @}
 
 /* Final cleanup. */
@@ -6178,7 +6226,7 @@ if (mmux_libc_read(&nbytes_done, fd, bufptr, buflen)) @{
 @section Writing to file descriptors
 
 
-@deftypefun bool mmux_libc_write (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_write (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 @MmuxCInterface{write}.
 
 @example
@@ -6196,13 +6244,13 @@ if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pwrite (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
+@deftypefun bool mmux_libc_pwrite (mmux_usize_t * @var{nbytes_done_p}, mmux_libc_fd_arg_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_off_t @var{offset})
 @MmuxCInterface{pwrite}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_write_buffer (mmux_libc_file_descriptor_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_write_buffer (mmux_libc_fd_arg_t @var{fd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 @deftypefunx bool mmux_libc_write_buffer_to_stdou (mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 @deftypefunx bool mmux_libc_write_buffer_to_stder (mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 Like @cfunc{mmux_libc_write}, but write a buffer to the file descriptor, respectively: @var{fd},
@@ -6226,7 +6274,7 @@ if (mmux_libc_write_buffer_to_stdou(bufptr, buflen)) @{
 @section Seeking position in file descriptors
 
 
-@deftypefun bool mmux_libc_lseek (mmux_libc_file_descriptor_t @var{fd}, mmux_off_t * @var{offset_p}, mmux_sint_t @var{whence})
+@deftypefun bool mmux_libc_lseek (mmux_libc_fd_arg_t @var{fd}, mmux_off_t * @var{offset_p}, mmux_libc_seek_whence_t @var{whence})
 @MmuxCInterface{lseek}.
 
 Upon calling this function: @var{offset_p} must reference a variable whose value represents the
@@ -6236,10 +6284,11 @@ Upon successfully returning from this function: the variable referenced by @var{
 updated to represent the resulting position, measured in bytes, from the beginning of the file.
 
 @example
-mmux_libc_fd_t  fd     = get_some_fd();
-mmux_off_t      offset = 123;
-mmux_sint_t     whence = MMUX_LIBC_SEEK_SET;
+mmux_libc_fd_t  fd;
+auto            offset = mmux_off_constant_zero();
+auto            whence = MMUX_LIBC_SEEK_SET;
 
+gimme_an_fd(fd);
 if (mmux_libc_lseek(fd, &offset, whence)) @{
   /* error */
 @}
@@ -6389,17 +6438,17 @@ if (isset) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_SET (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_SET (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
 @MmuxCInterface{FD_SET}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_CLR (mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_CLR (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
 @MmuxCInterface{FD_CLR}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_ISSET (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_fd_set_t const * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_ISSET (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t const * @var{fd_set_p})
 @MmuxCInterface{FD_ISSET}.
 @end deftypefun
 
@@ -6422,9 +6471,9 @@ check for events: if we want to check up to file descriptor @samp{10}, we have t
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_select_fd_for_reading (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
-@deftypefunx bool mmux_libc_select_fd_for_writing (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
-@deftypefunx bool mmux_libc_select_fd_for_exception (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefun bool mmux_libc_select_fd_for_reading (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefunx bool mmux_libc_select_fd_for_writing (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefunx bool mmux_libc_select_fd_for_exception (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
 Like @cfunc{mmux_libc_select}, but select a single event for a single file descriptor; if the file
 descriptor is ready the variable referenced by @var{result_p} is set to @ctrue{}, otherwise it is
 set to @cfalse{}.
@@ -6582,7 +6631,7 @@ Number of items in the array referenced by @code{iova_base}.
 @subsection Reading with the input/output vector programming interface
 
 
-@deftypefun bool mmux_libc_readv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p})
+@deftypefun bool mmux_libc_readv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p})
 @MmuxCInterface{readv}.
 
 @example
@@ -6612,7 +6661,7 @@ mmux_libc_iova_base_set (&iova, iov);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_preadv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset})
+@deftypefun bool mmux_libc_preadv (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset})
 @MmuxCInterface{preadv}.
 
 @example
@@ -6643,7 +6692,7 @@ mmux_libc_iova_base_set (&iova, iov);
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_preadv2 (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_preadv2 (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
 @MmuxCInterface{preadv2}.
 
 @example
@@ -6679,7 +6728,7 @@ mmux_libc_iova_base_set (&iova, iov);
 @subsection Writing with the input/output vector programming interface
 
 
-@deftypefun bool mmux_libc_writev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p})
+@deftypefun bool mmux_libc_writev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p})
 @MmuxCInterface{writev}.
 
 @example
@@ -6711,7 +6760,7 @@ fill_buffers(iova);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_pwritev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset})
+@deftypefun bool mmux_libc_pwritev (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset})
 @MmuxCInterface{pwritev}.
 
 @example
@@ -6744,7 +6793,7 @@ fill_buffers(iova);
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_file_descriptor_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
 @MmuxCInterface{pwritev2}.
 
 @example
@@ -6960,7 +7009,7 @@ representing the name of the value.
 @section File descriptors functionality control
 
 
-@deftypefun bool mmux_libc_fcntl (mmux_libc_file_descriptor_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
+@deftypefun bool mmux_libc_fcntl (mmux_libc_fd_arg_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
 @MmuxCInterface{fcntl}.  Arguments:
 
 @table @var
@@ -7099,7 +7148,7 @@ a variable of type @objtype{mmux_libc_pid_t}.
 @section File descriptors input/output control
 
 
-@deftypefun bool mmux_libc_ioctl (mmux_libc_file_descriptor_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
+@deftypefun bool mmux_libc_ioctl (mmux_libc_fd_arg_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
 @MmuxCInterface{ioctl}.  Arguments:
 
 @table @var
@@ -7441,7 +7490,7 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 @section File predicates with file descriptors
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_regular (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_regular (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 regular file; otherwise store @cfalse{}.
 
@@ -7469,7 +7518,7 @@ if (mmux_libc_file_descriptor_is_regular(&the_fd_is_regular, ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_symlink (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_symlink (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 symbolic link; otherwise store @cfalse{}.
 
@@ -7497,7 +7546,7 @@ if (mmux_libc_file_descriptor_is_symlink(&the_fd_is_symlink, ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_directory (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_directory (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 directory; otherwise store @cfalse{}.
 
@@ -7525,7 +7574,7 @@ if (mmux_libc_file_descriptor_is_directory(&the_fd_is_directory, ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_character_special (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_character_special (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 character special device; otherwise store @cfalse{}.
 
@@ -7553,7 +7602,7 @@ if (mmux_libc_file_descriptor_is_character_special(&the_fd_is_character_special,
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_block_special (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_block_special (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a block
 special device; otherwise store @cfalse{}.
 
@@ -7581,7 +7630,7 @@ if (mmux_libc_file_descriptor_is_block_special(&the_fd_is_block_special, ptn)) @
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_fifo (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_fifo (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a FIFO;
 otherwise store @cfalse{}.
 
@@ -7609,7 +7658,7 @@ if (mmux_libc_file_descriptor_is_fifo(&the_fd_is_fifo, ptn)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_file_descriptor_is_socket (bool * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_is_socket (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 socket; otherwise store @cfalse{}.
 
@@ -7648,7 +7697,7 @@ variants; true control about the resulting values is possible only by explicitly
 following functions are simpler and sometimes they are enough.
 
 
-@deftypefun bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_file_descriptor_t @var{fd})
+@deftypefun bool mmux_libc_file_descriptor_file_size_ref (mmux_usize_t * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Invoke @cfunc{mmux_libc_fstat} and retrieve the @code{st_size} field value of the resulting
 @objtype{mmux_libc_stat_t}.  Store such field value in the variable referenced by @var{result_p},
 casting the @objtype{mmux_off_t} value to @objtype{mmux_usize_t}.
@@ -9787,7 +9836,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_mkdirat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t @var{mode})
+@deftypefun bool mmux_libc_mkdirat (mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_mode_t @var{mode})
 @MmuxCInterface{mkdirat}.
 
 @example
@@ -10603,7 +10652,7 @@ Build and return a new object of type @objtype{mmux_libc_unlinkat_flags_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_unlinkat (mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_unlinkat (mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_sint_t @var{flags})
 @MmuxCInterface{unlinkat}.
 
 @example
@@ -11405,7 +11454,7 @@ Build and return an instance of @objtype{mmux_libc_faccessat_flags_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_libc_faccessat_flags_t @var{flags})
+@deftypefun bool mmux_libc_faccessat (bool * @var{access_is_permitted_p}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_libc_faccessat_flags_t @var{flags})
 @MmuxCInterface{faccessat}.  When successful the access mode specified by
 @var{how} could be permitted or denied:
 
@@ -11462,7 +11511,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsubsection Accessing file permissions with @cfunc{mmux_libc_faccessat2}
 
 
-@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_file_descriptor_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_libc_faccessat_flags_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_faccessat2 (bool * @var{access_is_permitted_p}, mmux_libc_dirfd_arg_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_access_how_t @var{how}, mmux_libc_faccessat_flags_t @var{flags})
 @MmuxCInterface{faccessat2}.  When successful the access mode specified by @var{how} could be
 permitted or denied:
 
@@ -11482,7 +11531,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Build the file system pathname. */
 @{
-  mmux_libc_fs_ptn_factory_t        fs_ptn_factory;
+  mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
   if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
