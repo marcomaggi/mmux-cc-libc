@@ -6442,25 +6442,31 @@ mmux_libc_fd_t      fd1, fd2;
   mmux_libc_fd_t      paren_to_child_fds[2];
   mmux_libc_fd_t      paren_fr_child_fds[2];
 
-  if        (mmux_libc_pipe(paren_to_child_fds)) @{
-    ... /* error */
-  @} else if (mmux_libc_pipe(paren_fr_child_fds)) @{
-    ... /* error */
-  @} else if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) @{
-    ... /* error */
-  @} else if (this_is_the_paren_process) @{
+  if (mmux_libc_pipe(paren_to_child_fds)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_pipe(paren_fr_child_fds)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) @{
+    /* error */
+  @}
+
+  if (this_is_the_paren_process) @{
     paren_play(paren_fr_child_fds[0], paren_to_child_fds[1], child_pid);
   @} else @{
     child_play(paren_to_child_fds[0], paren_fr_child_fds[1]);
   @}
 @}
 void
-paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mmux_libc_pid_t child_pid)
+paren_play (mmux_libc_fd_arg_t read_fr_child_fd, mmux_libc_fd_arg_t writ_to_child_fd, mmux_libc_pid_t child_pid)
 @{
   ...
 @}
 void
-child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
+child_play (mmux_libc_fd_arg_t read_fr_paren_fd, mmux_libc_fd_arg_t writ_to_paren_fd)
 @{
   ...
 @}
@@ -6591,11 +6597,31 @@ if (is_ready) @{
 
 
 @menu
+* fds scatter-gather types::    Scatter--gather type definitions.
 * fds scatter-gather buffer::   The input/output buffer data structure.
 * fds scatter-gather array::    The input/output array data structure.
 * fds scatter-gather reading::  Reading with the input/output vector programming interface.
 * fds scatter-gather writing::  Writing with the input/output vector programming interface.
 @end menu
+
+@c page
+@node fds scatter-gather types
+@subsection Scatter--gather type definitions
+
+
+@deftp {Struct Typedef} mmux_libc_scatter_gather_flags_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing a bitwise OR combination of flags to be used to configure a
+scatter--gather operation with the functions @cfunc{mmux_libc_preadv2} and
+@cfunc{mmux_libc_pwritev2}.
+
+The flags are the @code{MMUX_LIBC_RWF_*} ones.
+@end deftp
+
+
+@deftypefun mmux_libc_scatter_gather_flags_t mmux_libc_scatter_gather_flags (mmux_standard_sint_t @var{flags})
+Build and return a new instance of @objtype{mmux_libc_scatter_gather_flags_t}.
+@end deftypefun
 
 @c page
 @node fds scatter-gather buffer
@@ -6784,7 +6810,7 @@ mmux_libc_iova_base_set (&iova, iov);
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_preadv2 (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_preadv2 (mmux_usize_t * @var{nbytes_read_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_libc_scatter_gather_flags_t @var{flags})
 @MmuxCInterface{preadv2}.
 
 @example
@@ -6885,7 +6911,7 @@ fill_buffers(iova);
 @end deftypefun
 
 
-@deftypefn {Linux Function} bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_sint_t @var{flags})
+@deftypefn {Linux Function} bool mmux_libc_pwritev2 (mmux_usize_t * @var{nbytes_written_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_iovec_array_t * @var{iova_p}, mmux_off_t @var{offset}, mmux_libc_scatter_gather_flags_t @var{flags})
 @MmuxCInterface{pwritev2}.
 
 @example

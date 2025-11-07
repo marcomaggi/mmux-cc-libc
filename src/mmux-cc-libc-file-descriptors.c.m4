@@ -797,7 +797,8 @@ mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 bool
 mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 		   mmux_libc_iovec_array_t * iova_p,
-		   mmux_off_t offset, mmux_sint_t flags)
+		   mmux_off_t offset,
+		   mmux_libc_scatter_gather_flags_t flags)
 {
   mmux_standard_ssize_t	rv = preadv2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 
@@ -811,7 +812,8 @@ mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 bool
 mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 		    mmux_libc_iovec_array_t * iova_p,
-		    mmux_off_t offset, mmux_sint_t flags)
+		    mmux_off_t offset,
+		    mmux_libc_scatter_gather_flags_t flags)
 {
   mmux_standard_ssize_t	rv = pwritev2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 

@@ -135,6 +135,7 @@ typedef struct mmux_libc_open_flags_t		{ mmux_sint_t;	 } mmux_libc_open_flags_t;
 typedef struct mmux_libc_file_lock_type_t	{ mmux_sshort_t; } mmux_libc_file_lock_type_t;
 typedef struct mmux_libc_seek_whence_t		{ mmux_sshort_t; } mmux_libc_seek_whence_t;
 typedef struct mmux_libc_fcntl_command_t	{ mmux_sint_t;   } mmux_libc_fcntl_command_t;
+typedef struct mmux_libc_scatter_gather_flags_t	{ mmux_sint_t;   } mmux_libc_scatter_gather_flags_t;
 
 
 /** --------------------------------------------------------------------

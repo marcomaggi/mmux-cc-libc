@@ -576,6 +576,11 @@ mmux_libc_seek_whence (mmux_standard_sshort_t value)
 {
   return (mmux_libc_seek_whence_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_scatter_gather_flags_t
+mmux_libc_scatter_gather_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_scatter_gather_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -792,11 +797,13 @@ mmux_cc_libc_decl bool mmux_libc_pwritev (mmux_usize_t * nbytes_written_p, mmux_
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_preadv2 (mmux_usize_t * nbytes_read_p, mmux_libc_fd_arg_t fd,
-					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
+					  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset,
+					  mmux_libc_scatter_gather_flags_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux_libc_fd_arg_t fd,
-					   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset, mmux_sint_t flags)
+					   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset,
+					   mmux_libc_scatter_gather_flags_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 
