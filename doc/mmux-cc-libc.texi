@@ -6361,30 +6361,68 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dup2 (mmux_libc_fd_arg_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
+@deftypefun bool mmux_libc_dup2 (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
 @MmuxCInterface{dup2}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_dup3 (mmux_libc_fd_arg_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_dup3 (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd}, mmux_libc_open_flags_t @var{flags})
 @MmuxCInterface{dup3}.
 
 @example
-mmux_asciizcp_t pathname = "/path/to/file.ext";
-auto            flags    = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
-auto            mode     = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+mmux_libc_fd_t      fd1, fd2;
 
-mmux_libc_fd_t  fd1, fd2;
+/* Obtain the source file descriptor. */
+@{
+  mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
+  mmux_libc_fs_ptn_t  fs_ptn;
 
-if (mmux_libc_open(fd1, pathname, flags, mode)) @{
-  /* error */
+  /* Build the file descriptor pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the source file descriptor. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd1, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
+  @}
 @}
 
-/* I'm so dirty. */
-mmux_libc_make_fd(fd2, 5);
+/* Duplicate the file descriptor. */
+@{
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_CLOEXEC);
 
-if (mmux_libc_dup3(fd2, fd1, mmux_libc_open_flags(MMUX_LIBC_O_CLOEXEC))) @{
-  /* error */
+  /* I'm so dirty. */
+  mmux_libc_make_fd(fd2, 5);
+
+  if (mmux_libc_dup3(fd2, fd1, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd1)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(fd2)) @{
+    /* error */
+  @}
 @}
 @end example
 @end deftypefun
