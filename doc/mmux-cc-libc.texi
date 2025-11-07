@@ -423,11 +423,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{RESOLVE_NO_SYMLINKS}
 @MmuxDefineConstant{RESOLVE_NO_XDEV}
 @MmuxDefineConstant{RESOLVE_CACHED}
-@MmuxDefineConstant{SEEK_CUR}
-@MmuxDefineConstant{SEEK_DATA}
-@MmuxDefineConstant{SEEK_END}
-@MmuxDefineConstant{SEEK_HOLE}
-@MmuxDefineConstant{SEEK_SET}
 @MmuxDefineConstant{S_IRGRP}
 @MmuxDefineConstant{S_IROTH}
 @MmuxDefineConstant{S_IRUSR}
@@ -6303,6 +6298,12 @@ if (mmux_libc_write_buffer_to_stdou(bufptr, buflen)) @{
 @section Seeking position in file descriptors
 
 
+@deftp {Struct Type} mmux_libc_seek_whence_t
+@deftpx {Parent Struct Type} mmux_sshort_t
+Data structure type representing values for the @var{whence} argument to @cfunc{mmux_libc_lseek}.
+@end deftp
+
+
 @deftypefun bool mmux_libc_lseek (mmux_libc_fd_arg_t @var{fd}, mmux_off_t * @var{offset_p}, mmux_libc_seek_whence_t @var{whence})
 @MmuxCInterface{lseek}.
 
@@ -6325,6 +6326,30 @@ if (mmux_libc_lseek(fd, &offset, whence)) @{
 /* now "offset" has been updated */
 @end example
 @end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineSeekWhenceConstant{NAME}
+@defvr {Constant Struct} MMUX_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} MMUX_LIBC_VALUEOF_\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{MMUX_LIBC_\NAME\} evaluates to a C language constant of type
+@objtype{mmux_libc_seek_whence_t} representing the standard value @code{\NAME\}.
+
+The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} evaluates to the standard @code{\NAME\} value as exact
+integer.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end defvr
+
+@end macro
+
+@MmuxDefineSeekWhenceConstant{SEEK_CUR}
+@MmuxDefineSeekWhenceConstant{SEEK_DATA}
+@MmuxDefineSeekWhenceConstant{SEEK_END}
+@MmuxDefineSeekWhenceConstant{SEEK_HOLE}
+@MmuxDefineSeekWhenceConstant{SEEK_SET}
 
 @c page
 @node fds duplicating
