@@ -17,10 +17,9 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
-static mmux_asciizcp_t		src_pathname_asciiz = "./test-file-descriptors-file-size.src.ext";
+static mmux_asciizcp_t	src_pathname_asciiz = "./test-file-descriptors-file-size.src.ext";
 
 
 /** --------------------------------------------------------------------
@@ -39,9 +38,6 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_atexit(cleanfiles);
   }
 
-  mmux_libc_ptn_t	ptn;
-  mmux_libc_fd_t	fd;
-
   /* Create the data file. */
   {
     printf_message("create the data file");
@@ -50,34 +46,63 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
-  if (mmux_libc_make_file_system_pathname(&mmux_libc_file_system_pathname_static_class, &ptn, src_pathname_asciiz)) {
-    handle_error();
-  }
-
-  /* Open the file. */
   {
-    mmux_libc_fd_t	dirfd;
-    mmux_sint_t		flags = MMUX_LIBC_O_RDWR;
-    mmux_mode_t		mode  = 0;
+    mmux_libc_fd_t	fd;
 
-    mmux_libc_at_fdcwd(&dirfd);
+    /* Obtain the file descriptor. */
+    {
+      mmux_libc_fs_ptn_t	fs_ptn;
 
-    printf_message("opening the file");
-    if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode)) {
-      handle_error();
+      /* Build the file system pathname. */
+      {
+	mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, src_pathname_asciiz)) {
+	  handle_error();
+	}
+      }
+
+      /* Open the file. */
+      {
+	mmux_libc_dirfd_t	dirfd;
+	auto		flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR);
+	auto		mode  = mmux_libc_mode_constant_zero();
+
+	mmux_libc_at_fdcwd(dirfd);
+
+	printf_message("open-ing the file");
+	if (mmux_libc_openat(fd, dirfd, fs_ptn, flags, mode)) {
+	  printf_error("open-ing the file");
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	mmux_libc_unmake_file_system_pathname(fs_ptn);
+      }
     }
-  }
 
-  /* Do it. */
-  {
-    mmux_usize_t	result;
+    /* Do it. */
+    {
+      mmux_usize_t	result;
 
-    printf_message("file_descriptor_file_size_refing");
-    if (mmux_libc_file_descriptor_file_size_ref(&result, fd)) {
-      handle_error();
+      printf_message("file_descriptor_file_size_refing");
+      if (mmux_libc_file_descriptor_file_size_ref(&result, fd)) {
+	handle_error();
+      }
+
+      printf_message("file size: %lu", result.value);
     }
 
-    printf_message("file size: %lu", result);
+    /* Final cleanup. */
+    {
+      if (mmux_libc_close(fd)) {
+	printf_error("closing the file descriptor");
+	handle_error();
+      }
+    }
   }
 
   mmux_libc_exit_success();

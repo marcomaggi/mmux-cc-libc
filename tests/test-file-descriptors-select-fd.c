@@ -17,7 +17,6 @@
  ** Headers.
  ** ----------------------------------------------------------------- */
 
-#include <mmux-cc-libc.h>
 #include <test-common.h>
 
 
@@ -42,7 +41,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     bool			read_fr_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_reading()");
-    mmux_libc_timeval_set(timeout, 1, 0);
+    mmux_libc_timeval_set(timeout, mmux_time_constant_one(), mmux_slong_constant_zero());
     if (mmux_libc_select_fd_for_reading(&read_fr_child_fd_is_ready, read_fr_child_fd, timeout)) {
       print_error("paren: selecting fd events");
       handle_error();
@@ -50,12 +49,11 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     if (! read_fr_child_fd_is_ready) {
       printf_error("paren: expected read event on read_fr_child_fd");
-      mmux_libc_errno_set(1);
       handle_error();
     } else {
-      mmux_usize_t		nbytes_done;
-      mmux_usize_t const	buflen = 4096;
-      mmux_char_t		bufptr[buflen];
+      mmux_usize_t	nbytes_done;
+      auto		buflen = mmux_usize_literal(4096);
+      char		bufptr[buflen.value];
 
       mmux_libc_memzero(bufptr, buflen);
 
@@ -72,14 +70,14 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
       /* Validate the greetings string received from child. */
       {
-	mmux_sint_t	result;
+	mmux_ternary_comparison_result_t	cmpnum;
 	mmux_asciizcp_t	expected_greetings = "hello parent\n";
 	mmux_usize_t	expected_greetings_len;
 
 	mmux_libc_strlen(&expected_greetings_len, expected_greetings);
 
-	mmux_libc_strncmp(&result, expected_greetings, bufptr, expected_greetings_len);
-	if (0 != result) {
+	mmux_libc_strncmp(&cmpnum, expected_greetings, bufptr, expected_greetings_len);
+	if (mmux_ternary_comparison_result_is_not_equal(cmpnum)) {
 	  printf_error("paren: wrong greetings string from child");
 	  handle_error();
 	}
@@ -93,7 +91,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     bool			read_fr_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_exception()");
-    mmux_libc_timeval_set(timeout, 1, 0);
+    mmux_libc_timeval_set(timeout, mmux_time_constant_one(), mmux_slong_constant_zero());
     if (mmux_libc_select_fd_for_exception(&read_fr_child_fd_is_ready, read_fr_child_fd, timeout)) {
       printf_error("paren: selecting fd events");
       handle_error();
@@ -101,7 +99,6 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     if (read_fr_child_fd_is_ready) {
       printf_error("paren: expected no exception event on read_fr_child_fd");
-      mmux_libc_errno_set(1);
       handle_error();
     }
   }
@@ -112,7 +109,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     bool			writ_to_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_writing()");
-    mmux_libc_timeval_set(timeout, 1, 0);
+    mmux_libc_timeval_set(timeout, mmux_time_constant_one(), mmux_slong_constant_zero());
     if (mmux_libc_select_fd_for_writing(&writ_to_child_fd_is_ready, writ_to_child_fd, timeout)) {
       printf_error("paren: selecting fd events");
       handle_error();
@@ -120,7 +117,6 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
 
     if (! writ_to_child_fd_is_ready) {
       printf_error("paren: expected write event on writ_to_child_fd");
-      mmux_libc_errno_set(1);
       handle_error();
     }
 
@@ -166,28 +162,31 @@ paren_give_child_process_time_to_exit (void)
 void
 paren_wait_for_child_process_completion (mmux_libc_pid_t child_pid)
 {
-  bool					completed_process_status_available;
-  mmux_libc_pid_t			completed_process_pid;
-  mmux_libc_completed_process_status_t	completed_process_status;
+  bool					process_completion_status_is_available;
+  mmux_libc_process_completion_status_t	process_completion_status;
+  mmux_libc_pid_t			process_completion_pid;
+  auto	waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
 
   printf_message("paren: wait child process completion");
 
-  if (mmux_libc_wait_process_id(&completed_process_status_available, &completed_process_pid,
-				&completed_process_status, child_pid, MMUX_LIBC_WNOHANG)) {
+  if (mmux_libc_wait_process_id(&process_completion_status_is_available,
+				&process_completion_status,
+				&process_completion_pid,
+				child_pid, waiting_options)) {
     printf_error("paren: waiting");
     handle_error();
   } else {
-    if (completed_process_status_available) {
+    if (process_completion_status_is_available) {
       bool	has_exited;
 
-      if (mmux_libc_WIFEXITED(&has_exited, completed_process_status)) {
+      if (mmux_libc_WIFEXITED(&has_exited, process_completion_status)) {
 	handle_error();
       } else if (has_exited) {
-	mmux_sint_t	exit_status;
+	mmux_libc_process_exit_status_t		exit_status;
 
-	if (mmux_libc_WEXITSTATUS(&exit_status, completed_process_status)) {
+	if (mmux_libc_WEXITSTATUS(&exit_status, process_completion_status)) {
 	  handle_error();
-	} else if (MMUX_LIBC_EXIT_SUCCESS == exit_status) {
+	} else if (MMUX_LIBC_EXIT_SUCCESS.value == exit_status.value) {
 	  mmux_libc_exit_success();
 	} else {
 	  printf_error("paren: child process exited unsuccessfully");
@@ -222,11 +221,11 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
   if (1) {
     printf_message("child: making the pipe input fd into stdin");
 
-    mmux_libc_stdin(&in);
+    mmux_libc_stdin(in);
     if (mmux_libc_close(in)) {
       handle_error();
     }
-    if (mmux_libc_dup(&in, read_fr_paren_fd)) {
+    if (mmux_libc_dup(in, read_fr_paren_fd)) {
       handle_error();
     }
     if (mmux_libc_close(read_fr_paren_fd)) {
@@ -238,11 +237,11 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
   if (1) {
     printf_message("child: making the pipe output fd into stdout");
 
-    mmux_libc_stdou(&ou);
+    mmux_libc_stdou(ou);
     if (mmux_libc_close(ou)) {
       handle_error();
     }
-    if (mmux_libc_dup(&ou, writ_to_paren_fd)) {
+    if (mmux_libc_dup(ou, writ_to_paren_fd)) {
       handle_error();
     }
     if (mmux_libc_close(writ_to_paren_fd)) {
@@ -263,7 +262,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     }
 
     /* Null the non-block flag. */
-    parameter &= (~ MMUX_LIBC_O_NONBLOCK);
+    parameter.value &= (~ MMUX_LIBC_O_NONBLOCK);
 
     /* Set the new flags. */
     if (mmux_libc_fcntl(in, MMUX_LIBC_F_SETFL, &parameter)) {
@@ -282,7 +281,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     mmux_libc_timeval_t		timeout[1];
 
     printf_message("child: calling select_fd_for_writing()");
-    mmux_libc_timeval_set(timeout, 1, 0);
+    mmux_libc_timeval_set(timeout, mmux_time_constant_one(), mmux_slong_constant_zero());
     if (mmux_libc_select_fd_for_writing(&ou_fd_is_ready, ou, timeout)) {
       printf_error("child: selecting fd events");
       handle_error();
@@ -290,7 +289,6 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
     if (! ou_fd_is_ready) {
       printf_error("child: expected write event on ou");
-      mmux_libc_errno_set(1);
       handle_error();
     }
 
@@ -309,7 +307,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     mmux_libc_timeval_t		timeout[1];
 
     printf_message("child: calling select_fd_for_reading()");
-    mmux_libc_timeval_set(timeout, 3, 0);
+    mmux_libc_timeval_set(timeout, mmux_time_literal(3), mmux_slong_constant_zero());
     if (mmux_libc_select_fd_for_reading(&in_fd_is_ready, in, timeout)) {
       printf_error("child: selecting fd events");
       handle_error();
@@ -317,14 +315,13 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
     if (! in_fd_is_ready) {
       printf_error("child: expected read event on in");
-      mmux_libc_errno_set(1);
       handle_error();
     }
 
     {
       mmux_usize_t	nbytes_done;
-      mmux_usize_t	buflen = 4096;
-      mmux_uint8_t	bufptr[buflen];
+      auto		buflen = mmux_usize_literal(4096);
+      mmux_uint8_t	bufptr[buflen.value];
 
       mmux_libc_memzero(bufptr, buflen);
 
@@ -341,14 +338,14 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 	MMUX_LIBC_IGNORE_RETVAL(mmux_libc_dprintfer("\"\n"));
 
 	{
-	  mmux_sint_t		result;
+	  mmux_ternary_comparison_result_t	cmpnum;
 	  mmux_asciizcp_t	expected_greetings = "hello child\n";
 	  mmux_usize_t		expected_greetings_len;
 
 	  mmux_libc_strlen(&expected_greetings_len, expected_greetings);
 
-	  mmux_libc_strncmp(&result, expected_greetings, (mmux_asciizcp_t)bufptr, expected_greetings_len);
-	  if (0 != result) {
+	  mmux_libc_strncmp(&cmpnum, expected_greetings, (mmux_asciizcp_t)bufptr, expected_greetings_len);
+	  if (mmux_ternary_comparison_result_is_not_equal(cmpnum)) {
 	    printf_error("child: wrong greetings string from child");
 	    handle_error();
 	  }
