@@ -316,15 +316,20 @@ mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_nu
 bool
 mmux_libc_dprintf (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, ...)
 {
-  va_list	ap;
-  int		rv;
+  if (fd->identity.is_for_ouput) {
+    va_list	ap;
+    int		rv;
 
-  va_start(ap, template);
-  {
-    rv = vdprintf(fd->value, template, ap);
+    va_start(ap, template);
+    {
+      rv = vdprintf(fd->value, template, ap);
+    }
+    va_end(ap);
+    return ((0 <= rv)? false : true);
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
-  va_end(ap);
-  return ((0 <= rv)? false : true);
 }
 bool
 mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
@@ -356,38 +361,48 @@ mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 bool
 mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)
 {
-  mmux_asciizcp_t	errmsg;
+  if (fd->identity.is_for_ouput) {
+    mmux_asciizcp_t	errmsg;
 
-  if (mmux_libc_strerror(&errmsg, errnum)) {
-    return true;
-  } else if (mmux_libc_dprintf(fd, "%s", errmsg)) {
-    return true;
+    if (mmux_libc_strerror(&errmsg, errnum)) {
+      return true;
+    } else if (mmux_libc_dprintf(fd, "%s", errmsg)) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }
 bool
 mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
 {
-  mmux_usize_t		required_nbytes_including_nil;
+  if (fd->identity.is_for_ouput) {
+    mmux_usize_t	required_nbytes_including_nil;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
-  if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
-#pragma GCC diagnostic pop
-    return true;
-  } else {
-    char		bufptr[required_nbytes_including_nil.value];
-    mmux_usize_t	required_nbytes_without_zero;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-    if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
+    if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
 #pragma GCC diagnostic pop
       return true;
     } else {
-      return mmux_libc_dprintf(fd, "%s", bufptr);
+      char		bufptr[required_nbytes_including_nil.value];
+      mmux_usize_t	required_nbytes_without_zero;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+      if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
+#pragma GCC diagnostic pop
+	return true;
+      } else {
+	return mmux_libc_dprintf(fd, "%s", bufptr);
+      }
     }
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }
 
@@ -396,8 +411,13 @@ mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmu
 bool
 mmux_libc_vdprintf (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, va_list ap)
 {
-  int	rv = vdprintf(fd->value, template, ap);
-  return ((0 <= rv)? false : true);
+  if (fd->identity.is_for_ouput) {
+    int	rv = vdprintf(fd->value, template, ap);
+    return ((0 <= rv)? false : true);
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
+  }
 }
 bool
 mmux_libc_vdprintfou (mmux_asciizcp_t template, va_list ap)
@@ -491,14 +511,18 @@ mmux_libc_open (mmux_libc_fd_t fd_result, mmux_libc_fs_ptn_arg_t pathname,
 bool
 mmux_libc_close (mmux_libc_fd_t fd)
 {
-  int	rv = close(fd->value);
-
-  if (-1 != rv) {
-    fd->identity.is_closed_for_reading = true;
-    fd->identity.is_closed_for_writing = true;
+  if (fd->identity.is_closed_for_writing && fd->identity.is_closed_for_reading) {
     return false;
   } else {
-    return true;
+    int	rv = close(fd->value);
+
+    if (-1 != rv) {
+      fd->identity.is_closed_for_reading = true;
+      fd->identity.is_closed_for_writing = true;
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 bool
@@ -632,24 +656,34 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
 bool
 mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd, mmux_pointer_t bufptr, mmux_usize_t buflen)
 {
-  mmux_standard_ssize_t	nbytes_done = read(fd->value, bufptr, buflen.value);
+  if (fd->identity.is_for_input) {
+    mmux_standard_ssize_t	nbytes_done = read(fd->value, bufptr, buflen.value);
 
-  if (0 <= nbytes_done) {
-    *nbytes_done_p = mmux_usize(nbytes_done);
-    return false;
+    if (0 <= nbytes_done) {
+      *nbytes_done_p = mmux_usize(nbytes_done);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
 bool
 mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
 {
-  mmux_standard_ssize_t	nbytes_done = write(fd->value, bufptr, buflen.value);
+  if (fd->identity.is_for_ouput) {
+    mmux_standard_ssize_t	nbytes_done = write(fd->value, bufptr, buflen.value);
 
-  if (0 <= nbytes_done) {
-    *nbytes_done_p = mmux_usize(nbytes_done);
-    return false;
+    if (0 <= nbytes_done) {
+      *nbytes_done_p = mmux_usize(nbytes_done);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -659,14 +693,19 @@ mmux_libc_write (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd, mmux_point
 bool
 mmux_libc_write_buffer (mmux_libc_fd_arg_t fd, mmux_pointerc_t bufptr, mmux_usize_t buflen)
 {
-  mmux_usize_t	nbytes_done;
-  bool		rv;
+  if (fd->identity.is_for_ouput) {
+    mmux_usize_t	nbytes_done;
+    bool		rv;
 
-  rv = mmux_libc_write(&nbytes_done, fd, bufptr, buflen);
-  if (rv || (mmux_ctype_not_equal(buflen, nbytes_done))) {
-    return true;
+    rv = mmux_libc_write(&nbytes_done, fd, bufptr, buflen);
+    if (rv || (mmux_ctype_not_equal(buflen, nbytes_done))) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }
 bool
@@ -687,12 +726,17 @@ mmux_libc_pread (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 		 mmux_pointer_t bufptr, mmux_usize_t buflen,
 		 mmux_off_t offset)
 {
-  mmux_standard_ssize_t	nbytes_done = pread(fd->value, bufptr, buflen.value, offset.value);
+  if (fd->identity.is_for_input) {
+    mmux_standard_ssize_t	nbytes_done = pread(fd->value, bufptr, buflen.value, offset.value);
 
-  if (0 <= nbytes_done) {
-    *nbytes_done_p = mmux_usize(nbytes_done);
-    return false;
+    if (0 <= nbytes_done) {
+      *nbytes_done_p = mmux_usize(nbytes_done);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -701,12 +745,17 @@ mmux_libc_pwrite (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
 		  mmux_pointerc_t bufptr, mmux_usize_t buflen,
 		  mmux_off_t offset)
 {
-  mmux_standard_ssize_t	nbytes_done = pwrite(fd->value, bufptr, buflen.value, offset.value);
+  if (fd->identity.is_for_ouput) {
+    mmux_standard_ssize_t	nbytes_done = pwrite(fd->value, bufptr, buflen.value, offset.value);
 
-  if (0 <= nbytes_done) {
-    *nbytes_done_p = mmux_usize(nbytes_done);
-    return false;
+    if (0 <= nbytes_done) {
+      *nbytes_done_p = mmux_usize(nbytes_done);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -907,24 +956,34 @@ mmux_libc_iovec_array_dump (mmux_libc_fd_arg_t fd, mmux_libc_iovec_array_t const
 bool
 mmux_libc_readv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd, mmux_libc_iovec_array_t * iova_p)
 {
-  mmux_standard_ssize_t	rv = readv(fd->value, iova_p->iova_base, iova_p->iova_len);
+  if (fd->identity.is_for_input) {
+    mmux_standard_ssize_t	rv = readv(fd->value, iova_p->iova_base, iova_p->iova_len);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
 bool
 mmux_libc_writev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd, mmux_libc_iovec_array_t * iova_p)
 {
-  mmux_standard_ssize_t	rv = writev(fd->value, iova_p->iova_base, iova_p->iova_len);
+  if (fd->identity.is_for_ouput) {
+    mmux_standard_ssize_t	rv = writev(fd->value, iova_p->iova_base, iova_p->iova_len);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -935,12 +994,17 @@ bool
 mmux_libc_preadv (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 		  mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
 {
-  mmux_standard_ssize_t	rv = preadv(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value);
+  if (fd->identity.is_for_input) {
+    mmux_standard_ssize_t	rv = preadv(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -948,12 +1012,17 @@ bool
 mmux_libc_pwritev (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 		   mmux_libc_iovec_array_t * iova_p, mmux_off_t offset)
 {
-  mmux_standard_ssize_t	rv = pwritev(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value);
+  if (fd->identity.is_for_ouput) {
+    mmux_standard_ssize_t	rv = pwritev(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -966,12 +1035,17 @@ mmux_libc_preadv2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd,
 		   mmux_off_t offset,
 		   mmux_libc_scatter_gather_flags_t flags)
 {
-  mmux_standard_ssize_t	rv = preadv2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
+  if (fd->identity.is_for_input) {
+    mmux_standard_ssize_t	rv = preadv2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -981,12 +1055,17 @@ mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd
 		    mmux_off_t offset,
 		    mmux_libc_scatter_gather_flags_t flags)
 {
-  mmux_standard_ssize_t	rv = pwritev2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
+  if (fd->identity.is_for_ouput) {
+    mmux_standard_ssize_t	rv = pwritev2(fd->value, iova_p->iova_base, iova_p->iova_len, offset.value, flags.value);
 
-  if (-1 < rv) {
-    *number_of_bytes_read_p = mmux_usize(rv);
-    return false;
+    if (-1 < rv) {
+      *number_of_bytes_read_p = mmux_usize(rv);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 }
@@ -1539,15 +1618,22 @@ mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes_copied_p,
 			   mmux_usize_t number_of_bytes_to_copy, mmux_sint_t flags)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_COPY_FILE_RANGE]]],[[[
-  mmux_standard_ssize_t	number_of_bytes_copied = copy_file_range(input_fd->value, &(input_position_p->value),
-								 ouput_fd->value, &(ouput_position_p->value),
-								 number_of_bytes_to_copy.value,
-								 flags.value);
+  if ((true == input_fd->identity.is_for_input) && (true == ouput_fd->identity.is_for_ouput)) {
 
-  if (0 <= number_of_bytes_copied) {
-    *number_of_bytes_copied_p = mmux_usize(number_of_bytes_copied);
-    return false;
+    mmux_standard_ssize_t	number_of_bytes_copied =
+      copy_file_range(input_fd->value, &(input_position_p->value),
+		      ouput_fd->value, &(ouput_position_p->value),
+		      number_of_bytes_to_copy.value,
+		      flags.value);
+
+    if (0 <= number_of_bytes_copied) {
+      *number_of_bytes_copied_p = mmux_usize(number_of_bytes_copied);
+      return false;
+    } else {
+      return true;
+    }
   } else {
+    mmux_libc_errno_set_to_einval();
     return true;
   }
 ]]])
@@ -1744,18 +1830,23 @@ mmux_libc_memfd_read_buffer (mmux_libc_memfd_arg_t mfd, mmux_pointer_t bufptr, m
 m4_define([[[DEFINE_PRINTER]]],[[[MMUX_CONDITIONAL_CODE([[[$2]]],[[[bool
 mmux_libc_dprintf_$1 (mmux_libc_fd_arg_t fd, mmux_$1_t value)
 {
-  mmux_usize_t	required_nbytes;
+  if (fd->identity.is_for_ouput) {
+    mmux_usize_t	required_nbytes;
 
-  if (mmux_$1_sprint_size(&required_nbytes, value)) {
-    return true;
-  } else {
-    char	s_value[required_nbytes.value];
-
-    if (mmux_$1_sprint(s_value, required_nbytes, value)) {
+    if (mmux_$1_sprint_size(&required_nbytes, value)) {
       return true;
     } else {
-      return mmux_libc_dprintf(fd, "%s", s_value);
+      char	s_value[required_nbytes.value];
+
+      if (mmux_$1_sprint(s_value, required_nbytes, value)) {
+	return true;
+      } else {
+	return mmux_libc_dprintf(fd, "%s", s_value);
+      }
     }
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }]]])]]])
 
@@ -1842,7 +1933,12 @@ DEFINE_PRINTER([[[libc_blkcnt]]])
 bool
 mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
 {
-  return mmux_sint_dprintf_p(fd->value, value);
+  if (fd->identity.is_for_ouput) {
+    return mmux_sint_dprintf_p(fd->value, value);
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
+  }
 }
 bool
 mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t pathname)
@@ -1852,37 +1948,57 @@ mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t pathname
 bool
 mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd, mmux_libc_process_completion_status_t value)
 {
-  return mmux_sint_dprintf_p(fd->value, &value);
+  if (fd->identity.is_for_ouput) {
+    return mmux_sint_dprintf_p(fd->value, &value);
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
+  }
 }
 bool
 mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd, mmux_libc_interprocess_signal_t value)
 {
-  return mmux_sint_dprintf_p(fd->value, &value);
+  if (fd->identity.is_for_ouput) {
+    return mmux_sint_dprintf_p(fd->value, &value);
+  } else {
+    mmux_libc_errno_set_to_einval();
+    return true;
+  }
 }
 bool
 mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_extension_arg_t E)
 {
-  mmux_usize_t	nbytes_done;
+  if (fd->identity.is_for_ouput) {
+    mmux_usize_t	nbytes_done;
 
-  if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
-    return true;
-  } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
-    return true;
+    if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
+      return true;
+    } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }
 bool
 mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_segment_arg_t E)
 {
-  mmux_usize_t	nbytes_done;
+  if (fd->identity.is_for_ouput) {
+    mmux_usize_t	nbytes_done;
 
-  if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
-    return true;
-  } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
-    return true;
+    if (mmux_libc_write(&nbytes_done, fd, E->ptr, E->len)) {
+      return true;
+    } else if (mmux_ctype_not_equal(nbytes_done, E->len)) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    mmux_libc_errno_set_to_einval();
+    return true;
   }
 }
 
