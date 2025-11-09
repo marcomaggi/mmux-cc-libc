@@ -108,12 +108,35 @@ typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_inter
 
 
 /** --------------------------------------------------------------------
- ** Input output.
+ ** Input/output.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_libc_file_descriptor_t	{ mmux_sint_t;	} mmux_libc_file_descriptor_t;
+typedef struct mmux_libc_file_descriptor_identity_t {
+  bool	is_for_input:		1;
+  bool	is_for_ouput:		1;
+  bool	is_directory:		1;
+  bool	is_closed_for_reading:	1;
+  bool	is_closed_for_writing:	1;
+} mmux_libc_file_descriptor_identity_t;
+
+typedef struct mmux_libc_file_descriptor_t {
+  mmux_sint_t;
+  mmux_libc_file_descriptor_identity_t	identity;
+} mmux_libc_file_descriptor_t;
 typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t[1];
 typedef mmux_libc_file_descriptor_t const *	mmux_libc_fd_arg_t;
+
+typedef struct mmux_libc_file_descriptor_input_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_file_descriptor_input_t;
+typedef mmux_libc_file_descriptor_input_t		mmux_libc_infd_t[1];
+typedef mmux_libc_file_descriptor_input_t const *	mmux_libc_infd_arg_t;
+
+typedef struct mmux_libc_file_descriptor_output_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_file_descriptor_output_t;
+typedef mmux_libc_file_descriptor_output_t		mmux_libc_oufd_t[1];
+typedef mmux_libc_file_descriptor_output_t const *	mmux_libc_oufd_arg_t;
 
 typedef struct mmux_libc_memory_file_descriptor_t {
   mmux_libc_file_descriptor_t;

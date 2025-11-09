@@ -124,6 +124,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (mmux_libc_readlinkfd(fs_ptn_real, fs_ptn_factory, fd_symlink)) {
 	printf_error("readlinkfd-ing");
 	handle_error();
+      } else {
+	printf_message("after readlinkfd-ing, the file system pathname is: %s", fs_ptn_real->value);
       }
     }
 
@@ -134,8 +136,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
       /* Build the original file-system-pathname. */
       {
-	mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+	mmux_libc_fs_ptn_factory_copying_t  fs_ptn_factory;
 
+	printf_message("re-creating the original link pathname");
+	mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
 	if (mmux_libc_make_file_system_pathname(fs_ptn_original, fs_ptn_factory, ptn_asciiz_original)) {
 	  printf_error("creating the original link pathname");
 	  handle_error();
@@ -185,6 +189,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     /* Final cleanup. */
     {
+      printf_message("closing symbolic-link file-descriptor");
       if (mmux_libc_close(fd_symlink)) {
 	printf_error("closing symbolic-link file-descriptor");
 	handle_error();

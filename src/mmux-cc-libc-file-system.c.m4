@@ -455,6 +455,7 @@ mmux_libc_readlinkat_from_asciiz_buffer_to_fs_ptn (mmux_libc_fs_ptn_t				fs_ptn_
 	return true;
       }
     } else {
+      output_buffer_ascii[nbytes_written_to_output_buffer_no_nul.value] = '\0';
       return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
 						  output_buffer_ascii,
 						  nbytes_written_to_output_buffer_no_nul);

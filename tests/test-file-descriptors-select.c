@@ -444,24 +444,37 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   {
-    bool		this_is_the_paren_process;
-    mmux_libc_pid_t	child_pid;
-    mmux_libc_fd_t	paren_to_child_fds[2];
-    mmux_libc_fd_t	paren_fr_child_fds[2];
+    mmux_libc_infd_t	read_fr_paren_fd;
+    mmux_libc_oufd_t	writ_to_paren_fd;
 
-    if (mmux_libc_pipe(paren_to_child_fds)) {
+    mmux_libc_infd_t	read_fr_child_fd;
+    mmux_libc_oufd_t	writ_to_child_fd;
+
+    if (mmux_libc_pipe(read_fr_paren_fd, writ_to_child_fd)) {
       handle_error();
-    } else if (mmux_libc_pipe(paren_fr_child_fds)) {
+    }
+    if (mmux_libc_pipe(read_fr_child_fd, writ_to_paren_fd)) {
       handle_error();
-    } else if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) {
-      printf_error("forking");
-      handle_error();
-    } else if (this_is_the_paren_process) {
-      paren_play(paren_fr_child_fds[0], paren_to_child_fds[1], child_pid);
-    } else {
-      child_play(paren_to_child_fds[0], paren_fr_child_fds[1]);
+    }
+
+    {
+      bool		this_is_the_paren_process;
+      mmux_libc_pid_t	child_pid;
+
+      printf_message("fork-ing");
+      if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) {
+	printf_error("fork-ing");
+	handle_error();
+      } else if (this_is_the_paren_process) {
+	printf_message("running the parent");
+	paren_play(read_fr_child_fd, writ_to_child_fd, child_pid);
+      } else {
+	printf_message("running the child");
+	child_play(read_fr_paren_fd, writ_to_paren_fd);
+      }
     }
   }
+
   /* We shold never get here. */
   mmux_libc_exit_failure();
 }

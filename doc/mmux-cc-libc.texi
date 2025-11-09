@@ -5485,7 +5485,6 @@ if (mmux_libc_dprintf(fd, "the integer is: %d\n", 123)) @{
 
 @menu
 * fds fds::                     File descriptors type.
-* fds dirfds::                  Directory file descriptors type.
 * fds standard::                Standard file descriptors.
 * fds printing::                Printing formatted output.
 * fds opening::                 Opening file descriptors.
@@ -5511,7 +5510,19 @@ if (mmux_libc_dprintf(fd, "the integer is: %d\n", 123)) @{
 @section File descriptors type
 
 
-@deftp {Struct Type} mmux_libc_file_descriptor_t
+@menu
+* fds fds io::                  Input and/or output file descriptors.
+* fds fds input::               Input--only file descriptors.
+* fds fds ouput::               Output--only file descriptors.
+* fds fds dirfds::              Directory file descriptors type.
+@end menu
+
+@c page
+@node fds fds io
+@subsection Input and/or output file descriptors
+
+
+@deftp {Opaque Struct Type} mmux_libc_file_descriptor_t
 @deftpx {Parent Struct Type} mmux_sint_t
 Data structure type representing file descriptors.
 @end deftp
@@ -5525,8 +5536,8 @@ typedef mmux_libc_file_descriptor_t  mmux_libc_fd_t[1];
 @end example
 
 @noindent
-it is meant to be used to define local variables and as type of result in function calls that open a
-new file descriptor or retrieve an already opened file descriptor, so the referenced
+it is meant to be used to define local variables and to declare a result argument for functions that
+open a new file descriptor or retrieve an already opened file descriptor, so the referenced
 @objtype{mmux_libc_file_descriptor_t} instance must be mutable.
 @end deftp
 
@@ -5539,7 +5550,8 @@ typedef mmux_libc_file_descriptor_t const *  mmux_libc_fd_arg_t;
 @end example
 
 @noindent
-it is meant to be used as type of immutable arguments to functions.
+it is meant to be used to declare an argument for functions that use an already open file
+descriptor, so the referenced @objtype{mmux_libc_file_descriptor_t} instance must be immutable.
 @end deftp
 
 
@@ -5557,8 +5569,108 @@ mmux_libc_make_fd(&er, STDERR_FILENO);
 @end deftypefun
 
 @c page
-@node fds dirfds
-@section Directory file descriptors type
+@node fds fds input
+@subsection Input--only file descriptors
+
+
+@deftp {Opaque Struct Type} mmux_libc_file_descriptor_input_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+Data structure type representing input--only file descriptors.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_infd_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_input_t  mmux_libc_infd_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and to declare a result argument for functions that
+open a new file descriptor or retrieve an already opened file descriptor, so the referenced
+@objtype{mmux_libc_file_descriptor_input_t} instance must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_infd_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_input_t const *  mmux_libc_infd_arg_t;
+@end example
+
+@noindent
+it is meant to be used to declare an argument for functions that use an already open file
+descriptor, so the referenced @objtype{mmux_libc_file_descriptor_input_t} instance must be immutable.
+@end deftp
+
+
+@deftypefun bool mmux_libc_make_infd (mmux_libc_infd_t @var{fd}, mmux_standard_sint_t @var{fd_num})
+Make a new file descriptor value.  If @var{fd_num} is negative: @var{fd} is left untouched and the
+return value is @ctrue{}.
+
+@example
+mmux_libc_infd_t  in;
+
+mmux_libc_make_infd(&in, STDIN_FILENO);
+@end example
+@end deftypefun
+
+@c page
+@node fds fds ouput
+@subsection Output--only file descriptors
+
+
+@deftp {Opaque Struct Type} mmux_libc_file_descriptor_output_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+Data structure type representing output--only file descriptors.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_oufd_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_output_t  mmux_libc_oufd_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and to declare a result argument for functions that
+open a new file descriptor or retrieve an already opened file descriptor, so the referenced
+@objtype{mmux_libc_file_descriptor_output_t} instance must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_oufd_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_output_t const *  mmux_libc_oufd_arg_t;
+@end example
+
+@noindent
+it is meant to be used to declare an argument for functions that use an already open file
+descriptor, so the referenced @objtype{mmux_libc_file_descriptor_output_t} instance must be
+immutable.
+@end deftp
+
+
+@deftypefun bool mmux_libc_make_oufd (mmux_libc_oufd_t @var{fd}, mmux_standard_sint_t @var{fd_num})
+Make a new file descriptor value.  If @var{fd_num} is negative: @var{fd} is left untouched and the
+return value is @ctrue{}.
+
+@example
+mmux_libc_oufd_t  ou, er;
+
+mmux_libc_make_oufd(&ou, STDOUT_FILENO);
+mmux_libc_make_oufd(&er, STDERR_FILENO);
+@end example
+@end deftypefun
+
+@c page
+@node fds fds dirfds
+@subsection Directory file descriptors type
 
 
 Directory file descriptors are represented as instances of

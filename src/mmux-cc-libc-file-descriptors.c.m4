@@ -167,10 +167,56 @@ m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[{
  ** Input/output: file descriptor core API.
  ** ----------------------------------------------------------------- */
 
-static const mmux_libc_file_descriptor_t stdin_fd = { { .value = STDIN_FILENO  } };
-static const mmux_libc_file_descriptor_t stdou_fd = { { .value = STDOUT_FILENO } };
-static const mmux_libc_file_descriptor_t stder_fd = { { .value = STDERR_FILENO } };
-static const mmux_libc_directory_file_descriptor_t at_fdcwd_fd = { { { .value = MMUX_LIBC_AT_FDCWD } } };
+static const mmux_libc_file_descriptor_t stdin_fd = {
+  {
+    .value = STDIN_FILENO,
+  },
+  .identity = {
+    .is_for_input		= true,
+    .is_for_ouput		= false,
+    .is_directory		= false,
+    .is_closed_for_reading	= false,
+    .is_closed_for_writing	= true,
+  },
+};
+static const mmux_libc_file_descriptor_t stdou_fd = {
+  {
+    .value = STDOUT_FILENO
+  },
+  .identity = {
+    .is_for_input		= false,
+    .is_for_ouput		= true,
+    .is_directory		= false,
+    .is_closed_for_reading	= true,
+    .is_closed_for_writing	= false,
+  },
+};
+static const mmux_libc_file_descriptor_t stder_fd = {
+  {
+    .value = STDERR_FILENO
+  },
+  .identity = {
+    .is_for_input		= false,
+    .is_for_ouput		= true,
+    .is_directory		= false,
+    .is_closed_for_reading	= true,
+    .is_closed_for_writing	= false,
+  },
+};
+static const mmux_libc_directory_file_descriptor_t at_fdcwd_fd = {
+  {
+    {
+      .value = MMUX_LIBC_AT_FDCWD
+    },
+    .identity = {
+      .is_for_input		= false,
+      .is_for_ouput		= false,
+      .is_directory		= true,
+    .is_closed_for_reading	= true,
+    .is_closed_for_writing	= true,
+    },
+  }
+};
 
 bool
 mmux_libc_stdin (mmux_libc_fd_t result_p)
@@ -197,19 +243,64 @@ mmux_libc_at_fdcwd (mmux_libc_dirfd_t result_p)
   return false;
 }
 bool
-mmux_libc_make_fd (mmux_libc_fd_t result_p, mmux_standard_sint_t fd_num)
+mmux_libc_make_fd (mmux_libc_fd_t fd_result, mmux_standard_sint_t fd_num)
 {
   if (0 <= fd_num) {
-    result_p->value = fd_num;
+    fd_result->value				= fd_num;
+    fd_result->identity.is_for_input		= true;
+    fd_result->identity.is_for_ouput		= true;
+    fd_result->identity.is_directory		= false;
+    fd_result->identity.is_closed_for_reading	= false;
+    fd_result->identity.is_closed_for_writing	= false;
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd, mmux_standard_sint_t fd_num)
+mmux_libc_make_infd (mmux_libc_infd_t infd_result, mmux_standard_sint_t fd_num)
 {
-  return mmux_libc_make_fd(dirfd, fd_num);
+  if (0 <= fd_num) {
+    infd_result->value				= fd_num;
+    infd_result->identity.is_for_input		= true;
+    infd_result->identity.is_for_ouput		= false;
+    infd_result->identity.is_directory		= false;
+    infd_result->identity.is_closed_for_reading	= false;
+    infd_result->identity.is_closed_for_writing	= true;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
+{
+  if (0 <= fd_num) {
+    oufd_result->value				= fd_num;
+    oufd_result->identity.is_for_input		= false;
+    oufd_result->identity.is_for_ouput		= true;
+    oufd_result->identity.is_directory		= false;
+    oufd_result->identity.is_closed_for_reading	= true;
+    oufd_result->identity.is_closed_for_writing	= false;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_num)
+{
+  if (0 <= fd_num) {
+    dirfd_result->value					= fd_num;
+    dirfd_result->identity.is_for_input			= false;
+    dirfd_result->identity.is_for_ouput			= false;
+    dirfd_result->identity.is_directory			= true;
+    dirfd_result->identity.is_closed_for_reading	= true;
+    dirfd_result->identity.is_closed_for_writing	= true;
+    return false;
+  } else {
+    return true;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -333,34 +424,89 @@ mmux_libc_dprintfer_newline (void)
 
 /* ------------------------------------------------------------------ */
 
+static void
+mmux_libc_file_descriptor_set_identity_according_to_open_flags (mmux_libc_fd_t fd, mmux_libc_open_flags_t flags)
+{
+  mmux_standard_sint_t	accmode = (flags.value & MMUX_LIBC_O_ACCMODE);
+
+  switch (accmode) {
+  case MMUX_LIBC_O_RDWR:
+    fd->identity.is_for_input		= true;
+    fd->identity.is_for_ouput		= true;
+    fd->identity.is_closed_for_reading	= false;
+    fd->identity.is_closed_for_writing	= false;
+    break;
+  case MMUX_LIBC_O_RDONLY:
+    fd->identity.is_for_input		= true;
+    fd->identity.is_for_ouput		= false;
+    fd->identity.is_closed_for_reading	= false;
+    fd->identity.is_closed_for_writing	= true;
+    break;
+  case MMUX_LIBC_O_WRONLY:
+    fd->identity.is_for_input		= false;
+    fd->identity.is_for_ouput		= true;
+    fd->identity.is_closed_for_reading	= true;
+    fd->identity.is_closed_for_writing	= false;
+    break;
+  default:
+    fd->identity.is_for_input		= false;
+    fd->identity.is_for_ouput		= false;
+    fd->identity.is_closed_for_reading	= true;
+    fd->identity.is_closed_for_writing	= true;
+    break;
+  }
+}
+
+static void
+mmux_libc_file_descriptor_set_identity_according_to_open_how (mmux_libc_fd_t fd, mmux_libc_open_how_arg_t how_p)
+{
+  mmux_libc_file_descriptor_set_identity_according_to_open_flags(fd, mmux_libc_open_flags(how_p->flags));
+}
+
 bool
-mmux_libc_open (mmux_libc_fd_t fd, mmux_libc_fs_ptn_arg_t pathname,
+mmux_libc_open (mmux_libc_fd_t fd_result, mmux_libc_fs_ptn_arg_t pathname,
 		mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
 {
   int	fd_num = open(pathname->value, flags.value, mode.value);
 
   if (-1 != fd_num) {
-    return mmux_libc_make_fd(fd, fd_num);
+    if (mmux_libc_make_fd(fd_result, fd_num)) {
+      return true;
+    } else {
+      mmux_libc_file_descriptor_set_identity_according_to_open_flags(fd_result, flags);
+      return false;
+    }
   } else {
     return true;
   }
 }
 bool
-mmux_libc_close (mmux_libc_fd_arg_t fd)
+mmux_libc_close (mmux_libc_fd_t fd)
 {
   int	rv = close(fd->value);
 
-  return ((-1 != rv)? false : true);
+  if (-1 != rv) {
+    fd->identity.is_closed_for_reading = true;
+    fd->identity.is_closed_for_writing = true;
+    return false;
+  } else {
+    return true;
+  }
 }
 bool
-mmux_libc_openat (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
+mmux_libc_openat (mmux_libc_fd_t fd_result, mmux_libc_dirfd_arg_t dirfd,
 		  mmux_libc_fs_ptn_arg_t pathname,
 		  mmux_libc_open_flags_t flags, mmux_libc_mode_t mode)
 {
   int	fd_num = openat(dirfd->value, pathname->value, flags.value, mode.value);
 
   if (-1 != fd_num) {
-    return mmux_libc_make_fd(fd, fd_num);
+    if (mmux_libc_make_fd(fd_result, fd_num)) {
+      return true;
+    } else {
+      mmux_libc_file_descriptor_set_identity_according_to_open_flags(fd_result, flags);
+      return false;
+    }
   } else {
     return true;
   }
@@ -453,14 +599,19 @@ mmux_libc_open_how_dump (mmux_libc_fd_arg_t fd, mmux_libc_open_how_arg_t open_ho
 }
 
 bool
-mmux_libc_openat2 (mmux_libc_fd_t fd, mmux_libc_dirfd_arg_t dirfd,
+mmux_libc_openat2 (mmux_libc_fd_t fd_result, mmux_libc_dirfd_arg_t dirfd,
 		   mmux_libc_fs_ptn_arg_t pathname, mmux_libc_open_how_arg_t how_p)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_LINUX_OPENAT2_H]]],[[[
-  mmux_standard_slong_t	fdval = syscall(SYS_openat2, dirfd->value, pathname->value, how_p, sizeof(mmux_libc_open_how_t));
+  mmux_standard_slong_t	fd_num = syscall(SYS_openat2, dirfd->value, pathname->value, how_p, sizeof(mmux_libc_open_how_t));
 
-  if (-1 != fdval) {
-    fd->value = fdval;
+  if (-1 != fd_num) {
+    if (mmux_libc_make_fd(fd_result, fd_num)) {
+      return true;
+    } else {
+      mmux_libc_file_descriptor_set_identity_according_to_open_how(fd_result, how_p);
+      return false;
+    }
     return false;
   } else {
     return true;
@@ -570,56 +721,63 @@ mmux_libc_lseek (mmux_libc_fd_arg_t fd, mmux_off_t * offset_p, mmux_libc_seek_wh
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_dup (mmux_libc_fd_t new_fd_p, mmux_libc_fd_arg_t old_fd)
+mmux_libc_dup (mmux_libc_fd_t new_fd, mmux_libc_fd_arg_t old_fd)
 {
   int	fd_num = dup(old_fd->value);
 
   if (-1 != fd_num) {
-    return mmux_libc_make_fd(new_fd_p, fd_num);
+    if (mmux_libc_make_fd(new_fd, fd_num)) {
+      return true;
+    } else {
+      new_fd->identity = old_fd->identity;
+      return false;
+    }
   } else {
     return true;
   }
 }
 bool
-mmux_libc_dup2 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd)
+mmux_libc_dup2 (mmux_libc_fd_t new_fd, mmux_libc_fd_arg_t old_fd)
 {
   int	rv = dup2(old_fd->value, new_fd->value);
 
-  return ((-1 != rv)? false : true);
-}
-bool
-mmux_libc_dup3 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
-{
-MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
-  int	rv = dup3(old_fd->value, new_fd->value, flags.value);
-
-  return ((-1 != rv)? false : true);
-]]])
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_pipe (mmux_libc_fd_t fds[2])
-{
-  int	fdvals[2];
-  int	rv = pipe(fdvals);
-
   if (-1 != rv) {
-    fds[0][0].value = fdvals[0];
-    fds[1][0].value = fdvals[1];
+    new_fd->identity = old_fd->identity;
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_close_pipe (mmux_libc_fd_t fds[2])
+mmux_libc_dup3 (mmux_libc_fd_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
 {
-  bool	rv1 = mmux_libc_close(fds[0]);
-  bool	rv2 = mmux_libc_close(fds[1]);
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DUP3]]],[[[
+  int	rv = dup3(old_fd->value, new_fd->value, flags.value);
 
-  return ((rv1 || rv2)? true : false);
+  if (-1 != rv) {
+    new_fd->identity = old_fd->identity;
+    return false;
+  } else {
+    return true;
+  }
+]]])
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_pipe (mmux_libc_infd_t infd, mmux_libc_oufd_t oufd)
+{
+  int	fd_nums[2];
+  int	rv = pipe(fd_nums);
+
+  if (-1 != rv) {
+    mmux_libc_make_infd(infd, fd_nums[0]);
+    mmux_libc_make_oufd(oufd, fd_nums[1]);
+    return false;
+  } else {
+    return true;
+  }
 }
 
 

@@ -587,6 +587,12 @@ mmux_libc_scatter_gather_flags (mmux_standard_sint_t value)
 mmux_cc_libc_decl bool mmux_libc_make_fd (mmux_libc_fd_t result_p, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_make_infd (mmux_libc_infd_t infd_result, mmux_standard_sint_t fd_num)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t result_p, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
@@ -677,7 +683,7 @@ mmux_cc_libc_decl bool mmux_libc_openat2 (mmux_libc_fd_t fd, mmux_libc_dirfd_arg
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_close (mmux_libc_fd_arg_t fd)
+mmux_cc_libc_decl bool mmux_libc_close (mmux_libc_fd_t fd)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_read (mmux_usize_t * nbytes_done_p, mmux_libc_fd_arg_t fd,
@@ -711,17 +717,14 @@ mmux_cc_libc_decl bool mmux_libc_lseek (mmux_libc_fd_arg_t fd, mmux_off_t * offs
 mmux_cc_libc_decl bool mmux_libc_dup (mmux_libc_fd_t new_fd_p, mmux_libc_fd_arg_t old_fd)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dup2 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd)
+mmux_cc_libc_decl bool mmux_libc_dup2 (mmux_libc_fd_t new_fd, mmux_libc_fd_arg_t old_fd)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dup3 (mmux_libc_fd_arg_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
+mmux_cc_libc_decl bool mmux_libc_dup3 (mmux_libc_fd_t new_fd, mmux_libc_fd_arg_t old_fd, mmux_libc_open_flags_t flags)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_fd_t fds[2])
-  __attribute__((__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_close_pipe (mmux_libc_fd_t fds[2])
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_infd_t infd, mmux_libc_oufd_t oufd)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------
