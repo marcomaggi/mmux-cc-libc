@@ -67,7 +67,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       auto		buflen = mmux_usize_literal(1024);
       char		bufptr[buflen.value];
-      mmux_usize_t	nbytes_done;
+      typeof(buflen)	nbytes_done;
 
       {
 	printf_message("reading data from the infd");

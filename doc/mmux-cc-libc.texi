@@ -6572,50 +6572,49 @@ mmux_libc_fd_t      fd1, fd2;
 @deftypefun bool mmux_libc_pipe (mmux_libc_fd_t @var{fds}[2])
 @MmuxCInterface{pipe}.
 
+As example, let's open a pipe, write into the writing file descriptor, read from the reading file
+descriptor, finally close the file descriptors.
+
 @example
+mmux_libc_infd_t  infd;
+mmux_libc_oufd_t  oufd;
+
+if (mmux_libc_pipe(infd, oufd)) @{
+  /* error */
+@}
+
+/* Writing data to pipe. */
 @{
-  bool                this_is_the_paren_process;
-  mmux_libc_pid_t     child_pid;
-  mmux_libc_fd_t      paren_to_child_fds[2];
-  mmux_libc_fd_t      paren_fr_child_fds[2];
+  mmux_asciizcp_t  bufptr = "The colour of water and quicksilver.";
+  mmux_usize_t     buflen, nbytes_done;
 
-  if (mmux_libc_pipe(paren_to_child_fds)) @{
+  mmux_libc_strlen(&buflen, bufptr);
+  if (mmux_libc_write(&nbytes_done, oufd, bufptr, buflen)) @{
     /* error */
-  @}
-
-  if (mmux_libc_pipe(paren_fr_child_fds)) @{
-    /* error */
-  @}
-
-  if (mmux_libc_fork(&this_is_the_paren_process, &child_pid)) @{
-    /* error */
-  @}
-
-  if (this_is_the_paren_process) @{
-    paren_play(paren_fr_child_fds[0], paren_to_child_fds[1], child_pid);
-  @} else @{
-    child_play(paren_to_child_fds[0], paren_fr_child_fds[1]);
   @}
 @}
-void
-paren_play (mmux_libc_fd_arg_t read_fr_child_fd, mmux_libc_fd_arg_t writ_to_child_fd, mmux_libc_pid_t child_pid)
+
+/* Reading data from pipe. */
 @{
-  ...
+  auto          buflen = mmux_usize_literal(1024);
+  char          bufptr[buflen.value];
+  mmux_usize_t  nbytes_done;
+
+  if (mmux_libc_read(&nbytes_done, infd, bufptr, buflen)) @{
+    /* error */
+  @}
 @}
-void
-child_play (mmux_libc_fd_arg_t read_fr_paren_fd, mmux_libc_fd_arg_t writ_to_paren_fd)
+
+/* Final cleanup. */
 @{
-  ...
+  if (mmux_libc_close(infd)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(oufd)) @{
+    /* error */
+  @}
 @}
 @end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_close_pipe (mmux_libc_fd_t @var{fds}[2])
-Close both the file descriptors in @var{fds}.  If both closures succeed: return @cfalse{}; otherwise
-return @ctrue{}.  If closing the first fails: this function still closes the second.
-
-This function might be useful when an error occurs after we have created a pipe.
 @end deftypefun
 
 @c page
