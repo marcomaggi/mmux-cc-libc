@@ -409,7 +409,8 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-struct-flock		\
 	tests/test-file-descriptors-struct-iovec		\
 	tests/test-file-descriptors-struct-iovec-array		\
-	tests/test-file-descriptors-file-size
+	tests/test-file-descriptors-file-size			\
+	tests/test-file-descriptors-pipe
 
 tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -458,6 +459,9 @@ tests_test_file_descriptors_fcntl_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_file_size_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_pipe_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_pipe_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system
