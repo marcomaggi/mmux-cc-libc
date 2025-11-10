@@ -410,7 +410,10 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-struct-iovec		\
 	tests/test-file-descriptors-struct-iovec-array		\
 	tests/test-file-descriptors-file-size			\
-	tests/test-file-descriptors-pipe
+	tests/test-file-descriptors-pipe			\
+	tests/test-file-descriptors-dup				\
+	tests/test-file-descriptors-dup2			\
+	tests/test-file-descriptors-dup3
 
 tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -462,6 +465,15 @@ tests_test_file_descriptors_file_size_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_pipe_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_pipe_LDADD					= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_dup_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_dup_LDADD					= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_dup2_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_dup2_LDADD					= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_dup3_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_dup3_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system

@@ -6493,13 +6493,14 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @section Duplicating file descriptors
 
 
-@deftypefun bool mmux_libc_dup (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
-@MmuxCInterface{dup}.
+@deftypefun bool mmux_libc_dup (mmux_libc_fd_t @var{fd_result}, mmux_libc_fd_arg_t @var{old_fd})
+@MmuxCInterface{dup}.  Duplicate @var{old_fd}, allocating the lowest--numbered unused file
+descriptor, and initialise @var{fd_result} to it.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_dup2 (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
-@MmuxCInterface{dup2}.
+@MmuxCInterface{dup2}.  Duplicate @var{old_fd} using the file descriptor selected by @var{new_fd}.
 @end deftypefun
 
 
