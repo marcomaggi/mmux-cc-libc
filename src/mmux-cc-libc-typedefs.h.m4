@@ -145,12 +145,12 @@ typedef struct mmux_libc_memory_file_descriptor_t {
 typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
 typedef mmux_libc_memory_file_descriptor_t const *	mmux_libc_memfd_arg_t;
 
-typedef struct mmux_libc_directory_file_descriptor_t {
+typedef struct mmux_libc_file_descriptor_directory_t {
   mmux_libc_file_descriptor_t;
-} mmux_libc_directory_file_descriptor_t;
+} mmux_libc_file_descriptor_directory_t;
 
-typedef mmux_libc_directory_file_descriptor_t		mmux_libc_dirfd_t[1];
-typedef mmux_libc_directory_file_descriptor_t const *	mmux_libc_dirfd_arg_t;
+typedef mmux_libc_file_descriptor_directory_t		mmux_libc_dirfd_t[1];
+typedef mmux_libc_file_descriptor_directory_t const *	mmux_libc_dirfd_arg_t;
 
 typedef mmux_libc_file_descriptor_open_how_t		mmux_libc_open_how_t[1];
 typedef mmux_libc_file_descriptor_open_how_t const *	mmux_libc_open_how_arg_t;

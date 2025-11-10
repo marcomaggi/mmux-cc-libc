@@ -5511,20 +5511,45 @@ if (mmux_libc_dprintf(fd, "the integer is: %d\n", 123)) @{
 
 
 @menu
-* fds fds io::                  Input and/or output file descriptors.
+* fds fds fds::                 Unspecified file descriptors.
 * fds fds input::               Input--only file descriptors.
 * fds fds ouput::               Output--only file descriptors.
 * fds fds dirfds::              Directory file descriptors type.
 @end menu
 
 @c page
-@node fds fds io
-@subsection Input and/or output file descriptors
+@node fds fds fds
+@subsection Unspecified file descriptors
 
 
 @deftp {Opaque Struct Type} mmux_libc_file_descriptor_t
 @deftpx {Parent Struct Type} mmux_sint_t
-Data structure type representing file descriptors.
+Data structure type representing file descriptors.  This type is used whenever a file descriptor is
+created without specifying its nature, it could be:
+
+@itemize
+@item
+an input/output, input--only or output--only file descriptor accessing a regular file;
+
+@item
+a file descriptor referencing a file system directory, which was opened with the
+@samp{MMUX_LIBC_O_DIRECTORY} flag;
+
+@item
+a file descriptor referencing a file system pathname, without access to the file itself, which was
+opened with the @samp{MMUX_LIBC_O_PATH} flag;
+
+@item
+a file descriptor referencing a networking socket;
+
+@item
+a file descriptor referencing any of the special files supported by the underlying system, like a
+character device, a @fifo{}, and others.
+@end itemize
+
+Whenever possible it is better to use a subtype of this type, like
+@objtype{mmux_libc_file_descriptor_input_t}, @objtype{mmux_libc_file_descriptor_output_t},
+@objtype{mmux_libc_file_descriptor_directory_t}, and others.
 @end deftp
 
 
@@ -5674,13 +5699,13 @@ mmux_libc_make_oufd(&er, STDERR_FILENO);
 
 
 Directory file descriptors are represented as instances of
-@objtype{mmux_libc_directory_file_descriptor_t}; we can open a file descriptor referencing a file
+@objtype{mmux_libc_file_descriptor_directory_t}; we can open a file descriptor referencing a file
 system directory with the opening functions like @func{mmux_libc_open} using the flag
 @samp{MMUX_LIBC_O_DIRECTORY}; we are required to use directory file descriptors with functions like
 @cfunc{mmux_libc_openat} and similar.
 
 
-@deftp {Struct Type} mmux_libc_directory_file_descriptor_t
+@deftp {Struct Type} mmux_libc_file_descriptor_directory_t
 @deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
 Data structure type representing directory file descriptors.
 @end deftp
@@ -5690,13 +5715,13 @@ Data structure type representing directory file descriptors.
 Pointer type defined as:
 
 @example
-typedef mmux_libc_directory_file_descriptor_t  mmux_libc_dirfd_t[1];
+typedef mmux_libc_file_descriptor_directory_t  mmux_libc_dirfd_t[1];
 @end example
 
 @noindent
 it is meant to be used to define local variables and as type of result in function calls that open a
 new directory file descriptor or retrieve an already opened file descriptor, so the referenced
-@objtype{mmux_libc_directory_file_descriptor_t} instance must be mutable.
+@objtype{mmux_libc_file_descriptor_directory_t} instance must be mutable.
 @end deftp
 
 
@@ -5704,7 +5729,7 @@ new directory file descriptor or retrieve an already opened file descriptor, so 
 Pointer type defined as:
 
 @example
-typedef mmux_libc_directory_file_descriptor_t const *  mmux_libc_dirfd_arg_t;
+typedef mmux_libc_file_descriptor_directory_t const *  mmux_libc_dirfd_arg_t;
 @end example
 
 @noindent
@@ -6043,9 +6068,9 @@ mmux_libc_fd_t  fd;
     @}
   @}
 
-  /* Open a file for writing. */
+  /* Create and open a file for writing. */
   @{
-    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL | MMUX_LIBC_O_RDWR);
     auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
     if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
@@ -7738,10 +7763,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7766,10 +7791,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7794,10 +7819,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7822,10 +7847,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7850,10 +7875,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7878,10 +7903,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
@@ -7906,10 +7931,10 @@ mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
 
 /* Open the link. */
 @{
-  mmux_sint_t       flags = MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW;
-  mmux_libc_mode_t       mode  = 0;
+  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+  auto  mode  = mmux_libc_mode_constant_zero();
 
-  if (mmux_libc_open(&fd, ptn, flags, mode)) @{
+  if (mmux_libc_open(fd, ptn, flags, mode)) @{
     /* error */
   @}
 @}
