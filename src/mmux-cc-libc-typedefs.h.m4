@@ -116,6 +116,7 @@ typedef struct mmux_libc_file_descriptor_identity_t {
   bool	is_for_ouput:		1;
   bool	is_directory:		1;
   bool	is_networking_socket:	1;
+  bool	is_path_only:		1;
   bool	is_closed_for_reading:	1;
   bool	is_closed_for_writing:	1;
 } mmux_libc_file_descriptor_identity_t;

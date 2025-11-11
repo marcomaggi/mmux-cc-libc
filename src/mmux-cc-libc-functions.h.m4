@@ -584,6 +584,22 @@ mmux_libc_scatter_gather_flags (mmux_standard_sint_t value)
 
 /* ------------------------------------------------------------------ */
 
+m4_define([[[DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER]]],[[[mmux_cc_libc_inline_decl bool
+mmux_libc_file_descriptor_identity_$1 (bool * result_p, mmux_libc_fd_arg_t fd)
+{
+  *result_p = fd->identity.$1;
+  return false;
+}]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_for_input]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_for_ouput]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_directory]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_networking_socket]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_path_only]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_closed_for_reading]]])
+DEFINE_FILE_DESCRIPTOR_IDENTITY_GETTER([[[is_closed_for_writing]]])
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_make_fd (mmux_libc_fd_t result_p, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 

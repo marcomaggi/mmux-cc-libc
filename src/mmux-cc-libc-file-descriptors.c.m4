@@ -176,6 +176,7 @@ static const mmux_libc_file_descriptor_t stdin_fd = {
     .is_for_ouput		= false,
     .is_directory		= false,
     .is_networking_socket	= false,
+    .is_path_only		= false,
     .is_closed_for_reading	= false,
     .is_closed_for_writing	= true,
   },
@@ -189,6 +190,7 @@ static const mmux_libc_file_descriptor_t stdou_fd = {
     .is_for_ouput		= true,
     .is_directory		= false,
     .is_networking_socket	= false,
+    .is_path_only		= false,
     .is_closed_for_reading	= true,
     .is_closed_for_writing	= false,
   },
@@ -202,6 +204,7 @@ static const mmux_libc_file_descriptor_t stder_fd = {
     .is_for_ouput		= true,
     .is_directory		= false,
     .is_networking_socket	= false,
+    .is_path_only		= false,
     .is_closed_for_reading	= true,
     .is_closed_for_writing	= false,
   },
@@ -216,6 +219,7 @@ static const mmux_libc_file_descriptor_directory_t at_fdcwd_fd = {
       .is_for_ouput		= false,
       .is_directory		= true,
       .is_networking_socket	= false,
+      .is_path_only		= true,
       .is_closed_for_reading	= true,
       .is_closed_for_writing	= true,
     },
@@ -255,6 +259,7 @@ mmux_libc_make_fd (mmux_libc_fd_t fd_result, mmux_standard_sint_t fd_num)
     fd_result->identity.is_for_ouput		= true;
     fd_result->identity.is_directory		= false;
     fd_result->identity.is_networking_socket	= false;
+    fd_result->identity.is_path_only		= false;
     fd_result->identity.is_closed_for_reading	= false;
     fd_result->identity.is_closed_for_writing	= false;
     return false;
@@ -287,6 +292,7 @@ mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
     oufd_result->identity.is_for_ouput		= true;
     oufd_result->identity.is_directory		= false;
     oufd_result->identity.is_networking_socket	= false;
+    oufd_result->identity.is_path_only		= false;
     oufd_result->identity.is_closed_for_reading	= true;
     oufd_result->identity.is_closed_for_writing	= false;
     return false;
@@ -303,6 +309,7 @@ mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_nu
     dirfd_result->identity.is_for_ouput			= false;
     dirfd_result->identity.is_directory			= true;
     dirfd_result->identity.is_networking_socket		= false;
+    dirfd_result->identity.is_path_only			= false;
     dirfd_result->identity.is_closed_for_reading	= true;
     dirfd_result->identity.is_closed_for_writing	= true;
     return false;
@@ -462,18 +469,21 @@ mmux_libc_file_descriptor_set_identity_according_to_open_flags (mmux_libc_fd_t f
     fd->identity.is_networking_socket	= false;
     fd->identity.is_closed_for_reading	= true;
     fd->identity.is_closed_for_writing	= true;
+    if (MMUX_LIBC_O_PATH & flags.value) {
+      fd->identity.is_path_only		= true;
+    }
   } else if (MMUX_LIBC_O_PATH & flags.value) {
-    /* FIXME Should there be  a bitfield to represent that this  fd references just a
-       file system pathname?  (Marco Maggi; Nov 10, 2025) */
     fd->identity.is_for_input		= false;
     fd->identity.is_for_ouput		= false;
     fd->identity.is_directory		= false;
     fd->identity.is_networking_socket	= false;
+    fd->identity.is_path_only		= true;
     fd->identity.is_closed_for_reading	= true;
     fd->identity.is_closed_for_writing	= true;
   } else {
     mmux_standard_sint_t	accmode = (flags.value & MMUX_LIBC_O_ACCMODE);
 
+    fd->identity.is_path_only		= false;
     switch (accmode) {
     case MMUX_LIBC_O_RDWR:
       fd->identity.is_for_input			= true;
