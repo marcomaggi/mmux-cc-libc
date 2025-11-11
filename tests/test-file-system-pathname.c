@@ -137,7 +137,7 @@ test_file_system_pathname_factory_swallow (void)
     }
 
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_dprintfer("%s: resulting malloced pathname: '", __func__)) {
@@ -172,7 +172,7 @@ test_file_system_pathname_factory_dynamic (void)
     }
   }
   {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dprintfer("%s: resulting malloced pathname: '", __func__)) {
@@ -211,7 +211,7 @@ test_file_system_pathname_factory_dynamic2 (void)
   }
 
   {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dprintfer("%s: resulting malloced pathname: '", __func__)) {
@@ -253,7 +253,7 @@ test_compare_equal_pathnames (void)
   }
 
   if (false) {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dprintf_fs_ptn(er, ptn1)) {
@@ -372,7 +372,7 @@ test_compare_different_pathnames_less (void)
   }
 
   if (false) {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dprintf_fs_ptn(er, ptn1)) {
@@ -491,7 +491,7 @@ test_compare_different_pathnames_greater (void)
   }
 
   if (false) {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dprintf_fs_ptn(er, ptn1)) {

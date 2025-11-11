@@ -145,7 +145,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
 
     if (false) {
-      mmux_libc_fd_t	fd;
+      mmux_libc_oufd_t	fd;
 
       mmux_libc_stder(fd);
       for (mmux_standard_usize_t i=0; i<item_num2.value;++i) {

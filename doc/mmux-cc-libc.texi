@@ -2872,7 +2872,7 @@ mmux_libc_timeval_t  TV[1];
 
 /* dumping */
 @{
-  mmux_libc_fd_t    fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
   if (mmux_libc_timeval_dump(fd, TV, NULL)) @{
@@ -2936,7 +2936,7 @@ mmux_libc_timespec_t  TS[1];
 
 /* dumping */
 @{
-  mmux_libc_fd_t    fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
   if (mmux_libc_timespec_dump(fd, TS, NULL)) @{
@@ -2970,7 +2970,7 @@ mmux_libc_tm_t  TM[1];
 mmux_libc_time(&T);
 mmux_libc_localtime_r(TM, T);
 @{
-  mmux_libc_fd_t    fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
   if (mmux_libc_tm_dump(fd, TM, NULL)) @{
@@ -3026,7 +3026,7 @@ mmux_time_t  T;
 
 mmux_libc_time(&T);
 @{
-  mmux_libc_fd_t    fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
   if (mmux_libc_dprintf_time(fd, T)) @{
@@ -3318,9 +3318,9 @@ if (mmux_libc_strptime(&first_unprocessed_after_timestamp, input_string, templat
 @}
 
 @{
-  mmux_libc_fd_t    fd;
+  mmux_libc_oufd_t  fd;
 
-  mmux_libc_stder(&fd);
+  mmux_libc_stder(fd);
   mmux_libc_tm_dump(fd, BT, NULL);
 @}
 @end example
@@ -3822,7 +3822,7 @@ mmux_libc_rlimit_t  RL[1];
 mmux_libc_rlim_cur_set(RL, cur);
 mmux_libc_rlim_max_set(RL, max);
 @{
-  mmux_libc_fd_t    er;
+  mmux_libc_oufd_t  er;
 
   mmux_libc_stder(er);
   if (mmux_libc_rlimit_dump(er, RL, NULL)) @{
@@ -4006,8 +4006,8 @@ operations are defined for this type.  To obtain a UID value and print its strin
 @stderr{}, we can do:
 
 @example
-mmux_libc_uid_t  the_uid;
-mmux_libc_fd_t   fd;
+mmux_libc_uid_t   the_uid;
+mmux_libc_oufd_t  fd;
 
 mmux_libc_getuid(&the_uid);
 
@@ -4052,8 +4052,8 @@ operations are defined for this type.  To obtain a GID value and print its strin
 @stderr{}, we can do:
 
 @example
-mmux_libc_gid_t  the_gid;
-mmux_libc_fd_t   fd;
+mmux_libc_gid_t   the_gid;
+mmux_libc_oufd_t  fd;
 
 mmux_libc_getgid(&the_gid);
 
@@ -4584,8 +4584,8 @@ operations are defined for this type.  To obtain a PID value and print its strin
 @stderr{}, we can do:
 
 @example
-mmux_libc_pid_t  the_pid;
-mmux_libc_fd_t   fd;
+mmux_libc_pid_t   the_pid;
+mmux_libc_oufd_t  fd;
 
 mmux_libc_getpid(&the_pid);
 
@@ -5165,8 +5165,8 @@ if (the_signal_is_the_expected_one) @{
 Write to @var{fd} a string representation of the given signal.
 
 @example
-auto            ipxsig = MMUX_LIBC_SIGUSR1;
-mmux_libc_fd_t  fd;
+auto              ipxsig = MMUX_LIBC_SIGUSR1;
+mmux_libc_oufd_t  fd;
 
 mmux_libc_stder(fd);
 mmux_libc_interprocess_signal_dump(fd, ipxsig);
@@ -5764,17 +5764,17 @@ negative: @var{dirfd} is left untouched and the return value is @ctrue{}.
 @cindex @stderr{} file descriptor
 
 
-@deftypefun bool mmux_libc_stdin (mmux_libc_fd_t @var{fd})
+@deftypefun bool mmux_libc_stdin (mmux_libc_infd_t @var{fd})
 Retrieve the file descriptor value associated to the standard input.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stdou (mmux_libc_fd_t @var{fd})
+@deftypefun bool mmux_libc_stdou (mmux_libc_oufd_t @var{fd})
 Retrieve the file descriptor value associated to the standard output.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stder (mmux_libc_fd_t @var{fd})
+@deftypefun bool mmux_libc_stder (mmux_libc_oufd_t @var{fd})
 Retrieve the file descriptor value associated to the standard error.
 @end deftypefun
 
@@ -6182,7 +6182,7 @@ mmux_libc_open_how_resolve_set(open_how,  \
   MMUX_LIBC_RESOLVE_NO_XDEV);
 
 @{
-  mmux_libc_fd_t  er;
+  mmux_libc_oufd_t  er;
 
   mmux_libc_stder(er);
   if (mmux_libc_open_how_dump(er, open_how, NULL)) @{
@@ -10109,7 +10109,7 @@ mmux_libc_dirfd_t      dirfd;
   if (mmux_libc_fstat(stat, dirfd)) @{
     /* error */
   @} else @{
-    mmux_libc_fd_t  er;
+    mmux_libc_oufd_t  er;
 
     mmux_libc_stder(er);
     if (mmux_libc_stat_dump(er, stat, NULL)) @{
@@ -11973,7 +11973,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
   if (mmux_libc_stat(stat, fs_ptn)) @{
     /* error */
   @} else @{
-    mmux_libc_fd_t  fd;
+    mmux_libc_oufd_t  fd;
 
     mmux_libc_stder(fd);
     if (mmux_libc_stat_dump(fd, stat, NULL)) @{

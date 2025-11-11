@@ -83,7 +83,7 @@ play_parent (mmux_libc_pid_t child_pid)
     mmux_libc_l_pid_set    (&flo, pid);
 
     if (true) {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_flock_dump(er, &flo, "paren struct flock before requesting lock status")) {
@@ -98,7 +98,7 @@ play_parent (mmux_libc_pid_t child_pid)
     }
 
     if (true) {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_flock_dump(er, &flo, "paren struct flock after requesting lock status")) {
@@ -261,7 +261,7 @@ play_child (void)
     mmux_libc_l_pid_set    (&flo, pid);
 
     if (true) {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_flock_dump(er, &flo, "child struct flock to request lock")) {
@@ -276,7 +276,7 @@ play_child (void)
     }
 
     if (true) {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_flock_dump(er, &flo, "child struct flock after request lock")) {

@@ -1387,8 +1387,8 @@ mmux_libc_file_system_pathname_exists (bool * result_p, mmux_libc_fs_ptn_arg_t p
       return true;
     }
   } else {
-    if (0) {
-      mmux_libc_fd_t	er;
+    if (false) {
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       mmux_libc_stat_dump(er, ST, NULL);

@@ -97,9 +97,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       }
 
       {
-	mmux_libc_fd_t	fd;
+	mmux_libc_oufd_t	fd;
 
-	mmux_libc_stdou(fd);
+	mmux_libc_stder(fd);
 	if (mmux_libc_timeval_dump(fd, &access_timeval, "access_timeval")) {
 	  handle_error();
 	}
@@ -112,7 +112,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     /* Check mode. */
     {
       mmux_libc_stat_t	stat;
-      mmux_libc_fd_t	fd;
+      mmux_libc_oufd_t	fd;
 
       mmux_libc_stder(fd);
       if (mmux_libc_lstat(stat, fs_ptn_symlink)) {

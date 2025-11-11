@@ -241,7 +241,8 @@ static void child_give_paren_process_time_to_reply (void);
 void
 child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 {
-  mmux_libc_fd_t	in, ou;
+  mmux_libc_infd_t	in;
+  mmux_libc_oufd_t	ou;
 
   /* Replace the stdin file descriptor with "read_fr_paren_fd". */
   if (true) {

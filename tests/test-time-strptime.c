@@ -44,7 +44,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
     {
-      mmux_libc_fd_t	fd;
+      mmux_libc_oufd_t	fd;
 
       mmux_libc_stder(fd);
       if (mmux_libc_tm_dump(fd, BT, NULL)) {

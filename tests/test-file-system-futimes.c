@@ -104,9 +104,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       }
 
       {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
-	mmux_libc_stdou(er);
+	mmux_libc_stder(er);
 	if (mmux_libc_timeval_dump(er, &access_timeval, "access_timeval")) {
 	  handle_error();
 	}
@@ -120,7 +120,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       mmux_libc_fs_ptn_t	fs_ptn;
       mmux_libc_stat_t		stat;
-      mmux_libc_fd_t		er;
+      mmux_libc_oufd_t		er;
 
       /* Build the file system pathname. */
       {

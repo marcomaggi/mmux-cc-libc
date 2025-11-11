@@ -77,7 +77,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     /* Check mode. */
     {
       mmux_libc_stat_t	stat;
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
       mmux_libc_mode_t	st_mode;
 
       mmux_libc_stder(er);

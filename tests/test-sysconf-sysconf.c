@@ -46,7 +46,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
     {
-      mmux_libc_fd_t	fd;
+      mmux_libc_oufd_t	fd;
 
       assert(false == mmux_libc_stder(fd));
       assert(false == mmux_libc_dprintf(fd, "%s: page size is: '", __func__));
@@ -98,7 +98,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (mmux_libc_pathconf(&result, fs_ptn, MMUX_LIBC__PC_LINK_MAX)) {
 	handle_error();
       } else {
-	mmux_libc_fd_t	fd;
+	mmux_libc_oufd_t	fd;
 
 	assert(false == mmux_libc_stder(fd));
 	assert(false == mmux_libc_dprintf(fd, "%s: pc_link_max is: '", __func__));
@@ -139,7 +139,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       if (mmux_libc_fpathconf(&result, fd, MMUX_LIBC__PC_LINK_MAX)) {
 	handle_error();
       } else {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
 	assert(false == mmux_libc_stder(er));
 	assert(false == mmux_libc_dprintf(er, "%s: pc_link_max is: '", __func__));

@@ -33,7 +33,7 @@ making_an_extension_from_raw_arguments (void)
   mmux_libc_fs_ptn_t		fs_ptn;
   mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
   mmux_libc_fs_ptn_extension_t	ext;
-  mmux_libc_fd_t		er;
+  mmux_libc_oufd_t		er;
 
   /* Build the file system pathname. */
   {
@@ -91,7 +91,7 @@ making_an_extension_from_pathname (void)
   mmux_asciizcp_t		ptn_asciiz = "/path/to/file.ext";
   mmux_libc_fs_ptn_t		fs_ptn;
   mmux_libc_fs_ptn_extension_t	fs_ptn_ext;
-  mmux_libc_fd_t		er;
+  mmux_libc_oufd_t		er;
 
   /* Build the file system pathname. */
   {
@@ -706,17 +706,17 @@ extension_from_ascii_array (void)
 
     /* Printing the file system pathname extension to stdout. */
     {
-      mmux_libc_fd_t	ou;
+      mmux_libc_oufd_t	er;
 
-      mmux_libc_stdou(ou);
-      if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
+      mmux_libc_stder(er);
+      if (mmux_libc_dprintf(er, "*** file system pathname extension is: '")) {
 	handle_error();
       }
-      if (mmux_libc_dprintf_fs_ptn_extension(ou, fs_ptn_ext)) {
+      if (mmux_libc_dprintf_fs_ptn_extension(er, fs_ptn_ext)) {
 	printf_error("printing file system pathname extension to stdout");
 	handle_error();
       }
-      if (mmux_libc_dprintf(ou, "'\n")) {
+      if (mmux_libc_dprintf(er, "'\n")) {
 	handle_error();
       }
     }
@@ -788,7 +788,7 @@ extension_from_asciiz_array (void)
 
     /* Printing the file system pathname extension to stdout. */
     {
-      mmux_libc_fd_t	ou;
+      mmux_libc_oufd_t	ou;
 
       mmux_libc_stdou(ou);
       if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
@@ -871,9 +871,9 @@ empty_extension_from_ascii_array (void)
 
     /* Printing the file system pathname extension to stdout. */
     {
-      mmux_libc_fd_t	ou;
+      mmux_libc_oufd_t	ou;
 
-      mmux_libc_stdou(ou);
+      mmux_libc_stder(ou);
       if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
 	handle_error();
       }
@@ -953,9 +953,9 @@ empty_extension_from_asciiz_array (void)
 
     /* Printing the file system pathname extension to stdout. */
     {
-      mmux_libc_fd_t	ou;
+      mmux_libc_oufd_t	ou;
 
-      mmux_libc_stdou(ou);
+      mmux_libc_stder(ou);
       if (mmux_libc_dprintf(ou, "*** file system pathname extension is: '")) {
 	handle_error();
       }

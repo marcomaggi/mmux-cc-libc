@@ -80,7 +80,7 @@ test_data_file (void)
 	printf_error("statfd-ing");
 	handle_error();
       } else {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
 	mmux_libc_stder(er);
 	if (mmux_libc_stat_dump(er, stat, NULL)) {
@@ -118,7 +118,7 @@ test_current_directory (void)
     printf_error("statfd-ing");
     handle_error();
   } else {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_stat_dump(er, stat, NULL)) {

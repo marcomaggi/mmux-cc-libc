@@ -167,7 +167,7 @@ m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[{
  ** Input/output: file descriptor core API.
  ** ----------------------------------------------------------------- */
 
-static const mmux_libc_file_descriptor_t stdin_fd = {
+static const mmux_libc_file_descriptor_input_t stdin_fd = {
   {
     .value = STDIN_FILENO,
   },
@@ -181,7 +181,7 @@ static const mmux_libc_file_descriptor_t stdin_fd = {
     .is_closed_for_writing	= true,
   },
 };
-static const mmux_libc_file_descriptor_t stdou_fd = {
+static const mmux_libc_file_descriptor_output_t stdou_fd = {
   {
     .value = STDOUT_FILENO
   },
@@ -195,7 +195,7 @@ static const mmux_libc_file_descriptor_t stdou_fd = {
     .is_closed_for_writing	= false,
   },
 };
-static const mmux_libc_file_descriptor_t stder_fd = {
+static const mmux_libc_file_descriptor_output_t stder_fd = {
   {
     .value = STDERR_FILENO
   },
@@ -227,19 +227,19 @@ static const mmux_libc_file_descriptor_directory_t at_fdcwd_fd = {
 };
 
 bool
-mmux_libc_stdin (mmux_libc_fd_t result_p)
+mmux_libc_stdin (mmux_libc_infd_t result_p)
 {
   *result_p = stdin_fd;
   return false;
 }
 bool
-mmux_libc_stdou (mmux_libc_fd_t result_p)
+mmux_libc_stdou (mmux_libc_oufd_t result_p)
 {
   *result_p = stdou_fd;
   return false;
 }
 bool
-mmux_libc_stder (mmux_libc_fd_t result_p)
+mmux_libc_stder (mmux_libc_oufd_t result_p)
 {
   *result_p = stder_fd;
   return false;

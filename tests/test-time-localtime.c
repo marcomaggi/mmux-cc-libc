@@ -37,7 +37,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_time_t		T;
     mmux_libc_tm_t *	BT;
-    mmux_libc_fd_t	fd;
+    mmux_libc_oufd_t	fd;
 
     mmux_libc_time(&T);
     mmux_libc_localtime(&BT, T);
@@ -52,7 +52,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_time_t		T;
     mmux_libc_tm_t	BT[1];
-    mmux_libc_fd_t	fd;
+    mmux_libc_oufd_t	fd;
 
     mmux_libc_time(&T);
     mmux_libc_localtime_r(BT, T);

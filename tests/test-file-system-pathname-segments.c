@@ -30,7 +30,7 @@ making_a_segment_from_raw_arguments (void)
   printf_message("running test: %s", __func__);
   mmux_libc_fs_ptn_t		fs_ptn;
   mmux_libc_fs_ptn_segment_t	fs_ptn_seg;
-  mmux_libc_fd_t		er;
+  mmux_libc_oufd_t		er;
 
   /* Build the file system pathname. */
   {
@@ -146,7 +146,7 @@ making_the_last_segment_from_pathname (void)
     }
 
     {
-      mmux_libc_fd_t		er;
+      mmux_libc_oufd_t		er;
 
       mmux_libc_stder(er);
 
@@ -375,7 +375,7 @@ one_last_segment_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_seg_
     if (mmux_libc_file_system_pathname_segment_equal(&correct, fs_ptn_seg_expected, fs_ptn_seg)) {
       handle_error();
     } else if (correct) {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_dprintfer("*** pathname \"%s\", last segment \"", ptn_asciiz)) {
@@ -388,7 +388,7 @@ one_last_segment_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_seg_
 	handle_error();
       }
     } else {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_dprintfer("invalid result, pathname \"%s\", last segment \"", ptn_asciiz)) {

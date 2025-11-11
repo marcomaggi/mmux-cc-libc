@@ -42,7 +42,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_rlim_cur_set(RL, cur);
     mmux_libc_rlim_max_set(RL, max);
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       if (mmux_libc_dprintfer("setter/getter ")) {
 	handle_error();
@@ -71,7 +71,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     mmux_libc_rlimit_set(RL, cur, max);
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_rlimit_dump(er, RL, NULL)) {
@@ -88,7 +88,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_dprintfer("getrlimit ")) {
@@ -114,7 +114,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       handle_error();
     }
     {
-      mmux_libc_fd_t	er;
+      mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
       if (mmux_libc_dprintfer("setrlimit ")) {
@@ -141,7 +141,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
       {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
 	mmux_libc_stder(er);
 	if (mmux_libc_dprintfer("prlimit ")) {
@@ -163,7 +163,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
       {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
 	mmux_libc_stder(er);
 	if (mmux_libc_dprintfer("prlimit only getting ")) {
@@ -191,7 +191,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	handle_error();
       }
       {
-	mmux_libc_fd_t	er;
+	mmux_libc_oufd_t	er;
 
 	mmux_libc_stder(er);
 	if (mmux_libc_dprintfer("prlimit only setting and only getting ")) {

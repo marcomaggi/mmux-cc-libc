@@ -34,7 +34,7 @@ read_one_directory_entry (mmux_libc_dirstream_t dirstream)
     printf_error("readdir-ing directory entry");
     handle_error();
   } else if (there_are_more_entries) {
-    mmux_libc_fd_t	er;
+    mmux_libc_oufd_t	er;
 
     mmux_libc_stder(er);
     if (mmux_libc_dirent_dump(er, direntry, NULL)) {

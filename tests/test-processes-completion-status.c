@@ -87,7 +87,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Printing */
   {
     mmux_libc_process_completion_status_t	pcs;
-    mmux_libc_fd_t				fd;
+    mmux_libc_oufd_t				fd;
 
     mmux_libc_stder(fd);
     assert(false == mmux_libc_make_process_completion_status(&pcs, 123));

@@ -612,13 +612,13 @@ mmux_cc_libc_decl bool mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_s
 mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t result_p, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_fd_t result_p)
+mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_infd_t result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_stdou (mmux_libc_fd_t result_p)
+mmux_cc_libc_decl bool mmux_libc_stdou (mmux_libc_oufd_t result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_stder (mmux_libc_fd_t result_p)
+mmux_cc_libc_decl bool mmux_libc_stder (mmux_libc_oufd_t result_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t result_p)

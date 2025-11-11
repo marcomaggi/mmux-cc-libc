@@ -42,9 +42,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   mmux_libc_modtime_set (utimbuf, T2);
 
   {
-    mmux_libc_fd_t	fd;
+    mmux_libc_oufd_t	fd;
 
-    mmux_libc_stdou(fd);
+    mmux_libc_stder(fd);
     if (mmux_libc_utimbuf_dump(fd, utimbuf, NULL)) {
       handle_error();
     }
