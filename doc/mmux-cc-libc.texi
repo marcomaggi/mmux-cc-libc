@@ -6496,11 +6496,116 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @deftypefun bool mmux_libc_dup (mmux_libc_fd_t @var{fd_result}, mmux_libc_fd_arg_t @var{old_fd})
 @MmuxCInterface{dup}.  Duplicate @var{old_fd}, allocating the lowest--numbered unused file
 descriptor, and initialise @var{fd_result} to it.
+
+@example
+mmux_libc_fd_t  fd1, fd2;
+
+/* Obtain the source file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+
+  /* Build the file descriptor pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the source file descriptor. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd1, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
+  @}
+@}
+
+/* Duplicate the file descriptor. */
+@{
+  if (mmux_libc_dup(fd2, fd1)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd1)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(fd2)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_dup2 (mmux_libc_fd_t @var{new_fd}, mmux_libc_fd_arg_t @var{old_fd})
 @MmuxCInterface{dup2}.  Duplicate @var{old_fd} using the file descriptor selected by @var{new_fd}.
+
+@example
+mmux_libc_fd_t  fd1, fd2;
+
+/* Obtain the source file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+
+  /* Build the file descriptor pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the source file descriptor. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd1, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
+  @}
+@}
+
+/* Duplicate the file descriptor. */
+@{
+  mmux_libc_make_fd(fd2, 5);
+  if (mmux_libc_dup2(fd2, fd1)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd1)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(fd2)) @{
+    /* error */
+  @}
+@}
+@end example
 @end deftypefun
 
 
@@ -6508,15 +6613,15 @@ descriptor, and initialise @var{fd_result} to it.
 @MmuxCInterface{dup3}.
 
 @example
-mmux_libc_fd_t      fd1, fd2;
+mmux_libc_fd_t  fd1, fd2;
 
 /* Obtain the source file descriptor. */
 @{
-  mmux_asciizcp_t     ptn_asciiz = "/path/to/file.ext";
   mmux_libc_fs_ptn_t  fs_ptn;
 
   /* Build the file descriptor pathname. */
   @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
@@ -6545,9 +6650,7 @@ mmux_libc_fd_t      fd1, fd2;
 @{
   auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_CLOEXEC);
 
-  /* I'm so dirty. */
   mmux_libc_make_fd(fd2, 5);
-
   if (mmux_libc_dup3(fd2, fd1, flags)) @{
     /* error */
   @}
