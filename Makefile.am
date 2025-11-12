@@ -394,13 +394,19 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 ## file descriptors
 
 check_PROGRAMS	+= \
+	tests/test-file-descriptors-dirfd			\
 	tests/test-file-descriptors-copy-file-range		\
+	tests/test-file-descriptors-dup				\
+	tests/test-file-descriptors-dup2			\
+	tests/test-file-descriptors-dup3			\
 	tests/test-file-descriptors-fcntl-flock			\
+	tests/test-file-descriptors-file-size			\
 	tests/test-file-descriptors-memfd			\
 	tests/test-file-descriptors-open-pwrite-pread-close	\
 	tests/test-file-descriptors-open-write-read-close	\
 	tests/test-file-descriptors-openat-write-read-close	\
 	tests/test-file-descriptors-openat2-write-read-close	\
+	tests/test-file-descriptors-pipe			\
 	tests/test-file-descriptors-preadv-pwritev		\
 	tests/test-file-descriptors-preadv2-pwritev2		\
 	tests/test-file-descriptors-readv-writev		\
@@ -408,12 +414,10 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-select-fd			\
 	tests/test-file-descriptors-struct-flock		\
 	tests/test-file-descriptors-struct-iovec		\
-	tests/test-file-descriptors-struct-iovec-array		\
-	tests/test-file-descriptors-file-size			\
-	tests/test-file-descriptors-pipe			\
-	tests/test-file-descriptors-dup				\
-	tests/test-file-descriptors-dup2			\
-	tests/test-file-descriptors-dup3
+	tests/test-file-descriptors-struct-iovec-array
+
+tests_test_file_descriptors_dirfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_dirfd_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_select_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)

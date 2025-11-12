@@ -5704,6 +5704,54 @@ system directory with the opening functions like @func{mmux_libc_open} using the
 @samp{MMUX_LIBC_O_DIRECTORY}; we are required to use directory file descriptors with functions like
 @cfunc{mmux_libc_openat} and similar.
 
+To open a directory as path--only, we do:
+
+@example
+mmux_asciizcp_t    ptn_asciiz = ".";
+mmux_libc_dirfd_t  dirfd;
+
+/* Obtain the directory file descriptor. */
+@{
+  mmux_libc_fs_ptn_t        fs_ptn_directory;
+
+  /* Build file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn_directory, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the directory file descriptor. */
+  @{
+    auto    flags = mmux_libc_open_flags(MMUX_LIBC_O_DIRECTORY | MMUX_LIBC_O_PATH);
+    auto    mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(dirfd, fs_ptn_directory, flags, mode)) @{
+      /* error */
+    @};
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+  @}
+@}
+
+@{
+  /* Do something with "dirfd". */
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(dirfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
 
 @deftp {Struct Type} mmux_libc_file_descriptor_directory_t
 @deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
