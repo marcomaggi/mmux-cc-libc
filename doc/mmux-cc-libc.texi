@@ -5785,13 +5785,14 @@ it is meant to be used as type of immutable arguments to functions.
 @end deftp
 
 
-@deftypefun bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t @var{dirfd})
+@deftypefun bool mmux_libc_at_fdcwd (mmux_libc_dirfd_t @var{dirfd_result})
 Store in the variable referenced by @var{dirfd} the directory file descriptor associated to the
-constant @code{AT_FDCWD}.  We can use it with @cfunc{mmux_libc_openat} and similar functions.
+standard constant @code{AT_FDCWD}.  We can use it with @cfunc{mmux_libc_openat} and similar
+functions.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_dirfd (mmux_libc_dirfd_t @var{dirfd}, mmux_standard_sint_t @var{dirfd_num})
+@deftypefun bool mmux_libc_make_dirfd (mmux_libc_dirfd_t @var{dirfd_result}, mmux_standard_sint_t @var{dirfd_num})
 Make a new file descriptor value representing a file system directory.  If @var{dirfd_num} is
 negative: @var{dirfd} is left untouched and the return value is @ctrue{}.
 @end deftypefun
@@ -5812,18 +5813,36 @@ negative: @var{dirfd} is left untouched and the return value is @ctrue{}.
 @cindex @stderr{} file descriptor
 
 
-@deftypefun bool mmux_libc_stdin (mmux_libc_infd_t @var{fd})
+@deftypefun bool mmux_libc_stdin (mmux_libc_infd_t @var{fd_result})
 Retrieve the file descriptor value associated to the standard input.
+
+@example
+mmux_libc_infd_t  in;
+
+mmux_libc_stdin(in);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stdou (mmux_libc_oufd_t @var{fd})
+@deftypefun bool mmux_libc_stdou (mmux_libc_oufd_t @var{fd_result})
 Retrieve the file descriptor value associated to the standard output.
+
+@example
+mmux_libc_oufd_t  ou;
+
+mmux_libc_stdou(ou);
+@end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_stder (mmux_libc_oufd_t @var{fd})
+@deftypefun bool mmux_libc_stder (mmux_libc_oufd_t @var{fd_result})
 Retrieve the file descriptor value associated to the standard error.
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+@end example
 @end deftypefun
 
 @c page
@@ -5834,7 +5853,7 @@ Retrieve the file descriptor value associated to the standard error.
 To print a formatted string to a file descriptor, we do:
 
 @example
-mmux_libc_fd_t  fd;
+mmux_libc_oufd_t  fd;
 
 /* Obtain the file descriptor. */
 @{
@@ -5913,8 +5932,8 @@ Notice that @file{stdarg.h} is already included by @value{PackageHeaderFile}.
 bool
 my_print_error (mmux_asciizcp_t template, ...)
 @{
-  bool          rv;
-  va_list       ap;
+  bool     rv;
+  va_list  ap;
 
   va_start(ap, template);
   @{
@@ -7821,7 +7840,8 @@ we take advantage of the fact that we know the data size.
 
 @deftypefun bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t @var{mfd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{maximum_buflen})
 Wrapper for @cfunc{mmux_libc_read}.  Copy up to @var{maximum_buflen} bytes from the device
-underlying @var{mfd} to the buffer referenced by @var{bufptr}.
+underlying @var{mfd} to the buffer referenced by @var{bufptr}, without moving the position of the
+device underlying the file descriptor.
 @end deftypefun
 
 @c page

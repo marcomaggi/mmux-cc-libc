@@ -609,7 +609,7 @@ mmux_cc_libc_decl bool mmux_libc_make_infd (mmux_libc_infd_t infd_result, mmux_s
 mmux_cc_libc_decl bool mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t result_p, mmux_standard_sint_t fd_num)
+mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_infd_t result_p)

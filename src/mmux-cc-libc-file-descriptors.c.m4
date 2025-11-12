@@ -389,19 +389,19 @@ mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmu
   if (fd->identity.is_for_ouput) {
     mmux_usize_t	required_nbytes_including_nil;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    _Pragma("GCC diagnostic push");
+    _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"");
     if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {
-#pragma GCC diagnostic pop
+      _Pragma("GCC diagnostic pop");
       return true;
     } else {
       char		bufptr[required_nbytes_including_nil.value];
       mmux_usize_t	required_nbytes_without_zero;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+      _Pragma("GCC diagnostic push");
+      _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"");
       if (mmux_libc_strftime(&required_nbytes_without_zero, bufptr, required_nbytes_including_nil, template, BT)) {
-#pragma GCC diagnostic pop
+	_Pragma("GCC diagnostic pop");
 	return true;
       } else {
 	return mmux_libc_dprintf(fd, "%s", bufptr);

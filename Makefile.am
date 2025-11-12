@@ -409,6 +409,7 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-pipe			\
 	tests/test-file-descriptors-preadv-pwritev		\
 	tests/test-file-descriptors-preadv2-pwritev2		\
+	tests/test-file-descriptors-printing			\
 	tests/test-file-descriptors-readv-writev		\
 	tests/test-file-descriptors-select			\
 	tests/test-file-descriptors-select-fd			\
@@ -478,6 +479,9 @@ tests_test_file_descriptors_dup2_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_dup3_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_dup3_LDADD					= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_printing_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_printing_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system
