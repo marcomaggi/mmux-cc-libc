@@ -1880,6 +1880,7 @@ mmux_libc_dprintf_$1 (mmux_libc_fd_arg_t fd, mmux_$1_t value)
 
 DEFINE_PRINTER([[[pointer]]])
 
+DEFINE_PRINTER([[[char]]])
 DEFINE_PRINTER([[[schar]]])
 DEFINE_PRINTER([[[uchar]]])
 DEFINE_PRINTER([[[sshort]]])

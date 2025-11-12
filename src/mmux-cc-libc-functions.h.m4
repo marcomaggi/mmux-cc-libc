@@ -930,6 +930,7 @@ m4_define([[[DEFINE_PRINTER_PROTO]]],
 
 DEFINE_PRINTER_PROTO([[[pointer]]])
 
+DEFINE_PRINTER_PROTO([[[char]]])
 DEFINE_PRINTER_PROTO([[[schar]]])
 DEFINE_PRINTER_PROTO([[[uchar]]])
 DEFINE_PRINTER_PROTO([[[sshort]]])

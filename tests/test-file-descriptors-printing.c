@@ -212,20 +212,113 @@ static void
 test_mmux_libc_dprintf_pointer (void)
 {
   printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "0xab78";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      auto	value = mmux_pointer_literal(0xAB78);
+
+      if (mmux_libc_dprintf_pointer(mfd, value)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
   printf_message("%s: DONE", __func__);
 }
+
+
 static void
 test_mmux_libc_dprintf_schar (void)
 {
   printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "-123";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      auto	value = mmux_schar_literal(-123);
+
+      if (mmux_libc_dprintf_schar(mfd, value)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
   printf_message("%s: DONE", __func__);
 }
+
 static void
 test_mmux_libc_dprintf_uchar (void)
 {
   printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "123";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      auto	value = mmux_uchar_literal(123);
+
+      if (mmux_libc_dprintf_uchar(mfd, value)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
   printf_message("%s: DONE", __func__);
 }
+
+
+static void
+test_mmux_libc_dprintf_char (void)
+{
+  printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "{";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      auto	value = mmux_char_literal('{');
+
+      if (mmux_libc_dprintf_char(mfd, value)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
+  printf_message("%s: DONE", __func__);
+}
+
+
 static void
 test_mmux_libc_dprintf_sshort (void)
 {
@@ -707,6 +800,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true) {	test_mmux_libc_dprintf_pointer();		}
   if (true) {	test_mmux_libc_dprintf_schar();			}
   if (true) {	test_mmux_libc_dprintf_uchar();			}
+  if (true) {	test_mmux_libc_dprintf_char();			}
   if (true) {	test_mmux_libc_dprintf_sshort();		}
   if (true) {	test_mmux_libc_dprintf_ushort();		}
   if (true) {	test_mmux_libc_dprintf_sint();			}
