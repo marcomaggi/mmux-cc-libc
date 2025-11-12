@@ -384,7 +384,7 @@ mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)
   }
 }
 bool
-mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
+mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_arg_t BT)
 {
   if (fd->identity.is_for_ouput) {
     mmux_usize_t	required_nbytes_including_nil;

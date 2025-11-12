@@ -36,7 +36,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* acquiring and dumping */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t	TM[1];
+    mmux_libc_tm_t	TM;
 
     assert(false == mmux_libc_time(&T));
     assert(false == mmux_libc_localtime_r(TM, T));
@@ -55,7 +55,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   /* setters and getters */
   {
-    mmux_libc_tm_t	TM[1];
+    mmux_libc_tm_t	TM;
 
     auto		sec	= mmux_sint_literal(47);
     auto		min	= mmux_sint_literal(4);

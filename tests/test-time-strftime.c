@@ -36,7 +36,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* mmux_libc_strftime_required_nbytes_including_nil() */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t 	BT[1];
+    mmux_libc_tm_t 	BT;
     mmux_usize_t	required_nbytes_including_nil;
 
     mmux_libc_time(&T);
@@ -51,7 +51,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* mmux_libc_strftime() */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t 	BT[1];
+    mmux_libc_tm_t 	BT;
     mmux_usize_t	required_nbytes_including_nil;
 
     mmux_libc_time(&T);
@@ -84,7 +84,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* mmux_libc_dprintf_strftime() */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t 	BT[1];
+    mmux_libc_tm_t 	BT;
     mmux_libc_memfd_t	fd;
 
     mmux_libc_time(&T);

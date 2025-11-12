@@ -46,7 +46,7 @@ extern "C" {
 
 typedef struct mmux_libc_timeval_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVAL];  } mmux_libc_timeval_t;
 typedef struct mmux_libc_timespec_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC]; } mmux_libc_timespec_t;
-typedef struct mmux_libc_tm_t       { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM];       } mmux_libc_tm_t;
+typedef struct mmux_libc_broken_down_time_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM]; } mmux_libc_broken_down_time_t;
 typedef struct mmux_libc_iovec_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_IOVEC];    } mmux_libc_iovec_t;
 typedef struct mmux_libc_flock_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_FLOCK];    } mmux_libc_flock_t;
 typedef struct mmux_libc_fd_set_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_FD_SET];   } mmux_libc_fd_set_t;

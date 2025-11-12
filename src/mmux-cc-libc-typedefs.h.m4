@@ -108,6 +108,14 @@ typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_inter
 
 
 /** --------------------------------------------------------------------
+ ** Times and dates.
+ ** ----------------------------------------------------------------- */
+
+typedef mmux_libc_broken_down_time_t		mmux_libc_tm_t[1];
+typedef mmux_libc_broken_down_time_t const *	mmux_libc_tm_arg_t;
+
+
+/** --------------------------------------------------------------------
  ** Input/output.
  ** ----------------------------------------------------------------- */
 

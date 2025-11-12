@@ -177,6 +177,515 @@ test_mmux_libc_dprintf_strerror (void)
 }
 
 
+static void
+test_mmux_libc_dprintf_strftime (void)
+{
+  printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "2025";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      mmux_libc_tm_t 	broken_down_time;
+
+      mmux_libc_tm_reset(broken_down_time);
+      mmux_libc_tm_year_set(broken_down_time, mmux_sint(2025 - 1900));
+
+      if (mmux_libc_dprintf_strftime(mfd, "%Y", broken_down_time)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
+  printf_message("%s: DONE", __func__);
+}
+
+
+static void
+test_mmux_libc_dprintf_pointer (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_schar (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uchar (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sshort (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_ushort (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sint (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uint (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_slong (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_ulong (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#ifdef MMUX_CC_TYPES_HAS_SLLONG
+static void
+test_mmux_libc_dprintf_sllong (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_ULLONG
+static void
+test_mmux_libc_dprintf_ullong (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+static void
+test_mmux_libc_dprintf_sint8 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uint8 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sint16 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uint16 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sint32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uint32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sint64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uint64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_flonumfl (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_flonumdb (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#ifdef MMUX_CC_TYPES_HAS_FLONUMLDB
+static void
+test_mmux_libc_dprintf_flonumldb (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF32
+static void
+test_mmux_libc_dprintf_flonumf32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF64
+static void
+test_mmux_libc_dprintf_flonumf64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF128
+static void
+test_mmux_libc_dprintf_flonumf128 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF32X
+static void
+test_mmux_libc_dprintf_flonumf32x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF64X
+static void
+test_mmux_libc_dprintf_flonumf64x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF128X
+static void
+test_mmux_libc_dprintf_flonumf128x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD32
+static void
+test_mmux_libc_dprintf_flonumd32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD64
+static void
+test_mmux_libc_dprintf_flonumd64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD128
+static void
+test_mmux_libc_dprintf_flonumd128 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+static void
+test_mmux_libc_dprintf_flonumcfl (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_flonumcdb (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCLDB
+static void
+test_mmux_libc_dprintf_flonumcldb (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF32
+static void
+test_mmux_libc_dprintf_flonumcf32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF64
+static void
+test_mmux_libc_dprintf_flonumcf64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF128
+static void
+test_mmux_libc_dprintf_flonumcf128 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF32X
+static void
+test_mmux_libc_dprintf_flonumcf32x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF64X
+static void
+test_mmux_libc_dprintf_flonumcf64x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF128X
+static void
+test_mmux_libc_dprintf_flonumcf128x (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD32
+static void
+test_mmux_libc_dprintf_flonumcd32 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD64
+static void
+test_mmux_libc_dprintf_flonumcd64 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD128
+static void
+test_mmux_libc_dprintf_flonumcd128 (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+#endif
+static void
+test_mmux_libc_dprintf_byte (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_octet (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_usize (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_ssize (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sintmax (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uintmax (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_sintptr (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_uintptr (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_ptrdiff (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_off (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_wchar (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_wint (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_time (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_mode (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_pid (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_uid (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_gid (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_socklen (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_rlim (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_ino (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_dev (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_nlink (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_blkcnt (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_fd (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_fs_ptn (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_fs_ptn_extension (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_fs_ptn_segment (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_process_completion_status (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+static void
+test_mmux_libc_dprintf_libc_interprocess_signal (void)
+{
+  printf_message("%s: running test", __func__);
+  printf_message("%s: DONE", __func__);
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -190,10 +699,127 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-file-descriptors-printing";
   }
 
-  if (true) {	test_mmux_libc_dprintf();		}
-  if (true) {	test_mmux_libc_vdprintf();		}
-  if (true) {	test_mmux_libc_dprintf_newline();	}
-  if (true) {	test_mmux_libc_dprintf_strerror();	}
+  if (true) {	test_mmux_libc_dprintf();			}
+  if (true) {	test_mmux_libc_vdprintf();			}
+  if (true) {	test_mmux_libc_dprintf_newline();		}
+  if (true) {	test_mmux_libc_dprintf_strerror();		}
+  if (true) {	test_mmux_libc_dprintf_strftime();		}
+  if (true) {	test_mmux_libc_dprintf_pointer();		}
+  if (true) {	test_mmux_libc_dprintf_schar();			}
+  if (true) {	test_mmux_libc_dprintf_uchar();			}
+  if (true) {	test_mmux_libc_dprintf_sshort();		}
+  if (true) {	test_mmux_libc_dprintf_ushort();		}
+  if (true) {	test_mmux_libc_dprintf_sint();			}
+  if (true) {	test_mmux_libc_dprintf_uint();			}
+  if (true) {	test_mmux_libc_dprintf_slong();			}
+  if (true) {	test_mmux_libc_dprintf_ulong();			}
+#ifdef MMUX_CC_TYPES_HAS_SLLONG
+  if (true) {	test_mmux_libc_dprintf_sllong();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_ULLONG
+  if (true) {	test_mmux_libc_dprintf_ullong();		}
+#endif
+  if (true) {	test_mmux_libc_dprintf_sint8();			}
+  if (true) {	test_mmux_libc_dprintf_uint8();			}
+  if (true) {	test_mmux_libc_dprintf_sint16();		}
+  if (true) {	test_mmux_libc_dprintf_uint16();		}
+  if (true) {	test_mmux_libc_dprintf_sint32();		}
+  if (true) {	test_mmux_libc_dprintf_uint32();		}
+  if (true) {	test_mmux_libc_dprintf_sint64();		}
+  if (true) {	test_mmux_libc_dprintf_uint64();		}
+  if (true) {	test_mmux_libc_dprintf_flonumfl();		}
+  if (true) {	test_mmux_libc_dprintf_flonumdb();		}
+#ifdef MMUX_CC_TYPES_HAS_FLONUMLDB
+  if (true) {	test_mmux_libc_dprintf_flonumldb();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF32
+  if (true) {	test_mmux_libc_dprintf_flonumf32();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF64
+  if (true) {	test_mmux_libc_dprintf_flonumf64();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF128
+  if (true) {	test_mmux_libc_dprintf_flonumf128();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF32X
+  if (true) {	test_mmux_libc_dprintf_flonumf32x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF64X
+  if (true) {	test_mmux_libc_dprintf_flonumf64x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMF128X
+  if (true) {	test_mmux_libc_dprintf_flonumf128x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD32
+  if (true) {	test_mmux_libc_dprintf_flonumd32();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD64
+  if (true) {	test_mmux_libc_dprintf_flonumd64();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMD128
+  if (true) {	test_mmux_libc_dprintf_flonumd128();		}
+#endif
+  if (true) {	test_mmux_libc_dprintf_flonumcfl();		}
+  if (true) {	test_mmux_libc_dprintf_flonumcdb();		}
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCLDB
+  if (true) {	test_mmux_libc_dprintf_flonumcldb();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF32
+  if (true) {	test_mmux_libc_dprintf_flonumcf32();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF64
+  if (true) {	test_mmux_libc_dprintf_flonumcf64();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF128
+  if (true) {	test_mmux_libc_dprintf_flonumcf128();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF32X
+  if (true) {	test_mmux_libc_dprintf_flonumcf32x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF64X
+  if (true) {	test_mmux_libc_dprintf_flonumcf64x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCF128X
+  if (true) {	test_mmux_libc_dprintf_flonumcf128x();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD32
+  if (true) {	test_mmux_libc_dprintf_flonumcd32();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD64
+  if (true) {	test_mmux_libc_dprintf_flonumcd64();		}
+#endif
+#ifdef MMUX_CC_TYPES_HAS_FLONUMCD128
+  if (true) {	test_mmux_libc_dprintf_flonumcd128();		}
+#endif
+  if (true) {	test_mmux_libc_dprintf_byte();			}
+  if (true) {	test_mmux_libc_dprintf_octet();			}
+  if (true) {	test_mmux_libc_dprintf_usize();			}
+  if (true) {	test_mmux_libc_dprintf_ssize();			}
+  if (true) {	test_mmux_libc_dprintf_sintmax();		}
+  if (true) {	test_mmux_libc_dprintf_uintmax();		}
+  if (true) {	test_mmux_libc_dprintf_sintptr();		}
+  if (true) {	test_mmux_libc_dprintf_uintptr();		}
+  if (true) {	test_mmux_libc_dprintf_ptrdiff();		}
+  if (true) {	test_mmux_libc_dprintf_off();			}
+  if (true) {	test_mmux_libc_dprintf_wchar();			}
+  if (true) {	test_mmux_libc_dprintf_wint();			}
+  if (true) {	test_mmux_libc_dprintf_time();			}
+  if (true) {	test_mmux_libc_dprintf_libc_mode();		}
+  if (true) {	test_mmux_libc_dprintf_libc_pid();		}
+  if (true) {	test_mmux_libc_dprintf_libc_uid();		}
+  if (true) {	test_mmux_libc_dprintf_libc_gid();		}
+  if (true) {	test_mmux_libc_dprintf_libc_socklen();		}
+  if (true) {	test_mmux_libc_dprintf_libc_rlim();		}
+  if (true) {	test_mmux_libc_dprintf_libc_ino();		}
+  if (true) {	test_mmux_libc_dprintf_libc_dev();		}
+  if (true) {	test_mmux_libc_dprintf_libc_nlink();		}
+  if (true) {	test_mmux_libc_dprintf_libc_blkcnt();		}
+  if (true) {	test_mmux_libc_dprintf_libc_fd();		}
+  if (true) {	test_mmux_libc_dprintf_fs_ptn();		}
+  if (true) {	test_mmux_libc_dprintf_fs_ptn_extension();	}
+  if (true) {	test_mmux_libc_dprintf_fs_ptn_segment();	}
+  if (true) {	test_mmux_libc_dprintf_libc_process_completion_status();	}
+  if (true) {	test_mmux_libc_dprintf_libc_interprocess_signal();		}
 
   mmux_libc_exit_success();
 }

@@ -37,7 +37,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_asciizcp_t	template     = "The timestamp is: %a, %d %b %Y %H:%M:%S %z";
     mmux_asciizcp_t	input_string = "The timestamp is: Fri, 15 Nov 2024 23:11:20 +0100, and that's it!";
-    mmux_libc_tm_t	BT[1];
+    mmux_libc_tm_t	BT;
     mmux_asciizp_t	first_unprocessed_after_timestamp;
 
     if (mmux_libc_strptime(&first_unprocessed_after_timestamp, input_string, template, BT)) {

@@ -1008,10 +1008,10 @@ static bool
 mmux_libc_stat_dump_time (mmux_libc_fd_arg_t fd, mmux_time_t T)
 {
   mmux_asciizcp_t	template = "%Y-%m-%dT%H:%M:%S%z";
-  mmux_libc_tm_t *	BT;
+  mmux_libc_tm_t	BT;
   mmux_usize_t		required_nbytes_including_nil;
 
-  mmux_libc_gmtime(&BT, T);
+  mmux_libc_gmtime(BT, T);
 _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
   if (mmux_libc_strftime_required_nbytes_including_nil(&required_nbytes_including_nil, template, BT)) {

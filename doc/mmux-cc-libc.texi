@@ -2825,7 +2825,7 @@ assert(true  == result);
 @menu
 * time timeval::                The @objtype{mmux_libc_timeval_t} type.
 * time timespec::               The @objtype{mmux_libc_timespec_t} type.
-* time tm::                     The @objtype{mmux_libc_tm_t} type.
+* time tm::                     The @objtype{mmux_libc_broken_down_time_t} type.
 * time acquiring::              Acquiring the current time.
 * time epoch time::             Converting from Epoch time to other formats.
 * time broken time::            Converting from broken time to other formats.
@@ -2958,14 +2958,17 @@ Initialise the fields of a @MmuxCStruct{timespec}.
 
 @c page
 @node time tm
-@section The @objtype{mmux_libc_tm_t} type
+@section The @objtype{mmux_libc_broken_down_time_t} type
 
 
-To acquire and dump an instance of @objtype{mmux_libc_tm_t} we do:
+Under @value{PACKAGE}, the standard type @code{struc tm} is aliased by the type
+@objtype{mmux_libc_broken_down_time_t}.
+
+To acquire and dump an instance of @objtype{mmux_libc_broken_down_time_t} we do:
 
 @example
 mmux_time_t     T;
-mmux_libc_tm_t  TM[1];
+mmux_libc_tm_t  TM;
 
 mmux_libc_time(&T);
 mmux_libc_localtime_r(TM, T);
@@ -2979,23 +2982,68 @@ mmux_libc_localtime_r(TM, T);
 @}
 @end example
 
+@deftp {Opaque Struct Type} mmux_libc_broken_down_time_t
+Opaque data structure type which is an alias of @code{struct tm}.
+@end deftp
 
-@MmuxCStructOpaqueTypedef{tm}
-@MmuxSetterGetter{tm, tm_sec,         mmux_sint_t}
-@MmuxSetterGetter{tm, tm_min,         mmux_sint_t}
-@MmuxSetterGetter{tm, tm_hour,        mmux_sint_t}
-@MmuxSetterGetter{tm, tm_mday,        mmux_sint_t}
-@MmuxSetterGetter{tm, tm_mon,         mmux_sint_t}
-@MmuxSetterGetter{tm, tm_year,        mmux_sint_t}
-@MmuxSetterGetter{tm, tm_wday,        mmux_sint_t}
-@MmuxSetterGetter{tm, tm_yday,        mmux_sint_t}
-@MmuxSetterGetter{tm, tm_isdst,       mmux_sint_t}
-@MmuxSetterGetter{tm, tm_gmtoff,      mmux_slong_t}
-@MmuxSetterGetter{tm, tm_zone,        mmux_asciizcp_t}
-@MmuxStructDumper{tm}
+@deftp {Struct Pointer Type} mmux_libc_tm_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_broken_down_time_t  mmux_libc_tm_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and to declare a result argument for functions that
+build a new broken--down time or retrieve an already built broken--down time description, so the
+referenced @objtype{mmux_libc_broken_down_time_t} instance must be mutable.
+@end deftp
 
 
-@deftypefun bool mmux_libc_tm_reset (mmux_libc_tm_t * @var{TM_P})
+@deftp {Struct Pointer Type} mmux_libc_tm_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_broken_down_time_t const *  mmux_libc_tm_arg_t;
+@end example
+
+@noindent
+it is meant to be used to declare an argument for functions that use an already built broken--down
+time descriptor, so the referenced @objtype{mmux_libc_broken_down_time_t} instance must be
+immutable.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxBrokenDownTimeSetterGetter{FIELDNAME, FIELDTYPE}
+@deftypefun bool mmux_libc_\FIELDNAME\_set (mmux_libc_tm_t @var{broken_down_time}, \FIELDTYPE\ @var{\FIELDNAME\})
+@deftypefunx bool mmux_libc_\FIELDNAME\_ref (\FIELDTYPE\ * @var{\FIELDNAME\_result_p}, mmux_libc_tm_arg_t @var{broken_down_time})
+Setter and getter for the field @code{\FIELDNAME\} of @objtype{mmux_libc_broken_down_time_t}.
+@end deftypefun
+
+@end macro
+
+@MmuxBrokenDownTimeSetterGetter{tm_sec,         mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_min,         mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_hour,        mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_mday,        mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_mon,         mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_year,        mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_wday,        mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_yday,        mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_isdst,       mmux_sint_t}
+@MmuxBrokenDownTimeSetterGetter{tm_gmtoff,      mmux_slong_t}
+@MmuxBrokenDownTimeSetterGetter{tm_zone,        mmux_asciizcp_t}
+
+@deftypefun bool mmux_libc_tm_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_tm_arg_t @var{struct_p}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the @MmuxCStruct{struct tm} referenced by
+@var{struct_p}.  @var{struct_name} must be a pointer to an @MmuxAsciiZ{} string representing the
+name of the data structure used in the description; when @cnull{}: it defaults to @samp{struct tm}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_tm_reset (mmux_libc_tm_t @var{broken_down_time})
 Reset the fields to:
 
 @example
@@ -3041,19 +3089,19 @@ mmux_libc_time(&T);
 @section Converting from Epoch time to other formats
 
 
-@deftypefun bool mmux_libc_localtime (mmux_libc_tm_t * * @var{result_p}, mmux_time_t @var{T})
-@MmuxCInterface{localtime}.  Store in the variable referenced by @var{result_p} a pointer to a
-statically allocated @objtype{mmux_libc_tm_t} that will be overwritten by future calls to time
+@deftypefun bool mmux_libc_localtime (mmux_libc_tm_t @var{tm_result}, mmux_time_t @var{T})
+@MmuxCInterface{localtime}.  Copy in the variable referenced by @var{tm_result} a statically
+allocated @objtype{mmux_libc_broken_down_time_t} that will be overwritten by future calls to time
 functions; we should just use @cfunc{mmux_libc_localtime_r}.
 
 @example
-mmux_time_t             T;
-mmux_libc_tm_t *        BT;
+mmux_time_t     T;
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T);
-mmux_libc_localtime(&BT, T);
+mmux_libc_localtime(BT, T);
 @{
-  mmux_libc_fd_t        fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
@@ -3064,12 +3112,12 @@ mmux_libc_localtime(&BT, T);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_localtime_r (mmux_libc_tm_t * @var{result_p}, mmux_time_t @var{T})
+@deftypefun bool mmux_libc_localtime_r (mmux_libc_tm_t @var{tm_result}, mmux_time_t @var{T})
 @MmuxCInterface{localtime_r}.
 
 @example
-mmux_time_t             T;
-mmux_libc_tm_t          BT[1];
+mmux_time_t     T;
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
@@ -3085,19 +3133,19 @@ mmux_libc_localtime_r(BT, T);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_gmtime (mmux_libc_tm_t * * @var{result_p}, mmux_time_t @var{T})
-@MmuxCInterface{gmtime}.  Store in the variable referenced by @var{result_p} a pointer to a
-statically allocated @objtype{mmux_libc_tm_t} that will be overwritten by future calls to time
-functions; we should just use @cfunc{mmux_libc_gmtime_r}.
+@deftypefun bool mmux_libc_gmtime (mmux_libc_tm_t @var{tm_result}, mmux_time_t @var{T})
+@MmuxCInterface{gmtime}.  Copy in the variable referenced by @var{tm_result} a statically allocated
+@objtype{mmux_libc_broken_down_time_t} that will be overwritten by future calls to time functions;
+we should just use @cfunc{mmux_libc_gmtime_r}.
 
 @example
-mmux_time_t             T;
-mmux_libc_tm_t *        BT;
+mmux_time_t     T;
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T);
-mmux_libc_gmtime(&BT, T);
+mmux_libc_gmtime(BT, T);
 @{
-  mmux_libc_fd_t        fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stdou(fd);
   if (mmux_libc_tm_dump(fd, BT, NULL)) @{
@@ -3108,12 +3156,12 @@ mmux_libc_gmtime(&BT, T);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_gmtime_r (mmux_libc_tm_t * @var{result_p}, mmux_time_t @var{T})
+@deftypefun bool mmux_libc_gmtime_r (mmux_libc_tm_t @var{tm_result}, mmux_time_t @var{T})
 @MmuxCInterface{gmtime_r}.
 
 @example
-mmux_time_t             T;
-mmux_libc_tm_t          BT[1];
+mmux_time_t     T;
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T);
 mmux_libc_gmtime_r(BT, T);
@@ -3168,12 +3216,12 @@ if (mmux_libc_dprintfer("the timestamp from ctime_r is: \"%s\"\n", bufptr)) @{
 @section Converting from broken time to other formats
 
 
-@deftypefun bool mmux_libc_mktime (mmux_time_t * @var{result_p}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_mktime (mmux_time_t * @var{result_p}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{mktime}.
 
 @example
 mmux_time_t     T1, T2;
-mmux_libc_tm_t  BT[1];
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T1);
 mmux_libc_localtime_r(BT, T1);
@@ -3190,12 +3238,12 @@ mmux_libc_mktime(&T2, BT);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_timegm (mmux_time_t * @var{result_p}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_timegm (mmux_time_t * @var{result_p}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{timegm}.
 
 @example
 mmux_time_t     T1, T2;
-mmux_libc_tm_t  BT[1];
+mmux_libc_tm_t  BT;
 
 mmux_libc_time(&T1);
 mmux_libc_localtime_r(BT, T1);
@@ -3212,14 +3260,14 @@ mmux_libc_timegm(&T2, BT);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_asctime (mmux_asciizcp_t * @var{result_p}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_asctime (mmux_asciizcp_t * @var{result_p}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{asctime}.  The variable referenced by @var{result_p} is set to a pointer to a
 statically allocated string, which will be overwritten by future calls to time functions; we should
 just use @cfunc{mmux_libc_asctime_r}.
 
 @example
 mmux_time_t         T;
-mmux_libc_tm_t      BT[1];
+mmux_libc_tm_t      BT;
 mmux_asciizcp_t     bufptr;
 
 mmux_libc_time(&T);
@@ -3232,15 +3280,15 @@ if (mmux_libc_dprintfer("the timestamp from asctime is: \"%s\"\n", bufptr)) @{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_asctime_r (mmux_asciizcp_t @var{result_p}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_asctime_r (mmux_asciizcp_t @var{result_p}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{asctime_r}.
 
 @example
-mmux_time_t         T;
-mmux_libc_tm_t      BT[1];
+mmux_time_t     T;
+mmux_libc_tm_t  BT;
 #undef  IS_THIS_ENOUGH_QUESTION_MARK
 #define IS_THIS_ENOUGH_QUESTION_MARK            512
-char                bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
+char            bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
 
 mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
@@ -3256,7 +3304,7 @@ if (mmux_libc_dprintfer("the timestamp from asctime_r is: \"%s\"\n", bufptr)) @{
 @section Formatting string timestamps
 
 
-@deftypefun bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * @var{required_nbytes_including_nil_p}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * @var{required_nbytes_including_nil_p}, mmux_asciizcp_t @var{template}, mmux_libc_tm_arg_t @var{BT})
 When successful: store in the variable referenced by @var{required_nbytes_including_nil_p} the
 number of bytes, @strong{including} the terminating zero, required to hold the string generated by
 @cfunc{strftime} when applied to @var{template} to format a time specification from the broken time
@@ -3265,7 +3313,7 @@ number of bytes, @strong{including} the terminating zero, required to hold the s
 
 
 @anchor{mmux_libc_strftime}
-@deftypefun bool mmux_libc_strftime (mmux_usize_t * @var{generated_nbytes_without_zero_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_strftime (mmux_usize_t * @var{generated_nbytes_without_zero_p}, mmux_asciizp_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_asciizcp_t @var{template}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{strftime}.  Format an output string representation of the timestamp referenced by
 @var{BT} according to @var{template}, and store it in the buffer referenced by @var{bufptr}; at
 most @var{buflen} characters, including the terminating zero, will be written to @var{bufptr}.
@@ -3277,10 +3325,10 @@ It is sometimes better to use the function @cfunc{mmux_libc_dprintf_strftime},
 @ref{mmux_libc_dprintf_strftime} for details.
 
 @example
-mmux_asciizcp_t   template = "%Y-%m-%dT%H:%M:%S%z";
-mmux_time_t       T;
-mmux_libc_tm_t    BT[1];
-mmux_usize_t      required_nbytes_including_nil;
+mmux_asciizcp_t  template = "%Y-%m-%dT%H:%M:%S%z";
+mmux_time_t      T;
+mmux_libc_tm_t   BT;
+mmux_usize_t     required_nbytes_including_nil;
 
 mmux_libc_time(&T);
 mmux_libc_localtime_r(BT, T);
@@ -3304,14 +3352,14 @@ mmux_libc_dprintfou("%s\n", bufptr);
 @section Converting from string timestamps to other formats
 
 
-@deftypefun bool mmux_libc_strptime (mmux_asciizpp_t @var{first_unprocessed_after_timestamp_p}, mmux_asciizcp_t @var{input_string}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_strptime (mmux_asciizpp_t @var{first_unprocessed_after_timestamp_p}, mmux_asciizcp_t @var{input_string}, mmux_asciizcp_t @var{template}, mmux_libc_tm_arg_t @var{BT})
 @MmuxCInterface{strptime}.
 
 @example
-mmux_asciizcp_t         template     = "The timestamp is: %a, %d %b %Y %H:%M:%S %z";
-mmux_asciizcp_t         input_string = "The timestamp is: Fri, 15 Nov 2024 23:11:20 +0100, and that's it!";
-mmux_libc_tm_t          BT[1];
-mmux_asciizp_t          first_unprocessed_after_timestamp;
+mmux_asciizcp_t  template     = "The timestamp is: %a, %d %b %Y %H:%M:%S %z";
+mmux_asciizcp_t  input_string = "The timestamp is: Fri, 15 Nov 2024 23:11:20 +0100, and that's it!";
+mmux_libc_tm_t   BT;
+mmux_asciizp_t   first_unprocessed_after_timestamp;
 
 if (mmux_libc_strptime(&first_unprocessed_after_timestamp, input_string, template, BT)) @{
   /* error */
@@ -5961,7 +6009,7 @@ from a call to @cfunc{mmux_libc_strerror}.
 
 
 @anchor{mmux_libc_dprintf_strftime}
-@deftypefun bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, mmux_libc_tm_t * @var{BT})
+@deftypefun bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t @var{fd}, mmux_asciizcp_t @var{template}, mmux_libc_tm_arg_t @var{BT})
 Wrapper for @cfunc{mmux_libc_dprintf} that prints to @var{fd} the timestamp representation of
 @var{BT} formatted according to @var{template} using @cfunc{mmux_libc_strftime},
 @ref{mmux_libc_strftime} for details.

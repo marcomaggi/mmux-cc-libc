@@ -245,8 +245,7 @@ extern "C" {
 
 typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
-typedef struct tm		mmux_libc_tm_t;
-
+typedef struct tm		mmux_libc_broken_down_time_t;
 typedef struct iovec		mmux_libc_iovec_t;
 typedef struct flock		mmux_libc_flock_t;
 typedef fd_set			mmux_libc_fd_set_t;

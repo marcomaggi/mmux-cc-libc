@@ -465,23 +465,26 @@ mmux_cc_libc_decl bool mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc
  ** Times and dates: mmux_libc_tm_t.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_sec,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_min,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_hour,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_mday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_mon,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_year,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_wday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_yday,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_isdst,	mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_gmtoff,	mmux_slong_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(tm,	tm_zone,	mmux_asciizcp_t)
+m4_define([[[DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS]]],
+[[[mmux_cc_libc_decl bool mmux_libc_$1_set (mmux_libc_tm_t broken_down_time, $2 value);
+mmux_cc_libc_decl bool mmux_libc_$1_ref ($2 * result_p, mmux_libc_tm_arg_t broken_down_time);]]])
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_sec,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_min,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_hour,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_mday,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_mon,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_year,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_wday,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_yday,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_isdst,		mmux_sint_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_gmtoff,	mmux_slong_t)
+DEFINE_STRUCT_TM_SETTER_GETTER_PROTOS(tm_zone,		mmux_asciizcp_t)
 
-mmux_cc_libc_decl bool mmux_libc_tm_dump (mmux_libc_fd_arg_t fd, mmux_libc_tm_t const * tm_p,
+mmux_cc_libc_decl bool mmux_libc_tm_dump (mmux_libc_fd_arg_t fd, mmux_libc_tm_arg_t tm_p,
 					  mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_tm_reset (mmux_libc_tm_t * tm_p)
+mmux_cc_libc_decl bool mmux_libc_tm_reset (mmux_libc_tm_t tm_p)
   __attribute__((__nonnull__(1)));
 
 
@@ -494,16 +497,16 @@ mmux_cc_libc_decl bool mmux_libc_time (mmux_time_t * result_p)
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_localtime   (mmux_libc_tm_t * * result_p, mmux_time_t T)
+mmux_cc_libc_decl bool mmux_libc_localtime   (mmux_libc_tm_t result_p, mmux_time_t T)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_localtime_r (mmux_libc_tm_t * result_p, mmux_time_t T)
+mmux_cc_libc_decl bool mmux_libc_localtime_r (mmux_libc_tm_t result_p, mmux_time_t T)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_gmtime      (mmux_libc_tm_t * * result_p, mmux_time_t T)
+mmux_cc_libc_decl bool mmux_libc_gmtime      (mmux_libc_tm_t result_p, mmux_time_t T)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_gmtime_r    (mmux_libc_tm_t * result_p, mmux_time_t T)
+mmux_cc_libc_decl bool mmux_libc_gmtime_r    (mmux_libc_tm_t result_p, mmux_time_t T)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_ctime       (mmux_asciizcpp_t result_p, mmux_time_t T)
@@ -514,33 +517,35 @@ mmux_cc_libc_decl bool mmux_libc_ctime_r     (mmux_asciizp_t result_p, mmux_time
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_mktime    (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
+mmux_cc_libc_decl bool mmux_libc_mktime    (mmux_time_t * result_p, mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_timegm    (mmux_time_t * result_p, mmux_libc_tm_t * tm_p)
+mmux_cc_libc_decl bool mmux_libc_timegm    (mmux_time_t * result_p, mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_asctime   (mmux_asciizcp_t * result_p, mmux_libc_tm_t * tm_p)
+mmux_cc_libc_decl bool mmux_libc_asctime   (mmux_asciizcp_t * result_p, mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_t * tm_p)
+mmux_cc_libc_decl bool mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_strftime_required_nbytes_including_nil (mmux_usize_t * required_nbytes_including_nil_p,
-									 mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+									 mmux_asciizcp_t template,
+									 mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2),__format__(__strftime__,2,0)));
 
 mmux_cc_libc_decl bool mmux_libc_strftime (mmux_usize_t * required_nbytes_without_zero_p,
 					   mmux_asciizp_t bufptr, mmux_usize_t buflen,
-					   mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+					   mmux_asciizcp_t template, mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(1,2,4,5),__format__(__strftime__,4,0),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_strptime (char ** first_unprocessed_after_timestamp_p,
-					   mmux_asciizcp_t input_string, mmux_asciizcp_t template, mmux_libc_tm_t * tm_p)
+					   mmux_asciizcp_t input_string, mmux_asciizcp_t template,
+					   mmux_libc_tm_arg_t tm_p)
   __attribute__((__nonnull__(2,3,4),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -638,7 +643,7 @@ mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_t * BT)
+mmux_cc_libc_decl bool mmux_libc_dprintf_strftime (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, mmux_libc_tm_arg_t BT)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__,__format__(__strftime__,2,0)));
 
 mmux_cc_libc_decl bool mmux_libc_vdprintf (mmux_libc_fd_arg_t fd, mmux_asciizcp_t template, va_list ap)
@@ -1004,15 +1009,6 @@ DEFINE_PRINTER_PROTO([[[libc_nlink]]])
 DEFINE_PRINTER_PROTO([[[libc_blkcnt]]])
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
-  __attribute__((__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_pid (mmux_libc_fd_arg_t fd, mmux_libc_pid_t value)
-  __attribute__((__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_uid (mmux_libc_fd_arg_t fd, mmux_libc_uid_t value)
-  __attribute__((__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_gid (mmux_libc_fd_arg_t fd, mmux_libc_gid_t value)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t value)

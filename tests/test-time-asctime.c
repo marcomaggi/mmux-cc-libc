@@ -36,7 +36,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* mmux_libc_asctime() */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t	BT[1];
+    mmux_libc_tm_t	BT;
     mmux_asciizcp_t	bufptr;
 
     mmux_libc_time(&T);
@@ -50,7 +50,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* mmux_libc_asctime_r() */
   {
     mmux_time_t		T;
-    mmux_libc_tm_t	BT[1];
+    mmux_libc_tm_t	BT;
 #undef  IS_THIS_ENOUGH_QUESTION_MARK
 #define IS_THIS_ENOUGH_QUESTION_MARK		512
     char		bufptr[IS_THIS_ENOUGH_QUESTION_MARK];
