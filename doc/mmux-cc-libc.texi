@@ -6507,7 +6507,7 @@ if (mmux_libc_pread(&nbytes_done, fd, bufptr, buflen, offset)) @{
 mmux_libc_fd_t   fd;
 mmux_usize_t     nbytes_done;
 mmux_usize_t     buflen;
-mmux_asciizcp_t  bufptr = "ciao";
+mmux_asciizcp_t  bufptr = "The colour of water and quicksilver.";
 
 mmux_libc_strlen(&buflen, bufptr);
 mmux_libc_stdou(fd);
@@ -6525,7 +6525,7 @@ if (mmux_libc_write(&nbytes_done, fd, bufptr, buflen)) @{
 mmux_libc_fd_t   fd;
 mmux_usize_t     nbytes_done;
 mmux_usize_t     buflen;
-mmux_asciizcp_t  bufptr = "ciao";
+mmux_asciizcp_t  bufptr = "The colour of water and quicksilver.";
 auto             offset = mmux_off_literal(123);
 
 mmux_libc_strlen(&buflen, bufptr);
@@ -6549,7 +6549,7 @@ These functions exist mostly as tools in debugging code.
 
 @example
 mmux_usize_t     buflen;
-mmux_asciizcp_t  bufptr = "ciao";
+mmux_asciizcp_t  bufptr = "The colour of water and quicksilver.";
 
 mmux_libc_strlen(&buflen, bufptr);
 
@@ -9622,7 +9622,7 @@ Build a new @objtype{mmux_libc_file_system_pathname_segment_t} object from an @M
 The resulting segment object shares memory with the string itself.
 
 @example
-mmux_asciizcp_t             seg_asciiz = "ciao";
+mmux_asciizcp_t             seg_asciiz = "The colour of water and quicksilver.";
 mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
 if (mmux_libc_make_file_system_pathname_segment1(fs_ptn_seg, seg_asciiz)) @{
@@ -9651,8 +9651,8 @@ longest.
 @end itemize
 
 @example
-mmux_asciizcp_t             seg_asciiz1 = "ciao";
-mmux_asciizcp_t             seg_asciiz2 = "hello";
+mmux_asciizcp_t             seg_asciiz1 = "doit.sh";
+mmux_asciizcp_t             seg_asciiz2 = "makeit.sh";
 mmux_libc_fs_ptn_segment_t  seg1, seg2;
 
 /* Build the segments. */
