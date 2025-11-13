@@ -1009,7 +1009,7 @@ DEFINE_PRINTER_PROTO([[[libc_dev]]])
 DEFINE_PRINTER_PROTO([[[libc_nlink]]])
 DEFINE_PRINTER_PROTO([[[libc_blkcnt]]])
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_fd (mmux_libc_fd_arg_t fd, mmux_libc_fd_arg_t value)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t value)
@@ -1021,12 +1021,12 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t fd
 mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_segment_arg_t E)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t fd,
-									 mmux_libc_process_completion_status_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_process_completion_status (mmux_libc_fd_arg_t fd,
+								    mmux_libc_process_completion_status_t value)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t fd,
-								   mmux_libc_interprocess_signal_t value)
+mmux_cc_libc_decl bool mmux_libc_dprintf_interprocess_signal (mmux_libc_fd_arg_t fd,
+							      mmux_libc_interprocess_signal_t value)
   __attribute__((__warn_unused_result__));
 
 

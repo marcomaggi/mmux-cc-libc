@@ -92,7 +92,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_stder(fd);
     assert(false == mmux_libc_make_process_completion_status(&pcs, 123));
     assert(false == mmux_libc_dprintfer("%s: process completion status: '", __func__));
-    assert(false == mmux_libc_dprintf_libc_process_completion_status(fd, pcs));
+    assert(false == mmux_libc_dprintf_process_completion_status(fd, pcs));
     assert(false == mmux_libc_dprintfer("'\n"));
   }
 

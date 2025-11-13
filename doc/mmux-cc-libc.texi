@@ -5598,6 +5598,9 @@ character device, a @fifo{}, and others.
 Whenever possible it is better to use a subtype of this type, like
 @objtype{mmux_libc_file_descriptor_input_t}, @objtype{mmux_libc_file_descriptor_output_t},
 @objtype{mmux_libc_file_descriptor_directory_t}, and others.
+
+We can print a string representation of a file descriptor with the function
+@cfunc{mmux_libc_dprintf_fd}; @ref{mmux_libc_dprintf_fd} for details.
 @end deftp
 
 
@@ -6125,8 +6128,8 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{flonumcd64}
 @MmuxDefineTypePrinterFunc{flonumcd128}
 
-@anchor{mmux_libc_dprintf_libc_fd}
-@deftypefun bool mmux_libc_dprintf_libc_fd (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_arg_t @var{value})
+@anchor{mmux_libc_dprintf_fd}
+@deftypefun bool mmux_libc_dprintf_fd (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
@@ -6149,14 +6152,14 @@ Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_process_completion_status}
-@deftypefun bool mmux_libc_dprintf_libc_process_completion_status (mmux_libc_fd_arg_t @var{fd}, mmux_libc_process_completion_status_t @var{value})
+@anchor{mmux_libc_dprintf_process_completion_status}
+@deftypefun bool mmux_libc_dprintf_process_completion_status (mmux_libc_fd_arg_t @var{fd}, mmux_libc_process_completion_status_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
 
-@anchor{mmux_libc_dprintf_libc_interprocess_signal}
-@deftypefun bool mmux_libc_dprintf_libc_interprocess_signal (mmux_libc_fd_arg_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
+@anchor{mmux_libc_dprintf_interprocess_signal}
+@deftypefun bool mmux_libc_dprintf_interprocess_signal (mmux_libc_fd_arg_t @var{fd}, mmux_libc_interprocess_signal_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
