@@ -6192,7 +6192,8 @@ Build and return a new instance of @objtype{mmux_libc_open_flags_t}.
 @MmuxCInterface{open}.
 
 @example
-mmux_libc_fd_t  fd;
+mmux_asciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t   fd;
 
 /* Obtain the file descriptor. */
 @{
@@ -6200,18 +6201,17 @@ mmux_libc_fd_t  fd;
 
   /* Build the file system pathname. */
   @{
-    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
-    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, pathname_asciiz)) @{
       /* error */
     @}
   @}
 
-  /* Create and open a file for writing. */
+  /* Open the file. */
   @{
-    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL | MMUX_LIBC_O_RDWR);
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
     auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
     if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
@@ -6219,17 +6219,13 @@ mmux_libc_fd_t  fd;
     @}
   @}
 
-  /* Local cleanup. */
+  /* Local cleanup */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
-      /* error */
-    @}
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
-@{
-  /* Do something with "fd". */
-@}
+/* Do something with "fd". */
 
 /* Final cleanup. */
 @{
@@ -6245,7 +6241,8 @@ mmux_libc_fd_t  fd;
 @MmuxCInterface{openat}.
 
 @example
-mmux_libc_fd_t  fd;
+mmux_asciizcp_t  ptn_asciiz = "/path/to/file.ext";
+mmux_libc_fd_t   fd;
 
 /* Obtain the file descriptor. */
 @{
@@ -6253,7 +6250,6 @@ mmux_libc_fd_t  fd;
 
   /* Build the file system pathname. */
   @{
-    mmux_asciizcp_t             ptn_asciiz = "/path/to/file.ext";
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
@@ -6262,28 +6258,25 @@ mmux_libc_fd_t  fd;
     @}
   @}
 
-  /* Open a file for writing. */
+  /* Open the file. */
   @{
+    mmux_libc_dirfd_t  dirfd;
     auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
     auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
-    mmux_libc_at_fdcwd(&dirfd);
+    mmux_libc_at_fdcwd(dirfd);
     if (mmux_libc_openat(fd, dirfd, fs_ptn, flags, mode)) @{
       /* error */
     @}
   @}
 
-  /* Local cleanup. */
+  /* Local cleanup */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
-      /* error */
-    @}
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
   @}
 @}
 
-@{
-  /* Do something with "fd". */
-@}
+/* Do something with "fd". */
 
 /* Final cleanup. */
 @{
