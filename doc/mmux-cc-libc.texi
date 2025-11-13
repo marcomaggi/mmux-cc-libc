@@ -6858,15 +6858,15 @@ if (mmux_libc_pipe(infd, oufd)) @{
 Example:
 
 @example
-mmux_libc_fd_set_t      read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
+mmux_libc_fd_set_t      read_fd_set, writ_fd_set, exce_fd_set;
 mmux_uint_t             nfds_ready;
-auto                 maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
+auto                    maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
 mmux_libc_timeval_t     timeout[1];
 mmux_libc_fd_t          in, ou;
 bool                    isset;
 
-mmux_libc_stdin(&in);
-mmux_libc_stdou(&ou);
+mmux_libc_stdin(in);
+mmux_libc_stdou(ou);
 
 mmux_libc_FD_ZERO(read_fd_set);
 mmux_libc_FD_ZERO(writ_fd_set);
@@ -6875,7 +6875,7 @@ mmux_libc_FD_ZERO(exce_fd_set);
 mmux_libc_FD_SET(in, read_fd_set);
 mmux_libc_FD_SET(ou, writ_fd_set);
 
-mmux_libc_timeval_set(timeout, 1, 0);
+mmux_libc_timeval_set(timeout, mmux_time_literal(1), mmux_slong_constant_zero());
 
 if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
                      read_fd_set, writ_fd_set, exce_fd_set,
@@ -6905,31 +6905,31 @@ Constant value representing the standard constant @code{FD_SETSIZE}.
 @end deftypevar
 
 
-@deftypefun bool mmux_libc_FD_ZERO (mmux_libc_fd_set_t * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_ZERO (mmux_libc_fd_set_t @var{fd_set})
 @MmuxCInterface{FD_ZERO}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_SET (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_SET (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t @var{fd_set})
 @MmuxCInterface{FD_SET}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_CLR (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_CLR (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t @var{fd_set})
 @MmuxCInterface{FD_CLR}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_FD_ISSET (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_t const * @var{fd_set_p})
+@deftypefun bool mmux_libc_FD_ISSET (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_fd_set_arg_t @var{fd_set})
 @MmuxCInterface{FD_ISSET}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t * @var{read_fd_set_p}, mmux_libc_fd_set_t * @var{writ_fd_set_p}, mmux_libc_fd_set_t * @var{exce_fd_set_p}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t @var{read_fd_set}, mmux_libc_fd_set_t @var{writ_fd_set}, mmux_libc_fd_set_t @var{exce_fd_set}, mmux_libc_timeval_t * @var{timeout_p})
 @MmuxCInterface{select}.
 
-Each of the arguments @var{read_fd_set_p}, @var{writ_fd_set_p}, @var{exce_fd_set_p} can be @cnull{}
-if we are not interested in selecting the corresponding events.
+Each of the arguments @var{read_fd_set}, @var{writ_fd_set}, @var{exce_fd_set} can be @cnull{} if we
+are not interested in selecting the corresponding events.
 
 The argument @var{timeout_p} can be @cnull{} if we want to set a timeout of infinite time.
 

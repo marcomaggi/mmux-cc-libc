@@ -170,6 +170,9 @@ typedef struct mmux_libc_seek_whence_t		{ mmux_sshort_t; } mmux_libc_seek_whence
 typedef struct mmux_libc_fcntl_command_t	{ mmux_sint_t;   } mmux_libc_fcntl_command_t;
 typedef struct mmux_libc_scatter_gather_flags_t	{ mmux_sint_t;   } mmux_libc_scatter_gather_flags_t;
 
+typedef mmux_libc_file_descriptors_set_t		mmux_libc_fd_set_t[1];
+typedef mmux_libc_file_descriptors_set_t const *	mmux_libc_fd_set_arg_t;
+
 
 /** --------------------------------------------------------------------
  ** Networking.

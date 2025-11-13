@@ -33,7 +33,7 @@ void
 paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mmux_libc_pid_t child_pid)
 /* We expect the child to greet the parent first, then the parent replies. */
 {
-  mmux_libc_fd_set_t	read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
+  mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
   mmux_uint_t		nfds_ready;
   auto			maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
   mmux_libc_timeval_t	timeout[1];
@@ -315,7 +315,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
   /* Read parent's reply. */
   {
-    mmux_libc_fd_set_t	read_fd_set[1], writ_fd_set[1], exce_fd_set[1];
+    mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
     mmux_uint_t		nfds_ready;
     auto		maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
     mmux_libc_timeval_t	timeout[1];

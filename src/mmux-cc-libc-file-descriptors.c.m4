@@ -1532,36 +1532,38 @@ mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_sint_t command, mmux_pointer_t para
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_FD_ZERO (mmux_libc_fd_set_t * fd_set_p)
+mmux_libc_FD_ZERO (mmux_libc_fd_set_t the_set)
 {
-  FD_ZERO(fd_set_p);
+  FD_ZERO(the_set);
   return false;
 }
 bool
-mmux_libc_FD_SET (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_libc_FD_SET (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t the_set)
 {
-  FD_SET(fd->value, fd_set_p);
+  FD_SET(fd->value, the_set);
   return false;
 }
 bool
-mmux_libc_FD_CLR (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_libc_FD_CLR (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t the_set)
 {
-  FD_CLR(fd->value, fd_set_p);
+  FD_CLR(fd->value, the_set);
   return false;
 }
 bool
-mmux_libc_FD_ISSET (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t const * fd_set_p)
+mmux_libc_FD_ISSET (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_fd_set_arg_t the_set)
 {
-  *result_p = (FD_ISSET(fd->value, fd_set_p))? true : false;
+  *result_p = (FD_ISSET(fd->value, the_set))? true : false;
   return false;
 }
 bool
 mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
-		  mmux_libc_fd_set_t * read_fd_set_p, mmux_libc_fd_set_t * write_fd_set_p, mmux_libc_fd_set_t * except_fd_set_p,
+		  mmux_libc_fd_set_t read_fd_set,
+		  mmux_libc_fd_set_t write_fd_set,
+		  mmux_libc_fd_set_t except_fd_set,
 		  mmux_libc_timeval_t * timeout_p)
 {
   mmux_standard_sint_t	rv = select(maximum_nfds_to_check.value,
-				    read_fd_set_p, write_fd_set_p, except_fd_set_p,
+				    read_fd_set, write_fd_set, except_fd_set,
 				    timeout_p);
 
   if (-1 < rv) {
@@ -1576,7 +1578,7 @@ mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_li
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);
-  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_libc_fd_set_t	the_fd_set;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
@@ -1596,7 +1598,7 @@ mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_li
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);
-  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_libc_fd_set_t	the_fd_set;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);
@@ -1617,7 +1619,7 @@ mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);
-  mmux_libc_fd_set_t	the_fd_set[1];
+  mmux_libc_fd_set_t	the_fd_set;
 
   mmux_libc_FD_ZERO(the_fd_set);
   mmux_libc_FD_SET(fd, the_fd_set);

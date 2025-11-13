@@ -752,33 +752,36 @@ mmux_cc_libc_decl bool mmux_libc_pipe (mmux_libc_infd_t infd, mmux_libc_oufd_t o
  ** Input/output: selecting file descriptors.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_FD_ZERO  (mmux_libc_fd_set_t * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_ZERO  (mmux_libc_fd_set_t fd_set)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_SET   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_SET   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t fd_set)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_CLR   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_CLR   (mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t fd_set)
   __attribute__((__nonnull__(2)));
 
-mmux_cc_libc_decl bool mmux_libc_FD_ISSET (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_fd_set_t const * fd_set_p)
+mmux_cc_libc_decl bool mmux_libc_FD_ISSET (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_fd_set_arg_t fd_set)
   __attribute__((__nonnull__(1,3)));
 
 mmux_cc_libc_decl bool mmux_libc_select (mmux_uint_t * nfds_ready,
 					 mmux_uint_t maximum_nfds_to_check,
-					 mmux_libc_fd_set_t * read_fd_set_p,
-					 mmux_libc_fd_set_t * write_fd_set_p,
-					 mmux_libc_fd_set_t * except_fd_set_p,
+					 mmux_libc_fd_set_t read_fd_set_p,
+					 mmux_libc_fd_set_t write_fd_set_p,
+					 mmux_libc_fd_set_t except_fd_set_p,
 					 mmux_libc_timeval_t * timeout_p)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd,
+							mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd,
+							mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd,
+							  mmux_libc_timeval_t * timeout_p)
   __attribute__((__nonnull__(1)));
 
 
