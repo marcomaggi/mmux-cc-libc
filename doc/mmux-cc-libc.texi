@@ -13639,7 +13639,17 @@ mmux_libc_fd_t   fd;
 @subsubsection Setting file system times with @cfunc{mmux_libc_utimensat}
 
 
-@deftypefun bool mmux_libc_utimensat (mmux_libc_dirfd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_arg_t @var{access_timespec}, mmux_libc_timespec_arg_t @var{modification_timespec}, mmux_sint_t @var{flags})
+@deftp {Struct Type} mmux_libc_utimensat_flags_t
+Data structure type representing a bitwise OR combination of flags for @cfunc{mmux_libc_utimensat}.
+@end deftp
+
+
+@deftypefun mmux_libc_utimensat_flags_t mmux_libc_utimensat_flags (mmux_standard_sint_t @var{flags})
+Build and return an instance of @objtype{mmux_libc_utimensat_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_utimensat (mmux_libc_dirfd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_arg_t @var{access_timespec}, mmux_libc_timespec_arg_t @var{modification_timespec}, mmux_libc_utimensat_flags_t @var{flags})
 @MmuxCInterface{utimensat}.
 
 @example
