@@ -71,9 +71,9 @@ test_small_string (void)
 
   /* Extract all the data from the memfd into a local buffer "bufptr". */
   {
-    auto			buflen = mmux_usize_literal(4096);
-    mmux_standard_uint8_t	bufptr[buflen.value];
-    mmux_usize_t		nbytes_done;
+    auto		buflen = mmux_usize_literal(4096);
+    char		bufptr[buflen.value];
+    mmux_usize_t	nbytes_done;
 
     mmux_libc_memzero(bufptr, buflen);
 

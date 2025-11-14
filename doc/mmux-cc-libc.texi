@@ -8028,22 +8028,28 @@ position to its original value, we do:
 @example
 mmux_libc_memfd_t  mfd;
 
- /* new position with respect to MMUX_LIBC_SEEK_SET */
-auto               position = mmux_off_literal(0);
-
 if (mmux_libc_make_memfd(&mfd)) @{
   /* error */
 @}
 
-/* Save the current position then seek to the beginning. */
-if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
-  /* error */
+@{
+  /* New position with respect to MMUX_LIBC_SEEK_SET. */
+  auto  position = mmux_off_literal(0);
+
+  /* Save the current position then seek to the beginning. */
+  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
+    /* error */
+  @}
+
+  /* Do something with "mfd". */
+
+  /* Restore the original position. */
+  if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
+    /* error */
+  @}
 @}
 
-/* do something with mfd */
-
-/* Restore the original position. */
-if (mmux_libc_lseek(mfd, &position, MMUX_LIBC_SEEK_SET)) @{
+if (mmux_libc_close(mfd)) @{
   /* error */
 @}
 @end example
@@ -8068,8 +8074,8 @@ Data structure type representing memory--mapped file descriptors.
 Pointer types defined as:
 
 @example
-typedef mmux_libc_memory_file_descriptor_t        mmux_libc_memfd_t[1];
-typedef mmux_libc_memory_file_descriptor_t const  mmux_libc_memfd_arg_t[1];
+typedef mmux_libc_memory_file_descriptor_t          mmux_libc_memfd_t[1];
+typedef mmux_libc_memory_file_descriptor_t const *  mmux_libc_memfd_arg_t;
 @end example
 @end deftp
 
@@ -8082,9 +8088,9 @@ The core constructor for a memfd is @cfunc{mmux_libc_make_memfd}; we should alwa
 with a call to @cfunc{mmux_libc_close}, which acts as destructor:
 
 @example
-mmux_libc_fd_t  mfd;
+mmux_libc_memfd_t  mfd;
 
-if (mmux_libc_make_memfd(&mfd)) @{
+if (mmux_libc_make_memfd(mfd)) @{
   /* error */
 @}
 
@@ -8098,9 +8104,9 @@ if (mmux_libc_close(mfd)) @{
 @end example
 
 
-@deftypefun bool mmux_libc_make_memfd (mmux_libc_file_descriptor_t * @var{mfd_p})
+@deftypefun bool mmux_libc_make_memfd (mmux_libc_memfd_t @var{mfd})
 Create a new file descriptor whose underlying device is mapped into ordinary memory; store the
-resulting file descriptor in the variable referenced by @var{mfd_p}.
+resulting file descriptor in the variable referenced by @var{mfd}.
 @end deftypefun
 
 @c page
@@ -8111,9 +8117,10 @@ resulting file descriptor in the variable referenced by @var{mfd_p}.
 To acquire the number of bytes in the device underlying a memfd, we do:
 
 @example
-mmux_libc_fd_t  mfd;
-mmux_usize_t    buflen;
+mmux_libc_memfd_t  mfd;
+mmux_usize_t       buflen;
 
+gimme_a_memfd(mfd);
 if (mmux_libc_memfd_length(&buflen, mfd)) @{
   /* error */
 @}
@@ -8126,23 +8133,24 @@ If the data in the device is to be interpreted as an @MmuxAscii{} string, we can
 to contain it as @MmuxAsciiZ{} string as follows:
 
 @example
-mmux_libc_fd_t  mfd;
-mmux_usize_t    buflen;
+mmux_libc_memfd_t  mfd;
+mmux_usize_t       buflen;
 
+gimme_a_memfd(mfd);
 if (mmux_libc_memfd_length(&buflen, mfd)) @{
   /* error */
 @}
 
 @{
-  char  bufptr[1+buflen];
+  char  bufptr[1+buflen.value];
 
-  bufptr[buflen] = '\0';
+  bufptr[buflen.value] = '\0';
   ...
 @}
 @end example
 
 
-@deftypefun bool mmux_libc_memfd_length (mmux_usize_t * @var{len_p}, mmux_libc_file_descriptor_t @var{mfd})
+@deftypefun bool mmux_libc_memfd_length (mmux_usize_t * @var{len_p}, mmux_libc_memfd_arg_t @var{mfd})
 Store in the variable referenced by @var{len_p} the number of bytes in the device underlying
 @var{mfd}.
 @end deftypefun
@@ -8155,14 +8163,12 @@ Store in the variable referenced by @var{len_p} the number of bytes in the devic
 Applying the basic reading operation using @cfunc{mmux_libc_read} to a memfd, looks like this:
 
 @example
-mmux_usize_t    buflen = 4094;
-mmux_octet_t *  bufptr[buflen];
+mmux_libc_memfd_t  mfd;
+auto               buflen = mmux_usize_literal(4094);
+mmux_octet_t       bufptr[buflen.value];
+mmux_usize_t       nbytes_done;
 
-mmux_libc_fd_t  mfd;
-mmux_usize_t    nbytes_done;
-
-gimme_a_memfd(&mfd);
-
+gimme_a_memfd(mfd);
 if (mmux_libc_read(&nbytes_done, mfd, bufptr, buflen)) @{
   /* error */
 @}
@@ -8176,7 +8182,7 @@ If the data in the device underlying the memfd is to be considered as an @MmuxAs
 copy it into an external buffer as follows:
 
 @example
-mmux_usize_t    buflen;
+mmux_usize_t  buflen;
 
 if (mmux_libc_memfd_length(&buflen, mfd)) @{
   /* error */
@@ -8195,7 +8201,7 @@ if (mmux_libc_memfd_length(&buflen, mfd)) @{
 we take advantage of the fact that we know the data size.
 
 
-@deftypefun bool mmux_libc_memfd_read_buffer (mmux_libc_fd_t @var{mfd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{maximum_buflen})
+@deftypefun bool mmux_libc_memfd_read_buffer (mmux_libc_memfd_t @var{mfd}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{maximum_buflen})
 Wrapper for @cfunc{mmux_libc_read}.  Copy up to @var{maximum_buflen} bytes from the device
 underlying @var{mfd} to the buffer referenced by @var{bufptr}, without moving the position of the
 device underlying the file descriptor.
@@ -8209,14 +8215,13 @@ device underlying the file descriptor.
 Applying the basic writing operation using @cfunc{mmux_libc_write} to a memfd, looks like this:
 
 @example
-mmux_usize_t    buflen = 4094;
-mmux_octet_t *  bufptr[buflen];
-
-mmux_libc_fd_t  mfd;
-mmux_usize_t    nbytes_done;
+mmux_libc_memfd_t  mfd;
+auto               buflen = mmux_usize_literal(4094);
+mmux_octet_t       bufptr[buflen.value];
+mmux_usize_t       nbytes_done;
 
 fill_buffer(bufptr, buflen);
-gimme_a_memfd(&mfd);
+gimme_a_memfd(mfd);
 
 if (mmux_libc_write(&nbytes_done, mfd, bufptr, buflen)) @{
   /* error */
@@ -8229,22 +8234,22 @@ enough memory available to enlarge the underlying device.  Anyway, the following
 implemented.
 
 
-@deftypefun bool mmux_libc_memfd_write_buffer (mmux_libc_file_descriptor_t @var{mfd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
+@deftypefun bool mmux_libc_memfd_write_buffer (mmux_libc_memfd_arg_t @var{mfd}, mmux_pointerc_t @var{bufptr}, mmux_usize_t @var{buflen})
 Write @var{buflen} bytes from the buffer @var{bufptr} into the device underlying @var{mfd}, at the
 current position.  The return value is @ctrue{} if less than @var{buflen} bytes are written to
 @var{mfd}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memfd_write_asciiz (mmux_libc_file_descriptor_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
-Write the @MmuxAsciiZ{} string referenced by @var{bufptr} into the device underlying @var{mfd}, at the
-current position.  The return value is @ctrue{} if less than the whole string is written to
-@var{mfd}.
+@deftypefun bool mmux_libc_memfd_write_asciiz (mmux_libc_memfd_arg_t @var{mfd}, mmux_asciizcp_t @var{bufptr})
+Write the @MmuxAsciiZ{} string referenced by @var{bufptr} into the device underlying @var{mfd},
+@strong{excluding} the ending zero byte, at the current position.  The return value is @ctrue{} if
+less than the whole string is written to @var{mfd}.
 @end deftypefun
 
 
 @anchor{mmux_libc_memfd_strerror}
-@deftypefun bool mmux_libc_memfd_strerror (mmux_libc_file_descriptor_t @var{mfd}, mmux_sint_t @var{errnum})
+@deftypefun bool mmux_libc_memfd_strerror (mmux_libc_memfd_arg_t @var{mfd}, mmux_libc_errno_t @var{errnum})
 Write to @var{mfd}, at the current position for the underlying device, the error string associated
 to @var{errnum} and retrieved using @cfunc{mmux_libc_strerror}.  The return value is @ctrue{} if
 less than the whole error message is written to @var{mfd}.
@@ -8255,7 +8260,7 @@ less than the whole error message is written to @var{mfd}.
 @subsection Special copying operations upon memfds
 
 
-@deftypefun bool mmux_libc_memfd_copy (mmux_libc_file_descriptor_t @var{oufd}, mmux_libc_file_descriptor_t @var{mfd})
+@deftypefun bool mmux_libc_memfd_copy (mmux_libc_fd_arg_t @var{oufd}, mmux_libc_memfd_arg_t @var{mfd})
 Copy all the data in the device underlying @var{mfd} to the file descriptor @var{oufd}.
 
 This function ignores the current device position, writing all the data from the beginning to the
@@ -8267,8 +8272,8 @@ undefined.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_memfd_copyou (mmux_libc_file_descriptor_t @var{mfd})
-@deftypefunx bool mmux_libc_memfd_copyer (mmux_libc_file_descriptor_t @var{mfd})
+@deftypefun bool mmux_libc_memfd_copyou (mmux_libc_memfd_arg_t @var{mfd})
+@deftypefunx bool mmux_libc_memfd_copyer (mmux_libc_memfd_arg_t @var{mfd})
 Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device contents to, respectively:
 @stdout{}, @stderr{}.
 @end deftypefun
