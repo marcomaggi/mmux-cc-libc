@@ -737,6 +737,21 @@ MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETOWN)
 
 
 /** --------------------------------------------------------------------
+ ** Ioctl command.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_IOCTL_COMMAND_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	(mmux_libc_ioctl_command(mmux_libc_VALUEOF_$1))]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_IOCTL_COMMAND_CONSTANT(SIOCATMARK)
+
+
+/** --------------------------------------------------------------------
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
@@ -882,8 +897,6 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(X_OK)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MFD_CLOEXEC)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MFD_ALLOW_SEALING)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MFD_HUGETLB)
-
-MMUX_LIBC_DEFINE_ENUM_CONSTANT(SIOCATMARK)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_APPEND)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_DSYNC)

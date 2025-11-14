@@ -1485,7 +1485,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 }
 
 bool
-mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* str_p, mmux_sint_t flag)
+mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* str_p, mmux_libc_fcntl_command_t flag)
 {
   /* We use the if statement, rather than  the switch statement, because there may be
      duplicates in the symbols. */
@@ -1531,12 +1531,12 @@ mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* str_p, mmux_sint_t flag
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
+mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_libc_ioctl_command_t command, mmux_pointer_t parameter_p)
 {
   switch (command.value) {
 
 #ifdef MMUX_HAVE_LIBC_SIOCATMARK
-  case MMUX_LIBC_SIOCATMARK: { /* synopsis: mmux_libc_ioctl FD SIOCATMARK ATMARK_POINTER */
+  case MMUX_LIBC_VALUEOF_SIOCATMARK: { /* synopsis: mmux_libc_ioctl FD SIOCATMARK ATMARK_POINTER */
     mmux_sint_t *	atmark_p = parameter_p;
     int			rv = ioctl(fd->value, command.value, atmark_p->value);
 

@@ -880,7 +880,7 @@ mmux_cc_libc_decl bool mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes
 						  mmux_libc_fd_arg_t input_fd, mmux_sint64_t * input_position_p,
 						  mmux_libc_fd_arg_t ouput_fd, mmux_sint64_t * ouput_position_p,
 						  mmux_usize_t number_of_bytes_to_copy, mmux_sint_t flags)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,4),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------
@@ -892,16 +892,22 @@ mmux_libc_fcntl_command (mmux_standard_sshort_t value)
 {
   return (mmux_libc_fcntl_command_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_ioctl_command_t
+mmux_libc_ioctl_command (mmux_standard_sint_t value)
+{
+  return (mmux_libc_ioctl_command_t) { .value = value };
+}
 
 mmux_cc_libc_decl bool mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command,
 					mmux_pointer_t parameter_p)
-  __attribute__((__warn_unused_result__));
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t * str_p, mmux_sint_t flag)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t * str_p,
+							       mmux_libc_fcntl_command_t flag)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_sint_t command, mmux_pointer_t parameter_p)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_libc_ioctl_command_t, mmux_pointer_t parameter_p)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

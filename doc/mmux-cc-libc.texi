@@ -7662,7 +7662,18 @@ representing the name of the value.
 @section File descriptors functionality control
 
 
-@deftypefun bool mmux_libc_fcntl (mmux_libc_fd_arg_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
+@deftp {Struct Typedef} mmux_libc_fcntl_command_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing values for the @var{command} argument of @cfunc{mmux_libc_fcntl}.
+@end deftp
+
+
+@deftypefun mmux_libc_fcntl_command_t mmux_libc_fcntl_command (mmux_standard_sint_t @var{command_num})
+Build and return a new instance of @objtype{mmux_libc_fcntl_command_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_fcntl (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fcntl_command_t @var{command}, mmux_pointer_t @var{parameter_p})
 @MmuxCInterface{fcntl}.  Arguments:
 
 @table @var
@@ -7679,7 +7690,7 @@ Pointer to a variable representing a parameter that can be input or output depen
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* @var{str_p}, mmux_sint_t @var{command})
+@deftypefun bool mmux_libc_fcntl_command_flag_to_symbol (mmux_asciizcp_t* @var{str_p}, mmux_libc_fcntl_command_t @var{command})
 Identify @var{command} as a command argument for @cfunc{mmux_libc_fcntl}; store in the variable
 referenced by @var{str_p} a pointer to a statically allocated @MmuxAsciiZ{} string representing a string
 representation of the @var{command}.
@@ -7687,30 +7698,56 @@ representation of the @var{command}.
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_DUPFD
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_DUPFD
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_DUPFD
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_DUPFD
 Duplicate a file descriptor; @var{parameter_p} must reference a variable of type
 @objtype{mmux_libc_file_descriptor_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_DUPFD} is defined to the standard exact integer
+corresponding to @code{F_DUPFD}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_DUPFD} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_DUPFD} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_GETFD
-Get file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a variable
-of type @objtype{mmux_sint_t}.
-@end defvr
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETFD
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETFD
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETFD
+Get file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a
+variable of type @objtype{mmux_sint_t}.
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETFD} is defined to the standard exact integer
+corresponding to @code{F_GETFD}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETFD} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_GETFD} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_SETFD
-Set file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a variable
-of type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
-@end defvr
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETFD
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETFD
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETFD
+Set file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a
+variable of type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETFD} is defined to the standard exact integer
+corresponding to @code{F_SETFD}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETFD} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_SETFD} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_GETFL
-Get open file descriptor flags, like @samp{O_RDWR}; @var{parameter_p} must reference a variable of
-type @objtype{mmux_sint_t}.
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETFL
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETFL
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETFL
+Get open file descriptor flags, like @samp{MMUX_LIBC_O_RDWR}; @var{parameter_p} must reference a
+variable of type @objtype{mmux_sint_t}.
 
 To set blocking mode for a file descriptor we do:
 
@@ -7724,84 +7761,173 @@ if (mmux_libc_fcntl(in, MMUX_LIBC_F_GETFL, &parameter)) @{
 @}
 
 /* Null the non-block flag. */
-parameter &= (~ MMUX_LIBC_O_NONBLOCK);
+parameter.value &= (~ MMUX_LIBC_O_NONBLOCK);
 
 /* Set the new flags. */
 if (mmux_libc_fcntl(in, MMUX_LIBC_F_SETFL, &parameter)) @{
   /* error */
 @}
 @end example
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETFL} is defined to the standard exact integer
+corresponding to @code{F_GETFL}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETFL} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_GETFL} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_SETFL
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETFL
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETFL
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETFL
 Set open file descriptor flags, like @samp{O_APPEND}; @var{parameter_p} must reference a variable of
 type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETFL} is defined to the standard exact integer
+corresponding to @code{F_SETFL}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETFL} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_SETFL} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_GETLK
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETLK
 Get a @MmuxCStruct{flock} describing a lock that blocks a requested lock; @var{parameter_p} must
 reference a value of type @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETLK} is defined to the standard exact integer
+corresponding to @code{F_GETLK}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETLK} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_GETLK} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_SETLK
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETLK
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETLK} is defined to the standard exact integer
+corresponding to @code{F_SETLK}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETLK} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_SETLK} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_SETLKW
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETLKW
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETLKW
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETLKW
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETLKW} is defined to the standard exact integer
+corresponding to @code{F_SETLKW}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETLKW} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_SETLKW} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_OFD_GETLK
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_GETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_GETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_GETLK
 Get a @MmuxCStruct{flock} describing a lock that blocks a requested lock; @var{parameter_p} must
 reference a value of type @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_GETLK} is defined to the standard exact integer
+corresponding to @code{F_OFD_GETLK}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_GETLK} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_OFD_GETLK} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_OFD_SETLK
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_SETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_SETLK
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_SETLK
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_SETLK} is defined to the standard exact integer
+corresponding to @code{F_OFD_SETLK}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_SETLK} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_OFD_SETLK} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_OFD_SETLKW
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_SETLKW
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_SETLKW
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_SETLKW
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_SETLKW} is defined to the standard exact
+integer corresponding to @code{F_OFD_SETLKW}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_SETLKW} is defined, and defined to @samp{1}, if
+the symbol @code{MMUX_LIBC_F_OFD_SETLKW} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_GETOWN
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETOWN
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETOWN
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETOWN
 Get the process or group id that receives the signal @samp{SIGIO}; @var{parameter_p} must reference
 a variable of type @objtype{mmux_libc_pid_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETOWN} is defined to the standard exact integer
+corresponding to @code{F_GETOWN}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETOWN} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_GETOWN} is available.
+@end deftypevr
 
 @c ------------------------------------------------------------------------
 
-@defvr {Fcntl Command} MMUX_LIBC_F_SETOWN
+@deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETOWN
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETOWN
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETOWN
 Set the process or group id that receives the signal @samp{SIGIO}; @var{parameter_p} must reference
 a variable of type @objtype{mmux_libc_pid_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETOWN} is defined to the standard exact integer
+corresponding to @code{F_SETOWN}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETOWN} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_F_SETOWN} is available.
+@end deftypevr
 
 @c page
 @node fds io control
 @section File descriptors input/output control
 
 
-@deftypefun bool mmux_libc_ioctl (mmux_libc_fd_arg_t @var{fd}, mmux_sint_t @var{command}, mmux_pointer_t @var{parameter_p})
+@deftp {Struct Typedef} mmux_libc_ioctl_command_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing values for the @var{command} argument of @cfunc{mmux_libc_ioctl}.
+@end deftp
+
+
+@deftypefun mmux_libc_ioctl_command_t mmux_libc_ioctl_command (mmux_standard_sint_t @var{command_num})
+Build and return a new instance of @objtype{mmux_libc_ioctl_command_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_ioctl (mmux_libc_fd_arg_t @var{fd}, mmux_libc_ioctl_command_t @var{command}, mmux_pointer_t @var{parameter_p})
 @MmuxCInterface{ioctl}.  Arguments:
 
 @table @var
@@ -7819,10 +7945,18 @@ Pointer to a variable representing a parameter that can be input or output depen
 
 @c ------------------------------------------------------------------------
 
-@defvr {Iontl Command} MMUX_LIBC_SIOCATMARK
+@deftypevr {Struct Constant} mmux_libc_ioctl_command_t MMUX_LIBC_SIOCATMARK
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_SIOCATMARK
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_SIOCATMARK
 Detect if the data received through a socket has reached the mark; @var{parameter_p} must reference
 a variable of type @objtype{mmux_sint_t}.
-@end defvr
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_SIOCATMARK} is defined to the standard exact integer
+corresponding to @code{SIOCATMARK}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_SIOCATMARK} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_SIOCATMARK} is available.
+@end deftypevr
 
 @c page
 @node fds memfd
