@@ -8435,19 +8435,11 @@ Invoke @cfunc{mmux_libc_fstat} and retrieve the @code{st_size} field value of th
 casting the @objtype{mmux_off_t} value to @objtype{mmux_usize_t}.
 
 @example
-mmux_libc_fs_ptn_t        ptn;
-mmux_libc_file_descriptor_t             dirfd;
-mmux_libc_file_descriptor_t             fd;
-mmux_sint_t                             flags = MMUX_LIBC_O_RDWR;
-mmux_libc_mode_t                             mode  = 0;
-mmux_usize_t                            size;
+mmux_libc_fd_t  fd;
+mmux_usize_t    size;
 
-mmux_libc_make_file_system_pathname(ptn, "/path/to/file.ext");
-mmux_libc_at_fdcwd(&dirfd);
-
-if (mmux_libc_openat(&fd, dirfd, ptn, flags, mode) @{
-  /* error */
-@} else if (mmux_libc_file_descriptor_file_size_ref(&size, fd)) @{
+gimme_a_regular_file_fd(fd);
+if (mmux_libc_file_descriptor_file_size_ref(&size, fd)) @{
   /* error */
 @}
 @end example
