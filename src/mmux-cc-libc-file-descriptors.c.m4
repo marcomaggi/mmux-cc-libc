@@ -1586,7 +1586,7 @@ mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
 		  mmux_libc_fd_set_t read_fd_set,
 		  mmux_libc_fd_set_t write_fd_set,
 		  mmux_libc_fd_set_t except_fd_set,
-		  mmux_libc_timeval_t * timeout_p)
+		  mmux_libc_timeval_t timeout_p)
 {
   mmux_standard_sint_t	rv = select(maximum_nfds_to_check.value,
 				    read_fd_set, write_fd_set, except_fd_set,
@@ -1600,7 +1600,7 @@ mmux_libc_select (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
   }
 }
 bool
-mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t timeout_p)
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);
@@ -1620,7 +1620,7 @@ mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd, mmux_li
   }
 }
 bool
-mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t timeout_p)
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);
@@ -1641,7 +1641,7 @@ mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd, mmux_li
   }
 }
 bool
-mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t * timeout_p)
+mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_libc_timeval_t timeout_p)
 {
   auto			nfds_ready		= mmux_uint_constant_zero();
   auto			maximum_nfds_to_check	= mmux_uint(1 + fd->value);

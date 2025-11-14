@@ -2820,8 +2820,8 @@ assert(true  == result);
 
 
 @menu
-* time timeval::                The @objtype{mmux_libc_timeval_t} type.
-* time timespec::               The @objtype{mmux_libc_timespec_t} type.
+* time timeval::                The @objtype{mmux_libc_time_value_t} type.
+* time timespec::               The @objtype{mmux_libc_time_specification_t} type.
 * time tm::                     The @objtype{mmux_libc_broken_down_time_t} type.
 * time acquiring::              Acquiring the current time.
 * time epoch time::             Converting from Epoch time to other formats.
@@ -2833,21 +2833,25 @@ assert(true  == result);
 
 @c page
 @node time timeval
-@section The @objtype{mmux_libc_timeval_t} type
+@section The @objtype{mmux_libc_time_value_t} type
 
+
+Under @value{PACKAGE}: the standard data structure @code{struct timeval} is aliased by the type
+@objtype{mmux_libc_time_value_t}.  It is usually better to use the type
+@objtype{mmux_libc_timeval_t}.
 
 To initialise and inspect a value of type @objtype{mmux_libc_timeval_t} we do:
 
 @example
-mmux_libc_timeval_t  TV[1];
+mmux_libc_timeval_t  timeval;
 
 /* setters */
 @{
   auto      sec  = mmux_time_literal(12);
   auto      usec = mmux_slong_literal(34);
 
-  mmux_libc_tv_sec_set  (TV, sec);
-  mmux_libc_tv_usec_set (TV, usec);
+  mmux_libc_tv_sec_set  (timeval, sec);
+  mmux_libc_tv_usec_set (timeval, usec);
 @}
 
 /* getters */
@@ -2855,8 +2859,8 @@ mmux_libc_timeval_t  TV[1];
   mmux_time_t       sec;
   mmux_slong_t      usec;
 
-  mmux_libc_tv_sec_ref  (&sec,  TV);
-  mmux_libc_tv_usec_ref (&usec, TV);
+  mmux_libc_tv_sec_ref  (&sec,  timeval);
+  mmux_libc_tv_usec_ref (&usec, timeval);
 @}
 
 /* another setter */
@@ -2864,7 +2868,7 @@ mmux_libc_timeval_t  TV[1];
   auto    sec  = mmux_time_literal(56);
   auto    usec = mmux_slong_literal(78);
 
-  mmux_libc_timeval_set(TV, sec, usec);
+  mmux_libc_timeval_set(timeval, sec, usec);
 @}
 
 /* dumping */
@@ -2872,7 +2876,7 @@ mmux_libc_timeval_t  TV[1];
   mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
-  if (mmux_libc_timeval_dump(fd, TV, NULL)) @{
+  if (mmux_libc_timeval_dump(fd, timeval, NULL)) @{
     /* error */
   @}
 @}
@@ -2882,14 +2886,50 @@ mmux_libc_timeval_t  TV[1];
 @end example
 
 
-@MmuxCStructOpaqueTypedef{timeval}
-@MmuxSetterGetter{timeval, tv_sec,  mmux_time_t}
-@MmuxSetterGetter{timeval, tv_usec, mmux_slong_t}
-@MmuxStructDumper{timeval}
+@deftp {Opaque Struct Type} mmux_libc_time_value_t
+Alias for the standard type @code{struct timeval}.
+@end deftp
 
 
-@deftypefun bool mmux_libc_timeval_set (mmux_libc_timeval_t * @var{timeval_p}, mmux_time_t @var{seconds}, mmux_slong_t @var{microseconds})
-Initialise the fields of a @MmuxCStruct{timeval}.
+@deftp {Struct Pointer Type} mmux_libc_timeval_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_time_value_t  mmux_libc_timeval_t[1];
+@end example
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_timeval_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_time_value_t const *  mmux_libc_timeval_arg_t;
+@end example
+@end deftp
+
+
+@deftypefun bool mmux_libc_tv_sec_set (mmux_libc_timeval_t @var{timeval}, mmux_time_t @var{tv_sec})
+@deftypefunx bool mmux_libc_tv_sec_ref (mmux_time_t * @var{result_p}, mmux_libc_timeval_arg_t @var{timeval})
+Setter and getter for the field @code{tv_sec} of @objtype{mmux_libc_time_value_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_tv_usec_set (mmux_libc_timeval_t @var{timeval}, mmux_slong_t @var{tv_usec})
+@deftypefunx bool mmux_libc_tv_usec_ref (mmux_slong_t * @var{result_p}, mmux_libc_timeval_arg_t @var{timeval})
+Setter and getter for the field @code{tv_usec} of @objtype{mmux_libc_time_value_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_timeval_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_arg_t @var{timeval}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the @objtype{mmux_libc_time_value_t} referenced by
+@var{timeval}.  @var{struct_name} must be a pointer to an @MmuxAsciiZ{} string representing the name
+of the data structure used in the description; when @cnull{}: it defaults to @samp{struct timeval}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_timeval_set (mmux_libc_timeval_t @var{timeval}, mmux_time_t @var{seconds}, mmux_slong_t @var{microseconds})
+Initialise the fields of a @objtype{mmux_libc_time_value_t}.
 @end deftypefun
 
 @c page
@@ -2897,21 +2937,25 @@ Initialise the fields of a @MmuxCStruct{timeval}.
 @section The @objtype{mmux_libc_timespec_t} type
 
 
+Under @value{PACKAGE}: the standard data structure @code{struct timespec} is aliased by the type
+@objtype{mmux_libc_time_specification_t}.  It is usually better to use the type
+@objtype{mmux_libc_timespec_t}.
+
 To have more expressive names: in this @api{} we ``rename'' the fields @samp{tv_sec} and
 @samp{tv_nsec} of @MmuxCStruct{timespec} to @samp{ts_sec} and @samp{ts_nsec}.
 
 To initialise and inspect a value of type @objtype{mmux_libc_timespec_t} we do:
 
 @example
-mmux_libc_timespec_t  TS[1];
+mmux_libc_timespec_t  timespec;
 
 /* setters */
 @{
   auto    sec  = mmux_time_literal(12);
   auto    nsec = mmux_slong_literal(34);
 
-  mmux_libc_ts_sec_set  (TS, sec);
-  mmux_libc_ts_nsec_set (TS, nsec);
+  mmux_libc_ts_sec_set  (timespec, sec);
+  mmux_libc_ts_nsec_set (timespec, nsec);
 @}
 
 /* getters */
@@ -2919,8 +2963,8 @@ mmux_libc_timespec_t  TS[1];
   mmux_time_t     sec;
   mmux_slong_t    nsec;
 
-  mmux_libc_ts_sec_ref  (&sec,  TS);
-  mmux_libc_ts_nsec_ref (&nsec, TS);
+  mmux_libc_ts_sec_ref  (&sec,  timespec);
+  mmux_libc_ts_nsec_ref (&nsec, timespec);
 @}
 
 /* another setter */
@@ -2928,7 +2972,7 @@ mmux_libc_timespec_t  TS[1];
   auto    sec  = mmux_time_literal(56);
   auto    nsec = mmux_slong_literal(78);
 
-  mmux_libc_timespec_set(TS, sec, nsec);
+  mmux_libc_timespec_set(timespec, sec, nsec);
 @}
 
 /* dumping */
@@ -2936,21 +2980,58 @@ mmux_libc_timespec_t  TS[1];
   mmux_libc_oufd_t  fd;
 
   mmux_libc_stder(fd);
-  if (mmux_libc_timespec_dump(fd, TS, NULL)) @{
+  if (mmux_libc_timespec_dump(fd, timespec, NULL)) @{
     /* error */
   @}
 @}
 @end example
 
 
-@MmuxCStructOpaqueTypedef{timespec}
-@MmuxSetterGetter{timespec, ts_sec,  mmux_time_t}
-@MmuxSetterGetter{timespec, ts_nsec, mmux_slong_t}
-@MmuxStructDumper{timespec}
+@deftp {Opaque Struct Type} mmux_libc_time_specification_t
+Alias for the standard type @code{struct timespec}.
+@end deftp
 
 
-@deftypefun bool mmux_libc_timespec_set (mmux_libc_timeval_t * @var{timeval_p}, mmux_time_t @var{seconds}, mmux_slong_t @var{nanoseconds})
-Initialise the fields of a @MmuxCStruct{timespec}.
+@deftp {Struct Pointer Type} mmux_libc_timespec_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_time_specification_t  mmux_libc_timespec_t[1];
+@end example
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_timespec_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_time_specification_t const *  mmux_libc_timespec_arg_t;
+@end example
+@end deftp
+
+
+@deftypefun bool mmux_libc_ts_sec_set (mmux_libc_timespec_t @var{timespec}, mmux_time_t @var{ts_sec})
+@deftypefunx bool mmux_libc_ts_sec_ref (mmux_time_t * @var{result_p}, mmux_libc_timespec_arg_t @var{timespec})
+Setter and getter for the field @code{ts_sec} of @objtype{mmux_libc_time_specification_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_ts_nsec_set (mmux_libc_timespec_t @var{timespec}, mmux_slong_t @var{ts_nsec})
+@deftypefunx bool mmux_libc_ts_nsec_ref (mmux_slong_t * @var{result_p}, mmux_libc_timespec_arg_t @var{timespec})
+Setter and getter for the field @code{ts_nsec} of @objtype{mmux_libc_time_specification_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_timespec_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timespec_arg_t @var{timespec}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the @objtype{mmux_libc_time_specification_t}
+referenced by @var{timespec}.  @var{struct_name} must be a pointer to an @MmuxAsciiZ{} string
+representing the name of the data structure used in the description; when @cnull{}: it defaults to
+@samp{struct timespec}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_timespec_set (mmux_libc_timespec_t @var{timespec}, mmux_time_t @var{seconds}, mmux_slong_t @var{nanoseconds})
+Initialise the fields of a @objtype{mmux_libc_time_specification_t}.
 @end deftypefun
 
 @c page
@@ -3388,7 +3469,7 @@ mmux_libc_sleep(&leftover, seconds);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_nanosleep (mmux_libc_timespec_t * @var{requested_time}, mmux_libc_timespec_t * @var{remaining_time})
+@deftypefun bool mmux_libc_nanosleep (mmux_libc_timespec_arg_t @var{requested_time}, mmux_libc_timespec_t @var{remaining_time})
 @MmuxCInterface{nanosleep}.
 
 @example
@@ -3398,9 +3479,9 @@ mmux_libc_timespec_t    remaining_time;
 @{
   auto      seconds     = mmux_time_constant_zero(0);
   auto      nanoseconds = mmux_slong_literal(34);
-  mmux_libc_timespec_set(&requested_time, seconds, nanoseconds);
+  mmux_libc_timespec_set(requested_time, seconds, nanoseconds);
 @}
-if (mmux_libc_nanosleep(&requested_time, &remaining_time)) @{
+if (mmux_libc_nanosleep(requested_time, remaining_time)) @{
   /* error or interruption */
 @}
 @end example
@@ -6858,7 +6939,7 @@ Example:
 mmux_libc_fd_set_t      read_fd_set, writ_fd_set, exce_fd_set;
 mmux_uint_t             nfds_ready;
 auto                    maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-mmux_libc_timeval_t     timeout[1];
+mmux_libc_timeval_t     timeout;
 mmux_libc_fd_t          in, ou;
 bool                    isset;
 
@@ -6922,7 +7003,7 @@ Constant value representing the standard constant @code{FD_SETSIZE}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t @var{read_fd_set}, mmux_libc_fd_set_t @var{writ_fd_set}, mmux_libc_fd_set_t @var{exce_fd_set}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefun bool mmux_libc_select (mmux_uint_t * @var{nfds_ready_p}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t @var{read_fd_set}, mmux_libc_fd_set_t @var{writ_fd_set}, mmux_libc_fd_set_t @var{exce_fd_set}, mmux_libc_timeval_t @var{timeout})
 @MmuxCInterface{select}.
 
 Each of the arguments @var{read_fd_set}, @var{writ_fd_set}, @var{exce_fd_set} can be @cnull{} if we
@@ -6940,9 +7021,9 @@ check for events: if we want to check up to file descriptor @samp{10}, we have t
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_select_fd_for_reading (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
-@deftypefunx bool mmux_libc_select_fd_for_writing (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
-@deftypefunx bool mmux_libc_select_fd_for_exception (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t * @var{timeout_p})
+@deftypefun bool mmux_libc_select_fd_for_reading (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_arg_t @var{timeout})
+@deftypefunx bool mmux_libc_select_fd_for_writing (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_arg_t @var{timeout})
+@deftypefunx bool mmux_libc_select_fd_for_exception (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_arg_t @var{timeout})
 Like @cfunc{mmux_libc_select}, but select a single event for a single file descriptor; if the file
 descriptor is ready the variable referenced by @var{result_p} is set to @ctrue{}, otherwise it is
 set to @cfalse{}.
@@ -13316,7 +13397,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsubsection Setting file system times with @cfunc{mmux_libc_utimes}
 
 
-@deftypefun bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
+@deftypefun bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_arg_t @var{access}, mmux_libc_timeval_arg_t @var{modification})
 @MmuxCInterface{utimes}.
 
 @example
@@ -13345,8 +13426,8 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
     mmux_libc_time(&T1);
     mmux_libc_time(&T2);
-    mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
-    mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+    mmux_libc_timeval_set(access_timeval,       T1, microsecs1);
+    mmux_libc_timeval_set(modification_timeval, T2, microsecs2);
   @}
 
   if (mmux_libc_utimes(fs_ptn, access_timeval, modification_timeval)) @{
@@ -13365,7 +13446,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsubsection Setting file system times with @cfunc{mmux_libc_lutimes}
 
 
-@deftypefun bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
+@deftypefun bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timeval_arg_t @var{access}, mmux_libc_timeval_arg_t @var{modification})
 @MmuxCInterface{lutimes}.
 
 @example
@@ -13394,8 +13475,8 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
     mmux_libc_time(&T1);
     mmux_libc_time(&T2);
-    mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
-    mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+    mmux_libc_timeval_set(access_timeval,       T1, microsecs1);
+    mmux_libc_timeval_set(modification_timeval, T2, microsecs2);
   @}
 
   if (mmux_libc_lutimes(fs_ptn, access_timeval, modification_timeval)) @{
@@ -13414,7 +13495,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @subsubsection Setting file system times with @cfunc{mmux_libc_futimes}
 
 
-@deftypefun bool mmux_libc_futimes (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_t @var{access}, mmux_libc_timeval_t @var{modification})
+@deftypefun bool mmux_libc_futimes (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timeval_arg_t @var{access}, mmux_libc_timeval_arg_t @var{modification})
 @MmuxCInterface{futimes}.
 
 @example
@@ -13463,8 +13544,8 @@ mmux_libc_fd_t   fd;
 
     mmux_libc_time(&T1);
     mmux_libc_time(&T2);
-    mmux_libc_timeval_set(&access_timeval,       T1, microsecs1);
-    mmux_libc_timeval_set(&modification_timeval, T2, microsecs2);
+    mmux_libc_timeval_set(access_timeval,       T1, microsecs1);
+    mmux_libc_timeval_set(modification_timeval, T2, microsecs2);
   @}
 
   if (mmux_libc_futimes(fd, access_timeval, modification_timeval)) @{
@@ -13486,7 +13567,7 @@ mmux_libc_fd_t   fd;
 @subsubsection Setting file system times with @cfunc{mmux_libc_futimens}
 
 
-@deftypefun bool mmux_libc_futimens (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec})
+@deftypefun bool mmux_libc_futimens (mmux_libc_fd_arg_t @var{fd}, mmux_libc_timespec_arg_t @var{access_timespec}, mmux_libc_timespec_arg_t @var{modification_timespec})
 @MmuxCInterface{futimens}.
 
 @example
@@ -13535,8 +13616,8 @@ mmux_libc_fd_t   fd;
 
     mmux_libc_time(&T1);
     mmux_libc_time(&T2);
-    mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
-    mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+    mmux_libc_timespec_set(access_timespec,       T1, nanosecs1);
+    mmux_libc_timespec_set(modification_timespec, T2, nanosecs2);
   @}
 
   if (mmux_libc_futimens(fd, access_timespec, modification_timespec)) @{
@@ -13558,7 +13639,7 @@ mmux_libc_fd_t   fd;
 @subsubsection Setting file system times with @cfunc{mmux_libc_utimensat}
 
 
-@deftypefun bool mmux_libc_utimensat (mmux_libc_dirfd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_t @var{access_timespec}, mmux_libc_timespec_t @var{modification_timespec}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_utimensat (mmux_libc_dirfd_t @var{dirfd}, mmux_libc_fs_ptn_arg_t @var{pathname}, mmux_libc_timespec_arg_t @var{access_timespec}, mmux_libc_timespec_arg_t @var{modification_timespec}, mmux_sint_t @var{flags})
 @MmuxCInterface{utimensat}.
 
 @example
@@ -13587,8 +13668,8 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
     mmux_libc_time(&T1);
     mmux_libc_time(&T2);
-    mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
-    mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+    mmux_libc_timespec_set(access_timespec,       T1, nanosecs1);
+    mmux_libc_timespec_set(modification_timespec, T2, nanosecs2);
   @}
 
   @{

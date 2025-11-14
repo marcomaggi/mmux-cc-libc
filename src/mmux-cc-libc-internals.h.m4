@@ -243,9 +243,18 @@ extern "C" {
  ** Type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef struct timeval		mmux_libc_timeval_t;
-typedef struct timespec		mmux_libc_timespec_t;
-typedef struct tm		mmux_libc_broken_down_time_t;
+typedef struct mmux_libc_time_value_t {
+  struct timeval;
+} mmux_libc_time_value_t;
+
+typedef struct mmux_libc_time_specification_t {
+  struct timespec;
+} mmux_libc_time_specification_t;
+
+typedef struct mmux_libc_broken_down_time_t {
+  struct tm;
+} mmux_libc_broken_down_time_t;
+
 typedef struct iovec		mmux_libc_iovec_t;
 typedef struct rlimit		mmux_libc_rlimit_t;
 typedef struct passwd		mmux_libc_passwd_t;

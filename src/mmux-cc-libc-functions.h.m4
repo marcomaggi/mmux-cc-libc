@@ -435,13 +435,23 @@ mmux_cc_libc_decl bool mmux_libc_memory_allocator_malloc_and_copy_ (mmux_libc_ma
  ** Times and dates: mmux_libc_timeval_t.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(timeval,	tv_sec,		mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(timeval,	tv_usec,	mmux_slong_t)
-
-mmux_cc_libc_decl bool mmux_libc_timeval_set (mmux_libc_timeval_t * timeval_p, mmux_time_t seconds, mmux_slong_t microseconds)
+mmux_cc_libc_decl bool mmux_libc_tv_sec_set (mmux_libc_timeval_t P, mmux_time_t value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_t const * timeval_p,
+mmux_cc_libc_decl bool mmux_libc_tv_sec_ref (mmux_time_t * result_p, mmux_libc_timeval_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_tv_usec_set (mmux_libc_timeval_t P, mmux_slong_t value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_tv_usec_ref (mmux_slong_t * result_p, mmux_libc_timeval_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_timeval_set (mmux_libc_timeval_t timeval_p,
+					      mmux_time_t seconds, mmux_slong_t microseconds)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_arg_t timeval_p,
 					       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
@@ -450,14 +460,24 @@ mmux_cc_libc_decl bool mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_
  ** Times and dates: mmux_libc_timespec_t.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(timespec,	ts_sec,		mmux_time_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(timespec,	ts_nsec,	mmux_slong_t)
-
-mmux_cc_libc_decl bool mmux_libc_timespec_set (mmux_libc_timespec_t * timespec_p, mmux_time_t seconds, mmux_slong_t nanoseconds)
+mmux_cc_libc_decl bool mmux_libc_ts_sec_set (mmux_libc_timespec_t P, mmux_time_t value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_t const * timespec_p,
-					       mmux_asciizcp_t struct_name)
+mmux_cc_libc_decl bool mmux_libc_ts_sec_ref (mmux_time_t * result_p, mmux_libc_timespec_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ts_nsec_set (mmux_libc_timespec_t P, mmux_slong_t value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ts_nsec_ref (mmux_slong_t * result_p, mmux_libc_timespec_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_timespec_set (mmux_libc_timespec_t timespec_p,
+					       mmux_time_t seconds, mmux_slong_t nanoseconds)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_arg_t timespec_p,
+						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(2)));
 
 
@@ -553,7 +573,8 @@ mmux_cc_libc_decl bool mmux_libc_strptime (char ** first_unprocessed_after_times
 mmux_cc_libc_decl bool mmux_libc_sleep     (mmux_uint_t * result_p, mmux_uint_t seconds)
        __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_nanosleep (mmux_libc_timespec_t * requested_time, mmux_libc_timespec_t * remaining_time)
+mmux_cc_libc_decl bool mmux_libc_nanosleep (mmux_libc_timespec_arg_t requested_time,
+					    mmux_libc_timespec_t     remaining_time)
   __attribute__((__nonnull__(1,2)));
 
 
@@ -769,19 +790,19 @@ mmux_cc_libc_decl bool mmux_libc_select (mmux_uint_t * nfds_ready,
 					 mmux_libc_fd_set_t read_fd_set_p,
 					 mmux_libc_fd_set_t write_fd_set_p,
 					 mmux_libc_fd_set_t except_fd_set_p,
-					 mmux_libc_timeval_t * timeout_p)
+					 mmux_libc_timeval_t timeout_p)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd,
-							mmux_libc_timeval_t * timeout_p)
+							mmux_libc_timeval_t timeout_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_select_fd_for_writing (bool * result_p, mmux_libc_fd_arg_t fd,
-							mmux_libc_timeval_t * timeout_p)
+							mmux_libc_timeval_t timeout_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd,
-							  mmux_libc_timeval_t * timeout_p)
+							  mmux_libc_timeval_t timeout_p)
   __attribute__((__nonnull__(1)));
 
 
@@ -2215,29 +2236,29 @@ mmux_cc_libc_decl bool mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_li
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_utimes (mmux_libc_fs_ptn_arg_t pathname,
-					 mmux_libc_timeval_t access_timeval,
-					 mmux_libc_timeval_t modification_timeval)
+					 mmux_libc_timeval_arg_t access_timeval,
+					 mmux_libc_timeval_arg_t modification_timeval)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t pathname,
-					  mmux_libc_timeval_t access_timeval,
-					  mmux_libc_timeval_t modification_timeval)
+					  mmux_libc_timeval_arg_t access_timeval,
+					  mmux_libc_timeval_arg_t modification_timeval)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_futimes (mmux_libc_fd_arg_t fd,
-					  mmux_libc_timeval_t access_timeval,
-					  mmux_libc_timeval_t modification_timeval)
+					  mmux_libc_timeval_arg_t access_timeval,
+					  mmux_libc_timeval_arg_t modification_timeval)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_futimens (mmux_libc_fd_arg_t fd,
-					   mmux_libc_timespec_t access_timespec,
-					   mmux_libc_timespec_t modification_timespec)
+					   mmux_libc_timespec_arg_t access_timespec,
+					   mmux_libc_timespec_arg_t modification_timespec)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd,
 					    mmux_libc_fs_ptn_arg_t pathname,
-					    mmux_libc_timespec_t access_timespec,
-					    mmux_libc_timespec_t modification_timespec,
+					    mmux_libc_timespec_arg_t access_timespec,
+					    mmux_libc_timespec_arg_t modification_timespec,
 					    mmux_libc_utimensat_flags_t flags)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 

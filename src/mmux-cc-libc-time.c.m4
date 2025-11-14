@@ -33,18 +33,45 @@
  ** Struct timeval.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_sec,		time)
-DEFINE_STRUCT_SETTER_GETTER(timeval,	tv_usec,	slong)
+bool
+mmux_libc_tv_sec_set (mmux_libc_timeval_t P, mmux_time_t value)
+{
+  P->tv_sec = value.value;
+  return false;
+}
+bool
+mmux_libc_tv_sec_ref (mmux_time_t * result_p, mmux_libc_timeval_arg_t P)
+{
+  *result_p = mmux_time(P->tv_sec);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_timeval_set (mmux_libc_timeval_t * timeval_p, mmux_time_t seconds, mmux_slong_t microseconds)
+mmux_libc_tv_usec_set (mmux_libc_timeval_t P, mmux_slong_t value)
+{
+  P->tv_usec = value.value;
+  return false;
+}
+bool
+mmux_libc_tv_usec_ref (mmux_slong_t * result_p, mmux_libc_timeval_arg_t P)
+{
+  *result_p = mmux_slong(P->tv_usec);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_timeval_set (mmux_libc_timeval_t timeval_p, mmux_time_t seconds, mmux_slong_t microseconds)
 {
   timeval_p->tv_sec  = seconds.value;
   timeval_p->tv_usec = microseconds.value;
   return false;
 }
 bool
-mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_t const * const timeval_p, char const * struct_name)
+mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_arg_t timeval_p, mmux_asciizcp_t struct_name)
 {
   int	rv;
 
@@ -98,38 +125,44 @@ mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_t const * const
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_ts_sec_set (mmux_libc_timespec_t * const P, mmux_time_t value)
+mmux_libc_ts_sec_set (mmux_libc_timespec_t P, mmux_time_t value)
 {
   P->tv_sec = value.value;
   return false;
 }
 bool
-mmux_libc_ts_sec_ref (mmux_time_t * result_p, mmux_libc_timespec_t const * const P)
+mmux_libc_ts_sec_ref (mmux_time_t * result_p, mmux_libc_timespec_arg_t P)
 {
   *result_p = mmux_time(P->tv_sec);
   return false;
 }
+
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_ts_nsec_set (mmux_libc_timespec_t * const P, mmux_slong_t value)
+mmux_libc_ts_nsec_set (mmux_libc_timespec_t P, mmux_slong_t value)
 {
   P->tv_nsec = value.value;
   return false;
 }
 bool
-mmux_libc_ts_nsec_ref (mmux_slong_t * result_p, mmux_libc_timespec_t const * const P)
+mmux_libc_ts_nsec_ref (mmux_slong_t * result_p, mmux_libc_timespec_arg_t P)
 {
   *result_p = mmux_slong(P->tv_nsec);
   return false;
 }
+
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_timespec_set (mmux_libc_timespec_t * timespec_p, mmux_time_t seconds, mmux_slong_t nanoseconds)
+mmux_libc_timespec_set (mmux_libc_timespec_t timespec_p, mmux_time_t seconds, mmux_slong_t nanoseconds)
 {
   timespec_p->tv_sec  = seconds.value;
   timespec_p->tv_nsec = nanoseconds.value;
   return false;
 }
 bool
-mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_t const * const timespec_p, char const * struct_name)
+mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_arg_t timespec_p, mmux_asciizcp_t struct_name)
 {
   int	rv;
 
@@ -305,7 +338,7 @@ mmux_libc_localtime (mmux_libc_tm_t result_p, mmux_time_t T)
 {
   /* A call to "localtime()" returns a  pointer to a "struct tm" statically allocated
      by the C library. */
-  result_p[0] = *(localtime(&T.value));
+  *((struct tm *) result_p) = *(localtime(&T.value));
   return false;
 }
 bool
@@ -317,7 +350,7 @@ mmux_libc_localtime_r (mmux_libc_tm_t result_p, mmux_time_t T)
 bool
 mmux_libc_gmtime (mmux_libc_tm_t result_p, mmux_time_t T)
 {
-  result_p[0] = *(gmtime(&T.value));
+  *((struct tm *) result_p) = *(gmtime(&T.value));
   return false;
 }
 bool
@@ -448,7 +481,7 @@ mmux_libc_sleep (mmux_uint_t * result_p, mmux_uint_t seconds)
   return false;
 }
 bool
-mmux_libc_nanosleep (mmux_libc_timespec_t * requested_time, mmux_libc_timespec_t * remaining_time)
+mmux_libc_nanosleep (mmux_libc_timespec_arg_t requested_time, mmux_libc_timespec_t remaining_time)
 {
   int	rv = nanosleep(requested_time, remaining_time);
 

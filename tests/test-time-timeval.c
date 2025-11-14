@@ -34,7 +34,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   }
 
   {
-    mmux_libc_timeval_t	TV[1];
+    mmux_libc_timeval_t	TV;
 
     /* setters and getters */
     {

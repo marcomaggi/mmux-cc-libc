@@ -194,8 +194,8 @@ wait_for_some_time (void)
   auto			seconds     = mmux_time(0);
   auto			nanoseconds = mmux_slong(5000000);
 
-  mmux_libc_timespec_set(&requested_time, seconds, nanoseconds);
-  if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
+  mmux_libc_timespec_set(requested_time, seconds, nanoseconds);
+  if (mmux_libc_nanosleep(requested_time, remaining_time)) {
     printf_error("nanosleep");
     handle_error();
   }

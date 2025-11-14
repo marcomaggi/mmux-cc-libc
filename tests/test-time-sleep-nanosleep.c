@@ -48,9 +48,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       auto	seconds     = mmux_time_constant_zero();
       auto	nanoseconds = mmux_slong_literal(34);
-      mmux_libc_timespec_set(&requested_time, seconds, nanoseconds);
+      mmux_libc_timespec_set(requested_time, seconds, nanoseconds);
     }
-    if (mmux_libc_nanosleep(&requested_time, &remaining_time)) {
+    if (mmux_libc_nanosleep(requested_time, remaining_time)) {
       handle_error();
     }
   }

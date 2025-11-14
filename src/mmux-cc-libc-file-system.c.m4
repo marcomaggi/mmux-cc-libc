@@ -1613,46 +1613,61 @@ mmux_libc_utime (mmux_libc_fs_ptn_arg_t pathname, mmux_libc_utimbuf_arg_t utimbu
 }
 bool
 mmux_libc_utimes (mmux_libc_fs_ptn_arg_t pathname,
-		  mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
+		  mmux_libc_timeval_arg_t access_timeval, mmux_libc_timeval_arg_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
-  int			rv   = utimes(pathname->value, T);
+  struct timeval	T[2] = {
+    *((struct timeval *) access_timeval),
+    *((struct timeval *) modification_timeval)
+  };
+  int	rv = utimes(pathname->value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_lutimes (mmux_libc_fs_ptn_arg_t pathname,
-		   mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
+		   mmux_libc_timeval_arg_t access_timeval, mmux_libc_timeval_arg_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
-  int			rv   = lutimes(pathname->value, T);
+  struct timeval	T[2] = {
+    *((struct timeval *) access_timeval),
+    *((struct timeval *) modification_timeval)
+  };
+  int	rv = lutimes(pathname->value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_futimes (mmux_libc_fd_arg_t fd,
-		   mmux_libc_timeval_t access_timeval, mmux_libc_timeval_t modification_timeval)
+		   mmux_libc_timeval_arg_t access_timeval, mmux_libc_timeval_arg_t modification_timeval)
 {
-  mmux_libc_timeval_t	T[2] = { access_timeval, modification_timeval };
-  int			rv   = futimes(fd->value, T);
+  struct timeval	T[2] = {
+    *((struct timeval *) access_timeval),
+    *((struct timeval *) modification_timeval)
+  };
+  int	rv = futimes(fd->value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_futimens (mmux_libc_fd_arg_t fd,
-		    mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec)
+		    mmux_libc_timespec_arg_t access_timespec, mmux_libc_timespec_arg_t modification_timespec)
 {
-  mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
+  struct timespec	T[2] = {
+    *((struct timespec *) access_timespec),
+    *((struct timespec *) modification_timespec)
+  };
   int			rv   = futimens(fd->value, T);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd, mmux_libc_fs_ptn_arg_t ptn,
-		     mmux_libc_timespec_t access_timespec, mmux_libc_timespec_t modification_timespec,
+		     mmux_libc_timespec_arg_t access_timespec, mmux_libc_timespec_arg_t modification_timespec,
 		     mmux_libc_utimensat_flags_t flags)
 {
-  mmux_libc_timespec_t	T[2] = { access_timespec, modification_timespec };
+  struct timespec	T[2] = {
+    *((struct timespec *) access_timespec),
+    *((struct timespec *) modification_timespec)
+  };
   int			rv   = utimensat(dirfd->value, ptn->value, T, flags.value);
 
   return ((0 == rv)? false : true);

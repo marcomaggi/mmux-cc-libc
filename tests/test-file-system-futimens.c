@@ -93,8 +93,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
 	mmux_libc_time(&T1);
 	mmux_libc_time(&T2);
-	mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
-	mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+	mmux_libc_timespec_set(access_timespec,       T1, nanosecs1);
+	mmux_libc_timespec_set(modification_timespec, T2, nanosecs2);
       }
 
       printf_message("futimens-ing");
@@ -107,10 +107,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	mmux_libc_oufd_t	er;
 
 	mmux_libc_stder(er);
-	if (mmux_libc_timespec_dump(er, &access_timespec, "access_timespec")) {
+	if (mmux_libc_timespec_dump(er, access_timespec, "access_timespec")) {
 	  handle_error();
 	}
-	if (mmux_libc_timespec_dump(er, &modification_timespec, "modification_timespec")) {
+	if (mmux_libc_timespec_dump(er, modification_timespec, "modification_timespec")) {
 	  handle_error();
 	}
       }

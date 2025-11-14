@@ -66,7 +66,7 @@ paren_play (mmux_libc_infd_t read_fr_child_fd, mmux_libc_oufd_t writ_to_child_fd
 
   /* Read from child. */
   {
-    mmux_libc_timeval_t		timeout[1];
+    mmux_libc_timeval_t		timeout;
     bool			read_fr_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_reading()");
@@ -117,7 +117,7 @@ paren_play (mmux_libc_infd_t read_fr_child_fd, mmux_libc_oufd_t writ_to_child_fd
 
   /* Check for no exceptional condition, just to show off. */
   {
-    mmux_libc_timeval_t		timeout[1];
+    mmux_libc_timeval_t		timeout;
     bool			read_fr_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_exception()");
@@ -135,7 +135,7 @@ paren_play (mmux_libc_infd_t read_fr_child_fd, mmux_libc_oufd_t writ_to_child_fd
 
   /* Write to child. */
   {
-    mmux_libc_timeval_t		timeout[1];
+    mmux_libc_timeval_t		timeout;
     bool			writ_to_child_fd_is_ready;
 
     printf_message("paren: calling select_fd_for_writing()");
@@ -344,7 +344,7 @@ child_play (mmux_libc_infd_t read_fr_paren_fd, mmux_libc_oufd_t writ_to_paren_fd
     bool	ou_fd_is_ready;
 
     {
-      mmux_libc_timeval_t	timeout[1];
+      mmux_libc_timeval_t	timeout;
 
       mmux_libc_timeval_set(timeout, mmux_time_constant_one(), mmux_slong_constant_zero());
       printf_message("child: calling select_fd_for_writing()");
@@ -371,7 +371,7 @@ child_play (mmux_libc_infd_t read_fr_paren_fd, mmux_libc_oufd_t writ_to_paren_fd
   /* Read parent's reply. */
   {
     bool			in_fd_is_ready;
-    mmux_libc_timeval_t		timeout[1];
+    mmux_libc_timeval_t		timeout;
 
     printf_message("child: calling select_fd_for_reading()");
     mmux_libc_timeval_set(timeout, mmux_time_literal(3), mmux_slong_constant_zero());

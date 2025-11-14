@@ -36,7 +36,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
   mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
   mmux_uint_t		nfds_ready;
   auto			maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-  mmux_libc_timeval_t	timeout[1];
+  mmux_libc_timeval_t	timeout;
   bool			isset;
 
   /* Setting blocking mode for input fd. */
@@ -318,7 +318,7 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
     mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
     mmux_uint_t		nfds_ready;
     auto		maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-    mmux_libc_timeval_t	timeout[1];
+    mmux_libc_timeval_t	timeout;
     bool		isset;
 
     /* Setup the arguments of "mmux_libc_select()". */

@@ -71,8 +71,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
 	mmux_libc_time(&T1);
 	mmux_libc_time(&T2);
-	mmux_libc_timespec_set(&access_timespec,       T1, nanosecs1);
-	mmux_libc_timespec_set(&modification_timespec, T2, nanosecs2);
+	mmux_libc_timespec_set(access_timespec,       T1, nanosecs1);
+	mmux_libc_timespec_set(modification_timespec, T2, nanosecs2);
       }
 
       {
@@ -92,10 +92,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	mmux_libc_oufd_t	fd;
 
 	mmux_libc_stder(fd);
-	if (mmux_libc_timespec_dump(fd, &modification_timespec, "access_timespec")) {
+	if (mmux_libc_timespec_dump(fd, modification_timespec, "access_timespec")) {
 	  handle_error();
 	}
-	if (mmux_libc_timespec_dump(fd, &modification_timespec, "modification_timespec")) {
+	if (mmux_libc_timespec_dump(fd, modification_timespec, "modification_timespec")) {
 	  handle_error();
 	}
       }

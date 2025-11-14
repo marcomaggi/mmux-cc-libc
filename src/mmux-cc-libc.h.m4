@@ -44,9 +44,18 @@ extern "C" {
  ** Type definitions.
  ** ----------------------------------------------------------------- */
 
-typedef struct mmux_libc_timeval_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVAL];  } mmux_libc_timeval_t;
-typedef struct mmux_libc_timespec_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC]; } mmux_libc_timespec_t;
-typedef struct mmux_libc_broken_down_time_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM]; } mmux_libc_broken_down_time_t;
+typedef struct mmux_libc_time_value_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVAL];
+} mmux_libc_time_value_t;
+
+typedef struct mmux_libc_time_specification_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC];
+} mmux_libc_time_specification_t;
+
+typedef struct mmux_libc_broken_down_time_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM];
+} mmux_libc_broken_down_time_t;
+
 typedef struct mmux_libc_iovec_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_IOVEC];    } mmux_libc_iovec_t;
 typedef struct mmux_libc_rlimit_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_RLIMIT];   } mmux_libc_rlimit_t;
 typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD];   } mmux_libc_passwd_t;
