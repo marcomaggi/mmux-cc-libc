@@ -396,6 +396,7 @@ tests_test_processes_wait_LDADD				= $(mmux_cc_libc_tests_ldadd)
 check_PROGRAMS	+= \
 	tests/test-file-descriptors-dirfd			\
 	tests/test-file-descriptors-copy-file-range		\
+	tests/test-file-descriptors-copy-file-range-raw		\
 	tests/test-file-descriptors-dup				\
 	tests/test-file-descriptors-dup2			\
 	tests/test-file-descriptors-dup3			\
@@ -458,6 +459,9 @@ tests_test_file_descriptors_preadv2_pwritev2_LDADD			= $(mmux_cc_libc_tests_ldad
 
 tests_test_file_descriptors_copy_file_range_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_copy_file_range_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_copy_file_range_raw_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_copy_file_range_raw_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_struct_flock_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_struct_flock_LDADD				= $(mmux_cc_libc_tests_ldadd)

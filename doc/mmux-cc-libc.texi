@@ -7385,72 +7385,82 @@ fill_the_buffers_with_data(&iova);
 Here is an example to understand the mechanics of the function call:
 
 @example
-mmux_libc_file_descriptor_t     src_fd;
-mmux_libc_file_descriptor_t     dst_fd;
+mmux_asciizcp_t  src_ptn_asciiz = "/path/to/src-file.ext";
+mmux_asciizcp_t  dst_ptn_asciiz = "/path/to/dst-file.ext";
+mmux_libc_fd_t   fd_src, fd_dst;
 
-/* Open the source and destination files. */
+/* Obtain the file descriptors. */
 @{
-  mmux_libc_fs_ptn_t    src_ptn;
-  mmux_libc_fs_ptn_t    dst_ptn;
-  mmux_sint_t  flags = MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL;
-  mmux_libc_mode_t  mode  = MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR;
+  mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
 
-  if (mmux_libc_make_file_system_pathname(src_ptn, "source.ext")) @{
-    /* error */
-  @}
-  if (mmux_libc_open(&src_fd, src_ptn, flags, mode)) @{
-    /* error */
+  /* Build the file system pathnames. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn_src, fs_ptn_factory, src_ptn_asciiz)) @{
+      /* error */
+    @}
+    if (mmux_libc_make_file_system_pathname(fs_ptn_dst, fs_ptn_factory, dst_ptn_asciiz)) @{
+      /* error */
+    @}
   @}
 
-  if (mmux_libc_make_file_system_pathname(dst_ptn, "destination.ext")) @{
-    /* error */
+  /* Open the source file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_RDONLY);
+    auto  mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd_src, fs_ptn_src, flags, mode)) @{
+      /* error */
+    @}
   @}
 
-  if (mmux_libc_open(&dst_fd, dst_ptn, flags, mode)) @{
-    /* error */
+  /* Create and open the destination file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL | MMUX_LIBC_O_WRONLY);
+    auto  mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+    if (mmux_libc_open(fd_dst, fs_ptn_dst, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn_src)) @{
+      /* error */
+    @}
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn_dst)) @{
+      /* error */
+    @}
   @}
 @}
 
-/* Write data to the source file. */
+/* Copy the data from the source file to the destination file. */
 @{
-  mmux_usize_t        nbytes_done;
-  //                            01234567890123456789012345678901234567890
-  //                            0         1         2         3         4
-  mmux_asciizcp_t     bufptr = "0123456789abcdefghilmnopqrstuvz0123456789";
-  mmux_usize_t        buflen;
-
-  mmux_libc_strlen(&buflen, bufptr);
-
-  if (mmux_libc_write(&nbytes_done, src_fd, bufptr, buflen)) @{
-    /* error */
-  @}
-  if (nbytes_done != buflen) @{
-    /* it is an error for our purposes */
-  @}
-@}
-
-/* Copy the alpha range of data "abcdefghilmnopqrstuvz" from the source
-   file to the destination file. */
-@{
-  mmux_usize_t        nbytes_done;
-  mmux_sint64_t       src_position = 10;
-  mmux_sint64_t       dst_position = 0;
-  mmux_usize_t        number_of_bytes_to_copy = 21;
-  mmux_sint_t         flags = 0;
+  auto          src_position            = mmux_sint64_constant_zero();
+  auto          dst_position            = mmux_sint64_constant_zero();
+  auto          number_of_bytes_to_copy = mmux_usize_literal(4096);
+  auto          flags                   = mmux_sint_constant_zero();
+  mmux_usize_t  nbytes_done;
 
   if (mmux_libc_copy_file_range(&nbytes_done,
-                                src_fd, &src_position,
-                                dst_fd, &dst_position,
+                                fd_src, &src_position,
+                                fd_dst, &dst_position,
                                 number_of_bytes_to_copy, flags)) @{
     /* error */
   @}
 @}
 
-if (mmux_libc_close(src_fd)) @{
-  /* error */
-@}
-if (mmux_libc_close(dst_fd)) @{
-  /* error */
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(fd_src)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(fd_dst)) @{
+    /* error */
+  @}
 @}
 @end example
 
@@ -7458,39 +7468,41 @@ If we need to copy data between file descriptors, and we cannot use
 @cfunc{mmux_libc_copy_file_range}, we can adapt the following code template:
 
 @example
-mmux_libc_fd_t                  infd, oufd;
+mmux_libc_fd_t  fd_src, fd_dst;
 
-static mmux_usize_t const       read_buflen = 1024;
-mmux_octet_t                    read_bufptr[read_buflen];
-mmux_usize_t                    nbytes_read;
+gimme_an_input_fd(fd_src);
+gimme_an_ouput_fd(fd_dst);
 
-gimme_an_input_fd(&infd);
-gimme_an_ouput_fd(&oufd);
+@{
+  auto const    read_buflen = mmux_usize_literal(4096);
+  mmux_octet_t  read_bufptr[read_buflen.value];
+  mmux_usize_t  nbytes_read;
 
-/* Loop reading while the number of bytes read is positive. */
-do @{
-  if (mmux_libc_read(&nbytes_read, infd, read_bufptr, read_buflen)) @{
-    /* error */
-  @}
+  /* Loop reading while the number of bytes read is positive. */
+  do @{
+    if (mmux_libc_read(&nbytes_read, fd_src, read_bufptr, read_buflen)) @{
+      /* error */
+    @}
 
-  if (nbytes_read > 0) @{
-    mmux_octet_t *  write_bufptr    = read_bufptr;
-    mmux_usize_t    write_buflen    = nbytes_read;
-    mmux_usize_t    nbytes_written  = 0;
+    if (mmux_ctype_is_positive(nbytes_read)) @{
+      mmux_octet_t *  write_bufptr = read_bufptr;
+      auto            write_buflen = nbytes_read;
+      mmux_usize_t    nbytes_written;
 
-    /* Loop writing until we have written all the bytes from the buffer. */
-    do @{
-      if (mmux_libc_write(&nbytes_written, oufd, write_bufptr, write_buflen)) @{
-        /* error */
-      @}
+      /* Loop writing until we have written all the bytes from the buffer. */
+      do @{
+        if (mmux_libc_write(&nbytes_written, fd_dst, write_bufptr, write_buflen)) @{
+          /* error */
+        @}
 
-      if (nbytes_written < write_buflen) @{
-        write_bufptr += nbytes_written;
-        write_buflen -= nbytes_written;
-      @}
-    @} while (nbytes_written < write_buflen);
-  @}
-@} while (nbytes_read > 0);
+        if (mmux_ctype_less(nbytes_written, write_buflen)) @{
+          write_bufptr += nbytes_written.value;
+          mmux_ctype_sub_from_variable(write_buflen, nbytes_written);
+        @}
+      @} while (mmux_ctype_less(nbytes_written, write_buflen));
+    @}
+  @} while (mmux_ctype_is_positive(nbytes_read));
+@}
 @end example
 
 @c page

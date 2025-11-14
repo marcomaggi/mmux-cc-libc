@@ -33,7 +33,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-copy-file-range";
+    PROGNAME = "test-file-descriptors-copy-file-range";
     cleanfiles_register(src_pathname_asciiz);
     cleanfiles_register(dst_pathname_asciiz);
     cleanfiles();
@@ -45,10 +45,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
     /* Obtain the file descriptors. */
     {
-      /* As a toy experiment: let's use the "cleanup" attribute.  We should not do it
-	 here because: we are not immediately initialising the auto variables. */
-      mmux_libc_fs_ptn_t		fs_ptn_src, fs_ptn_dst
-	__attribute__((__cleanup__(mmux_libc_unmake_file_system_pathname_variable)));
+      mmux_libc_fs_ptn_t	fs_ptn_src, fs_ptn_dst;
 
       /* Build the file system pathnames. */
       {
@@ -63,23 +60,33 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	}
       }
 
-      /* Create and open the source and destination files. */
+      /* Crete and open the source file. */
       {
-	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_RDWR | MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL);
+	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL | MMUX_LIBC_O_RDWR);
 	auto	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
 
-	/* Open the source file. */
-	{
-	  if (mmux_libc_open(fd_src, fs_ptn_src, flags, mode)) {
-	    handle_error();
-	  }
+	if (mmux_libc_open(fd_src, fs_ptn_src, flags, mode)) {
+	  handle_error();
 	}
+      }
 
-	/* Open the destination file. */
-	{
-	  if (mmux_libc_open(fd_dst, fs_ptn_dst, flags, mode)) {
-	    handle_error();
-	  }
+      /* Create and open the destination file. */
+      {
+	auto	flags = mmux_libc_open_flags(MMUX_LIBC_O_CREAT | MMUX_LIBC_O_EXCL | MMUX_LIBC_O_RDWR);
+	auto	mode  = mmux_libc_mode(MMUX_LIBC_S_IRUSR | MMUX_LIBC_S_IWUSR);
+
+	if (mmux_libc_open(fd_dst, fs_ptn_dst, flags, mode)) {
+	  handle_error();
+	}
+      }
+
+      /* Local cleanup. */
+      {
+	if (mmux_libc_unmake_file_system_pathname(fs_ptn_dst)) {
+	  handle_error();
+	}
+	if (mmux_libc_unmake_file_system_pathname(fs_ptn_src)) {
+	  handle_error();
 	}
       }
     }
