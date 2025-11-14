@@ -45,7 +45,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       auto const		bufnum = mmux_usize_literal(4);
       auto const		buflen = mmux_usize_literal(8);
-      mmux_standard_octet_t	bufptr[bufnum.value][buflen.value];
+      mmux_octet_t		bufptr[bufnum.value][buflen.value];
       mmux_libc_iovec_t		iov[bufnum.value];
       mmux_libc_iovec_array_t	iova;
 
@@ -63,7 +63,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	{
 	  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) {
 	    for (mmux_standard_uint_t j=0; j<buflen.value; ++j) {
-	      bufptr[i][j] = 10 * i + j;
+	      bufptr[i][j] = mmux_octet(10 * i + j);
 	    }
 	  }
 	}
@@ -109,7 +109,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     {
       auto const		bufnum = mmux_usize_literal(4);
       auto const		buflen = mmux_usize_literal(8);
-      mmux_standard_octet_t	bufptr[bufnum.value][buflen.value];
+      mmux_octet_t		bufptr[bufnum.value][buflen.value];
       mmux_libc_iovec_t		iov[bufnum.value];
       mmux_libc_iovec_array_t	iova;
 
@@ -152,15 +152,15 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       {
 	for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) {
 	  for (mmux_standard_uint_t j=0; j<buflen.value; ++j) {
-	    mmux_standard_octet_t	expected_octet = (10 * i + j);
+	    auto const	expected_octet = mmux_octet(10 * i + j);
 	    if (false) {
-	      if (mmux_libc_dprintfer("bufptr[%u][%u] = %u\n", i, j, bufptr[i][j])) {
+	      if (mmux_libc_dprintfer("bufptr[%u][%u] = %u\n", i, j, bufptr[i][j].value)) {
 		handle_error();
 	      }
 	    }
-	    if (bufptr[i][j] != expected_octet) {
+	    if (mmux_ctype_not_equal(bufptr[i][j], expected_octet)) {
 	      printf_error("wrong octet at bufptr[%u][%u], expected %u got %u\n",
-			   i, j, expected_octet, bufptr[i][j]);
+			   i, j, expected_octet.value, bufptr[i][j].value);
 	      handle_error();
 	    }
 	  }

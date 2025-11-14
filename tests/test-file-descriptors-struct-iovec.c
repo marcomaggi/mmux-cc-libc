@@ -35,7 +35,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   auto const		bufnum = mmux_usize_literal(16);
   auto const		buflen = mmux_usize_literal(4096);
-  mmux_octet_t		bufptr[bufnum.value][buflen.value];
+  mmux_standard_octet_t	bufptr[bufnum.value][buflen.value];
   mmux_libc_iovec_t	iov[bufnum.value];
 
   for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) {
@@ -43,9 +43,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
   }
 
+  /* Inspect the fields of the iovec array. */
   {
-    mmux_usize_t	the_buflen;
-    mmux_octet_t *	the_bufptr;
+    mmux_usize_t		the_buflen;
+    mmux_standard_octet_t *	the_bufptr;
 
     mmux_libc_iov_len_ref  (&the_buflen, &(iov[0]));
     mmux_libc_iov_base_ref ((mmux_pointer_t)&the_bufptr, &(iov[0]));

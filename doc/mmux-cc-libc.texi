@@ -7003,22 +7003,27 @@ Build and return a new instance of @objtype{mmux_libc_scatter_gather_flags_t}.
 
 
 Data to be read from or written to a file descriptor using the scatter--gather facilities must be
-stored in multiple buffers; a single buffer of data is represented by the data structure
-@objtype{mmux_libc_iovec_t}.  To instantiate and inspect such data structure we do:
+stored in multiple buffers; according to the standard: a single buffer of data is represented by the
+data structure @code{struct iovec}.  Under @value{PACKAGE}: such data structure is aliased by the
+type @objtype{mmux_libc_iovec_t}.
+
+To allocate @samp{16} data buffers, each capable of containing @samp{4096} octets, and each
+referenced by an instance of @objtype{mmux_libc_iovec_t}, we do:
 
 @example
-mmux_usize_t const      bufnum = 16;
-mmux_usize_t const      buflen = 4096;
-mmux_octet_t            bufptr[bufnum][buflen];
-mmux_libc_iovec_t       iov[bufnum];
+auto const         bufnum = mmux_usize_literal(16);
+auto const         buflen = mmux_usize_literal(4096);
+mmux_octet_t       bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t  iov[bufnum.value];
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
+for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
   mmux_libc_iov_len_set  (&(iov[i]), buflen);
   mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
 @}
 
+/* Let's print the fields of the first iovec. */
 @{
-  mmux_libc_fd_t      fd;
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stdou(fd);
   if (mmux_libc_iovec_dump(fd, &(iov[0]), NULL)) @{
@@ -7050,26 +7055,39 @@ struct iovec->iov_len = 4096
 
 
 Data to be read from or written to a file descriptor using the scatter--gather facilities must be
-stored in multiple buffers; an array of these buffers is represented by the data structure
-@objtype{mmux_libc_iovec_array_t}.  To instantiate and inspect such data structure we do:
+stored in multiple buffers; according to the standard: we must initialise an array of these buffers.
+Under @value{PACKAGE}: such array is represented by the data structure
+@objtype{mmux_libc_iovec_array_t}.
+
+To allocate @samp{16} data buffers, each capable of containing @samp{4096} octets, each referenced
+by an instance of @objtype{mmux_libc_iovec_t}, and all of them referenced by an instance of
+@objtype{mmux_libc_iovec_array_t}, we do:
 
 @example
-mmux_usize_t const      bufnum = 16;
-mmux_usize_t const      buflen = 4096;
-mmux_octet_t            bufptr[bufnum][buflen];
-mmux_libc_iovec_t       iov[bufnum];
-mmux_libc_iovec_array_t iova;
+auto const         bufnum = mmux_usize_literal(4);
+auto const         buflen = mmux_usize_literal(4096);
+mmux_octet_t       bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t  iov[bufnum.value];
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+mmux_libc_iovec_array_t  iova;
+
+/* Initialise the array of iovecs. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
 @}
 
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
-
+/* Initialise the array object. */
 @{
-  mmux_libc_fd_t      fd;
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
+@}
+
+/* Dump array's fields. */
+@{
+  mmux_libc_oufd_t  fd;
 
   mmux_libc_stdou(fd);
   if (mmux_libc_iovec_array_dump(fd, &iova, NULL)) @{
@@ -7127,25 +7145,31 @@ Number of items in the array referenced by @code{iova_base}.
 @MmuxCInterface{readv}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(16);
+auto const               buflen = mmux_usize_literal(4096);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
-
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
 
 /* Perform the reading. */
 @{
-  mmux_usize_t      nbytes_done;
+  mmux_usize_t  nbytes_done;
 
-  if (mmux_libc_readv(&nbytes_done, mfd, &iova)) @{
+  if (mmux_libc_readv(&nbytes_done, fd, &iova)) @{
     /* error */
   @}
 @}
@@ -7157,24 +7181,30 @@ mmux_libc_iova_base_set (&iova, iov);
 @MmuxCInterface{preadv}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(16);
+auto const               buflen = mmux_usize_literal(4096);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
-
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
 
 /* Perform the reading. */
 @{
   mmux_usize_t  nbytes_done;
-  mmux_off_t    offset = 0;
+  auto          offset = mmux_off_constant_zero();
 
   if (mmux_libc_preadv(&nbytes_done, mfd, &iova, offset)) @{
     /* error */
@@ -7188,25 +7218,31 @@ mmux_libc_iova_base_set (&iova, iov);
 @MmuxCInterface{preadv2}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(4);
+auto const               buflen = mmux_usize_literal(8);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
-
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
 
 /* Perform the reading. */
 @{
   mmux_usize_t  nbytes_done;
-  mmux_off_t    offset = 0;
-  mmux_sint_t   flags  = MMUX_LIBC_RWF_HIPRI;
+  auto          offset = mmux_off_constant_zero();
+  auto          flags  = mmux_libc_scatter_gather_flags(MMUX_LIBC_RWF_HIPRI);
 
   if (mmux_libc_preadv2(&nbytes_done, mfd, &iova, offset, flags)) @{
     /* error */
@@ -7224,25 +7260,31 @@ mmux_libc_iova_base_set (&iova, iov);
 @MmuxCInterface{writev}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(4);
+auto const               buflen = mmux_usize_literal(8);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
 
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
-
-fill_buffers(iova);
+fill_the_buffers_with_data(&iova);
 
 /* Perform the writing. */
 @{
-  mmux_usize_t      nbytes_done;
+  mmux_usize_t  nbytes_done;
 
   if (mmux_libc_writev(&nbytes_done, mfd, &iova)) @{
     /* error */
@@ -7256,26 +7298,32 @@ fill_buffers(iova);
 @MmuxCInterface{pwritev}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(4);
+auto const               buflen = mmux_usize_literal(8);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
 
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
-
-fill_buffers(iova);
+fill_the_buffers_with_data(&iova);
 
 /* Perform the writing. */
 @{
   mmux_usize_t  nbytes_done;
-  mmux_off_t    offset = 0;
+  auto          offset = mmux_off_constant_zero();
 
   if (mmux_libc_pwritev(&nbytes_done, mfd, &iova, offset)) @{
     /* error */
@@ -7289,27 +7337,33 @@ fill_buffers(iova);
 @MmuxCInterface{pwritev2}.
 
 @example
-mmux_usize_t const          bufnum = 4;
-mmux_usize_t const          buflen = 8;
-mmux_octet_t                bufptr[bufnum][buflen];
-mmux_libc_iovec_t           iov[bufnum];
-mmux_libc_iovec_array_t     iova;
+mmux_libc_fd_t           fd;
+auto const               bufnum = mmux_usize_literal(16);
+auto const               buflen = mmux_usize_literal(4096);
+mmux_octet_t             bufptr[bufnum.value][buflen.value];
+mmux_libc_iovec_t        iov[bufnum.value];
+mmux_libc_iovec_array_t  iova;
 
-for (mmux_uint_t i=0; i<bufnum; ++i) @{
-  mmux_libc_iov_len_set  (&(iov[i]), buflen);
-  mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+gimme_an_fd(fd);
+
+/* Initialise the "iova" array. */
+@{
+  for (mmux_standard_uint_t i=0; i<bufnum.value; ++i) @{
+    mmux_libc_iov_len_set  (&(iov[i]), buflen);
+    mmux_libc_iov_base_set (&(iov[i]), &(bufptr[i][0]));
+  @}
+
+  mmux_libc_iova_len_set  (&iova, bufnum);
+  mmux_libc_iova_base_set (&iova, iov);
 @}
 
-mmux_libc_iova_len_set  (&iova, bufnum);
-mmux_libc_iova_base_set (&iova, iov);
-
-fill_buffers(iova);
+fill_the_buffers_with_data(&iova);
 
 /* Perform the writing. */
 @{
   mmux_usize_t  nbytes_done;
-  mmux_off_t    offset = 0;
-  mmux_sint_t   flags  = MMUX_LIBC_RWF_HIPRI;
+  auto          offset = mmux_off_constant_zero();
+  auto          flags  = mmux_libc_scatter_gather_flags(MMUX_LIBC_RWF_HIPRI);
 
   if (mmux_libc_pwritev2(&nbytes_done, mfd, &iova, offset, flags)) @{
     /* error */
