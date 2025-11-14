@@ -416,7 +416,8 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-select-fd			\
 	tests/test-file-descriptors-struct-flock		\
 	tests/test-file-descriptors-struct-iovec		\
-	tests/test-file-descriptors-struct-iovec-array
+	tests/test-file-descriptors-struct-iovec-array		\
+	tests/test-file-descriptors-attributes-predicates
 
 tests_test_file_descriptors_dirfd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_dirfd_LDADD					= $(mmux_cc_libc_tests_ldadd)
@@ -486,6 +487,9 @@ tests_test_file_descriptors_dup3_LDADD					= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_printing_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_printing_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_attributes_predicates_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_attributes_predicates_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## file system

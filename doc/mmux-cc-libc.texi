@@ -8283,28 +8283,51 @@ Wrappers for @cfunc{mmux_libc_memfd_copy} that write the underlying device conte
 @section File predicates with file descriptors
 
 
+In all the following examples, we can imagine this code preamble:
+
+@example
+mmux_libc_fd_t  fd;
+
+/* Obtain the file descriptor. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+
+  /* Build the file system pathname. */
+  @{
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Open the file. */
+  @{
+    auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
+    auto  mode  = mmux_libc_mode_constant_zero();
+
+    if (mmux_libc_open(fd, fs_ptn, flags, mode)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    mmux_libc_unmake_file_system_pathname(fs_ptn);
+  @}
+@}
+@end example
+
+
 @deftypefun bool mmux_libc_file_descriptor_is_regular (bool * @var{result_p}, mmux_libc_fd_arg_t @var{fd})
 Store @ctrue{} in the variable referenced by @var{result_p} if the given file descriptor is a
 regular file; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_regular;
+bool  the_fd_is_regular;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_regular(&the_fd_is_regular, ptn)) @{
+if (mmux_libc_file_descriptor_is_regular(&the_fd_is_regular, fd)) @{
   /* error */
 @}
 @end example
@@ -8316,23 +8339,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 symbolic link; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_symlink;
+bool  the_fd_is_symlink;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_symlink(&the_fd_is_symlink, ptn)) @{
+if (mmux_libc_file_descriptor_is_symlink(&the_fd_is_symlink, fd)) @{
   /* error */
 @}
 @end example
@@ -8344,23 +8353,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 directory; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_directory;
+bool  the_fd_is_directory;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_directory(&the_fd_is_directory, ptn)) @{
+if (mmux_libc_file_descriptor_is_directory(&the_fd_is_directory, fd)) @{
   /* error */
 @}
 @end example
@@ -8372,23 +8367,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 character special device; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_character_special;
+bool  the_fd_is_character_special;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_character_special(&the_fd_is_character_special, ptn)) @{
+if (mmux_libc_file_descriptor_is_character_special(&the_fd_is_character_special, fd)) @{
   /* error */
 @}
 @end example
@@ -8400,23 +8381,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 special device; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_block_special;
+bool  the_fd_is_block_special;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_block_special(&the_fd_is_block_special, ptn)) @{
+if (mmux_libc_file_descriptor_is_block_special(&the_fd_is_block_special, fd)) @{
   /* error */
 @}
 @end example
@@ -8428,23 +8395,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_fifo;
+bool  the_fd_is_fifo;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_fifo(&the_fd_is_fifo, ptn)) @{
+if (mmux_libc_file_descriptor_is_fifo(&the_fd_is_fifo, fd)) @{
   /* error */
 @}
 @end example
@@ -8456,23 +8409,9 @@ Store @ctrue{} in the variable referenced by @var{result_p} if the given file de
 socket; otherwise store @cfalse{}.
 
 @example
-mmux_libc_ptn_t         ptn;
-mmux_libc_fd_t          fd;
-bool                    the_fd_is_socket;
+bool  the_fd_is_socket;
 
-mmux_libc_make_file_system_pathname(&ptn, "/path/to/file.ext");
-
-/* Open the link. */
-@{
-  auto  flags = mmux_libc_open_flags(MMUX_LIBC_O_PATH | MMUX_LIBC_O_NOFOLLOW);
-  auto  mode  = mmux_libc_mode_constant_zero();
-
-  if (mmux_libc_open(fd, ptn, flags, mode)) @{
-    /* error */
-  @}
-@}
-
-if (mmux_libc_file_descriptor_is_socket(&the_fd_is_socket, ptn)) @{
+if (mmux_libc_file_descriptor_is_socket(&the_fd_is_socket, fd)) @{
   /* error */
 @}
 @end example
