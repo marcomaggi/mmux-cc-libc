@@ -76,23 +76,23 @@ play_parent (mmux_libc_pid_t child_pid)
       handle_error();
     }
 
-    mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
-    mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-    mmux_libc_l_start_set  (&flo, mmux_off_literal(11));
-    mmux_libc_l_len_set    (&flo, mmux_off_literal(21));
-    mmux_libc_l_pid_set    (&flo, pid);
+    mmux_libc_l_type_set   (flo, MMUX_LIBC_F_WRLCK);
+    mmux_libc_l_whence_set (flo, MMUX_LIBC_SEEK_SET);
+    mmux_libc_l_start_set  (flo, mmux_off_literal(11));
+    mmux_libc_l_len_set    (flo, mmux_off_literal(21));
+    mmux_libc_l_pid_set    (flo, pid);
 
     if (true) {
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      if (mmux_libc_flock_dump(er, &flo, "paren struct flock before requesting lock status")) {
+      if (mmux_libc_flock_dump(er, flo, "paren struct flock before requesting lock status")) {
 	handle_error();
       }
     }
 
     printf_message("paren process: check that the alpha portion of the file is locked");
-    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_GETLK, &flo)) {
+    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_GETLK, flo)) {
       print_error("setting lock with fcntl()");
       handle_error();
     }
@@ -101,7 +101,7 @@ play_parent (mmux_libc_pid_t child_pid)
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      if (mmux_libc_flock_dump(er, &flo, "paren struct flock after requesting lock status")) {
+      if (mmux_libc_flock_dump(er, flo, "paren struct flock after requesting lock status")) {
 	handle_error();
       }
     }
@@ -110,13 +110,13 @@ play_parent (mmux_libc_pid_t child_pid)
     {
       mmux_libc_file_lock_type_t	l_type;
 
-      mmux_libc_l_type_ref(&l_type, &flo);
+      mmux_libc_l_type_ref(&l_type, flo);
       if (l_type.value != MMUX_LIBC_F_UNLCK.value) {
 	printf_message("paren process: something acquired the lock, as expected");
 	{
 	  mmux_libc_pid_t	the_pid;
 
-	  mmux_libc_l_pid_ref(&the_pid, &flo);
+	  mmux_libc_l_pid_ref(&the_pid, flo);
 	  if (mmux_libc_pid_equal(the_pid, child_pid)) {
 	    printf_message("paren process: the child acquired the lock");
 	    the_child_acquired_the_lock = true;
@@ -254,23 +254,23 @@ play_child (void)
       handle_error();
     }
 
-    mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_WRLCK);
-    mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-    mmux_libc_l_start_set  (&flo, mmux_off_literal(11));
-    mmux_libc_l_len_set    (&flo, mmux_off_literal(21));
-    mmux_libc_l_pid_set    (&flo, pid);
+    mmux_libc_l_type_set   (flo, MMUX_LIBC_F_WRLCK);
+    mmux_libc_l_whence_set (flo, MMUX_LIBC_SEEK_SET);
+    mmux_libc_l_start_set  (flo, mmux_off_literal(11));
+    mmux_libc_l_len_set    (flo, mmux_off_literal(21));
+    mmux_libc_l_pid_set    (flo, pid);
 
     if (true) {
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      if (mmux_libc_flock_dump(er, &flo, "child struct flock to request lock")) {
+      if (mmux_libc_flock_dump(er, flo, "child struct flock to request lock")) {
 	handle_error();
       }
     }
 
     printf_message("child process: acquire the lock");
-    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, &flo)) {
+    if (mmux_libc_fcntl(fd, MMUX_LIBC_F_SETLK, flo)) {
       print_error("setting lock with fcntl()");
       handle_error();
     }
@@ -279,7 +279,7 @@ play_child (void)
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      if (mmux_libc_flock_dump(er, &flo, "child struct flock after request lock")) {
+      if (mmux_libc_flock_dump(er, flo, "child struct flock after request lock")) {
 	handle_error();
       }
     }

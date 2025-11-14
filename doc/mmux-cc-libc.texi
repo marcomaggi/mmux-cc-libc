@@ -376,14 +376,11 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{F_OFD_SETLKW}
 @MmuxDefineConstant{F_OFD_GETLK}
 @MmuxDefineConstant{F_OK}
-@MmuxDefineConstant{F_RDLCK}
 @MmuxDefineConstant{F_SETFD}
 @MmuxDefineConstant{F_SETFL}
 @MmuxDefineConstant{F_SETLK}
 @MmuxDefineConstant{F_SETLKW}
 @MmuxDefineConstant{F_SETOWN}
-@MmuxDefineConstant{F_UNLCK}
-@MmuxDefineConstant{F_WRLCK}
 @MmuxDefineConstant{MAXSYMLINKS}
 @MmuxDefineConstant{O_ACCMODE}
 @MmuxDefineConstant{O_APPEND}
@@ -7510,26 +7507,32 @@ gimme_an_ouput_fd(fd_dst);
 @section File locks
 
 
-Data structures of type @objtype{mmux_libc_flock_t} are used to describe a file lock in some calls
-to @cfunc{mmux_libc_fcntl}.  To declare and inspect such data structures we do:
+According to the standard: Data structures of type @code{struct flock} are used to describe a file
+lock in some calls to @cfunc{fcntl}.  Under @value{PACKAGE}: data structures of type @code{struct
+flock} are aliased by objects of type @objtype{mmux_libc_file_descriptor_lock_t} and we use them to
+describe a file lock in calls to @cfunc{mmux_libc_fcntl}.
+
+To declare and inspect such data structures we do:
 
 @example
-mmux_libc_flock_t     flo;
-mmux_libc_pid_t       pid;
+mmux_libc_flock_t  flo;
 
-mmux_libc_make_pid_zero(&pid); /* should not fail */
+mmux_libc_l_type_set   (flo, MMUX_LIBC_F_RDLCK);
+mmux_libc_l_whence_set (flo, MMUX_LIBC_SEEK_SET);
+mmux_libc_l_start_set  (flo, mmux_off_literal(11));
+mmux_libc_l_len_set    (flo, mmux_off_literal(33));
+@{
+  mmux_libc_pid_t    pid;
 
-mmux_libc_l_type_set   (&flo, MMUX_LIBC_F_RDLCK);
-mmux_libc_l_whence_set (&flo, MMUX_LIBC_SEEK_SET);
-mmux_libc_l_start_set  (&flo, mmux_off_literal(11));
-mmux_libc_l_len_set    (&flo, mmux_off_literal(33));
-mmux_libc_l_pid_set    (&flo, pid);
+  mmux_libc_make_pid_zero(&pid);
+  mmux_libc_l_pid_set(flo, pid);
+@}
 
 @{
-  mmux_libc_fd_t      fd;
+  mmux_libc_oufd_t    fd;
 
   mmux_libc_stdou(fd);
-  if (mmux_libc_flock_dump(fd, &flo, NULL)) @{
+  if (mmux_libc_flock_dump(fd, flo, NULL)) @{
     /* error */
   @}
 @}
@@ -7548,13 +7551,105 @@ struct flock.l_pid = "0"
 @end example
 
 
-@MmuxCStructOpaqueTypedef{flock}
-@MmuxSetterGetter{flock, l_type,   mmux_libc_file_lock_type_t}
-@MmuxSetterGetter{flock, l_whence, mmux_libc_seek_whence_t}
-@MmuxSetterGetter{flock, l_start,  mmux_off_t}
-@MmuxSetterGetter{flock, l_len,    mmux_off_t}
-@MmuxSetterGetter{flock, l_pid,    mmux_libc_pid_t}
-@MmuxStructDumper{flock}
+@deftp {Opaque Struct Type} mmux_libc_file_descriptor_lock_t
+Opaque alias to @code{struct flock}.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_flock_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_lock_t  mmux_libc_flock_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and to declare a mutable arguments to functions.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_flock_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_file_descriptor_lock_t const *  mmux_libc_flock_arg_t;
+@end example
+
+@noindent
+it is meant to be used to declare an immutable arguments to function.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Type} mmux_libc_file_lock_type_t
+@deftpx {Parent Struct Type} mmux_sshort_t
+Data structure type representing values of the field @code{l_type} in objects of type
+@objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftp
+
+
+@deftypefun mmux_libc_file_lock_type_t mmux_libc_file_lock_type (mmux_standard_sshort_t @var{type})
+Build and return a new instance of @objtype{mmux_libc_file_lock_type_t}.
+@end deftypefun
+
+
+@macro MmuxStructFlockLTypeDefineConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_file_lock_type_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+Value for the field @code{l_type} in objects of type @objtype{mmux_libc_file_descriptor_lock_t}.
+
+The preprocessor symbol @code{MMUX_LIBC_VALUEOF_\NAME\} is defined to the standard exact integer
+corresponding to @code{\NAME\}.
+
+The preprocessor symbol @code{MMUX_HAVE_LIBC_\NAME\} is defined, and defined to @samp{1}, if the
+symbol @code{MMUX_LIBC_\NAME\} is available.
+@end deftypevr
+
+@end macro
+
+@MmuxStructFlockLTypeDefineConstant{F_RDLCK}
+@MmuxStructFlockLTypeDefineConstant{F_UNLCK}
+@MmuxStructFlockLTypeDefineConstant{F_WRLCK}
+
+
+@deftypefun bool mmux_libc_l_type_set (mmux_libc_flock_t @var{flock}, mmux_libc_file_lock_type_t @var{l_type})
+@deftypefunx bool mmux_libc_l_type_ref (mmux_libc_file_lock_type_t * @var{result_p}, mmux_libc_flock_arg_t @var{flockp})
+Setter and getter for the field @code{l_type} of @objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_l_whence_set (mmux_libc_flock_t @var{flock}, mmux_libc_seek_whence_t @var{l_whence})
+@deftypefunx bool mmux_libc_l_whence_ref (mmux_libc_seek_whence_t * @var{result_p}, mmux_libc_flock_arg_t @var{flockp})
+Setter and getter for the field @code{l_whence} of @objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_l_start_set (mmux_libc_flock_t @var{flock}, mmux_off_t @var{l_start})
+@deftypefunx bool mmux_libc_l_start_ref (mmux_off_t * @var{result_p}, mmux_libc_flock_arg_t @var{flockp})
+Setter and getter for the field @code{l_start} of @objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_l_len_set (mmux_libc_flock_t @var{flock}, mmux_off_t @var{l_len})
+@deftypefunx bool mmux_libc_l_len_ref (mmux_off_t * @var{result_p}, mmux_libc_flock_arg_t @var{flockp})
+Setter and getter for the field @code{l_len} of @objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_l_pid_set (mmux_libc_flock_t @var{flock}, mmux_libc_pid_t @var{l_pid})
+@deftypefunx bool mmux_libc_l_pid_ref (mmux_libc_pid_t * @var{result_p}, mmux_libc_flock_arg_t @var{flockp})
+Setter and getter for the field @code{l_pid} of @objtype{mmux_libc_file_descriptor_lock_t}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_flock_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_flock_arg_t @var{flock}, mmux_asciizcp_t @var{struct_name})
+Write to @var{fd} a description of the fields of the @MmuxCStruct{flock} referenced by @var{flock}.
+@var{struct_name} must be a pointer to an @MmuxAsciiZ{} string representing the name of the data
+structure used in the description; when @cnull{}: it defaults to @samp{struct flock}.
+@end deftypefun
+
 
 @deftypefun bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcpp_t @var{str_p}, mmux_libc_file_lock_type_t @var{flag})
 Identify @var{flag} as a value for the field @code{l_type} of @objtype{mmux_libc_flock_t}; store in

@@ -1104,39 +1104,65 @@ mmux_libc_pwritev2 (mmux_usize_t * number_of_bytes_read_p, mmux_libc_fd_arg_t fd
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_l_type_set (mmux_libc_flock_t * const P, mmux_libc_file_lock_type_t value)
+mmux_libc_l_type_set (mmux_libc_flock_t P, mmux_libc_file_lock_type_t value)
 {
   P->l_type = value.value;
   return false;
 }
 bool
-mmux_libc_l_type_ref (mmux_libc_file_lock_type_t * result_p, mmux_libc_flock_t const * const P)
+mmux_libc_l_type_ref (mmux_libc_file_lock_type_t * result_p, mmux_libc_flock_arg_t P)
 {
   *result_p = mmux_libc_file_lock_type(P->l_type);
   return false;
 }
+
 bool
-mmux_libc_l_whence_set (mmux_libc_flock_t * const P, mmux_libc_seek_whence_t value)
+mmux_libc_l_whence_set (mmux_libc_flock_t P, mmux_libc_seek_whence_t value)
 {
   P->l_whence = value.value;
   return false;
 }
 bool
-mmux_libc_l_whence_ref (mmux_libc_seek_whence_t * result_p, mmux_libc_flock_t const * const P)
+mmux_libc_l_whence_ref (mmux_libc_seek_whence_t * result_p, mmux_libc_flock_arg_t P)
 {
   *result_p = mmux_libc_seek_whence(P->l_whence);
   return false;
 }
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_start,	off)
-DEFINE_STRUCT_SETTER_GETTER(flock,	l_len,		off)
+
 bool
-mmux_libc_l_pid_set (mmux_libc_flock_t * const P, mmux_libc_pid_t value)
+mmux_libc_l_start_set (mmux_libc_flock_t P, mmux_off_t value)
+{
+  P->l_start = value.value;
+  return false;
+}
+bool
+mmux_libc_l_start_ref (mmux_off_t * result_p, mmux_libc_flock_arg_t P)
+{
+  *result_p = mmux_off(P->l_start);
+  return false;
+}
+
+bool
+mmux_libc_l_len_set (mmux_libc_flock_t P, mmux_off_t value)
+{
+  P->l_len = value.value;
+  return false;
+}
+bool
+mmux_libc_l_len_ref (mmux_off_t * result_p, mmux_libc_flock_arg_t P)
+{
+  *result_p = mmux_off(P->l_len);
+  return false;
+}
+
+bool
+mmux_libc_l_pid_set (mmux_libc_flock_t P, mmux_libc_pid_t value)
 {
   P->l_pid = value.value;
   return false;
 }
 bool
-mmux_libc_l_pid_ref (mmux_libc_pid_t * result_p, mmux_libc_flock_t const * const P)
+mmux_libc_l_pid_ref (mmux_libc_pid_t * result_p, mmux_libc_flock_arg_t P)
 {
   return mmux_libc_make_pid(result_p, P->l_pid);
 }
@@ -1191,7 +1217,7 @@ mmux_libc_flag_to_symbol_seek_whence (mmux_asciizcp_t * const str_p, mmux_libc_s
   }
 }
 bool
-mmux_libc_flock_dump (mmux_libc_fd_arg_t fd, mmux_libc_flock_t const * const flock_p, mmux_asciizcp_t struct_name)
+mmux_libc_flock_dump (mmux_libc_fd_arg_t fd, mmux_libc_flock_arg_t flock_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct flock";

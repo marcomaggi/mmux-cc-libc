@@ -48,10 +48,13 @@ typedef struct mmux_libc_timeval_t  { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMEVA
 typedef struct mmux_libc_timespec_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TIMESPEC]; } mmux_libc_timespec_t;
 typedef struct mmux_libc_broken_down_time_t { mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM]; } mmux_libc_broken_down_time_t;
 typedef struct mmux_libc_iovec_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_IOVEC];    } mmux_libc_iovec_t;
-typedef struct mmux_libc_flock_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_FLOCK];    } mmux_libc_flock_t;
 typedef struct mmux_libc_rlimit_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_RLIMIT];   } mmux_libc_rlimit_t;
 typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD];   } mmux_libc_passwd_t;
 typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP];    } mmux_libc_group_t;
+
+typedef struct mmux_libc_file_descriptor_lock_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_FLOCK];
+} mmux_libc_file_descriptor_lock_t;
 
 /* FIXME Wha if "struct open_how" is not defined?  (Marco Maggi; Nov  7, 2025) */
 typedef struct mmux_libc_file_descriptors_set_t {

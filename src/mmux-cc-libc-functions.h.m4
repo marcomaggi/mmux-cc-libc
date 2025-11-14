@@ -838,15 +838,34 @@ mmux_cc_libc_decl bool mmux_libc_pwritev2 (mmux_usize_t * nbytes_written_p, mmux
  ** Input/output: file locking API.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_type,		mmux_libc_file_lock_type_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_whence,	mmux_libc_seek_whence_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_start,	mmux_off_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_len,		mmux_off_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(flock,	l_pid,		mmux_libc_pid_t)
+mmux_cc_libc_decl bool mmux_libc_l_type_ref (mmux_libc_file_lock_type_t * result_p, mmux_libc_flock_arg_t flock_p)
+     __attribute__((__nonnull__(1,2)));
+mmux_cc_libc_decl bool mmux_libc_l_type_set (mmux_libc_flock_t flock_p, mmux_libc_file_lock_type_t value)
+     __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_flock_dump (mmux_libc_fd_arg_t fd, mmux_libc_flock_t const * flock_p,
+mmux_cc_libc_decl bool mmux_libc_l_whence_ref (mmux_libc_seek_whence_t * result_p, mmux_libc_flock_arg_t flock_p)
+     __attribute__((__nonnull__(1,2)));
+mmux_cc_libc_decl bool mmux_libc_l_whence_set (mmux_libc_flock_t flock_p, mmux_libc_seek_whence_t value)
+     __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_l_start_ref (mmux_off_t * result_p, mmux_libc_flock_arg_t flock_p)
+     __attribute__((__nonnull__(1,2)));
+mmux_cc_libc_decl bool mmux_libc_l_start_set (mmux_libc_flock_t flock_p, mmux_off_t value)
+     __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_l_len_ref (mmux_off_t * result_p, mmux_libc_flock_arg_t flock_p)
+     __attribute__((__nonnull__(1,2)));
+mmux_cc_libc_decl bool mmux_libc_l_len_set (mmux_libc_flock_t flock_p, mmux_off_t value)
+     __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_l_pid_ref (mmux_libc_pid_t * result_p, mmux_libc_flock_arg_t flock_p)
+     __attribute__((__nonnull__(1,2)));
+mmux_cc_libc_decl bool mmux_libc_l_pid_set (mmux_libc_flock_t flock_p, mmux_libc_pid_t value)
+     __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_flock_dump (mmux_libc_fd_arg_t fd, mmux_libc_flock_arg_t flock_p,
 					     mmux_asciizcp_t struct_name)
-  __attribute__((__nonnull__(2)));
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_flag_to_symbol_struct_flock_l_type (mmux_asciizcpp_t str_p,
 								     mmux_libc_file_lock_type_t flag)

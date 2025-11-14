@@ -247,7 +247,6 @@ typedef struct timeval		mmux_libc_timeval_t;
 typedef struct timespec		mmux_libc_timespec_t;
 typedef struct tm		mmux_libc_broken_down_time_t;
 typedef struct iovec		mmux_libc_iovec_t;
-typedef struct flock		mmux_libc_flock_t;
 typedef struct rlimit		mmux_libc_rlimit_t;
 typedef struct passwd		mmux_libc_passwd_t;
 typedef struct group		mmux_libc_group_t;
@@ -257,6 +256,10 @@ typedef struct utimbuf		mmux_libc_file_system_utimbuf_t;
 typedef	struct mmux_libc_file_descriptors_set_t {
   fd_set;
 } mmux_libc_file_descriptors_set_t;
+
+typedef struct mmux_libc_file_descriptor_lock_t {
+  struct flock;
+} mmux_libc_file_descriptor_lock_t;
 
 typedef struct dirent		mmux_libc_file_system_dirent_t;
 typedef struct mmux_libc_file_system_dirstream_ptr_t {

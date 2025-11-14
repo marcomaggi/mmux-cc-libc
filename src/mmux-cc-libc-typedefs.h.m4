@@ -173,6 +173,9 @@ typedef struct mmux_libc_scatter_gather_flags_t	{ mmux_sint_t;   } mmux_libc_sca
 typedef mmux_libc_file_descriptors_set_t		mmux_libc_fd_set_t[1];
 typedef mmux_libc_file_descriptors_set_t const *	mmux_libc_fd_set_arg_t;
 
+typedef mmux_libc_file_descriptor_lock_t		mmux_libc_flock_t[1];
+typedef mmux_libc_file_descriptor_lock_t const *	mmux_libc_flock_arg_t;
+
 
 /** --------------------------------------------------------------------
  ** Networking.
