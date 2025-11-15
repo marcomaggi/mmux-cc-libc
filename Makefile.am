@@ -100,13 +100,13 @@ EXTRA_DIST	+= \
 	src/mmux-cc-libc-characters.c.m4		\
 	src/mmux-cc-libc-errors.c.m4			\
 	src/mmux-cc-libc-file-descriptors.c.m4		\
-	src/mmux-cc-libc-file-system.c.m4		\
 	src/mmux-cc-libc-file-system-pathnames.c.m4	\
+	src/mmux-cc-libc-file-system.c.m4		\
+	src/mmux-cc-libc-interprocess-signals.c.m4	\
 	src/mmux-cc-libc-library.c.m4			\
 	src/mmux-cc-libc-memory.c.m4			\
 	src/mmux-cc-libc-persona.c.m4			\
 	src/mmux-cc-libc-processes.c.m4			\
-	src/mmux-cc-libc-signals.c.m4			\
 	src/mmux-cc-libc-sockets.c.m4			\
 	src/mmux-cc-libc-strings.c.m4			\
 	src/mmux-cc-libc-system-configuration.c.m4	\
@@ -122,13 +122,13 @@ MMUX_CC_LIBC_BUILT_SOURCES	= \
 	src/mmux-cc-libc-characters.c			\
 	src/mmux-cc-libc-errors.c			\
 	src/mmux-cc-libc-file-descriptors.c		\
-	src/mmux-cc-libc-file-system.c			\
 	src/mmux-cc-libc-file-system-pathnames.c	\
+	src/mmux-cc-libc-file-system.c			\
+	src/mmux-cc-libc-interprocess-signals.c		\
 	src/mmux-cc-libc-library.c			\
 	src/mmux-cc-libc-memory.c			\
 	src/mmux-cc-libc-persona.c			\
 	src/mmux-cc-libc-processes.c			\
-	src/mmux-cc-libc-signals.c			\
 	src/mmux-cc-libc-sockets.c			\
 	src/mmux-cc-libc-strings.c			\
 	src/mmux-cc-libc-system-configuration.c		\
@@ -156,22 +156,22 @@ libmmux_cc_libc_la_LDFLAGS	= $(mmux_cc_libc_LINKER_VERSION) $(AM_LDFLAGS)
 libmmux_cc_libc_la_LIBADD	= $(MMUX_CC_TYPES_LIBS)
 libmmux_cc_libc_la_SOURCES	= \
 	src/mmux-cc-libc.h				\
-	src/mmux-cc-libc-config.h			\
 	src/mmux-cc-libc-typedefs.h			\
-	src/mmux-cc-libc-internals.h			\
+	src/mmux-cc-libc-config.h			\
+	src/mmux-cc-libc-characters.c			\
 	src/mmux-cc-libc-constants.h			\
 	src/mmux-cc-libc-functions.h			\
 	src/mmux-cc-libc-generics.h			\
-	src/mmux-cc-libc-characters.c			\
+	src/mmux-cc-libc-internals.h			\
 	src/mmux-cc-libc-errors.c			\
 	src/mmux-cc-libc-file-descriptors.c		\
-	src/mmux-cc-libc-file-system.c			\
 	src/mmux-cc-libc-file-system-pathnames.c	\
+	src/mmux-cc-libc-file-system.c			\
+	src/mmux-cc-libc-interprocess-signals.c		\
 	src/mmux-cc-libc-library.c			\
 	src/mmux-cc-libc-memory.c			\
 	src/mmux-cc-libc-persona.c			\
 	src/mmux-cc-libc-processes.c			\
-	src/mmux-cc-libc-signals.c			\
 	src/mmux-cc-libc-sockets.c			\
 	src/mmux-cc-libc-strings.c			\
 	src/mmux-cc-libc-system-configuration.c		\
@@ -748,7 +748,8 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-kill-pause		\
 	tests/test-interprocess-signals-struct-sigset		\
 	tests/test-interprocess-signals-blocking-mask		\
-	tests/test-interprocess-signals-pending
+	tests/test-interprocess-signals-pending			\
+	tests/test-interprocess-signals-suspend
 
 tests_test_interprocess_signals_signals_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_signals_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -767,6 +768,9 @@ tests_test_interprocess_signals_blocking_mask_LDADD	= $(mmux_cc_libc_tests_ldadd
 
 tests_test_interprocess_signals_pending_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_pending_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_suspend_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_suspend_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

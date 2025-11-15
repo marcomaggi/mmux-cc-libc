@@ -475,9 +475,16 @@ mmux_libc_interprocess_signals_blocking_mask_set(mmux_libc_sigset_arg_t new_bloc
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sigpending (mmux_libc_sigset_t ipxsigset)
+mmux_libc_sigpending (mmux_libc_sigset_arg_t ipxsigset)
 {
   int	rv = sigpending(ipxsigset);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
+{
+  int	rv = sigsuspend(temporary_blocking_mask);
 
   return (0 == rv)? false : true;
 }

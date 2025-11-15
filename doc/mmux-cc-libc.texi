@@ -5545,7 +5545,7 @@ To set the default action for @samp{SIGUSR1} we do:
 
   mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
   mmux_libc_retrieve_signal_handler_SIG_DFL(&the_new_handler);
-  if (mmux_libc_signal(&the_old_hadler, ipxsignal, the_new_handler)) @{
+  if (mmux_libc_signal(&the_old_handler, ipxsignal, the_new_handler)) @{
     /* error */
   @}
 @}
@@ -5603,6 +5603,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 * signals sets ops::            Operations on interprocess signals sets.
 * signals sets blocking mask::  Accessing the interprocess-signals blocking-mask.
 * signals sets pending::        Checking if there are pending interprocess signals.
+* signals sets suspending::     Waiting for selected interprocess signals.
 @end menu
 
 @c page
@@ -5751,14 +5752,15 @@ mmux_libc_interprocess_signals_blocking_mask_ref(current_blocking_mask);
 Set the current process' interprocess--signals blocking--mask to the set @var{new_blocking_mask}.
 
 If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
-@objtype{mmux_libc_interprocess_signals_set_t}.
+@objtype{mmux_libc_interprocess_signals_set_t}.  @strong{NOTE}: it is not required to apply
+@cfunc{mmux_libc_sigemptyset} to @var{old_blocking_mask}.
 
 @example
-mmux_libc_sigset_t  current_blocking_mask, previous_blocking_mask;
+mmux_libc_sigset_t  new_blocking_mask, previous_blocking_mask;
 
-mmux_libc_sigemptyset(current_blocking_mask);
-mmux_libc_sigemptyset(previous_blocking_mask);
-mmux_libc_interprocess_signals_blocking_mask_ref(current_blocking_mask, previous_blocking_mask);
+/* Block all the signals. */
+mmux_libc_sigemptyset(new_blocking_mask);
+mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, previous_blocking_mask);
 @end example
 @end deftypefun
 
@@ -5767,13 +5769,13 @@ mmux_libc_interprocess_signals_blocking_mask_ref(current_blocking_mask, previous
 Add the set of signals @var{ipxsigset} to the current process' interprocess--signals blocking--mask.
 
 If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
-@objtype{mmux_libc_interprocess_signals_set_t}.
+@objtype{mmux_libc_interprocess_signals_set_t}.  @strong{NOTE}: it is not required to apply
+@cfunc{mmux_libc_sigemptyset} to @var{old_blocking_mask}.
 
 @example
 mmux_libc_sigset_t  ipxsigset, previous_blocking_mask;
 
 mmux_libc_sigemptyset(ipxsigset);
-mmux_libc_sigemptyset(previous_blocking_mask);
 mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
 mmux_libc_interprocess_signals_blocking_mask_add_set(ipxsigset, previous_blocking_mask);
 @end example
@@ -5785,7 +5787,8 @@ Remove the set of signals @var{ipxsigset} from the current process' interprocess
 blocking--mask.
 
 If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
-@objtype{mmux_libc_interprocess_signals_set_t}.
+@objtype{mmux_libc_interprocess_signals_set_t}.  @strong{NOTE}: it is not required to apply
+@cfunc{mmux_libc_sigemptyset} to @var{old_blocking_mask}.
 
 @example
 mmux_libc_sigset_t  ipxsigset, previous_blocking_mask;
@@ -5837,6 +5840,20 @@ mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_bloc
     @}
   @}
 @}
+@end example
+@end deftypefun
+
+@c page
+@node signals sets suspending
+@subsection Waiting for selected interprocess signals
+
+
+@deftypefun bool mmux_libc_sigsuspend (mmux_libc_sigset_arg_t @var{temporary_blocking_mask})
+@MmuxCInterface{sigsuspend}.  Remember that, no matter what is set in @var{temporary_blocking_mask}:
+this function never blocks some job control signals.
+
+@example
+
 @end example
 @end deftypefun
 
