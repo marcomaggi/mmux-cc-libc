@@ -93,7 +93,7 @@ start_with_an_empty_set (void)
       handle_error();
     }
   }
-  printf_message("%s: DONE", __func__);
+  printf_message("%s: DONE\n", __func__);
 }
 
 
@@ -170,7 +170,7 @@ start_with_a_full_set (void)
       handle_error();
     }
   }
-  printf_message("%s: DONE", __func__);
+  printf_message("%s: DONE\n", __func__);
 }
 
 
@@ -249,7 +249,7 @@ sets_union (void)
       }
     }
   }
-  printf_message("%s: DONE", __func__);
+  printf_message("%s: DONE\n", __func__);
 }
 
 
@@ -342,7 +342,7 @@ sets_intersection (void)
       }
     }
   }
-  printf_message("%s: DONE", __func__);
+  printf_message("%s: DONE\n", __func__);
 }
 
 

@@ -1390,6 +1390,23 @@ mmux_cc_libc_decl bool mmux_libc_sigorset (mmux_libc_sigset_t ipxsigset_result,
 					   mmux_libc_sigset_arg_t ipxsigset1, mmux_libc_sigset_arg_t ipxsigset2)
   __attribute__((__nonnull__(1,2,3)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_blocking_mask_add_set (mmux_libc_sigset_arg_t ipxsigset,
+									     mmux_libc_sigset_t old_blocking_mask)
+  __attribute__((__nonnull__(1))); /* old_blocking_mask can be NULL. */
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_blocking_mask_remove_set (mmux_libc_sigset_arg_t ipxsigset,
+										mmux_libc_sigset_t old_blocking_mask)
+  __attribute__((__nonnull__(1))); /* old_blocking_mask can be NULL. */
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_blocking_mask_ref (mmux_libc_sigset_t current_blocking_mask)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_interprocess_signals_blocking_mask_set (mmux_libc_sigset_arg_t new_blocking_mask,
+									 mmux_libc_sigset_t old_blocking_mask)
+  __attribute__((__nonnull__(1))); /* old_blocking_mask can be NULL. */
+
 
 /** --------------------------------------------------------------------
  ** Persona.

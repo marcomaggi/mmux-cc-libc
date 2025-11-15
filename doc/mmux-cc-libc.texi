@@ -5601,6 +5601,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 @menu
 * signals sets types::          Types representing interprocess signals sets.
 * signals sets ops::            Operations on interprocess signals sets.
+* signals sets blocking mask::  Accessing the interprocess-signals blocking-mask.
 @end menu
 
 @c page
@@ -5724,6 +5725,76 @@ mmux_libc_sigandset(ipxsigset, ipxsigset1, ipxsigset2);
 @deftypefn {@glibc{} Function} bool mmux_libc_sigorset (mmux_libc_sigset_t @var{ipxsigset_result}, mmux_libc_sigset_arg_t @vari{ipxsigset}, mmux_libc_sigset_arg_t @varii{ipxsigset})
 @MmuxCInterface{sigorset}.  Compute the union between @vari{ipxsigset} and @varii{ipxsigset}.
 @end deftypefn
+
+@c page
+@node signals sets blocking mask
+@subsection Accessing the interprocess--signals blocking--mask
+
+
+The following functions are interfaces to the standard function @MmuxCInterface{sigprocmask}.
+
+
+@deftypefun bool mmux_libc_interprocess_signals_blocking_mask_ref (mmux_libc_sigset_t @var{current_blocking_mask})
+Retrieve the current process' interprocess--signals blocking--mask.
+
+@example
+mmux_libc_sigset_t  current_blocking_mask;
+
+mmux_libc_sigemptyset(current_blocking_mask);
+mmux_libc_interprocess_signals_blocking_mask_ref(current_blocking_mask);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_blocking_mask_set (mmux_libc_sigset_arg_t new_blocking_mask, mmux_libc_sigset_t @var{old_blocking_mask})
+Set the current process' interprocess--signals blocking--mask to the set @var{new_blocking_mask}.
+
+If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
+@objtype{mmux_libc_interprocess_signals_set_t}.
+
+@example
+mmux_libc_sigset_t  current_blocking_mask, previous_blocking_mask;
+
+mmux_libc_sigemptyset(current_blocking_mask);
+mmux_libc_sigemptyset(previous_blocking_mask);
+mmux_libc_interprocess_signals_blocking_mask_ref(current_blocking_mask, previous_blocking_mask);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_blocking_mask_add_set (mmux_libc_sigset_arg_t @var{ipxsigset}, mmux_libc_sigset_t @var{old_blocking_mask})
+Add the set of signals @var{ipxsigset} to the current process' interprocess--signals blocking--mask.
+
+If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
+@objtype{mmux_libc_interprocess_signals_set_t}.
+
+@example
+mmux_libc_sigset_t  ipxsigset, previous_blocking_mask;
+
+mmux_libc_sigemptyset(ipxsigset);
+mmux_libc_sigemptyset(previous_blocking_mask);
+mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
+mmux_libc_interprocess_signals_blocking_mask_add_set(ipxsigset, previous_blocking_mask);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_interprocess_signals_blocking_mask_remove_set (mmux_libc_sigset_arg_t @var{ipxsigset}, mmux_libc_sigset_t @var{old_blocking_mask})
+Remove the set of signals @var{ipxsigset} from the current process' interprocess--signals
+blocking--mask.
+
+If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the referenced
+@objtype{mmux_libc_interprocess_signals_set_t}.
+
+@example
+mmux_libc_sigset_t  ipxsigset, previous_blocking_mask;
+
+mmux_libc_sigemptyset(ipxsigset);
+mmux_libc_sigemptyset(previous_blocking_mask);
+mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
+mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_blocking_mask);
+@end example
+@end deftypefun
 
 @c page
 @node fds

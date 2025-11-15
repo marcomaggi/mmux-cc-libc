@@ -428,4 +428,45 @@ mmux_libc_sigorset (mmux_libc_sigset_t ipxsigset_result,
   return (0 == rv)? false : true;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Interprocess signals blocking mask.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_interprocess_signals_blocking_mask_add_set (mmux_libc_sigset_arg_t ipxsigset,
+						      mmux_libc_sigset_t old_blocking_mask)
+/* old_blocking_mask can be NULL. */
+{
+  int	rv = sigprocmask(SIG_BLOCK, ipxsigset, old_blocking_mask);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_interprocess_signals_blocking_mask_remove_set (mmux_libc_sigset_arg_t ipxsigset,
+							 mmux_libc_sigset_t old_blocking_mask)
+/* old_blocking_mask can be NULL. */
+{
+  int	rv = sigprocmask(SIG_UNBLOCK, ipxsigset, old_blocking_mask);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_interprocess_signals_blocking_mask_ref (mmux_libc_sigset_t current_blocking_mask)
+/* old_blocking_mask can be NULL. */
+{
+  int	rv = sigprocmask(SIG_BLOCK /* ignored */, NULL, current_blocking_mask);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_interprocess_signals_blocking_mask_set(mmux_libc_sigset_arg_t new_blocking_mask,
+						 mmux_libc_sigset_t old_blocking_mask)
+/* old_blocking_mask can be NULL. */
+{
+  int	rv = sigprocmask(SIG_SETMASK, new_blocking_mask, old_blocking_mask);
+
+  return (0 == rv)? false : true;
+}
+
 /* end of file */
