@@ -305,6 +305,10 @@ typedef struct protoent				mmux_libc_protoent_t;
 typedef struct netent				mmux_libc_netent_t;
 typedef struct linger				mmux_libc_linger_t;
 
+typedef struct mmux_libc_interprocess_signals_set_t {
+  sigset_t;
+} mmux_libc_interprocess_signals_set_t;
+
 typedef mmux_libc_in_addr_t *			mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *		mmux_libc_insix_addr_ptr_t;
 

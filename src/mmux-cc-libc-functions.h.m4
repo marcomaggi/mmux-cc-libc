@@ -1361,6 +1361,35 @@ mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
 
 mmux_cc_libc_decl bool mmux_libc_pause (void);
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sigemptyset (mmux_libc_sigset_t ipxsigset)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigfillset (mmux_libc_sigset_t ipxsigset)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigaddset (mmux_libc_sigset_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigdelset (mmux_libc_sigset_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigismember (bool * is_member_result_p,
+					      mmux_libc_sigset_arg_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sigisemptyset (bool * is_empty_result_p, mmux_libc_sigset_arg_t ipxsigset)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigandset (mmux_libc_sigset_t ipxsigset_result,
+					    mmux_libc_sigset_arg_t ipxsigset1, mmux_libc_sigset_arg_t ipxsigset2)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_sigorset (mmux_libc_sigset_t ipxsigset_result,
+					   mmux_libc_sigset_arg_t ipxsigset1, mmux_libc_sigset_arg_t ipxsigset2)
+  __attribute__((__nonnull__(1,2,3)));
+
 
 /** --------------------------------------------------------------------
  ** Persona.

@@ -357,4 +357,75 @@ mmux_libc_pause (void)
   }
 }
 
+
+/** --------------------------------------------------------------------
+ ** Interprocess signals sets.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_sigemptyset (mmux_libc_sigset_t ipxsigset)
+{
+  sigemptyset(ipxsigset);
+  return false;
+}
+bool
+mmux_libc_sigfillset (mmux_libc_sigset_t ipxsigset)
+{
+  sigfillset(ipxsigset);
+  return false;
+}
+bool
+mmux_libc_sigaddset (mmux_libc_sigset_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+{
+  int	rv = sigaddset(ipxsigset, ipxsig.value);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_sigdelset (mmux_libc_sigset_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+{
+  int	rv = sigdelset(ipxsigset, ipxsig.value);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_sigismember (bool * is_member_result_p, mmux_libc_sigset_arg_t ipxsigset, mmux_libc_interprocess_signal_t ipxsig)
+{
+  int	rv = sigismember(ipxsigset, ipxsig.value);
+
+  if (1 == rv) {
+    *is_member_result_p = true;
+    return false;
+  } else if (0 == rv) {
+    *is_member_result_p = false;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_sigisemptyset (bool * is_empty_result_p, mmux_libc_sigset_arg_t ipxsigset)
+{
+  int	rv = sigisemptyset(ipxsigset);
+
+  *is_empty_result_p = (0 == rv)? false : true;
+  return false;
+}
+bool
+mmux_libc_sigandset (mmux_libc_sigset_t ipxsigset_result,
+		     mmux_libc_sigset_arg_t ipxsigset1, mmux_libc_sigset_arg_t ipxsigset2)
+{
+  int	rv = sigandset(ipxsigset_result, ipxsigset1, ipxsigset2);
+
+  return (0 == rv)? false : true;
+}
+bool
+mmux_libc_sigorset (mmux_libc_sigset_t ipxsigset_result,
+		     mmux_libc_sigset_arg_t ipxsigset1, mmux_libc_sigset_arg_t ipxsigset2)
+{
+  int	rv = sigorset(ipxsigset_result, ipxsigset1, ipxsigset2);
+
+  return (0 == rv)? false : true;
+}
+
 /* end of file */

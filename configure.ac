@@ -166,6 +166,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_ADDRINFO],     [sizeof(struct addrinfo)
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_LINGER],       [sizeof(struct linger)])
 
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGINFO],      [sizeof(struct siginfo)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGSET],       [sizeof(sigset_t)])
 
 
 #### inspecting errno constants

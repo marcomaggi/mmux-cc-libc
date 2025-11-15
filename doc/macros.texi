@@ -320,6 +320,10 @@
 @acronym{GCC}
 @end macro
 
+@macro glibc{}
+@acronym{GLIBC}
+@end macro
+
 @macro cretwo{}
 @acronym{CRE2}
 @end macro

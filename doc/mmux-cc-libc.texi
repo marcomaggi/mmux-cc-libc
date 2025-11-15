@@ -5242,6 +5242,7 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 * signals delivering::          Delivering interprocess signals.
 * signals bub::                 Block/unblock interprocess signals handling.
 * signals handling::            Other interprocess signals delivering methods.
+* signals sets::                Interprocess signals sets.
 @end menu
 
 @c page
@@ -5591,6 +5592,138 @@ if the current process receives a signal for which @strong{no} handler was regis
 will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 @end itemize
 @end deftypefun
+
+@c page
+@node signals sets
+@section Interprocess signals sets
+
+
+@menu
+* signals sets types::          Types representing interprocess signals sets.
+* signals sets ops::            Operations on interprocess signals sets.
+@end menu
+
+@c page
+@node signals sets types
+@subsection Types representing interprocess signals sets
+
+
+According to the standard: an interprocess signals set is represented by the data structure
+@objtype{sigset_t}.  Under @value{PACKAGE}: such type is aliased by
+@objtype{mmux_libc_interprocess_signals_set_t}; it is usually better to use the type
+@objtype{mmux_libc_sigset_t}.
+
+
+@deftp {Struct Type} mmux_libc_interprocess_signals_set_t
+Data structure type alias of @objtype{sigset_t}.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigset_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_interprocess_signals_set_t  mmux_libc_sigset_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and to declare a result argument for functions, so
+the referenced @objtype{mmux_libc_interprocess_signals_set_t} instance must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigset_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_interprocess_signals_set_t const *  mmux_libc_sigset_arg_t;
+@end example
+
+@noindent
+it is meant to be used to declare an argument for functions that use an already existent object, so
+the referenced @objtype{mmux_libc_interprocess_signals_set_t} instance must be immutable.
+@end deftp
+
+@c page
+@node signals sets ops
+@subsection Operations on interprocess signals sets
+
+
+To add and remove interprocess signals to and from a set, we do:
+
+@example
+mmux_libc_sigset_t  ipxsigset;
+
+mmux_libc_sigemptyset(ipxsigset);
+mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
+
+/* Test SIGUSR1 membership. */
+@{
+  bool  is_member;
+
+  mmux_libc_sigismember(&is_member, ipxsigset, MMUX_LIBC_SIGUSR1);
+  if (is_member) @{
+    ...
+  @} else @{
+    ...
+  @}
+@}
+
+mmux_libc_sigdelset(ipxsigset, MMUX_LIBC_SIGUSR1);
+@end example
+
+
+@deftypefun bool mmux_libc_sigemptyset (mmux_libc_sigset_t @var{ipxsigset})
+@MmuxCInterface{sigemptyset}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sigfillset (mmux_libc_sigset_t @var{ipxsigset})
+@MmuxCInterface{sigfillset}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sigaddset (mmux_libc_sigset_t @var{ipxsigset}, mmux_libc_interprocess_signal_t @var{ipxsig})
+@MmuxCInterface{sigaddset}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sigdelset (mmux_libc_sigset_t @var{ipxsigset}, mmux_libc_interprocess_signal_t @var{ipxsig})
+@MmuxCInterface{sigdelset}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sigismember (bool * @var{is_member_result_p}, mmux_libc_sigset_arg_t @var{ipxsigset}, mmux_libc_interprocess_signal_t @var{ipxsig})
+@MmuxCInterface{sigismember}.
+@end deftypefun
+
+
+@deftypefn {@glibc{} Function} bool mmux_libc_sigisemptyset (bool * @var{is_empty_result_p}, mmux_libc_sigset_arg_t @var{ipxsigset})
+@MmuxCInterface{sigisemptyset}.
+@end deftypefn
+
+
+@deftypefn {@glibc{} Function} bool mmux_libc_sigandset (mmux_libc_sigset_t @var{ipxsigset_result}, mmux_libc_sigset_arg_t @vari{ipxsigset}, mmux_libc_sigset_arg_t @varii{ipxsigset})
+@MmuxCInterface{sigandset}.  Compute the intersection between @vari{ipxsigset} and
+@varii{ipxsigset}.
+
+@example
+mmux_libc_sigset_t  ipxsigset, ipxsigset1, ipxsigset2;
+
+mmux_libc_sigemptyset(ipxsigset);
+mmux_libc_sigemptyset(ipxsigset1);
+mmux_libc_sigemptyset(ipxsigset2);
+
+mmux_libc_sigaddset(ipxsigset1, MMUX_LIBC_SIGUSR1);
+mmux_libc_sigaddset(ipxsigset2, MMUX_LIBC_SIGUSR2);
+mmux_libc_sigandset(ipxsigset, ipxsigset1, ipxsigset2);
+@end example
+@end deftypefn
+
+
+@deftypefn {@glibc{} Function} bool mmux_libc_sigorset (mmux_libc_sigset_t @var{ipxsigset_result}, mmux_libc_sigset_arg_t @vari{ipxsigset}, mmux_libc_sigset_arg_t @varii{ipxsigset})
+@MmuxCInterface{sigorset}.  Compute the union between @vari{ipxsigset} and @varii{ipxsigset}.
+@end deftypefn
 
 @c page
 @node fds

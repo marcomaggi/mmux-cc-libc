@@ -106,6 +106,9 @@ typedef struct mmux_libc_process_completion_waiting_options_t {
 } mmux_libc_process_completion_waiting_options_t;
 typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
 
+typedef mmux_libc_interprocess_signals_set_t		mmux_libc_sigset_t[1];
+typedef mmux_libc_interprocess_signals_set_t const *	mmux_libc_sigset_arg_t;
+
 
 /** --------------------------------------------------------------------
  ** Times and dates.
