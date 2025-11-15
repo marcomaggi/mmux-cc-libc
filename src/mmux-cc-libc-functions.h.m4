@@ -1161,6 +1161,13 @@ mmux_libc_process_exit_status (mmux_standard_sint_t exit_status_num)
   return (mmux_libc_process_exit_status_t) { { .value = exit_status_num } };
 }
 
+mmux_cc_libc_inline_decl bool
+mmux_libc_process_exit_status_equal (mmux_libc_process_exit_status_t status1,
+				     mmux_libc_process_exit_status_t status2)
+{
+  return (status1.value == status2.value)? true : false;
+}
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_make_pid (mmux_libc_pid_t * result_p, mmux_standard_libc_pid_t pid_num)

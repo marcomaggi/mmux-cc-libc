@@ -110,7 +110,7 @@ play_paren (mmux_libc_pid_t child_pid)
 	  mmux_libc_process_exit_status_t	exit_status;
 
 	  mmux_libc_WEXITSTATUS(&exit_status, process_completion_status);
-	  if (exit_status.value == MMUX_LIBC_EXIT_SUCCESS.value) {
+	  if (mmux_libc_process_exit_status_equal(exit_status, MMUX_LIBC_EXIT_SUCCESS)) {
 	    printf_message("paren: the child exited successfully");
 	  } else {
 	    printf_error("paren: the child exited UNsuccessfully");
