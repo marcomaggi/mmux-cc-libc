@@ -469,4 +469,17 @@ mmux_libc_interprocess_signals_blocking_mask_set(mmux_libc_sigset_arg_t new_bloc
   return (0 == rv)? false : true;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Interprocess signals operations.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_sigpending (mmux_libc_sigset_t ipxsigset)
+{
+  int	rv = sigpending(ipxsigset);
+
+  return (0 == rv)? false : true;
+}
+
 /* end of file */

@@ -327,7 +327,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-interprocess-signals-struct-sigset";
+    PROGNAME = "test-interprocess-signals-blocking-mask";
   }
 
   if (true) {	test_starting_blocking_mask_is_empty();	}

@@ -5602,6 +5602,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 * signals sets types::          Types representing interprocess signals sets.
 * signals sets ops::            Operations on interprocess signals sets.
 * signals sets blocking mask::  Accessing the interprocess-signals blocking-mask.
+* signals sets pending::        Checking if there are pending interprocess signals.
 @end menu
 
 @c page
@@ -5793,6 +5794,49 @@ mmux_libc_sigemptyset(ipxsigset);
 mmux_libc_sigemptyset(previous_blocking_mask);
 mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
 mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_blocking_mask);
+@end example
+@end deftypefun
+
+@c page
+@node signals sets pending
+@subsection Checking if there are pending interprocess signals
+
+
+@deftypefun bool mmux_libc_sigpending (mmux_libc_sigset_t @var{ipxsigset})
+@MmuxCInterface{sigpending}.
+
+@example
+/* Block all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  if (mmux_libc_sigfillset(new_blocking_mask)) @{
+    /* error */
+  @}
+  if (mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL)) @{
+    /* error */
+  @}
+@}
+
+/* Do something. */
+
+/* Test if SIGUSR1 is pending. */
+@{
+  mmux_libc_sigset_t  pending_signals;
+
+  if (mmux_libc_sigpending(pending_signals)) @{
+    /* error */
+  @} else @{
+    bool  is_member;
+
+    mmux_libc_sigismember(&is_member, pending_signals, MMUX_LIBC_SIGUSR1);
+    if (is_member) @{
+      ...
+    @} else @{
+      ...
+    @}
+  @}
+@}
 @end example
 @end deftypefun
 

@@ -747,7 +747,8 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
 	tests/test-interprocess-signals-struct-sigset		\
-	tests/test-interprocess-signals-blocking-mask
+	tests/test-interprocess-signals-blocking-mask		\
+	tests/test-interprocess-signals-pending
 
 tests_test_interprocess_signals_signals_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_signals_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -763,6 +764,9 @@ tests_test_interprocess_signals_struct_sigset_LDADD	= $(mmux_cc_libc_tests_ldadd
 
 tests_test_interprocess_signals_blocking_mask_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_blocking_mask_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_pending_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_pending_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
