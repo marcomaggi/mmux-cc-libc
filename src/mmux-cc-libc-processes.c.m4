@@ -340,11 +340,11 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WIFEXITED]]],[[[
 ]]])
 }
 bool
-mmux_libc_WEXITSTATUS (mmux_sint_t * result_p MMUX_CC_LIBC_UNUSED,
+mmux_libc_WEXITSTATUS (mmux_libc_process_exit_status_t * exit_status_result_p MMUX_CC_LIBC_UNUSED,
 		       mmux_libc_process_completion_status_t process_completion_status MMUX_CC_LIBC_UNUSED)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[MMUX_LIBC_HAVE_WEXITSTATUS]]],[[[
-  *result_p = mmux_sint(WEXITSTATUS(process_completion_status.value));
+  *exit_status_result_p = mmux_libc_process_exit_status(WEXITSTATUS(process_completion_status.value));
   return false;
 ]]])
 }

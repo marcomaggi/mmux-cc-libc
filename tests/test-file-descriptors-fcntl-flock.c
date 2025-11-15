@@ -171,7 +171,7 @@ play_parent (mmux_libc_pid_t child_pid)
 
       mmux_libc_WIFEXITED(&child_process_has_exited, process_completion_status);
       if (child_process_has_exited) {
-	mmux_sint_t	child_process_exit_status;
+	mmux_libc_process_exit_status_t		child_process_exit_status;
 
 	mmux_libc_WEXITSTATUS(&child_process_exit_status, process_completion_status);
 	printf_message("paren process: child process has exited with status: %d", child_process_exit_status.value);

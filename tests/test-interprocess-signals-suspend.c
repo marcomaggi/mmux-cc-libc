@@ -75,6 +75,12 @@ play_paren (mmux_libc_pid_t child_pid)
 	mmux_libc_errno_t		errnum;
 
 	mmux_libc_errno_consume(&errnum);
+	if (mmux_libc_errno_equal(errnum, MMUX_LIBC_EINTR)) {
+	  printf_message("paren: sigsuspend was interrupted by a signal as expected, errno=EINTR");
+	} else {
+	  printf_error("paren: sigsuspend was interrupted for some unknown reason");
+	  handle_error();
+	}
       }
     } else {
       printf_error("paren: waiting for SIGUSR1");
@@ -100,6 +106,16 @@ play_paren (mmux_libc_pid_t child_pid)
       mmux_libc_WIFEXITED(&child_terminated_with_exit, process_completion_status);
       if (child_terminated_with_exit) {
 	printf_message("paren: successfully gathered child termination");
+	{
+	  mmux_libc_process_exit_status_t	exit_status;
+
+	  mmux_libc_WEXITSTATUS(&exit_status, process_completion_status);
+	  if (exit_status.value == MMUX_LIBC_EXIT_SUCCESS.value) {
+	    printf_message("paren: the child exited successfully");
+	  } else {
+	    printf_error("paren: the child exited UNsuccessfully");
+	  }
+	}
       } else {
 	printf_error("paren: abnormal termination of child process");
 	handle_error();

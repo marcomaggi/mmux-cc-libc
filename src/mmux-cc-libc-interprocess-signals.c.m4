@@ -334,7 +334,9 @@ mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** result_p)
   return false;
 }
 bool
-mmux_libc_signal (mmux_libc_sighandler_t ** result_p, mmux_libc_interprocess_signal_t ipxsignal, mmux_libc_sighandler_t action)
+mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
+		  mmux_libc_interprocess_signal_t ipxsignal,
+		  mmux_libc_sighandler_t * action)
 {
   mmux_libc_sighandler_t *	rv = signal(ipxsignal.value, action);
 

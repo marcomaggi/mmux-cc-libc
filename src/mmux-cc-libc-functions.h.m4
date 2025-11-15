@@ -1246,7 +1246,8 @@ mmux_cc_libc_decl bool mmux_libc_wait (bool * process_completion_status_availabl
 mmux_cc_libc_decl bool mmux_libc_WIFEXITED (bool * result_p, mmux_libc_process_completion_status_t psc)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_WEXITSTATUS (mmux_sint_t * result_p, mmux_libc_process_completion_status_t pcs)
+mmux_cc_libc_decl bool mmux_libc_WEXITSTATUS (mmux_libc_process_exit_status_t * exit_status_result_p,
+					      mmux_libc_process_completion_status_t pcs)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_WIFSIGNALED (bool * result_p, mmux_libc_process_completion_status_t pcs)
@@ -1356,7 +1357,7 @@ mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sigh
 
 mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
 					 mmux_libc_interprocess_signal_t ipxsignal,
-					 mmux_libc_sighandler_t action)
+					 mmux_libc_sighandler_t * action)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_pause (void);

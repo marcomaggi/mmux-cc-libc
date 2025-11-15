@@ -4850,9 +4850,9 @@ value computed by the C preprocessor macro.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_WEXITSTATUS (mmux_sint_t * @var{result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
-@MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.  Set the variable referenced by @var{result_p} to the
-value computed by the C preprocessor macro.
+@deftypefun bool mmux_libc_WEXITSTATUS (mmux_libc_process_exit_status_t * @var{exit_status_result_p}, mmux_libc_process_completion_status_t @var{completed_process_status})
+@MmuxCMacroInterfaceTwo{WEXITSTATUS,waitpid}.  Set the variable referenced by
+@var{exit_status_result_p} to the value computed by the C preprocessor macro.
 @end deftypefun
 
 
@@ -5516,7 +5516,7 @@ again without acquiring new signals always stores @false{} in the variable refer
 @section Other interprocess signals delivering methods
 
 
-@deftypefn {Function Type} bool mmux_libc_sighandler_t (mmux_sint_t @var{signum})
+@deftypefn {Function Type} void mmux_libc_sighandler_t (mmux_standard_sint_t @var{signum})
 Type of functions to be used as interprocess signal handlers.
 @end deftypefn
 
@@ -5531,7 +5531,7 @@ provided in this @api{} for completeness.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_signal (mmux_libc_sighandler_t ** @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal}, mmux_libc_sighandler_t @var{action})
+@deftypefun bool mmux_libc_signal (mmux_libc_sighandler_t ** @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal}, mmux_libc_sighandler_t * @var{action})
 @MmuxCInterface{signal}.  When successful: store in the variable referenced by @var{result_p} the
 action that was previously set for @var{ipxsignal}.
 
@@ -5539,13 +5539,11 @@ To set the default action for @samp{SIGUSR1} we do:
 
 @example
 @{
-  mmux_libc_interprocess_signal_t       ipxsignal;
-  mmux_libc_sighandler_t *              the_old_handler;
-  mmux_libc_sighandler_t *              the_new_handler;
+  mmux_libc_sighandler_t *  the_old_handler;
+  mmux_libc_sighandler_t *  the_new_handler;
 
-  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
   mmux_libc_retrieve_signal_handler_SIG_DFL(&the_new_handler);
-  if (mmux_libc_signal(&the_old_handler, ipxsignal, the_new_handler)) @{
+  if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, the_new_handler)) @{
     /* error */
   @}
 @}
@@ -5555,17 +5553,15 @@ To set a custom action for @samp{SIGUSR1} we do:
 
 @example
 static void
-my_handler (mmux_sint_t signum)
+my_handler (mmux_standard_sint_t signum)
 @{
   ...
 @}
 
 @{
-  mmux_libc_interprocess_signal_t       ipxsignal;
-  mmux_libc_sighandler_t *              the_old_handler;
+  mmux_libc_sighandler_t *  the_old_handler;
 
-  mmux_libc_make_interprocess_signal(&ipxsignal, MMUX_LIBC_SIGUSR1);
-  if (mmux_libc_signal(&the_old_handler, ipxsignal, my_handler)) @{
+  if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, my_handler)) @{
     /* error */
   @}
 @}
@@ -5852,8 +5848,44 @@ mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_bloc
 @MmuxCInterface{sigsuspend}.  Remember that, no matter what is set in @var{temporary_blocking_mask}:
 this function never blocks some job control signals.
 
-@example
+The standard function @cfunc{sigsuspend} always returns @samp{-1}; so @cfunc{mmux_libc_sigsuspend}
+always returns @cfalse{}.  After @cfunc{mmux_libc_sigsuspend} returns: we expect @code{errno} to be
+set to @code{MMUX_LIBC_EINTR}.
 
+@example
+/* Let's say this process blocks all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  mmux_libc_sigfillset(new_blocking_mask);
+  mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL);
+@}
+
+/* Install a signal handler for SIGUSR1. */
+@{
+  mmux_libc_sighandler_t *  the_old_handler;
+
+  if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, this_process_handler)) @{
+    /* error */
+  @}
+@}
+
+/* Wait for SIGUSR1 */
+@{
+  mmux_libc_sigset_t  temporary_blocking_mask;
+
+  /* Initially all the signals in the blocking mask. */
+  mmux_libc_sigfillset(temporary_blocking_mask);
+
+  /* Remove SIGUSR1 from the mask, so it will pass. */
+  mmux_libc_sigdelset(temporary_blocking_mask, MMUX_LIBC_SIGUSR1);
+
+  if (mmux_libc_sigsuspend(temporary_blocking_mask)) @{
+    /* If we are here: this process is still alive and something interrupted
+       "sigsuspend()".  If it was the delivery of SIGUSR1: the handler has
+       been called. */
+  @}
+@}
 @end example
 @end deftypefun
 
