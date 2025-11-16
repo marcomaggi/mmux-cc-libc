@@ -1,5 +1,7 @@
 -*- coding: utf-8-unix -*-
 
+* Review and tests of networking sockets.
+
 * Add a builtin interfacing "pselect()"?
 
 * Add interprocess signals API: sigqueue, sigwait.
