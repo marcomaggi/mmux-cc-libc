@@ -5685,8 +5685,8 @@ typedef mmux_libc_interprocess_signals_set_t const *  mmux_libc_sigset_arg_t;
 @end example
 
 @noindent
-it is meant to be used to declare an argument for functions that use an already existent object, so
-the referenced @objtype{mmux_libc_interprocess_signals_set_t} instance must be immutable.
+it is meant to be used to declare an argument for functions that use an already initialised object,
+so the referenced @objtype{mmux_libc_interprocess_signals_set_t} instance must be immutable.
 @end deftp
 
 @c page
@@ -5760,7 +5760,11 @@ mmux_libc_sigemptyset(ipxsigset1);
 mmux_libc_sigemptyset(ipxsigset2);
 
 mmux_libc_sigaddset(ipxsigset1, MMUX_LIBC_SIGUSR1);
-mmux_libc_sigaddset(ipxsigset2, MMUX_LIBC_SIGUSR2);
+mmux_libc_sigaddset(ipxsigset1, MMUX_LIBC_SIGUSR2);
+
+mmux_libc_sigaddset(ipxsigset2, MMUX_LIBC_SIGUSR1);
+mmux_libc_sigaddset(ipxsigset2, MMUX_LIBC_SIGTERM);
+
 mmux_libc_sigandset(ipxsigset, ipxsigset1, ipxsigset2);
 @end example
 @end deftypefn
@@ -5775,7 +5779,8 @@ mmux_libc_sigandset(ipxsigset, ipxsigset1, ipxsigset2);
 @subsection Accessing the interprocess--signals blocking--mask
 
 
-The following functions are interfaces to the standard function @MmuxCInterface{sigprocmask}.
+The following functions are interfaces to the standard function @cfunc{sigprocmask},
+@MmuxCFuncpage{sigprocmask}.
 
 
 @deftypefun bool mmux_libc_interprocess_signals_blocking_mask_ref (mmux_libc_sigset_t @var{current_blocking_mask})
@@ -5836,7 +5841,6 @@ If @var{old_blocking_mask} is not @cnull{}: store the previous mask in the refer
 mmux_libc_sigset_t  ipxsigset, previous_blocking_mask;
 
 mmux_libc_sigemptyset(ipxsigset);
-mmux_libc_sigemptyset(previous_blocking_mask);
 mmux_libc_sigaddset(ipxsigset, MMUX_LIBC_SIGUSR1);
 mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_blocking_mask);
 @end example
@@ -5851,7 +5855,7 @@ mmux_libc_interprocess_signals_blocking_mask_remove_set(ipxsigset, previous_bloc
 @MmuxCInterface{sigpending}.
 
 @example
-/* Block all the signals. */
+/* Let's say that this process blocks all the signals. */
 @{
   mmux_libc_sigset_t  new_blocking_mask;
 
