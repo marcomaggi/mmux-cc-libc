@@ -491,4 +491,61 @@ mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
   return (0 == rv)? false : true;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Interprocess signals actions.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_sa_handler_ref (mmux_libc_sighandler_t * * result_p, mmux_libc_sigaction_arg_t action)
+{
+  *result_p = action->sa_handler;
+  return false;
+}
+bool
+mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_t * handler)
+{
+  action->sa_handler = handler;
+  return false;
+}
+
+bool
+mmux_libc_sa_mask_ref (mmux_libc_sigset_t ipxsigset, mmux_libc_sigaction_arg_t action)
+{
+  sigemptyset(ipxsigset);
+  sigorset(ipxsigset, ipxsigset, &(action->sa_mask));
+  return false;
+}
+bool
+mmux_libc_sa_mask_set (mmux_libc_sigaction_t action, mmux_libc_sigset_arg_t ipxsigset)
+{
+  sigemptyset(&(action->sa_mask));
+  sigorset(&(action->sa_mask), ipxsigset, ipxsigset);
+  return false;
+}
+
+bool
+mmux_libc_sa_flags_ref (mmux_libc_sigaction_flags_t * result_p, mmux_libc_sigaction_arg_t action)
+{
+  *result_p = mmux_libc_sigaction_flags(action->sa_flags);
+  return false;
+}
+bool
+mmux_libc_sa_flags_set (mmux_libc_sigaction_t action, mmux_libc_sigaction_flags_t flags)
+{
+  action->sa_flags = flags.value;
+  return false;
+}
+
+bool
+mmux_libc_sigaction (mmux_libc_interprocess_signal_t ipxsig,
+		     mmux_libc_sigaction_arg_t new_action,
+		     mmux_libc_sigaction_t old_action)
+{
+  int	rv = sigaction(ipxsig.value, new_action, old_action);
+
+  return (0 == rv)? false : true;
+}
+
+
 /* end of file */

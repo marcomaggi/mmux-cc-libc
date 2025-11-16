@@ -115,6 +115,10 @@ typedef struct mmux_libc_interprocess_signals_set_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_SIGSET];
 } mmux_libc_interprocess_signals_set_t;
 
+typedef struct mmux_libc_interprocess_signal_action_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SIGACTION];
+} mmux_libc_interprocess_signal_action_t;
+
 typedef mmux_libc_in_addr_t *		mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *	mmux_libc_insix_addr_ptr_t;
 typedef mmux_libc_if_nameindex_t *	mmux_libc_if_nameindex_ptr_t;

@@ -1325,6 +1325,14 @@ mmux_cc_libc_decl bool mmux_libc_interprocess_signal_parse (mmux_libc_interproce
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_inline_decl mmux_libc_sigaction_flags_t
+mmux_libc_sigaction_flags (mmux_standard_sint_t flags_num)
+{
+  return (mmux_libc_sigaction_flags_t) { { .value = flags_num } };
+}
+
+/* ------------------------------------------------------------------ */
+
 mmux_cc_libc_decl bool mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal)
   __attribute__((__warn_unused_result__));
 
@@ -1426,6 +1434,32 @@ mmux_cc_libc_decl bool mmux_libc_sigpending (mmux_libc_sigset_arg_t ipxsigset)
 
 mmux_cc_libc_decl bool mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
   __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_t * * result_p, mmux_libc_sigaction_arg_t action)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_t * handler)
+  __attribute__((__nonnull__(1,2)));
+
+
+mmux_cc_libc_decl bool mmux_libc_sa_mask_ref (mmux_libc_sigset_t ipxsigset, mmux_libc_sigaction_arg_t action)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sa_mask_set (mmux_libc_sigaction_t action, mmux_libc_sigset_arg_t ipxsigset)
+  __attribute__((__nonnull__(1)));
+
+
+mmux_cc_libc_decl bool mmux_libc_sa_flags_ref (mmux_libc_sigaction_flags_t * result_p, mmux_libc_sigaction_arg_t action)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sa_flags_set (mmux_libc_sigaction_t action, mmux_libc_sigaction_flags_t flags)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigaction (mmux_libc_interprocess_signal_t ipxsig,
+					    mmux_libc_sigaction_arg_t new_action,
+					    mmux_libc_sigaction_t old_action);
 
 
 /** --------------------------------------------------------------------
