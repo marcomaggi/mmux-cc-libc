@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Jun 25, 2025
+  Date: Nov 16, 2025
 
   Abstract
 
@@ -36,7 +36,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
   mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
   mmux_uint_t		nfds_ready;
   auto			maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-  mmux_libc_timeval_t	timeout;
+  mmux_libc_timespec_t	timeout;
   bool			isset;
 
   /* Setting blocking mode for input fd. */
@@ -61,7 +61,7 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     }
   }
 
-  /* Setup the arguments of "mmux_libc_select()". */
+  /* Setup the arguments of "mmux_libc_pselect()". */
   {
     printf_message("paren: setting up fd sets");
 
@@ -74,15 +74,15 @@ paren_play (mmux_libc_fd_t read_fr_child_fd, mmux_libc_fd_t writ_to_child_fd, mm
     mmux_libc_FD_SET(read_fr_child_fd, exce_fd_set);
     mmux_libc_FD_SET(writ_to_child_fd, exce_fd_set);
 
-    mmux_libc_timeval_set(timeout, mmux_time(10), mmux_slong_literal(0));
+    mmux_libc_timespec_set(timeout, mmux_time(10), mmux_slong_literal(0));
   }
 
   paren_give_child_process_time_to_start();
 
-  printf_message("paren: calling select()");
-  if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
-		       read_fd_set, writ_fd_set, exce_fd_set,
-		       timeout)) {
+  printf_message("paren: calling pselect()");
+  if (mmux_libc_pselect(&nfds_ready, maximum_nfds_to_check,
+			read_fd_set, writ_fd_set, exce_fd_set,
+			timeout, NULL)) {
     printf_error("paren: selecting fd events");
     handle_error();
   }
@@ -315,13 +315,13 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
 
   /* Read parent's reply. */
   {
-    mmux_libc_fd_set_t	read_fd_set, writ_fd_set, exce_fd_set;
-    mmux_uint_t		nfds_ready;
-    auto		maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
-    mmux_libc_timeval_t	timeout;
-    bool		isset;
+    mmux_libc_fd_set_t		read_fd_set, writ_fd_set, exce_fd_set;
+    mmux_uint_t			nfds_ready;
+    auto			maximum_nfds_to_check = MMUX_LIBC_FD_SETSIZE;
+    mmux_libc_timespec_t	timeout;
+    bool			isset;
 
-    /* Setup the arguments of "mmux_libc_select()". */
+    /* Setup the arguments of "mmux_libc_pselect()". */
     {
       printf_message("child: setting up fd sets");
 
@@ -332,20 +332,20 @@ child_play (mmux_libc_fd_t read_fr_paren_fd, mmux_libc_fd_t writ_to_paren_fd)
       mmux_libc_FD_SET(in, read_fd_set);
       if (0) {
 	/* We do not register  "ou" to be checked for writing: it  would be ready for
-	   writing immediately,  unblocking "select()".  We want  "select()" to block
+	   writing immediately, unblocking "pselect()".  We want "pselect()" to block
 	   until a read event is ready. */
 	mmux_libc_FD_SET(ou, writ_fd_set);
       }
       mmux_libc_FD_SET(in, exce_fd_set);
       mmux_libc_FD_SET(ou, exce_fd_set);
 
-      mmux_libc_timeval_set(timeout, mmux_time_literal(10), mmux_slong_literal(0));
+      mmux_libc_timespec_set(timeout, mmux_time_literal(10), mmux_slong_literal(0));
     }
 
-    printf_message("child: calling select()");
-    if (mmux_libc_select(&nfds_ready, maximum_nfds_to_check,
-			 read_fd_set, writ_fd_set, exce_fd_set,
-			 timeout)) {
+    printf_message("child: calling pselect()");
+    if (mmux_libc_pselect(&nfds_ready, maximum_nfds_to_check,
+			  read_fd_set, writ_fd_set, exce_fd_set,
+			  timeout, NULL)) {
       printf_error("child: selecting fd events");
       handle_error();
     }
@@ -441,7 +441,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-file-descriptors-select";
+    PROGNAME = "test-file-descriptors-pselect";
   }
 
   {

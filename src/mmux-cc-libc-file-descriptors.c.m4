@@ -1661,6 +1661,25 @@ mmux_libc_select_fd_for_exception (bool * result_p, mmux_libc_fd_arg_t fd, mmux_
     return false;
   }
 }
+bool
+mmux_libc_pselect (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
+		   mmux_libc_fd_set_t read_fd_set,
+		   mmux_libc_fd_set_t write_fd_set,
+		   mmux_libc_fd_set_t except_fd_set,
+		   mmux_libc_timespec_arg_t timeout_p,
+		   mmux_libc_sigset_arg_t signals_blocking_mask)
+{
+  mmux_standard_sint_t	rv = pselect(maximum_nfds_to_check.value,
+				     read_fd_set, write_fd_set, except_fd_set,
+				     timeout_p, signals_blocking_mask);
+
+  if (-1 < rv) {
+    *nfds_ready = mmux_uint(rv);
+    return false;
+  } else {
+    return true;
+  }
+}
 
 
 /** --------------------------------------------------------------------

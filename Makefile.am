@@ -414,6 +414,7 @@ check_PROGRAMS	+= \
 	tests/test-file-descriptors-readv-writev		\
 	tests/test-file-descriptors-select			\
 	tests/test-file-descriptors-select-fd			\
+	tests/test-file-descriptors-pselect			\
 	tests/test-file-descriptors-struct-flock		\
 	tests/test-file-descriptors-struct-iovec		\
 	tests/test-file-descriptors-struct-iovec-array		\
@@ -427,6 +428,9 @@ tests_test_file_descriptors_select_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_select_fd_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_select_fd_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_file_descriptors_pselect_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
+tests_test_file_descriptors_pselect_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_file_descriptors_open_write_read_close_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_file_descriptors_open_write_read_close_LDADD			= $(mmux_cc_libc_tests_ldadd)

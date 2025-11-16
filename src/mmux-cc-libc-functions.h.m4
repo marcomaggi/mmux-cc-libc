@@ -793,6 +793,14 @@ mmux_cc_libc_decl bool mmux_libc_select (mmux_uint_t * nfds_ready,
 					 mmux_libc_timeval_t timeout_p)
   __attribute__((__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_pselect (mmux_uint_t * nfds_ready, mmux_uint_t maximum_nfds_to_check,
+					  mmux_libc_fd_set_t read_fd_set,
+					  mmux_libc_fd_set_t write_fd_set,
+					  mmux_libc_fd_set_t except_fd_set,
+					  mmux_libc_timespec_arg_t timeout_p,
+					  mmux_libc_sigset_arg_t signals_blocking_mask)
+  __attribute__((__warn_unused_result__));
+
 mmux_cc_libc_decl bool mmux_libc_select_fd_for_reading (bool * result_p, mmux_libc_fd_arg_t fd,
 							mmux_libc_timeval_t timeout_p)
   __attribute__((__nonnull__(1)));

@@ -7543,6 +7543,11 @@ if (is_ready) @{
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_pselect (mmux_uint_t * @var{nfds_ready}, mmux_uint_t @var{maximum_nfds_to_check}, mmux_libc_fd_set_t @var{read_fd_set}, mmux_libc_fd_set_t @var{write_fd_set}, mmux_libc_fd_set_t @var{except_fd_set}, mmux_libc_timespec_arg_t @var{timeout_p}, mmux_libc_sigset_arg_t @var{signals_blocking_mask})
+@MmuxCInterface{pselect}.
+@end deftypefun
+
 @c page
 @node fds scatter-gather
 @section Scatter--gather input and output
