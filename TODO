@@ -2,7 +2,7 @@
 
 * Add a builtin interfacing "pselect()"?
 
-* Add interprocess signals API: sigaction, sigqueue, sigwait.
+* Add interprocess signals API: sigqueue, sigwait.
 
 * FIXME Cleanup the messy code in "mmux-libc-file-system-pathnames.c": rationalise the definition of
   helper macros and inline functions.
