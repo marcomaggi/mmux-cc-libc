@@ -755,6 +755,10 @@ MMUX_LIBC_DEFINE_IOCTL_COMMAND_CONSTANT(SIOCATMARK)
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
+#define MMUX_HAVE_LIBC_SIG_ZERO		1
+#define MMUX_LIBC_VALUEOF_SIG_ZERO	0
+#define MMUX_LIBC_SIG_ZERO		(mmux_libc_interprocess_signal(mmux_libc_VALUEOF_SIG_ZERO))
+
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_INTERPROCESS_SIGNAL_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl

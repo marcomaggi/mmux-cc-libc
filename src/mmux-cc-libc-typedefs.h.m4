@@ -104,10 +104,6 @@ typedef struct mmux_libc_process_completion_status_t	{ mmux_sint_t;	} mmux_libc_
 typedef struct mmux_libc_process_completion_waiting_options_t {
   mmux_sint_t;
 } mmux_libc_process_completion_waiting_options_t;
-typedef struct mmux_libc_interprocess_signal_t		{ mmux_sint_t;	} mmux_libc_interprocess_signal_t;
-
-typedef mmux_libc_interprocess_signals_set_t		mmux_libc_sigset_t[1];
-typedef mmux_libc_interprocess_signals_set_t const *	mmux_libc_sigset_arg_t;
 
 
 /** --------------------------------------------------------------------
@@ -327,8 +323,13 @@ typedef struct mmux_libc_dirstream_position_t	{ mmux_slong_t;	} mmux_libc_dirstr
 
 
 /** --------------------------------------------------------------------
- ** Function type definitions.
+ ** Interprocess signals.
  ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_interprocess_signal_t { mmux_sint_t; } mmux_libc_interprocess_signal_t;
+
+typedef mmux_libc_interprocess_signals_set_t		mmux_libc_sigset_t[1];
+typedef mmux_libc_interprocess_signals_set_t const *	mmux_libc_sigset_arg_t;
 
 typedef void mmux_libc_sighandler_t (mmux_standard_sint_t signum);
 

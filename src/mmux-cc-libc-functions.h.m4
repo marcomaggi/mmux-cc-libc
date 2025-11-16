@@ -1309,6 +1309,12 @@ mmux_libc_interprocess_signal (mmux_standard_sint_t signal_num)
 {
   return (mmux_libc_interprocess_signal_t) { { .value = signal_num } };
 }
+mmux_cc_libc_inline_decl bool
+mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t ipxsig1,
+				     mmux_libc_interprocess_signal_t ipxsig2)
+{
+  return (ipxsig1.value == ipxsig2.value)? true : false;
+}
 
 mmux_cc_libc_decl bool mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t fd,
 							   mmux_libc_interprocess_signal_t ipxsig);

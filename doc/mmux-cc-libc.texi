@@ -5268,42 +5268,47 @@ status @code{MMUX_LIBC_EXIT_SUCCESS} or @code{MMUX_LIBC_EXIT_FAILURE}.
 @section Representing interprocess signals
 
 
-@deftp {Struct Typedef} mmux_libc_interprocess_signal_t
-Opaque data structure type representing an interprocess signal number.  It has a single anonymous
-field of type @objtype{mmux_sint_t}, so we can access the numeric value of the signal with:
+Under @value{PACKAGE}: all the standard constants like @samp{SIGTERM}, @samp{SIGUSR1}, and others
+are represented as values of type @objtype{mmux_libc_interprocess_signal_t} with identifiers like
+@samp{MMUX_LIBC_SIGTERM}, @samp{MMUX_LIBC_SIGUSR1}, and others.
+
+To access and print the value of an @objtype{mmux_libc_interprocess_signal_t} object, we do:
 
 @example
 auto  ipxsig = MMUX_LIBC_SIGUSR1;
 
-mmux_libc_dprintf("%s\n", ipxsig.value);
-@end example
+mmux_libc_dprintfer("%s\n", ipxsig.value);
+@print{} 10
 
-@noindent
-or code like:
+@{
+  mmux_libc_oufd_t  ou;
 
-@example
-mmux_libc_interprocess_signal_t  ipxsig;
-
-mmux_libc_WTERMSIG(&ipxsig, process_completion_status);
-if (ipxsig.value == MMUX_LIBC_SIGUSR1.value) @{
-  ...
+  mmux_libc_stdou(ou);
+  mmux_libc_dprintf_interprocess_signal(fd, ipxsig);
 @}
-@end example
+@print{} SIGUSR1
 
-@noindent
-or code like:
+@{
+  mmux_libc_process_completion_status_t  process_completion_status;
+  mmux_libc_interprocess_signal_t        ipxsig;
 
-@example
-mmux_libc_interprocess_signal_t  ipxsig, expected_ipxsig = MMUX_LIBC_SIGUSR1;
-bool                             the_signal_is_the_expected_one;
-
-mmux_libc_WTERMSIG(&ipxsig, process_completion_status);
-mmux_sint_equal_p(&the_signal_is_the_expected_one, &ipxsig, &expected_ipxsig);
-if (the_signal_is_the_expected_one) @{
   ...
-@}
+  mmux_libc_WTERMSIG(&ipxsig, process_completion_status);
+  if (mmux_libc_interprocess_signal_equal(ipxsig, MMUX_LIBC_SIGUSR1)) @{
+    ...
+  @}
 @end example
+
+
+@deftp {Struct Type} mmux_libc_interprocess_signal_t
+@deftpx {Parent Struct Type} mmux_sint_t
+Opaque data structure type representing an interprocess signal number.
 @end deftp
+
+
+@deftypefun bool mmux_libc_interprocess_signal_equal (mmux_libc_interprocess_signal_t @vari{ipxsig}, mmux_libc_interprocess_signal_t @varii{ipxsig})
+Return @ctrue{} if @vari{ipxsig} and @varii{ipxsig} are equal; otherwise return @cfalse{}.
+@end deftypefun
 
 
 @deftypefun bool mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t @var{fd}, mmux_libc_interprocess_signal_t @var{ipxsig})
@@ -5341,15 +5346,34 @@ if (mmux_libc_interprocess_signal_parse(&ipxsig, input_string, __func__)) @{
 
 @c ------------------------------------------------------------------------
 
+@deftypevr {Struct Constant} mmux_libc_interprocess_signal_t MMUX_LIBC_SIG_ZERO
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_SIG_ZERO
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_SIG_ZERO
+The symbol @samp{MMUX_LIBC_SIG_ZERO} evaluates to an instance of
+@objtype{mmux_libc_interprocess_signal_t} representing the signal number zero; this is not a real
+signal number: it is used in calls to @cfunc{mmux_libc_kill} to test for the existence of a process
+and for permissions to signal it.
+
+The symbol @samp{MMUX_LIBC_VALUEOF_SIG_ZERO} expands into the signal's raw numeric value, which is
+zero.
+
+The symbol @samp{MMUX_HAVE_LIBC_SIG_ZERO} is defined, and defined to @samp{1}, if the symbol
+@samp{MMUX_LIBC_SIG_ZERO} is available.
+@end deftypevr
+
+
 @macro MmuxDefineInterprocessSignalConstant{NAME}
-@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@deftypevr {Struct Constant} mmux_libc_interprocess_signal_t @value{PackageApiPrefixUpper}\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_interprocess_signal_t} representing the signal number @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} expands into the signal's raw numeric value.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined, and defined to @samp{1}, if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
-@end defvr
+@end deftypevr
 
 @end macro
 
@@ -5414,8 +5438,8 @@ if (mmux_libc_raise(MMUX_LIBC_SIGUSR1)) @{
 To deliver the signal @samp{SIGUSR1} to a child process we do:
 
 @example
-bool                    this_is_the_parent_process;
-mmux_libc_pid_t         child_pid;
+bool             this_is_the_parent_process;
+mmux_libc_pid_t  child_pid;
 
 if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
   /* error */
@@ -5427,6 +5451,10 @@ if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) @{
   ... /* do something in the child process */
 @}
 @end example
+
+It is possible to use @code{MMUX_LIBC_SIG_ZERO} as value for @var{ipxsignal} to check for the
+existence of a process with process identifier @var{PID} and for the permissions to signal it by the
+current process.
 @end deftypefun
 
 
@@ -5525,7 +5553,7 @@ When successful: store @ctrue{} in the variable referenced by @var{result_p} if 
 @cfunc{mmux_libc_interprocess_signal_bub_acquire}.
 
 Calling this function with @var{ipxsignal} clears the internal flag for this signal, so calling it
-again without acquiring new signals always stores @false{} in the variable referenced by
+again without acquiring new signals always stores @cfalse{} in the variable referenced by
 @var{result_p}.
 @end deftypefun
 

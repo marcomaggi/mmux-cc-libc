@@ -52,7 +52,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
       if (mmux_libc_interprocess_signal_parse(&ipxsig, input_string, __func__)) {
 	handle_error();
-      } else if (MMUX_LIBC_VALUEOF_SIGUSR1 == ipxsig.value) {
+      } else if (mmux_libc_interprocess_signal_equal(MMUX_LIBC_SIGUSR1, ipxsig)) {
 	printf_message("successfully parsed: %s", input_string);
       } else {
 	printf_error("error parsing: %s", input_string);
