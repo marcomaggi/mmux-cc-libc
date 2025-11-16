@@ -46,7 +46,7 @@ play_paren (mmux_libc_pid_t child_pid)
 
   /* Install a signal handler for SIGUSR1. */
   {
-    mmux_libc_sighandler_t *	the_old_handler;
+    mmux_libc_sighandler_fun_t *	the_old_handler;
 
     printf_message("paren: installing a SIGUSR1 handler");
     if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, paren_sigusr1_handler)) {

@@ -1367,18 +1367,18 @@ mmux_cc_libc_decl bool mmux_libc_interprocess_signals_bub_delivered (bool * resu
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_t ** result_p)
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_fun_t ** result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_t ** result_p)
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_fun_t ** result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** result_p)
+mmux_cc_libc_decl bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_fun_t ** result_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
+mmux_cc_libc_decl bool mmux_libc_signal (mmux_libc_sighandler_fun_t ** result_p,
 					 mmux_libc_interprocess_signal_t ipxsignal,
-					 mmux_libc_sighandler_t * action)
+					 mmux_libc_sighandler_fun_t * action)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_pause (void);
@@ -1437,10 +1437,19 @@ mmux_cc_libc_decl bool mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_bl
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_t * * result_p, mmux_libc_sigaction_arg_t action)
+mmux_cc_libc_decl bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_fun_t * * result_p,
+						 mmux_libc_sigaction_arg_t action)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_t * handler)
+mmux_cc_libc_decl bool mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_fun_t * handler)
+  __attribute__((__nonnull__(1,2)));
+
+
+mmux_cc_libc_decl bool mmux_libc_sa_sigaction_ref (mmux_libc_sigaction_fun_t * * result_p,
+						   mmux_libc_sigaction_arg_t action)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sa_sigaction_set (mmux_libc_sigaction_t action, mmux_libc_sigaction_fun_t * handler)
   __attribute__((__nonnull__(1,2)));
 
 

@@ -316,29 +316,29 @@ mmux_libc_interprocess_signals_bub_delivered (bool * result_p, mmux_libc_interpr
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_t ** result_p)
+mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_fun_t ** result_p)
 {
   *result_p = SIG_DFL;
   return false;
 }
 bool
-mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_t ** result_p)
+mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_fun_t ** result_p)
 {
   *result_p = SIG_IGN;
   return false;
 }
 bool
-mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** result_p)
+mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_fun_t ** result_p)
 {
   *result_p = SIG_ERR;
   return false;
 }
 bool
-mmux_libc_signal (mmux_libc_sighandler_t ** result_p,
+mmux_libc_signal (mmux_libc_sighandler_fun_t ** result_p,
 		  mmux_libc_interprocess_signal_t ipxsignal,
-		  mmux_libc_sighandler_t * action)
+		  mmux_libc_sighandler_fun_t * action)
 {
-  mmux_libc_sighandler_t *	rv = signal(ipxsignal.value, action);
+  mmux_libc_sighandler_fun_t *	rv = signal(ipxsignal.value, action);
 
   if (SIG_ERR == rv) {
     return true;
@@ -497,15 +497,30 @@ mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sa_handler_ref (mmux_libc_sighandler_t * * result_p, mmux_libc_sigaction_arg_t action)
+mmux_libc_sa_handler_ref (mmux_libc_sighandler_fun_t * * result_p, mmux_libc_sigaction_arg_t action)
 {
   *result_p = action->sa_handler;
   return false;
 }
 bool
-mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_t * handler)
+mmux_libc_sa_handler_set (mmux_libc_sigaction_t action, mmux_libc_sighandler_fun_t * handler)
 {
   action->sa_handler = handler;
+  return false;
+}
+
+typedef void true_mmux_libc_sigaction_fun_t  (int signum, siginfo_t * info, mmux_pointer_t context);
+
+bool
+mmux_libc_sa_sigaction_ref (mmux_libc_sigaction_fun_t * * result_p, mmux_libc_sigaction_arg_t action)
+{
+  *result_p = (mmux_libc_sigaction_fun_t *)action->sa_sigaction;
+  return false;
+}
+bool
+mmux_libc_sa_sigaction_set (mmux_libc_sigaction_t action, mmux_libc_sigaction_fun_t * handler)
+{
+  action->sa_sigaction = (true_mmux_libc_sigaction_fun_t *)handler;
   return false;
 }
 

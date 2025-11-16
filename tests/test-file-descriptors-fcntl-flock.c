@@ -287,8 +287,8 @@ play_child (void)
 
   /* Register the handler for SIGUSR1. */
   {
-    auto			ipxsignal = MMUX_LIBC_SIGUSR1;
-    mmux_libc_sighandler_t *	the_old_handler;
+    auto				ipxsignal = MMUX_LIBC_SIGUSR1;
+    mmux_libc_sighandler_fun_t *	the_old_handler;
 
     printf_message("child process: registering the handler for SIGUSR1");
     if (mmux_libc_signal(&the_old_handler, ipxsignal, child_process_signal_handler)) {

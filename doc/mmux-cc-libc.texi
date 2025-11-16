@@ -5562,14 +5562,14 @@ again without acquiring new signals always stores @cfalse{} in the variable refe
 @section Other interprocess signals delivering methods
 
 
-@deftypefn {Function Type} void mmux_libc_sighandler_t (mmux_standard_sint_t @var{signum})
+@deftypefn {Function Type} void mmux_libc_sighandler_fun_t (mmux_standard_sint_t @var{signum})
 Type of functions to be used as interprocess signal handlers.
 @end deftypefn
 
 
-@deftypefun bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_t ** @var{result_p})
-@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_t ** @var{result_p})
-@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_t ** @var{result_p})
+@deftypefun bool mmux_libc_retrieve_signal_handler_SIG_DFL (mmux_libc_sighandler_fun_t ** @var{result_p})
+@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_IGN (mmux_libc_sighandler_fun_t ** @var{result_p})
+@deftypefunx bool mmux_libc_retrieve_signal_handler_SIG_ERR (mmux_libc_sighandler_fun_t ** @var{result_p})
 Store in the variable referenced by @var{result_p} the corresponding signal handling action.
 
 The value @samp{SIG_ERR} is a special value used by @cfunc{signal} to return error, but it is
@@ -5577,7 +5577,7 @@ provided in this @api{} for completeness.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_signal (mmux_libc_sighandler_t ** @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal}, mmux_libc_sighandler_t * @var{action})
+@deftypefun bool mmux_libc_signal (mmux_libc_sighandler_fun_t ** @var{result_p}, mmux_libc_interprocess_signal_t @var{ipxsignal}, mmux_libc_sighandler_fun_t * @var{action})
 @MmuxCInterface{signal}.  When successful: store in the variable referenced by @var{result_p} the
 action that was previously set for @var{ipxsignal}.
 
@@ -5585,8 +5585,8 @@ To set the default action for @samp{SIGUSR1} we do:
 
 @example
 @{
-  mmux_libc_sighandler_t *  the_old_handler;
-  mmux_libc_sighandler_t *  the_new_handler;
+  mmux_libc_sighandler_fun_t *  the_old_handler;
+  mmux_libc_sighandler_fun_t *  the_new_handler;
 
   mmux_libc_retrieve_signal_handler_SIG_DFL(&the_new_handler);
   if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, the_new_handler)) @{
@@ -5605,7 +5605,7 @@ my_handler (mmux_standard_sint_t signum)
 @}
 
 @{
-  mmux_libc_sighandler_t *  the_old_handler;
+  mmux_libc_sighandler_fun_t *  the_old_handler;
 
   if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, my_handler)) @{
     /* error */
@@ -5914,7 +5914,7 @@ set to @code{MMUX_LIBC_EINTR}.
 
 /* Install a signal handler for SIGUSR1. */
 @{
-  mmux_libc_sighandler_t *  the_old_handler;
+  mmux_libc_sighandler_fun_t *  the_old_handler;
 
   if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, this_process_handler)) @{
     /* error */
@@ -6015,9 +6015,21 @@ it is meant to be used as type of already initialised arguments to functions, so
 @end deftp
 
 
-@deftypefun bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_t * * @var{result_p}, mmux_libc_sigaction_arg_t @var{sigaction})
-@deftypefunx bool mmux_libc_sa_handler_set (mmux_libc_sigaction_t @var{sigaction}, mmux_libc_sighandler_t * @var{handler})
+@deftypefun bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_fun_t * * @var{result_p}, mmux_libc_sigaction_arg_t @var{sigaction})
+@deftypefunx bool mmux_libc_sa_handler_set (mmux_libc_sigaction_t @var{sigaction}, mmux_libc_sighandler_fun_t * @var{handler})
 Accessor and mutator for the field @code{sa_handler} of
+@objtype{mmux_libc_interprocess_signal_action_t}.
+@end deftypefun
+
+
+@deftypefn {Function Type} void mmux_libc_sigaction_fun_t (mmux_standard_sint_t @var{signum}, mmux_libc_siginfo_t @var{info}, mmux_pointer_t @var{context})
+Type of functions to be used as interprocess signal action handlers.
+@end deftypefn
+
+
+@deftypefun bool mmux_libc_sa_sigaction_ref (mmux_libc_sigaction_fun_t * * @var{result_p}, mmux_libc_sigaction_arg_t @var{sigaction})
+@deftypefunx bool mmux_libc_sa_sigaction_set (mmux_libc_sigaction_t @var{sigaction}, mmux_libc_sigaction_fun_t * @var{handler})
+Accessor and mutator for the field @code{sa_sigaction} of
 @objtype{mmux_libc_interprocess_signal_action_t}.
 @end deftypefun
 
@@ -6051,6 +6063,34 @@ Accessor and mutator for the field @code{sa_flags} of
 @deftypefun bool mmux_libc_sigaction (mmux_libc_interprocess_signal_t @var{ipxsig}, mmux_libc_sigaction_arg_t @var{new_sigaction}, mmux_libc_sigaction_t @var{previous_sigaction})
 @MmuxCInterface{sigaction}.  Both @var{new_sigaction} and @var{previous_sigaction} can be @cnull{}.
 @end deftypefun
+
+@c ------------------------------------------------------------------------
+
+We cal use the following constants as flags for the field @code{sa_flags} of
+@objtype{mmux_libc_interprocess_signal_action_t}.
+
+@macro MmuxDefineSigactionFlagConstant{NAME}
+@defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant
+@code{\NAME\}; it can be defined or not depending on the features of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineSigactionFlagConstant{SA_NOCLDSTOP}
+@MmuxDefineSigactionFlagConstant{SA_NOCLDWAIT}
+@MmuxDefineSigactionFlagConstant{SA_NODEFER}
+@MmuxDefineSigactionFlagConstant{SA_ONSTACK}
+@MmuxDefineSigactionFlagConstant{SA_RESETHAND}
+@MmuxDefineSigactionFlagConstant{SA_RESTART}
+@MmuxDefineSigactionFlagConstant{SA_RESTORER}
+@MmuxDefineSigactionFlagConstant{SA_SIGINFO}
+@MmuxDefineSigactionFlagConstant{SA_UNSUPPORTED}
+@MmuxDefineSigactionFlagConstant{SA_EXPOSE_TAGBITS}
 
 @c page
 @node fds

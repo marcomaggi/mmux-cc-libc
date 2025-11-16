@@ -114,7 +114,7 @@ test_delivery_and_handling (void)
 
     /* Register the handler for SIGUSR1. */
     {
-      mmux_libc_sighandler_t *	the_old_handler;
+      mmux_libc_sighandler_fun_t *	the_old_handler;
 
       printf_message("child process: registering SIGUSR1 handler");
       if (mmux_libc_signal(&the_old_handler, MMUX_LIBC_SIGUSR1, my_sigusr1_handler)) {
