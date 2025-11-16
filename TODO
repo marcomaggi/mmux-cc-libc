@@ -1,5 +1,7 @@
 -*- coding: utf-8-unix -*-
 
+* Add a builtin interfacing "pselect()"?
+
 * Add interprocess signals API: sigaction, sigqueue, sigwait.
 
 * FIXME Cleanup the messy code in "mmux-libc-file-system-pathnames.c": rationalise the definition of
@@ -14,17 +16,11 @@
 
 * Add a builtin interfacing "strfmon()"?
 
-* Add a builtin interfacing "copy_file_range()"?
-
 * Add a builtin interfacing "statx(2)"? (Documented in a manual page.)
 
 * Add a builtin interfacing "statfs(2)" and "fstatfs(2)"? (Documented in a manual page.)
 
 * Add a builtin interfacing "sendfile(2)"? (Documented in a manual page.)
-
-* Add a builtin interfacing Linux's "openat2()"?
-
-* Add a builtin interfacing "pselect()"?
 
 * Add a builtin interfacing "poll()"?
 
