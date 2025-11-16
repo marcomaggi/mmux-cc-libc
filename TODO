@@ -4,7 +4,7 @@
 
 * Add a builtin interfacing "pselect()"?
 
-* Add interprocess signals API: sigqueue, sigwait.
+* Add interprocess signals API: sigqueue, sigwait, sigwaitinfo, sigtimedwait.
 
 * Add interprocess signals API for everything related to the use of "siginfo_t" see sigaction(2).
 
