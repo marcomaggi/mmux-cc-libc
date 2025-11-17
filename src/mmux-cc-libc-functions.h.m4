@@ -1481,6 +1481,18 @@ mmux_cc_libc_decl bool mmux_libc_sigaction (mmux_libc_interprocess_signal_t ipxs
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_inline_decl mmux_libc_si_code_t
+mmux_libc_si_code (mmux_standard_sint_t code_num)
+{
+  return (mmux_libc_si_code_t) { { .value = code_num } };
+}
+
+mmux_cc_libc_inline_decl bool
+mmux_libc_si_code_equal (mmux_libc_si_code_t code1, mmux_libc_si_code_t code2)
+{
+  return (code1.value == code2.value)? true : false;
+}
+
 mmux_cc_libc_decl bool mmux_libc_si_signo_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
   __attribute__((__nonnull__(1,2)));
 
@@ -1493,10 +1505,10 @@ mmux_cc_libc_decl bool mmux_libc_si_errno_ref (mmux_sint_t * field_value_result_
 mmux_cc_libc_decl bool mmux_libc_si_errno_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_si_code_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+mmux_cc_libc_decl bool mmux_libc_si_code_ref (mmux_libc_si_code_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_si_code_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+mmux_cc_libc_decl bool mmux_libc_si_code_set (mmux_libc_siginfo_t self, mmux_libc_si_code_t new_field_value)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_si_pid_ref (mmux_libc_pid_t * field_value_result_p, mmux_libc_siginfo_arg_t self)

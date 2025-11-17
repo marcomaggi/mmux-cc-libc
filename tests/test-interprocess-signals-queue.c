@@ -32,28 +32,45 @@ this_process_handler (mmux_standard_sint_t signum, mmux_libc_siginfo_arg_t sigin
 		      mmux_pointer_t reserved_context MMUX_CC_LIBC_UNUSED)
 {
   printf_message("%s: inside SIGUSR1 handler", __func__);
+
+  got_signal = true;
+
+  /* Check that we got the expected signal SIGUSR1. */
   {
     auto	ipxsig = mmux_libc_interprocess_signal(signum);
 
-    got_signal = true;
     if (mmux_libc_interprocess_signal_equal(ipxsig, MMUX_LIBC_SIGUSR1)) {
       printf_message("%s: correctly got SIGUSR1", __func__);
     } else {
       printf_error("%s: wrongly got a signal different from SIGUSR1", __func__);
       handle_error();
     }
+  }
 
-    {
-      auto	expected_associated_value = mmux_sint_literal(123);
+  /* Check the correct value in siginfo_t. */
+  {
+    mmux_libc_si_code_t		si_code;
 
-      mmux_libc_si_value_sival_int_ref(&associated_value, siginfo);
-      if (mmux_ctype_equal(associated_value, expected_associated_value)) {
-	printf_message("%s: correctly got associated value: %d", __func__, associated_value.value);
-      } else {
-	printf_error("%s: wrong associated value, expected '%d', got '%d'",
-		     __func__, expected_associated_value.value, associated_value.value);
-	handle_error();
-      }
+    mmux_libc_si_code_ref(&si_code, siginfo);
+    if (mmux_libc_si_code_equal(si_code, MMUX_LIBC_SI_QUEUE)) {
+      printf_message("%s: correct si_code value SI_QUEUE", __func__);
+    } else {
+      printf_error("%s: wrong si_code value, expected SI_QUEUE, got %d", __func__, si_code.value);
+      handle_error();
+    }
+  }
+
+  /* Check the associated value. */
+  {
+    auto	expected_associated_value = mmux_sint_literal(123);
+
+    mmux_libc_si_value_sival_int_ref(&associated_value, siginfo);
+    if (mmux_ctype_equal(associated_value, expected_associated_value)) {
+      printf_message("%s: correctly got associated value: %d", __func__, associated_value.value);
+    } else {
+      printf_error("%s: wrong associated value, expected '%d', got '%d'",
+		   __func__, expected_associated_value.value, associated_value.value);
+      handle_error();
     }
   }
 }

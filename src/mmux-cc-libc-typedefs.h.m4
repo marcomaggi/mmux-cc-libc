@@ -346,6 +346,8 @@ typedef void mmux_libc_sigaction_fun_t  (mmux_standard_sint_t signum,
 					 mmux_libc_siginfo_arg_t info,
 					 mmux_pointer_t reserved_context);
 
+typedef struct mmux_libc_si_code_t { mmux_sint_t; } mmux_libc_si_code_t;
+
 
 /** --------------------------------------------------------------------
  ** System configuration.

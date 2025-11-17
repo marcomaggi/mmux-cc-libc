@@ -598,7 +598,7 @@ m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_UINT]]],[[[DEFINE_SIGINFO_SETTER_GETTE
 
 DEFINE_SIGINFO_SETTER_GETTER_SINT(si_signo)
 DEFINE_SIGINFO_SETTER_GETTER_SINT(si_errno)
-DEFINE_SIGINFO_SETTER_GETTER_SINT(si_code)
+DEFINE_SIGINFO_SETTER_GETTER(si_code,			mmux_libc_si_code_t,	mmux_libc_si_code)
 m4_dnl DEFINE_SIGINFO_SETTER_GETTER_SINT(si_trapno)
 DEFINE_SIGINFO_SETTER_GETTER(si_pid,			mmux_libc_pid_t,	mmux_libc_pid)
 DEFINE_SIGINFO_SETTER_GETTER(si_uid,			mmux_libc_uid_t,	mmux_libc_uid)
