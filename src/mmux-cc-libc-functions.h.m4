@@ -1444,6 +1444,10 @@ mmux_cc_libc_decl bool mmux_libc_sigpending (mmux_libc_sigset_arg_t ipxsigset)
 mmux_cc_libc_decl bool mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_sigwait (mmux_libc_interprocess_signal_t * ipxsig_result_p,
+					  mmux_libc_sigset_arg_t set_of_signals_to_wait_for)
+  __attribute__((__nonnull__(1,2)));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_fun_t * * result_p,

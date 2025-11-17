@@ -490,6 +490,20 @@ mmux_libc_sigsuspend (mmux_libc_sigset_arg_t temporary_blocking_mask)
 
   return (0 == rv)? false : true;
 }
+bool
+mmux_libc_sigwait (mmux_libc_interprocess_signal_t * ipxsig_result_p,
+		   mmux_libc_sigset_arg_t set_of_signals_to_wait_for)
+{
+  int	signum;
+  int	rv = sigwait(set_of_signals_to_wait_for, &signum);
+
+  if (0 == rv) {
+    *ipxsig_result_p = mmux_libc_interprocess_signal(signum);
+    return false;
+  } else {
+    return true;
+  }
+}
 
 
 /** --------------------------------------------------------------------

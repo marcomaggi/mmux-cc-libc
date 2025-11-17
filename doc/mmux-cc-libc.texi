@@ -5945,6 +5945,40 @@ set to @code{MMUX_LIBC_EINTR}.
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_sigwait (mmux_libc_interprocess_signal_t * @var{ipxsig_result_p}, mmux_libc_sigset_arg_t @var{set_of_signals_to_wait_for})
+@MmuxCInterface{sigwait}.
+
+@example
+/* Let's say this process blocks all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  mmux_libc_sigfillset(new_blocking_mask);
+  if (mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL)) @{
+    /* error */
+  @}
+@}
+
+/* Wait for SIGUSR1 and SIGUSR2. */
+@{
+  mmux_libc_ipxsig_t  delivered_signal;
+  mmux_libc_sigset_t  signals_to_wait_for;
+
+  mmux_libc_sigemptyset(signals_to_wait_for);
+  mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR1);
+  mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR2);
+
+  if (mmux_libc_sigwait(&delivered_signal, signals_to_wait_for)) @{
+    /* error */
+  @}
+
+  if (mmux_libc_interprocess_signal_equal(delivered_signal, MMUX_LIBC_SIGUSR1)) @{
+    /* Successufully received SIGUSR1. */
+  @}
+@}
+@end example
+@end deftypefun
 @c page
 @node signals sets action
 @subsection Advanced interprocess signals handling
