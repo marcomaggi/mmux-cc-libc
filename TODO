@@ -2,9 +2,9 @@
 
 * Review and tests of networking sockets.
 
-* Add a builtin interfacing "pselect()"?
+* Interface shared memory: shm_open, shm_unlink.
 
-* Add interprocess signals API: sigqueue, sigwait, sigwaitinfo, sigtimedwait.
+* Add interprocess signals API: sigwait, sigwaitinfo, sigtimedwait.
 
 * Add interprocess signals API for everything related to the use of "siginfo_t" see sigaction(2).
 
