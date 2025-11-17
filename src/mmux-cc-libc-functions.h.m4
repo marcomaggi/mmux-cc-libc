@@ -1478,6 +1478,152 @@ mmux_cc_libc_decl bool mmux_libc_sigaction (mmux_libc_interprocess_signal_t ipxs
 					    mmux_libc_sigaction_arg_t new_action,
 					    mmux_libc_sigaction_t old_action);
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_si_signo_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_signo_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_errno_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_errno_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_code_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_code_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_pid_ref (mmux_libc_pid_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_pid_set (mmux_libc_siginfo_t self, mmux_libc_pid_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_uid_ref (mmux_libc_uid_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_uid_set (mmux_libc_siginfo_t self, mmux_libc_uid_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_status_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_status_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_utime_ref (mmux_clock_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_utime_set (mmux_libc_siginfo_t self, mmux_clock_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_stime_ref (mmux_clock_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_stime_set (mmux_libc_siginfo_t self, mmux_clock_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_int_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_int_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_ptr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_ptr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_overrun_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_overrun_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_timerid_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_timerid_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_addr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_addr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_band_ref (mmux_slong_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_band_set (mmux_libc_siginfo_t self, mmux_slong_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_fd_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_fd_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_addr_lsb_ref (mmux_sshort_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_addr_lsb_set (mmux_libc_siginfo_t self, mmux_sshort_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_lower_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_lower_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_upper_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_upper_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_pkey_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_pkey_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_call_addr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_call_addr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_syscall_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_syscall_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_arch_ref (mmux_uint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_arch_set (mmux_libc_siginfo_t self, mmux_uint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_value_sival_int_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_value_sival_int_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_si_value_sival_ptr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
 
 /** --------------------------------------------------------------------
  ** Persona.

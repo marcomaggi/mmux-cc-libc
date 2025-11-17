@@ -340,7 +340,8 @@ typedef mmux_libc_interprocess_signal_action_t const *	mmux_libc_sigaction_arg_t
 
 typedef void mmux_libc_sighandler_fun_t (mmux_standard_sint_t signum);
 typedef void mmux_libc_sigaction_fun_t  (mmux_standard_sint_t signum,
-					 mmux_libc_siginfo_t info, mmux_pointer_t context);
+					 mmux_libc_siginfo_t info,
+					 mmux_pointer_t reserved_context);
 
 
 /** --------------------------------------------------------------------

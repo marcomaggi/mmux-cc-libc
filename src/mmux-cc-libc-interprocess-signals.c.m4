@@ -562,5 +562,87 @@ mmux_libc_sigaction (mmux_libc_interprocess_signal_t ipxsig,
   return (0 == rv)? false : true;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Data structure siginfo_t.
+ ** ----------------------------------------------------------------- */
+
+m4_define([[[DEFINE_SIGINFO_SETTER_GETTER]]],[[[bool
+mmux_libc_$1_ref ($2 * field_value_result_p, mmux_libc_siginfo_arg_t self)
+{
+  *field_value_result_p = $3(self->$1);
+  return false;
+}
+bool
+mmux_libc_$1_set (mmux_libc_siginfo_t self, $2 new_field_value)
+{
+  self->$1 = mmux_ctype_value(new_field_value);
+  return false;
+}]]])
+
+m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_PTR]]],[[[bool
+mmux_libc_$1_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+{
+  *field_value_result_p = mmux_pointer(self->$1);
+  return false;
+}
+bool
+mmux_libc_$1_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+{
+  self->$1 = new_field_value;
+  return false;
+}]]])
+
+m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_SINT]]],[[[DEFINE_SIGINFO_SETTER_GETTER($1,mmux_sint_t,mmux_sint)]]])
+m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_UINT]]],[[[DEFINE_SIGINFO_SETTER_GETTER($1,mmux_uint_t,mmux_uint)]]])
+
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_signo)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_errno)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_code)
+m4_dnl DEFINE_SIGINFO_SETTER_GETTER_SINT(si_trapno)
+DEFINE_SIGINFO_SETTER_GETTER(si_pid,			mmux_libc_pid_t,	mmux_libc_pid)
+DEFINE_SIGINFO_SETTER_GETTER(si_uid,			mmux_libc_uid_t,	mmux_libc_uid)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_status)
+DEFINE_SIGINFO_SETTER_GETTER(si_utime,			mmux_clock_t,		mmux_clock)
+DEFINE_SIGINFO_SETTER_GETTER(si_stime,			mmux_clock_t,		mmux_clock)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_int)
+DEFINE_SIGINFO_SETTER_GETTER_PTR(si_ptr)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_overrun)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_timerid)
+DEFINE_SIGINFO_SETTER_GETTER_PTR(si_addr)
+DEFINE_SIGINFO_SETTER_GETTER(si_band,			mmux_slong_t,		mmux_slong)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_fd)
+DEFINE_SIGINFO_SETTER_GETTER(si_addr_lsb,		mmux_sshort_t,		mmux_sshort)
+DEFINE_SIGINFO_SETTER_GETTER_PTR(si_lower)
+DEFINE_SIGINFO_SETTER_GETTER_PTR(si_upper)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_pkey)
+DEFINE_SIGINFO_SETTER_GETTER_PTR(si_call_addr)
+DEFINE_SIGINFO_SETTER_GETTER_SINT(si_syscall)
+DEFINE_SIGINFO_SETTER_GETTER_UINT(si_arch)
+
+bool
+mmux_libc_si_value_sival_int_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+{
+  *field_value_result_p = mmux_sint(self->si_value.sival_int);
+  return false;
+}
+bool
+mmux_libc_si_value_sival_int_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+{
+  self->si_value.sival_int = mmux_ctype_value(new_field_value);
+  return false;
+}
+bool
+mmux_libc_si_value_sival_ptr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+{
+  *field_value_result_p = mmux_pointer(self->si_value.sival_ptr);
+  return false;
+}
+bool
+mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
+{
+  self->si_value.sival_ptr = new_field_value;
+  return false;
+}
 
 /* end of file */

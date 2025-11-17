@@ -5647,6 +5647,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 * signals sets pending::        Checking if there are pending interprocess signals.
 * signals sets suspending::     Waiting for selected interprocess signals.
 * signals sets action::         Advanced interprocess signals handling.
+* signals sets info::           Interprocess signals extended informations.
 @end menu
 
 @c page
@@ -6022,7 +6023,7 @@ Accessor and mutator for the field @code{sa_handler} of
 @end deftypefun
 
 
-@deftypefn {Function Type} void mmux_libc_sigaction_fun_t (mmux_standard_sint_t @var{signum}, mmux_libc_siginfo_t @var{info}, mmux_pointer_t @var{context})
+@deftypefn {Function Type} void mmux_libc_sigaction_fun_t (mmux_standard_sint_t @var{signum}, mmux_libc_siginfo_t @var{info}, mmux_pointer_t @var{reserved_context})
 Type of functions to be used as interprocess signal action handlers.
 @end deftypefn
 
@@ -6091,6 +6092,192 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineSigactionFlagConstant{SA_SIGINFO}
 @MmuxDefineSigactionFlagConstant{SA_UNSUPPORTED}
 @MmuxDefineSigactionFlagConstant{SA_EXPOSE_TAGBITS}
+
+@c page
+@node signals sets info
+@subsection Interprocess signals extended informations
+
+
+According to the standard: advanced interprocess--signals informations is exchanged using the type
+@code{siginfo_t}, @MmuxCFuncpage{sigaction}.  Under @value{PACKAGE}: this type is aliased by
+@objtype{mmux_libc_interprocess_signal_info_t}; it is usually better to use the type
+@objtype{mmux_libc_siginfo_t}.
+
+
+@deftp {Struct Type} mmux_libc_interprocess_signal_info_t
+A data structure type aliasing @code{siginfo_t}.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_siginfo_t
+Type of pointer to data structure defined as:
+
+@example
+typedef mmux_libc_interprocess_signal_info_t  mmux_libc_siginfo_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and as type of result arguments to functions, so
+the referenced @objtype{mmux_libc_interprocess_signal_info_t} must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_siginfo_arg_t
+Type of pointer to data structure defined as:
+
+@example
+typedef mmux_libc_interprocess_signal_info_t const *  mmux_libc_siginfo_arg_t;
+@end example
+
+@noindent
+it is meant to be used as type of already initialised arguments to functions, so the referenced
+@objtype{mmux_libc_interprocess_signal_info_t} must be immutable.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_si_signo_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_signo_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_signo} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_errno_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_errno_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_errno} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_code_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_code_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_code} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_pid_ref (mmux_libc_pid_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_pid_set (mmux_libc_siginfo_t @var{siginfo}, mmux_libc_pid_t @var{new_field_value})
+Accessor and mutator for the field @code{si_pid} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_uid_ref (mmux_libc_uid_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_uid_set (mmux_libc_siginfo_t @var{siginfo}, mmux_libc_uid_t @var{new_field_value})
+Accessor and mutator for the field @code{si_uid} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_status_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_status_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_status} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_utime_ref (mmux_clock_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_utime_set (mmux_libc_siginfo_t @var{siginfo}, mmux_clock_t @var{new_field_value})
+Accessor and mutator for the field @code{si_utime} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_stime_ref (mmux_clock_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_stime_set (mmux_libc_siginfo_t @var{siginfo}, mmux_clock_t @var{new_field_value})
+Accessor and mutator for the field @code{si_stime} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_int_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_int_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_int} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_ptr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_ptr_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_ptr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_overrun_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_overrun_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_overrun} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_timerid_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_timerid_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_timerid} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_addr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_addr_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_addr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_band_ref (mmux_slong_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_band_set (mmux_libc_siginfo_t @var{siginfo}, mmux_slong_t @var{new_field_value})
+Accessor and mutator for the field @code{si_band} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_fd_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_fd_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_fd} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_addr_lsb_ref (mmux_sshort_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_addr_lsb_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sshort_t @var{new_field_value})
+Accessor and mutator for the field @code{si_addr_lsb} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_lower_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_lower_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_lower} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_upper_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_upper_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_upper} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_pkey_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_pkey_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_pkey} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_call_addr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_call_addr_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_call_addr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_syscall_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_syscall_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_syscall} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_arch_ref (mmux_uint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_arch_set (mmux_libc_siginfo_t @var{siginfo}, mmux_uint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_arch} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_value_sival_int_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_value_sival_int_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_value.sival_int} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_si_value_sival_ptr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_value.sival_ptr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
 
 @c page
 @node fds
