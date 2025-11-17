@@ -1899,6 +1899,34 @@ test_mmux_libc_dprintf_time (void)
 
 
 static void
+test_mmux_libc_dprintf_clock (void)
+{
+  printf_message("%s: running test", __func__);
+  {
+    mmux_asciicp_t	expected_str_asciiz = "-123";
+    mmux_libc_memfd_t	mfd;
+
+    if (mmux_libc_make_memfd(mfd)) {
+      handle_error();
+    }
+    {
+      auto	value = mmux_clock_literal(-123);
+
+      if (mmux_libc_dprintf_clock(mfd, value)) {
+	handle_error();
+      } else {
+	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
+      }
+    }
+    if (mmux_libc_close(mfd)) {
+      handle_error();
+    }
+  }
+  printf_message("%s: DONE", __func__);
+}
+
+
+static void
 test_mmux_libc_dprintf_libc_mode (void)
 {
   printf_message("%s: running test", __func__);
@@ -2523,6 +2551,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true) {	test_mmux_libc_dprintf_wchar();			}
   if (true) {	test_mmux_libc_dprintf_wint();			}
   if (true) {	test_mmux_libc_dprintf_time();			}
+  if (true) {	test_mmux_libc_dprintf_clock();			}
   if (true) {	test_mmux_libc_dprintf_libc_mode();		}
   if (true) {	test_mmux_libc_dprintf_libc_pid();		}
   if (true) {	test_mmux_libc_dprintf_libc_uid();		}

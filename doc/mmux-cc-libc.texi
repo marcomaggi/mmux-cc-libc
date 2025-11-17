@@ -6854,6 +6854,7 @@ Print to @var{fd} the string representation of @var{value}.
 @MmuxDefineTypePrinterFunc{wchar}
 @MmuxDefineTypePrinterFunc{wint}
 @MmuxDefineTypePrinterFunc{time}
+@MmuxDefineTypePrinterFunc{clock}
 @MmuxDefineTypePrinterFunc{libc_socklen}
 @MmuxDefineTypePrinterFunc{libc_rlim}
 @MmuxDefineTypePrinterFunc{libc_ino}
