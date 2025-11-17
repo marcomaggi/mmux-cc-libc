@@ -25,7 +25,7 @@
  ** ----------------------------------------------------------------- */
 
 static bool		got_signal = false;
-static mmux_sint_t	associated_value = { .value = 0 };
+static mmux_sint_t	paren_associated_value = { .value = 0 };
 
 static void
 this_process_handler (mmux_standard_sint_t signum, mmux_libc_siginfo_arg_t siginfo,
@@ -64,12 +64,12 @@ this_process_handler (mmux_standard_sint_t signum, mmux_libc_siginfo_arg_t sigin
   {
     auto	expected_associated_value = mmux_sint_literal(123);
 
-    mmux_libc_si_value_sival_int_ref(&associated_value, siginfo);
-    if (mmux_ctype_equal(associated_value, expected_associated_value)) {
-      printf_message("%s: correctly got associated value: %d", __func__, associated_value.value);
+    mmux_libc_si_value_sival_int_ref(&paren_associated_value, siginfo);
+    if (mmux_ctype_equal(paren_associated_value, expected_associated_value)) {
+      printf_message("%s: correctly got associated value: %d", __func__, paren_associated_value.value);
     } else {
       printf_error("%s: wrong associated value, expected '%d', got '%d'",
-		   __func__, expected_associated_value.value, associated_value.value);
+		   __func__, expected_associated_value.value, paren_associated_value.value);
       handle_error();
     }
   }
@@ -120,11 +120,11 @@ play_parent (mmux_libc_pid_t child_pid)
       handle_error();
     }
 
-    if (mmux_ctype_equal(associated_value, expected_associated_value)) {
-      printf_message("paren: correctly got associated value: %d", associated_value.value);
+    if (mmux_ctype_equal(paren_associated_value, expected_associated_value)) {
+      printf_message("paren: correctly got associated value: %d", paren_associated_value.value);
     } else {
       printf_error("paren: wrong associated value, expected '%d', got '%d'",
-		   expected_associated_value.value, associated_value.value);
+		   expected_associated_value.value, paren_associated_value.value);
       handle_error();
     }
   }
@@ -170,9 +170,10 @@ play_child (void)
     mmux_libc_pid_t			paren_pid;
     mmux_libc_interprocess_signal_t	ipxsig = MMUX_LIBC_SIGUSR1;
     mmux_libc_sigval_t			sigval;
+    auto				child_associated_value = mmux_sint_literal(123);
 
     mmux_libc_getppid(&paren_pid);
-    mmux_libc_sival_int_set(sigval, mmux_sint(123));
+    mmux_libc_sival_int_set(sigval, child_associated_value);
 
     printf_message("child: sigqueue-ing");
     if (mmux_libc_sigqueue(paren_pid, ipxsig, sigval)) {

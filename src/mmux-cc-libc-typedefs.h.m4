@@ -334,6 +334,9 @@ typedef mmux_libc_interprocess_signal_value_t const *	mmux_libc_sigval_arg_t;
 
 typedef struct mmux_libc_interprocess_signal_t { mmux_sint_t; } mmux_libc_interprocess_signal_t;
 typedef struct mmux_libc_sigaction_flags_t     { mmux_sint_t; } mmux_libc_sigaction_flags_t;
+typedef struct mmux_libc_si_code_t             { mmux_sint_t; } mmux_libc_si_code_t;
+
+typedef mmux_libc_interprocess_signal_t		mmux_libc_ipxsig_t;
 
 typedef mmux_libc_interprocess_signals_set_t		mmux_libc_sigset_t[1];
 typedef mmux_libc_interprocess_signals_set_t const *	mmux_libc_sigset_arg_t;
@@ -345,8 +348,6 @@ typedef void mmux_libc_sighandler_fun_t (mmux_standard_sint_t signum);
 typedef void mmux_libc_sigaction_fun_t  (mmux_standard_sint_t signum,
 					 mmux_libc_siginfo_arg_t info,
 					 mmux_pointer_t reserved_context);
-
-typedef struct mmux_libc_si_code_t { mmux_sint_t; } mmux_libc_si_code_t;
 
 
 /** --------------------------------------------------------------------

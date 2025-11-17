@@ -5301,8 +5301,11 @@ mmux_libc_dprintfer("%s\n", ipxsig.value);
 
 
 @deftp {Struct Type} mmux_libc_interprocess_signal_t
+@deftpx {Struct Type} mmux_libc_ipxsig_t
 @deftpx {Parent Struct Type} mmux_sint_t
 Opaque data structure type representing an interprocess signal number.
+
+The type @objtype{mmux_libc_ipxsig_t} is an alias for @objtype{mmux_libc_interprocess_signal_t}.
 @end deftp
 
 
@@ -6382,11 +6385,82 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @subsection Associating values to some interprocess signals
 
 
-According to the standard: it is sometimes possible to associate a value to an interprocess signal
-using the type @code{union sigval}, @MmuxCFuncpage{sigaction}.  Under @value{PACKAGE}: this type is
-aliased by @objtype{mmux_libc_interprocess_signal_value_t}; it is usually better to use the type
+According to the standard: it is possible to associate a value to an interprocess signal using the
+type @code{union sigval}, @MmuxCFuncpage{sigaction}.  Under @value{PACKAGE}: this type is aliased by
+@objtype{mmux_libc_interprocess_signal_value_t}; it is usually better to use the type
 @objtype{mmux_libc_sigval_t}.
 
+To send the interprocess signal @samp{SIGUSR1} to another process using @cfunc{mmux_libc_sigqueue},
+associating the exact integer @samp{123} to it, we can do:
+
+@example
+mmux_libc_sigval_t  sigval;
+auto                associated_value = mmux_sint_literal(123);
+
+mmux_libc_sival_int_set(sigval, associated_value);
+@{
+  mmux_libc_pid_t  receiving_process_pid;
+  auto             ipxsig = MMUX_LIBC_SIGUSR1;
+
+  acquire_the_receiving_process_pid(&receiving_process_pid);
+  if (mmux_libc_sigqueue(receiving_process_pid, ipxsig, sigval)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+the receiving process should implement a signal handler of type @objtype{mmux_libc_sigaction_fun_t},
+somehow like the following:
+
+@example
+static void
+this_process_handler (mmux_standard_sint_t signum, mmux_libc_siginfo_arg_t siginfo,
+                      mmux_pointer_t reserved_context MMUX_CC_LIBC_UNUSED)
+@{
+  /* If we need the signal object, for some reason. */
+  @{
+    auto  ipxsig = mmux_libc_interprocess_signal(signum);
+    ...
+  @}
+
+  /* Acquire the associated value. */
+  @{
+    mmux_libc_si_code_t  si_code;
+
+    mmux_libc_si_code_ref(&si_code, siginfo);
+    /* If there is an associated value: we expect "si_code" to have value "SI_QUEUE";
+       it is up to the code itself to expect the value to be an integer in the field
+       "si_value_sival_int". */
+    if (mmux_libc_si_code_equal(si_code, MMUX_LIBC_SI_QUEUE)) @{
+      mmux_sint_t  associated_value;
+
+      mmux_libc_si_value_sival_int_ref(&associated_value, siginfo);
+      ...
+    @}
+  @}
+@}
+@end example
+
+@noindent
+and the receiving process should register the handler somehow as follows:
+
+@example
+mmux_libc_sigaction_t  sigaction;
+mmux_libc_sigset_t     action_blocking_mask;
+auto                   action_flags = mmux_libc_sigaction_flags(MMUX_LIBC_SA_SIGINFO);
+
+/* Block all the interprocess signals while "this_process_handler()" is running. */
+mmux_libc_sigfillset(action_blocking_mask);
+
+mmux_libc_sa_sigaction_set (sigaction, this_process_handler);
+mmux_libc_sa_mask_set      (sigaction, action_blocking_mask);
+mmux_libc_sa_flags_set     (sigaction, action_flags);
+
+mmux_libc_sigaction(MMUX_LIBC_SIGUSR1, sigaction, NULL);
+@end example
+
+@c ------------------------------------------------------------------------
 
 @deftp {Struct Type} mmux_libc_interprocess_signal_value_t
 A data structure type aliasing @code{union sigval}.
