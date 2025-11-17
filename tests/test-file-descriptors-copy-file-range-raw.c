@@ -19,8 +19,8 @@
 
 #include <test-common.h>
 
-static mmux_asciizcp_t	src_pathname_asciiz = "./test-copy-file-range.src-file.ext";
-static mmux_asciizcp_t	dst_pathname_asciiz = "./test-copy-file-range.dst-file.ext";
+static mmux_asciizcp_t	src_pathname_asciiz = "./test-copy-file-range-raw.src-file.ext";
+static mmux_asciizcp_t	dst_pathname_asciiz = "./test-copy-file-range-raw.dst-file.ext";
 
 
 static void
