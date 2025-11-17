@@ -5648,6 +5648,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 * signals sets suspending::     Waiting for selected interprocess signals.
 * signals sets action::         Advanced interprocess signals handling.
 * signals sets info::           Interprocess signals extended informations.
+* signals sets value::          Associating values to some interprocess signals.
 @end menu
 
 @c page
@@ -6023,7 +6024,7 @@ Accessor and mutator for the field @code{sa_handler} of
 @end deftypefun
 
 
-@deftypefn {Function Type} void mmux_libc_sigaction_fun_t (mmux_standard_sint_t @var{signum}, mmux_libc_siginfo_t @var{info}, mmux_pointer_t @var{reserved_context})
+@deftypefn {Function Type} void mmux_libc_sigaction_fun_t (mmux_standard_sint_t @var{signum}, mmux_libc_siginfo_arg_t @var{info}, mmux_pointer_t @var{reserved_context})
 Type of functions to be used as interprocess signal action handlers.
 @end deftypefn
 
@@ -6277,6 +6278,66 @@ Accessor and mutator for the field @code{si_value.sival_int} of @objtype{mmux_li
 @deftypefun bool mmux_libc_si_value_sival_ptr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
 @deftypefunx bool mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
 Accessor and mutator for the field @code{si_value.sival_ptr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+@c page
+@node signals sets value
+@subsection Associating values to some interprocess signals
+
+
+According to the standard: it is sometimes possible to associate a value to an interprocess signal
+using the type @code{union sigval}, @MmuxCFuncpage{sigaction}.  Under @value{PACKAGE}: this type is
+aliased by @objtype{mmux_libc_interprocess_signal_value_t}; it is usually better to use the type
+@objtype{mmux_libc_sigval_t}.
+
+
+@deftp {Struct Type} mmux_libc_interprocess_signal_value_t
+A data structure type aliasing @code{union sigval}.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigval_t
+Type of pointer to data structure defined as:
+
+@example
+typedef mmux_libc_interprocess_signal_value_t  mmux_libc_sigval_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and as type of result arguments to functions, so
+the referenced @objtype{mmux_libc_interprocess_signal_value_t} must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigval_arg_t
+Type of pointer to data structure defined as:
+
+@example
+typedef mmux_libc_interprocess_signal_value_t const *  mmux_libc_sigval_arg_t;
+@end example
+
+@noindent
+it is meant to be used as type of already initialised arguments to functions, so the referenced
+@objtype{mmux_libc_interprocess_signal_value_t} must be immutable.
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sival_int_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_sigval_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_sival_int_set (mmux_libc_sigval_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+Accessor and mutator for the field @code{si_value.sival_int} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sival_ptr_ref (mmux_pointer_t * @var{field_value_result_p}, mmux_libc_sigval_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_sival_ptr_set (mmux_libc_sigval_t @var{siginfo}, mmux_pointer_t @var{new_field_value})
+Accessor and mutator for the field @code{si_value.sival_ptr} of @objtype{mmux_libc_interprocess_signal_info_t}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sigqueue (mmux_libc_pid_t @var{pid}, mmux_libc_interprocess_signal_t @var{ipxsig}, mmux_libc_sigval_arg_t @var{sigval})
+@MmuxCInterface{sigqueue}.
 @end deftypefun
 
 @c page

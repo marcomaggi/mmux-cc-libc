@@ -754,7 +754,8 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-blocking-mask		\
 	tests/test-interprocess-signals-pending			\
 	tests/test-interprocess-signals-suspend			\
-	tests/test-interprocess-signals-action
+	tests/test-interprocess-signals-action			\
+	tests/test-interprocess-signals-queue
 
 tests_test_interprocess_signals_signals_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_signals_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -779,6 +780,9 @@ tests_test_interprocess_signals_suspend_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_interprocess_signals_action_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_action_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_queue_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_queue_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

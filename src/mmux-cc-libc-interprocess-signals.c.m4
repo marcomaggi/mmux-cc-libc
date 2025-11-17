@@ -645,4 +645,43 @@ mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_f
   return false;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Data union sigval.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_sival_int_ref (mmux_sint_t * field_value_result_p, mmux_libc_sigval_arg_t self)
+{
+  *field_value_result_p = mmux_sint(self->sival_int);
+  return false;
+}
+bool
+mmux_libc_sival_int_set (mmux_libc_sigval_t self, mmux_sint_t new_field_value)
+{
+  self->sival_int = mmux_ctype_value(new_field_value);
+  return false;
+}
+
+bool
+mmux_libc_sival_ptr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_sigval_arg_t self)
+{
+  *field_value_result_p = mmux_pointer(self->sival_ptr);
+  return false;
+}
+bool
+mmux_libc_sival_ptr_set (mmux_libc_sigval_t self, mmux_pointer_t new_field_value)
+{
+  self->sival_ptr = new_field_value;
+  return false;
+}
+
+bool
+mmux_libc_sigqueue (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t ipxsig, mmux_libc_sigval_arg_t the_val)
+{
+  int	rv = sigqueue(pid.value, ipxsig.value, *((const union sigval *)the_val));
+
+  return (0 == rv)? false : true;
+}
+
 /* end of file */

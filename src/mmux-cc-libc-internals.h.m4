@@ -317,6 +317,10 @@ typedef struct mmux_libc_interprocess_signal_info_t {
   siginfo_t;
 } mmux_libc_interprocess_signal_info_t;
 
+typedef struct mmux_libc_interprocess_signal_value_t {
+  union sigval;
+} mmux_libc_interprocess_signal_value_t;
+
 typedef mmux_libc_in_addr_t *			mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *		mmux_libc_insix_addr_ptr_t;
 

@@ -168,6 +168,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_LINGER],       [sizeof(struct linger)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGSET],       [sizeof(sigset_t)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGACTION],    [sizeof(struct sigaction)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGINFO],      [sizeof(siginfo_t)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGVAL],       [sizeof(union sigval)])
 
 
 #### inspecting errno constants

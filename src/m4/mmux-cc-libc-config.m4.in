@@ -68,6 +68,7 @@ m4_define([[[MMUX_LIBC_SIZEOF_LINGER]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_LINGER@
 m4_define([[[MMUX_LIBC_SIZEOF_SIGSET]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGSET@]]])
 m4_define([[[MMUX_LIBC_SIZEOF_SIGACTION]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGACTION@]]])
 m4_define([[[MMUX_LIBC_SIZEOF_SIGINFO]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGINFO@]]])
+m4_define([[[MMUX_LIBC_SIZEOF_SIGVAL]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGVAL@]]])
 
 
 m4_dnl constants
@@ -718,6 +719,17 @@ m4_define([[[mmux_libc_VALUEOF_RLIMIT_RTTIME]]],		[[[@MMUX_VALUEOF_RLIMIT_RTTIME
 m4_define([[[mmux_libc_VALUEOF_RLIMIT_SIGPENDING]]],		[[[@MMUX_VALUEOF_RLIMIT_SIGPENDING@]]])
 m4_define([[[mmux_libc_VALUEOF_RLIMIT_STACK]]],			[[[@MMUX_VALUEOF_RLIMIT_STACK@]]])
 m4_define([[[mmux_libc_VALUEOF_RLIM_INFINITY]]],		[[[@MMUX_VALUEOF_RLIM_INFINITY@]]])
+
+m4_define([[[mmux_libc_VALUEOF_SA_NOCLDSTOP]]],			[[[@MMUX_VALUEOF_SA_NOCLDSTOP@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_NOCLDWAIT]]],			[[[@MMUX_VALUEOF_SA_NOCLDWAIT@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_NODEFER]]],			[[[@MMUX_VALUEOF_SA_NODEFER@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_ONSTACK]]],			[[[@MMUX_VALUEOF_SA_ONSTACK@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_RESETHAND]]],			[[[@MMUX_VALUEOF_SA_RESETHAND@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_RESTART]]],			[[[@MMUX_VALUEOF_SA_RESTART@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_RESTORER]]],			[[[@MMUX_VALUEOF_SA_RESTORER@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_SIGINFO]]],			[[[@MMUX_VALUEOF_SA_SIGINFO@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_UNSUPPORTED]]],		[[[@MMUX_VALUEOF_SA_UNSUPPORTED@]]])
+m4_define([[[mmux_libc_VALUEOF_SA_EXPOSE_TAGBITS]]],		[[[@MMUX_VALUEOF_SA_EXPOSE@]]])
 
 m4_define([[[mmux_libc_VALUEOF_NSIG]]],				[[[@MMUX_VALUEOF_NSIG@]]])
 m4_define([[[mmux_libc_VALUEOF_SIGFPE]]],			[[[@MMUX_VALUEOF_SIGFPE@]]])

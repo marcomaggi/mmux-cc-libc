@@ -1625,6 +1625,24 @@ mmux_cc_libc_decl bool mmux_libc_si_value_sival_ptr_ref (mmux_pointer_t * field_
 mmux_cc_libc_decl bool mmux_libc_si_value_sival_ptr_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
   __attribute__((__nonnull__(1)));
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sival_int_ref (mmux_sint_t * field_value_result_p, mmux_libc_sigval_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sival_int_set (mmux_libc_sigval_t self, mmux_sint_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sival_ptr_ref (mmux_pointer_t * field_value_result_p, mmux_libc_sigval_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sival_ptr_set (mmux_libc_sigval_t self, mmux_pointer_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sigqueue (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t ipxsig,
+					   mmux_libc_sigval_arg_t the_val)
+  __attribute__((__nonnull__(3)));
+
 
 /** --------------------------------------------------------------------
  ** Persona.
