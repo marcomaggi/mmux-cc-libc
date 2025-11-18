@@ -1448,6 +1448,15 @@ mmux_cc_libc_decl bool mmux_libc_sigwait (mmux_libc_interprocess_signal_t * ipxs
 					  mmux_libc_sigset_arg_t set_of_signals_to_wait_for)
   __attribute__((__nonnull__(1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_sigwaitinfo (mmux_libc_siginfo_t siginfo_result,
+					      mmux_libc_sigset_arg_t set_of_signals_to_wait_for)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sigtimedwait (mmux_libc_siginfo_t siginfo_result,
+					       mmux_libc_sigset_arg_t set_of_signals_to_wait_for,
+					       mmux_libc_timespec_t timeout)
+  __attribute__((__nonnull__(1,2,3)));
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_sa_handler_ref (mmux_libc_sighandler_fun_t * * result_p,
@@ -1497,16 +1506,18 @@ mmux_libc_si_code_equal (mmux_libc_si_code_t code1, mmux_libc_si_code_t code2)
   return (code1.value == code2.value)? true : false;
 }
 
-mmux_cc_libc_decl bool mmux_libc_si_signo_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+mmux_cc_libc_decl bool mmux_libc_si_signo_ref (mmux_libc_interprocess_signal_t * field_value_result_p,
+					       mmux_libc_siginfo_arg_t self)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_si_signo_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+mmux_cc_libc_decl bool mmux_libc_si_signo_set (mmux_libc_siginfo_t self,
+					       mmux_libc_interprocess_signal_t new_field_value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_si_errno_ref (mmux_sint_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
+mmux_cc_libc_decl bool mmux_libc_si_errno_ref (mmux_libc_errno_t * field_value_result_p, mmux_libc_siginfo_arg_t self)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_si_errno_set (mmux_libc_siginfo_t self, mmux_sint_t new_field_value)
+mmux_cc_libc_decl bool mmux_libc_si_errno_set (mmux_libc_siginfo_t self, mmux_libc_errno_t new_field_value)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_si_code_ref (mmux_libc_si_code_t * field_value_result_p, mmux_libc_siginfo_arg_t self)

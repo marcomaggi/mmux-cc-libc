@@ -504,6 +504,22 @@ mmux_libc_sigwait (mmux_libc_interprocess_signal_t * ipxsig_result_p,
     return true;
   }
 }
+bool
+mmux_libc_sigwaitinfo (mmux_libc_siginfo_t siginfo_result, mmux_libc_sigset_arg_t set_of_signals_to_wait_for)
+{
+  int	rv = sigwaitinfo(set_of_signals_to_wait_for, siginfo_result);
+
+  return (-1 != rv)? false : true;
+}
+bool
+mmux_libc_sigtimedwait (mmux_libc_siginfo_t siginfo_result,
+			mmux_libc_sigset_arg_t set_of_signals_to_wait_for,
+			mmux_libc_timespec_t timeout)
+{
+  int	rv = sigtimedwait(set_of_signals_to_wait_for, siginfo_result, timeout);
+
+  return (-1 != rv)? false : true;
+}
 
 
 /** --------------------------------------------------------------------
@@ -610,8 +626,8 @@ mmux_libc_$1_set (mmux_libc_siginfo_t self, mmux_pointer_t new_field_value)
 m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_SINT]]],[[[DEFINE_SIGINFO_SETTER_GETTER($1,mmux_sint_t,mmux_sint)]]])
 m4_define([[[DEFINE_SIGINFO_SETTER_GETTER_UINT]]],[[[DEFINE_SIGINFO_SETTER_GETTER($1,mmux_uint_t,mmux_uint)]]])
 
-DEFINE_SIGINFO_SETTER_GETTER_SINT(si_signo)
-DEFINE_SIGINFO_SETTER_GETTER_SINT(si_errno)
+DEFINE_SIGINFO_SETTER_GETTER(si_signo,	mmux_libc_interprocess_signal_t,	mmux_libc_interprocess_signal)
+DEFINE_SIGINFO_SETTER_GETTER(si_errno,			mmux_libc_errno_t,	mmux_libc_errno)
 DEFINE_SIGINFO_SETTER_GETTER(si_code,			mmux_libc_si_code_t,	mmux_libc_si_code)
 m4_dnl DEFINE_SIGINFO_SETTER_GETTER_SINT(si_trapno)
 DEFINE_SIGINFO_SETTER_GETTER(si_pid,			mmux_libc_pid_t,	mmux_libc_pid)

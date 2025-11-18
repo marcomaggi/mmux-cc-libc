@@ -5979,6 +5979,45 @@ set to @code{MMUX_LIBC_EINTR}.
 @}
 @end example
 @end deftypefun
+
+
+@deftypefun bool mmux_libc_sigwaitinfo (mmux_libc_siginfo_t @var{delivered_siginfo_result}, mmux_libc_sigset_arg_t @var{set_of_signals_to_wait_for})
+@MmuxCInterface{sigwaitinfo}.
+
+@example
+/* Let's say this process blocks all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  mmux_libc_sigfillset(new_blocking_mask);
+  if (mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL)) @{
+    /* error */
+  @}
+@}
+
+/* Wait for SIGUSR1 and SIGUSR2. */
+@{
+  mmux_libc_siginfo_t  delivered_siginfo;
+  mmux_libc_sigset_t   ipxsigset_to_wait_for;
+
+  mmux_libc_sigemptyset(ipxsigset_to_wait_for);
+  mmux_libc_sigaddset(ipxsigset_to_wait_for, MMUX_LIBC_SIGUSR1);
+  mmux_libc_sigaddset(ipxsigset_to_wait_for, MMUX_LIBC_SIGUSR2);
+
+  if (mmux_libc_sigwaitinfo(delivered_siginfo, ipxsigset_to_wait_for)) @{
+    /* error */
+  @} else @{
+    mmux_libc_interprocess_signal_t   delivered_ipxsig;
+
+    mmux_libc_si_signo_ref(&delivered_ipxsig, delivered_siginfo);
+    if (mmux_libc_interprocess_signal_equal(delivered_ipxsig, MMUX_LIBC_SIGUSR1)) @{
+      (* Successufully received SIGUSR1. */
+    @}
+  @}
+@}
+@end example
+@end deftypefun
+
 @c page
 @node signals sets action
 @subsection Advanced interprocess signals handling
@@ -6174,14 +6213,14 @@ it is meant to be used as type of already initialised arguments to functions, so
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_si_signo_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
-@deftypefunx bool mmux_libc_si_signo_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+@deftypefun bool mmux_libc_si_signo_ref (mmux_libc_interprocess_signal_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_signo_set (mmux_libc_siginfo_t @var{siginfo}, mmux_libc_interprocess_signal_t @var{new_field_value})
 Accessor and mutator for the field @code{si_signo} of @objtype{mmux_libc_interprocess_signal_info_t}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_si_errno_ref (mmux_sint_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
-@deftypefunx bool mmux_libc_si_errno_set (mmux_libc_siginfo_t @var{siginfo}, mmux_sint_t @var{new_field_value})
+@deftypefun bool mmux_libc_si_errno_ref (mmux_libc_errno_t * @var{field_value_result_p}, mmux_libc_siginfo_arg_t @var{siginfo})
+@deftypefunx bool mmux_libc_si_errno_set (mmux_libc_siginfo_t @var{siginfo}, mmux_libc_errno_t @var{new_field_value})
 Accessor and mutator for the field @code{si_errno} of @objtype{mmux_libc_interprocess_signal_info_t}.
 @end deftypefun
 

@@ -747,16 +747,17 @@ tests_test_file_system_utimensat_LDADD			= $(mmux_cc_libc_tests_ldadd)
 ## ------------------------------------------------------------------------
 
 check_PROGRAMS	+= \
-	tests/test-interprocess-signals-signals			\
+	tests/test-interprocess-signals-blocking-mask		\
 	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
-	tests/test-interprocess-signals-struct-sigset		\
-	tests/test-interprocess-signals-blocking-mask		\
-	tests/test-interprocess-signals-pending			\
-	tests/test-interprocess-signals-suspend			\
-	tests/test-interprocess-signals-wait			\
-	tests/test-interprocess-signals-action			\
-	tests/test-interprocess-signals-queue
+	tests/test-interprocess-signals-sigaction		\
+	tests/test-interprocess-signals-signals			\
+	tests/test-interprocess-signals-sigpending		\
+	tests/test-interprocess-signals-sigqueue		\
+	tests/test-interprocess-signals-sigsuspend		\
+	tests/test-interprocess-signals-sigwait			\
+	tests/test-interprocess-signals-sigwaitinfo		\
+	tests/test-interprocess-signals-struct-sigset
 
 tests_test_interprocess_signals_signals_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_signals_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -773,20 +774,23 @@ tests_test_interprocess_signals_struct_sigset_LDADD	= $(mmux_cc_libc_tests_ldadd
 tests_test_interprocess_signals_blocking_mask_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_blocking_mask_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_interprocess_signals_pending_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_interprocess_signals_pending_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_sigaction_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigaction_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_interprocess_signals_suspend_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
-tests_test_interprocess_signals_suspend_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_sigpending_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigpending_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_interprocess_signals_wait_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_interprocess_signals_wait_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_sigsuspend_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigsuspend_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_interprocess_signals_action_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_interprocess_signals_action_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_sigwait_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigwait_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
-tests_test_interprocess_signals_queue_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_interprocess_signals_queue_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_interprocess_signals_sigwaitinfo_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigwaitinfo_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_sigqueue_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigqueue_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 
