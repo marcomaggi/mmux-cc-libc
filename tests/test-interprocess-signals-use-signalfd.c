@@ -45,13 +45,23 @@ play_paren (mmux_libc_pid_t child_pid)
     mmux_libc_sigset_t	signals_to_wait_for;
     auto		flags = mmux_libc_signalfd_flags(MMUX_LIBC_SFD_CLOEXEC);
 
+    mmux_libc_make_sigfd(sigfd, 17);
+
     mmux_libc_sigemptyset(signals_to_wait_for);
+
+
+    printf_message("paren: make a signal file descriptor");
+    if (mmux_libc_make_signalfd(sigfd, signals_to_wait_for, flags)) {
+      printf_error("paren: make a signal file descriptor");
+      handle_error();
+    }
+
     mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR1);
     mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR2);
 
-    printf_message("paren: making a new signal file descriptor");
-    if (mmux_libc_make_signalfd(sigfd, signals_to_wait_for, flags)) {
-      printf_error("paren: making a new signal file descriptor");
+    printf_message("paren: using a signal file descriptor");
+    if (mmux_libc_use_signalfd(sigfd, signals_to_wait_for, flags)) {
+      printf_error("paren: using a signal file descriptor");
       handle_error();
     }
   }

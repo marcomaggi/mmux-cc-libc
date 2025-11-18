@@ -1788,9 +1788,9 @@ mmux_cc_libc_decl bool mmux_libc_make_signalfd (mmux_libc_sigfd_t fd,
 						mmux_libc_signalfd_flags_t flags)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_use_fd_as_signalfd (mmux_libc_sigfd_arg_t fd,
-						     mmux_libc_sigset_arg_t accepted_ipxsigset,
-						     mmux_libc_signalfd_flags_t flags)
+mmux_cc_libc_decl bool mmux_libc_use_signalfd (mmux_libc_sigfd_arg_t fd,
+					       mmux_libc_sigset_arg_t accepted_ipxsigset,
+					       mmux_libc_signalfd_flags_t flags)
   __attribute__((__nonnull__(1,2)));
 
 

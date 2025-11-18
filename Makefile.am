@@ -751,6 +751,7 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
 	tests/test-interprocess-signals-make-signalfd		\
+	tests/test-interprocess-signals-use-signalfd		\
 	tests/test-interprocess-signals-sigaction		\
 	tests/test-interprocess-signals-signals			\
 	tests/test-interprocess-signals-sigpending		\

@@ -6701,13 +6701,21 @@ mmux_libc_sigfd_t     sigfd;
     @}
   @}
 @}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(sigfd)) @{
+    /* error */
+  @}
+@}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_use_fd_as_signalfd (mmux_libc_sigfd_arg_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset, mmux_libc_signalfd_flags_t flags)
-@MmuxCInterface{signalfd}.  Use the already allocated file descriptor number represented by
-@var{fd}.
+@deftypefun bool mmux_libc_use_signalfd (mmux_libc_sigfd_arg_t @var{sigfd}, mmux_libc_sigset_arg_t @var{accepted_ipxsigset}, mmux_libc_signalfd_flags_t @var{flags})
+@MmuxCInterface{signalfd}.  Reuse the previously made interprocess--signals file--descriptor
+@var{sigfd}, changing its associated interprocess--signals set; @var{sigfd} must have been
+previously made by @cfunc{mmux_libc_make_signalfd}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
