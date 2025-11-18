@@ -6638,9 +6638,14 @@ Accessor and mutator for the field @code{si_value.sival_ptr} of @objtype{mmux_li
 @subsection Receiving interprocess signals through file descriptors
 
 
+We can configure a file descriptor to be used to accept interprocess signals delivered to the
+current process; we do it using the standard function @cfunc{signalfd} and file descriptors of type
+@objtype{mmux_libc_signal_file_descriptor_t}, @ref{fds fds sigfds} for details.
+
+
 @deftp {Struct Typedef} mmux_libc_signalfd_flags_t
-Data structure representing a bitwise OR combination of flags for @cfunc{mmux_libc_signalfd}.  The
-flags are the @samp{MMUX_LIBC_SFD_*}.
+Data structure representing a bitwise OR combination of flags for @cfunc{mmux_libc_make_signalfd}
+and @cfunc{mmux_libc_use_signalfd}.  The flags are the @samp{MMUX_LIBC_SFD_*}.
 @end deftp
 
 
@@ -6652,6 +6657,51 @@ Build and return a new instance of @objtype{mmux_libc_signalfd_flags_t}.
 @deftypefun bool mmux_libc_make_signalfd (mmux_libc_sigfd_t @var{fd_result}, mmux_libc_sigset_arg_t @var{accepted_ipxsigset}, mmux_libc_signalfd_flags_t @var{flags})
 @MmuxCInterface{signalfd}.  Allocate a new file descriptor number and store the resulting file
 descriptor in @var{fd_result}.
+
+@example
+mmux_libc_sigfd_t     sigfd;
+
+/* Let's say this process blocks all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  mmux_libc_sigfillset(new_blocking_mask);
+  if (mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL)) @{
+    /* error */
+  @}
+@}
+
+/* Obtain the signal file descriptor to wait for SIGUSR1 and SIGUSR2. */
+@{
+  mmux_libc_sigset_t  signals_to_wait_for;
+  auto  flags = mmux_libc_signalfd_flags(MMUX_LIBC_SFD_CLOEXEC);
+
+  mmux_libc_sigemptyset(signals_to_wait_for);
+  mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR1);
+  mmux_libc_sigaddset(signals_to_wait_for, MMUX_LIBC_SIGUSR2);
+
+  if (mmux_libc_make_signalfd(sigfd, signals_to_wait_for, flags)) @{
+    /* error */
+  @}
+@}
+
+/* Wait for SIGUSR1 and SIGUSR2 by reading from sigfd, blocking as needed. */
+@{
+  mmux_libc_signalfd_siginfo_t  delivered_ipxsigset;
+  mmux_usize_t  nbytes_done, buflen = mmux_usize(sizeof(*delivered_ipxsigset));
+
+  if (mmux_libc_read(&nbytes_done, sigfd, delivered_ipxsigset, buflen)) @{
+    /* error */
+  @} else @{
+    mmux_libc_ipxsig_t  delivered_ipxsig;
+
+    mmux_libc_ssi_signo_ref(&delivered_ipxsig, delivered_ipxsigset);
+    if (mmux_libc_interprocess_signal_equal(delivered_ipxsig, MMUX_LIBC_SIGUSR1)) @{
+      /* Successufully received SIGUSR1. */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 

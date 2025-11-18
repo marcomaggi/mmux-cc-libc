@@ -40,7 +40,7 @@ play_paren (mmux_libc_pid_t child_pid)
     }
   }
 
-  /* Obtain the signal file descriptor. */
+  /* Obtain the signal file descriptor to wait for SIGUSR1 and SIGUSR2. */
   {
     mmux_libc_sigset_t	signals_to_wait_for;
     auto		flags = mmux_libc_signalfd_flags(MMUX_LIBC_SFD_CLOEXEC);
@@ -66,12 +66,12 @@ play_paren (mmux_libc_pid_t child_pid)
       printf_error("paren: reading the signalfd_siginfo");
       handle_error();
     } else {
-      mmux_libc_ipxsig_t	delivered_signal;
+      mmux_libc_ipxsig_t	delivered_ipxsig;
 
       printf_message("paren: a signal was received");
 
-      mmux_libc_ssi_signo_ref(&delivered_signal, delivered_ipxsigset);
-      if (mmux_libc_interprocess_signal_equal(delivered_signal, MMUX_LIBC_SIGUSR1)) {
+      mmux_libc_ssi_signo_ref(&delivered_ipxsig, delivered_ipxsigset);
+      if (mmux_libc_interprocess_signal_equal(delivered_ipxsig, MMUX_LIBC_SIGUSR1)) {
 	printf_message("paren: successufully received SIGUSR1");
       } else {
 	printf_message("paren: expected SIGUSR1, got some other signal");
