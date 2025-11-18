@@ -783,6 +783,7 @@ bool
 mmux_libc_make_signalfd (mmux_libc_sigfd_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset,
 			 mmux_libc_signalfd_flags_t flags)
 {
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_SIGNALFD]]],[[[
   /* By using -1  as first argument to  "signalfd()": we request the  allocation of a
      new file descriptor. */
   int	rv = signalfd(-1, accepted_ipxsigset, flags.value);
@@ -792,11 +793,13 @@ mmux_libc_make_signalfd (mmux_libc_sigfd_t fd, mmux_libc_sigset_arg_t accepted_i
   } else {
     return mmux_libc_make_sigfd(fd, rv);
   }
+]]])
 }
 bool
 mmux_libc_use_signalfd (mmux_libc_sigfd_arg_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset,
 			mmux_libc_signalfd_flags_t flags)
 {
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_SIGNALFD]]],[[[
   if (true == fd->identity.is_signal_fd) {
     /* By using a  valid file descriptor value as first  argument to "signalfd()": we
        request the use of an already selected file descriptor number. */
@@ -817,6 +820,7 @@ mmux_libc_use_signalfd (mmux_libc_sigfd_arg_t fd, mmux_libc_sigset_arg_t accepte
     mmux_libc_errno_set(MMUX_LIBC_EINVAL);
     return true;
   }
+]]])
 }
 
 /* end of file */
