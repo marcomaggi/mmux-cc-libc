@@ -5652,6 +5652,7 @@ will terminate and @cfunc{mmux_libc_pause} will @strong{not} return.
 * signals sets action::         Advanced interprocess signals handling.
 * signals sets info::           Interprocess signals extended informations.
 * signals sets value::          Associating values to some interprocess signals.
+* signals sets fds::            Receiving interprocess signals through file descriptors.
 @end menu
 
 @c page
@@ -6430,8 +6431,8 @@ We can use the following constants as values for the field @code{si_code} of
 @deftypevr {Constant} mmux_libc_si_code_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
-We can use @samp{MMUX_LIBC_\NAME\} as actual value for the field @code{si_code}of
-@objtype{mmux_libc_interprocess_signal_info_t}..
+We can use @samp{MMUX_LIBC_\NAME\} as actual value for the field @code{si_code} of
+@objtype{mmux_libc_interprocess_signal_info_t}.
 
 The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} evaluates to the C language constant @code{\NAME\}; it
 can be defined or not depending on the features of the underlying platform.
@@ -6633,6 +6634,52 @@ Accessor and mutator for the field @code{si_value.sival_ptr} of @objtype{mmux_li
 @end deftypefun
 
 @c page
+@node signals sets fds
+@subsection Receiving interprocess signals through file descriptors
+
+
+@deftp {Struct Typedef} mmux_libc_signalfd_flags_t
+Data structure representing a bitwise OR combination of flags for @cfunc{mmux_libc_signalfd}.  The
+flags are the @samp{MMUX_LIBC_SFD_*}.
+@end deftp
+
+
+@deftypefun mmux_libc_signalfd_flags_t mmux_libc_signalfd_flags (mmux_libc_sint_t @var{flags})
+Build and return a new instance of @objtype{mmux_libc_signalfd_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_signalfd (mmux_libc_sigfd_t @var{fd_result}, mmux_libc_sigset_arg_t @var{accepted_ipxsigset}, mmux_libc_signalfd_flags_t @var{flags})
+@MmuxCInterface{signalfd}.  Allocate a new file descriptor number and store the resulting file
+descriptor in @var{fd_result}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_use_fd_as_signalfd (mmux_libc_sigfd_arg_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset, mmux_libc_signalfd_flags_t flags)
+@MmuxCInterface{signalfd}.  Use the already allocated file descriptor number represented by
+@var{fd}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+We can use the following constants as values for the field @var{flags} argument of
+@cfunc{mmux_libc_signalfd}.
+
+@macro MmuxDefineSignalfdFlagConstant{NAME}
+@defvr {Constant} MMUX_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+Value of the standard constant @samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineSignalfdFlagConstant{SFD_NONBLOCK}
+@MmuxDefineSignalfdFlagConstant{SFD_CLOEXEC}
+
+@c page
 @node fds
 @chapter File descriptors
 
@@ -6681,6 +6728,7 @@ if (mmux_libc_dprintf(fd, "the integer is: %d\n", 123)) @{
 * fds fds input::               Input--only file descriptors.
 * fds fds ouput::               Output--only file descriptors.
 * fds fds dirfds::              Directory file descriptors type.
+* fds fds sigfds::              Interprocess signals file descriptors type.
 @end menu
 
 @c page
@@ -6964,6 +7012,48 @@ functions.
 @deftypefun bool mmux_libc_make_dirfd (mmux_libc_dirfd_t @var{dirfd_result}, mmux_standard_sint_t @var{dirfd_num})
 Make a new file descriptor value representing a file system directory.  If @var{dirfd_num} is
 negative: @var{dirfd} is left untouched and the return value is @ctrue{}.
+@end deftypefun
+
+@c page
+@node fds fds sigfds
+@subsection Interprocess signals file descriptors type
+
+
+@deftp {Struct Type} mmux_libc_signal_file_descriptor_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+Data structure type representing interprocess signals file descriptors.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigfd_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_signal_file_descriptor_t  mmux_libc_sigfd_t[1];
+@end example
+
+@noindent
+it is meant to be used to define local variables and as type of result in function calls that open a
+new interprocess signals file descriptor or retrieve an already opened file descriptor, so the
+referenced @objtype{mmux_libc_signal_file_descriptor_t} instance must be mutable.
+@end deftp
+
+
+@deftp {Struct Pointer Type} mmux_libc_sigfd_arg_t
+Pointer type defined as:
+
+@example
+typedef mmux_libc_signal_file_descriptor_t const *  mmux_libc_sigfd_arg_t;
+@end example
+
+@noindent
+it is meant to be used as type of immutable arguments to functions.
+@end deftp
+
+
+@deftypefun bool mmux_libc_make_sigfd (mmux_libc_sigfd_t @var{sigfd_result}, mmux_standard_sint_t @var{fd_num})
+Make a new file descriptor value to be used to receive interprocess signals.  If @var{fd_num} is
+negative: @var{sigfd} is left untouched and the return value is @ctrue{}.
 @end deftypefun
 
 @c page

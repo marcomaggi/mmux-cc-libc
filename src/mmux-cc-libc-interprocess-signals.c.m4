@@ -715,4 +715,103 @@ mmux_libc_sigqueue (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t ipxsig,
   return (0 == rv)? false : true;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Data structure signalfd_siginfo.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER]]],[[[bool
+mmux_libc_$1_ref ($2 * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+{
+  *field_value_result_p = $3(self->$1);
+  return false;
+}
+bool
+mmux_libc_$1_set (mmux_libc_signalfd_siginfo_t self, $2 new_field_value)
+{
+  self->$1 = mmux_ctype_value(new_field_value);
+  return false;
+}]]])
+
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_PTR]]],[[[bool
+mmux_libc_$1_ref (mmux_pointer_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+{
+  *field_value_result_p = mmux_pointer(self->$1);
+  return false;
+}
+bool
+mmux_libc_$1_set (mmux_libc_signalfd_siginfo_t self, mmux_pointer_t new_field_value)
+{
+  self->$1 = new_field_value;
+  return false;
+}]]])
+
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_SINT32]]],
+	  [[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER($1,mmux_sint32_t,mmux_sint32)]]])
+
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT32]]],
+	  [[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER($1,mmux_uint32_t,mmux_uint32)]]])
+
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT64]]],
+	  [[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER($1,mmux_uint64_t,mmux_uint64)]]])
+
+m4_define([[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT16]]],
+	  [[[DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER($1,mmux_uint16_t,mmux_uint16)]]])
+
+m4_divert(0)m4_dnl
+
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER(ssi_signo,	mmux_libc_interprocess_signal_t, mmux_libc_interprocess_signal)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER(ssi_errno,	mmux_libc_errno_t,		mmux_libc_errno)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_SINT32(ssi_code)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER(ssi_pid,		mmux_libc_pid_t,		mmux_libc_pid)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER(ssi_uid,		mmux_libc_uid_t,		mmux_libc_uid)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_SINT32(ssi_fd,	mmux_libc_file_descriptors_t,	mmux_libc_file_descriptor)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT32(ssi_tid)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT32(ssi_band)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT32(ssi_overrun)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT32(ssi_trapno)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_SINT32(ssi_status)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_SINT32(ssi_int)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT64(ssi_ptr)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT64(ssi_utime)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT64(ssi_stime)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT64(ssi_addr)
+DEFINE_SIGNALFD_SIGINFO_SETTER_GETTER_UINT16(ssi_addr_lsb)
+
+bool
+mmux_libc_make_signalfd (mmux_libc_sigfd_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset,
+			 mmux_libc_signalfd_flags_t flags)
+{
+  /* By using -1  as first argument to  "signalfd()": we request the  allocation of a
+     new file descriptor. */
+  int	rv = signalfd(-1, accepted_ipxsigset, flags.value);
+
+  if (-1 == rv) {
+    return true;
+  } else {
+    return mmux_libc_make_sigfd(fd, rv);
+  }
+}
+bool
+mmux_libc_use_fd_as_signalfd (mmux_libc_sigfd_arg_t fd, mmux_libc_sigset_arg_t accepted_ipxsigset,
+			      mmux_libc_signalfd_flags_t flags)
+{
+  /* By using  a valid file  descriptor value as  first argument to  "signalfd()": we
+     request the use of an already selected file descriptor number. */
+  int	rv = signalfd(fd->value, accepted_ipxsigset, flags.value);
+
+  if (-1 == rv) {
+    /* A genuine error in "signalfd()". */
+    return true;
+  } else if (rv == fd->value) {
+    /* Success! */
+    return false;
+  } else {
+    /* This should not happen. */
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+}
+
 /* end of file */

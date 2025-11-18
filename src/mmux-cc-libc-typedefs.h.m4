@@ -130,6 +130,7 @@ typedef struct mmux_libc_file_descriptor_identity_t {
   bool	is_directory:		1;
   bool	is_networking_socket:	1;
   bool	is_path_only:		1;
+  bool	is_signal_fd:		1;
   bool	is_closed_for_reading:	1;
   bool	is_closed_for_writing:	1;
 } mmux_libc_file_descriptor_identity_t;
@@ -158,6 +159,12 @@ typedef struct mmux_libc_memory_file_descriptor_t {
 } mmux_libc_memory_file_descriptor_t;
 typedef mmux_libc_memory_file_descriptor_t		mmux_libc_memfd_t[1];
 typedef mmux_libc_memory_file_descriptor_t const *	mmux_libc_memfd_arg_t;
+
+typedef struct mmux_libc_signal_file_descriptor_t {
+  mmux_libc_file_descriptor_t;
+} mmux_libc_signal_file_descriptor_t;
+typedef mmux_libc_signal_file_descriptor_t		mmux_libc_sigfd_t[1];
+typedef mmux_libc_signal_file_descriptor_t const *	mmux_libc_sigfd_arg_t;
 
 typedef struct mmux_libc_file_descriptor_directory_t {
   mmux_libc_file_descriptor_t;
@@ -335,6 +342,7 @@ typedef mmux_libc_interprocess_signal_value_t const *	mmux_libc_sigval_arg_t;
 typedef struct mmux_libc_interprocess_signal_t { mmux_sint_t; } mmux_libc_interprocess_signal_t;
 typedef struct mmux_libc_sigaction_flags_t     { mmux_sint_t; } mmux_libc_sigaction_flags_t;
 typedef struct mmux_libc_si_code_t             { mmux_sint_t; } mmux_libc_si_code_t;
+typedef struct mmux_libc_signalfd_flags_t	{ mmux_sint_t; } mmux_libc_signalfd_flags_t;
 
 typedef mmux_libc_interprocess_signal_t		mmux_libc_ipxsig_t;
 
@@ -343,6 +351,9 @@ typedef mmux_libc_interprocess_signals_set_t const *	mmux_libc_sigset_arg_t;
 
 typedef mmux_libc_interprocess_signal_action_t		mmux_libc_sigaction_t[1];
 typedef mmux_libc_interprocess_signal_action_t const *	mmux_libc_sigaction_arg_t;
+
+typedef mmux_libc_interprocess_signal_fd_info_t		mmux_libc_signalfd_siginfo_t[1];
+typedef mmux_libc_interprocess_signal_fd_info_t const *	mmux_libc_signalfd_siginfo_arg_t;
 
 typedef void mmux_libc_sighandler_fun_t (mmux_standard_sint_t signum);
 typedef void mmux_libc_sigaction_fun_t  (mmux_standard_sint_t signum,

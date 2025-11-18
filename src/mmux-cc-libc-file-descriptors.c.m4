@@ -176,6 +176,7 @@ static const mmux_libc_file_descriptor_input_t stdin_fd = {
     .is_for_ouput		= false,
     .is_directory		= false,
     .is_networking_socket	= false,
+    .is_signal_fd		= false,
     .is_path_only		= false,
     .is_closed_for_reading	= false,
     .is_closed_for_writing	= true,
@@ -190,6 +191,7 @@ static const mmux_libc_file_descriptor_output_t stdou_fd = {
     .is_for_ouput		= true,
     .is_directory		= false,
     .is_networking_socket	= false,
+    .is_signal_fd		= false,
     .is_path_only		= false,
     .is_closed_for_reading	= true,
     .is_closed_for_writing	= false,
@@ -219,6 +221,7 @@ static const mmux_libc_file_descriptor_directory_t at_fdcwd_fd = {
       .is_for_ouput		= false,
       .is_directory		= true,
       .is_networking_socket	= false,
+      .is_signal_fd		= false,
       .is_path_only		= true,
       .is_closed_for_reading	= true,
       .is_closed_for_writing	= true,
@@ -260,6 +263,7 @@ mmux_libc_make_fd (mmux_libc_fd_t fd_result, mmux_standard_sint_t fd_num)
     fd_result->identity.is_directory		= false;
     fd_result->identity.is_networking_socket	= false;
     fd_result->identity.is_path_only		= false;
+    fd_result->identity.is_signal_fd		= false,
     fd_result->identity.is_closed_for_reading	= false;
     fd_result->identity.is_closed_for_writing	= false;
     return false;
@@ -276,6 +280,7 @@ mmux_libc_make_infd (mmux_libc_infd_t infd_result, mmux_standard_sint_t fd_num)
     infd_result->identity.is_for_ouput		= false;
     infd_result->identity.is_directory		= false;
     infd_result->identity.is_networking_socket	= false;
+    infd_result->identity.is_signal_fd		= false,
     infd_result->identity.is_closed_for_reading	= false;
     infd_result->identity.is_closed_for_writing	= true;
     return false;
@@ -292,6 +297,7 @@ mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
     oufd_result->identity.is_for_ouput		= true;
     oufd_result->identity.is_directory		= false;
     oufd_result->identity.is_networking_socket	= false;
+    oufd_result->identity.is_signal_fd		= false,
     oufd_result->identity.is_path_only		= false;
     oufd_result->identity.is_closed_for_reading	= true;
     oufd_result->identity.is_closed_for_writing	= false;
@@ -309,9 +315,28 @@ mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_nu
     dirfd_result->identity.is_for_ouput			= false;
     dirfd_result->identity.is_directory			= true;
     dirfd_result->identity.is_networking_socket		= false;
+    dirfd_result->identity.is_signal_fd			= false,
     dirfd_result->identity.is_path_only			= false;
     dirfd_result->identity.is_closed_for_reading	= true;
     dirfd_result->identity.is_closed_for_writing	= true;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_make_sigfd (mmux_libc_sigfd_t sigfd_result, mmux_standard_sint_t fd_num)
+{
+  if (0 <= fd_num) {
+    sigfd_result->value					= fd_num;
+    sigfd_result->identity.is_for_input			= true;
+    sigfd_result->identity.is_for_ouput			= false;
+    sigfd_result->identity.is_directory			= false;
+    sigfd_result->identity.is_networking_socket		= false;
+    sigfd_result->identity.is_signal_fd			= true,
+    sigfd_result->identity.is_path_only			= false;
+    sigfd_result->identity.is_closed_for_reading	= false;
+    sigfd_result->identity.is_closed_for_writing	= true;
     return false;
   } else {
     return true;
@@ -467,6 +492,7 @@ mmux_libc_file_descriptor_set_identity_according_to_open_flags (mmux_libc_fd_t f
     fd->identity.is_for_ouput		= false;
     fd->identity.is_directory		= true;
     fd->identity.is_networking_socket	= false;
+    fd->identity.is_signal_fd		= false,
     fd->identity.is_closed_for_reading	= true;
     fd->identity.is_closed_for_writing	= true;
     if (MMUX_LIBC_O_PATH & flags.value) {
@@ -477,6 +503,7 @@ mmux_libc_file_descriptor_set_identity_according_to_open_flags (mmux_libc_fd_t f
     fd->identity.is_for_ouput		= false;
     fd->identity.is_directory		= false;
     fd->identity.is_networking_socket	= false;
+    fd->identity.is_signal_fd		= false,
     fd->identity.is_path_only		= true;
     fd->identity.is_closed_for_reading	= true;
     fd->identity.is_closed_for_writing	= true;

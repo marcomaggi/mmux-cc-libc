@@ -69,6 +69,7 @@ m4_define([[[MMUX_LIBC_SIZEOF_SIGSET]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGSET@
 m4_define([[[MMUX_LIBC_SIZEOF_SIGACTION]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGACTION@]]])
 m4_define([[[MMUX_LIBC_SIZEOF_SIGINFO]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGINFO@]]])
 m4_define([[[MMUX_LIBC_SIZEOF_SIGVAL]]],		[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGVAL@]]])
+m4_define([[[MMUX_LIBC_SIZEOF_SIGNALFD_SIGINFO]]],	[[[@MMUX_VALUEOF_SIZEOF_STRUCT_SIGNALFD_SIGINFO@]]])
 
 
 m4_dnl constants
@@ -789,6 +790,9 @@ m4_define([[[mmux_libc_VALUEOF_POLL_PRI]]],		[[[@MMUX_VALUEOF_POLL_PRI@]]])
 m4_define([[[mmux_libc_VALUEOF_POLL_HUP]]],		[[[@MMUX_VALUEOF_POLL_HUP@]]])
 
 m4_define([[[mmux_libc_VALUEOF_SYS_SECCOMP]]],		[[[@MMUX_VALUEOF_SYS_SECCOMP@]]])
+
+m4_define([[[mmux_libc_VALUEOF_SFD_NONBLOCK]]],		[[[@MMUX_VALUEOF_SFD_NONBLOCK@]]])
+m4_define([[[mmux_libc_VALUEOF_SFD_CLOEXEC]]],		[[[@MMUX_VALUEOF_SFD_CLOEXEC@]]])
 
 m4_define([[[mmux_libc_VALUEOF_NSIG]]],				[[[@MMUX_VALUEOF_NSIG@]]])
 m4_define([[[mmux_libc_VALUEOF_SIGFPE]]],			[[[@MMUX_VALUEOF_SIGFPE@]]])

@@ -750,6 +750,7 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-blocking-mask		\
 	tests/test-interprocess-signals-kill-bub		\
 	tests/test-interprocess-signals-kill-pause		\
+	tests/test-interprocess-signals-make-signalfd		\
 	tests/test-interprocess-signals-sigaction		\
 	tests/test-interprocess-signals-signals			\
 	tests/test-interprocess-signals-sigpending		\
@@ -795,6 +796,12 @@ tests_test_interprocess_signals_sigqueue_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_interprocess_signals_sigtimedwait_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_sigtimedwait_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_make_signalfd_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_make_signalfd_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_use_signalfd_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_use_signalfd_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

@@ -901,6 +901,10 @@ AC_INCLUDES_DEFAULT([
 #  include <sys/wait.h>
 #endif
 
+#ifdef HAVE_SYS_SIGNALFD_H
+#  include <sys/signalfd.h>
+#endif
+
 #ifdef HAVE_TIME_H
 #  include <time.h>
 #endif

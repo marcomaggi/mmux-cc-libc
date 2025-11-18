@@ -78,7 +78,7 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h dirent.h])
+                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h dirent.h sys/signalfd.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -169,6 +169,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGSET],       [sizeof(sigset_t)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGACTION],    [sizeof(struct sigaction)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGINFO],      [sizeof(siginfo_t)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGVAL],       [sizeof(union sigval)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SIGNALFD_SIGINFO],      [sizeof(struct signalfd_siginfo)])
 
 
 #### inspecting errno constants
@@ -360,6 +361,9 @@ MMUX_CONSTANT_TESTS([TRAP_BRKPT TRAP_TRACE TRAP_BRANCH TRAP_HWBKPT])
 MMUX_CONSTANT_TESTS([CLD_EXITED CLD_KILLED CLD_DUMPED CLD_TRAPPED CLD_STOPPED CLD_CONTINUED])
 MMUX_CONSTANT_TESTS([POLL_IN POLL_OUT POLL_MSG POLL_ERR POLL_PRI POLL_HUP])
 MMUX_CONSTANT_TESTS([SYS_SECCOMP])
+
+## interprocess signals: signalfd
+MMUX_CONSTANT_TESTS([SFD_NONBLOCK SFD_CLOEXEC])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE CLOCKS_PER_SEC])

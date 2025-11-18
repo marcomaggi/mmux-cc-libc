@@ -638,6 +638,9 @@ mmux_cc_libc_decl bool mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_s
 mmux_cc_libc_decl bool mmux_libc_make_dirfd (mmux_libc_dirfd_t dirfd_result, mmux_standard_sint_t fd_num)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_make_sigfd (mmux_libc_sigfd_t sigfd_result, mmux_standard_sint_t fd_num)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_stdin (mmux_libc_infd_t result_p)
   __attribute__((__nonnull__(1)));
 
@@ -1340,6 +1343,12 @@ mmux_libc_sigaction_flags (mmux_standard_sint_t flags_num)
   return (mmux_libc_sigaction_flags_t) { { .value = flags_num } };
 }
 
+mmux_cc_libc_inline_decl mmux_libc_signalfd_flags_t
+mmux_libc_signalfd_flags (mmux_standard_sint_t flags_num)
+{
+  return (mmux_libc_signalfd_flags_t) { { .value = flags_num } };
+}
+
 /* ------------------------------------------------------------------ */
 
 mmux_cc_libc_decl bool mmux_libc_raise (mmux_libc_interprocess_signal_t ipxsignal)
@@ -1669,6 +1678,120 @@ mmux_cc_libc_decl bool mmux_libc_sival_ptr_set (mmux_libc_sigval_t self, mmux_po
 mmux_cc_libc_decl bool mmux_libc_sigqueue (mmux_libc_pid_t pid, mmux_libc_interprocess_signal_t ipxsig,
 					   mmux_libc_sigval_arg_t the_val)
   __attribute__((__nonnull__(3)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_ssi_signo_ref (mmux_libc_interprocess_signal_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_signo_set (mmux_libc_signalfd_siginfo_t self, mmux_libc_interprocess_signal_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_errno_ref (mmux_libc_errno_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_errno_set (mmux_libc_signalfd_siginfo_t self, mmux_libc_errno_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_code_ref (mmux_sint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_code_set (mmux_libc_signalfd_siginfo_t self, mmux_sint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_pid_ref (mmux_libc_pid_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_pid_set (mmux_libc_signalfd_siginfo_t self, mmux_libc_pid_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_uid_ref (mmux_libc_uid_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_uid_set (mmux_libc_signalfd_siginfo_t self, mmux_libc_uid_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_fd_ref (mmux_sint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_fd_set (mmux_libc_signalfd_siginfo_t self, mmux_sint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_tid_ref (mmux_uint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_tid_set (mmux_libc_signalfd_siginfo_t self, mmux_uint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_band_ref (mmux_uint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_band_set (mmux_libc_signalfd_siginfo_t self, mmux_uint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_overrun_ref (mmux_uint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_overrun_set (mmux_libc_signalfd_siginfo_t self, mmux_uint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_trapno_ref (mmux_uint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_trapno_set (mmux_libc_signalfd_siginfo_t self, mmux_uint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_status_ref (mmux_sint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_status_set (mmux_libc_signalfd_siginfo_t self, mmux_sint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_int_ref (mmux_sint32_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_int_set (mmux_libc_signalfd_siginfo_t self, mmux_sint32_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_ptr_ref (mmux_uint64_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_ptr_set (mmux_libc_signalfd_siginfo_t self, mmux_uint64_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_utime_ref (mmux_uint64_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_utime_set (mmux_libc_signalfd_siginfo_t self, mmux_uint64_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_stime_ref (mmux_uint64_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_stime_set (mmux_libc_signalfd_siginfo_t self, mmux_uint64_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_addr_ref (mmux_uint64_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_addr_set (mmux_libc_signalfd_siginfo_t self, mmux_uint64_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_addr_lsb_ref (mmux_uint16_t * field_value_result_p, mmux_libc_signalfd_siginfo_arg_t self)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ssi_addr_lsb_set (mmux_libc_signalfd_siginfo_t self, mmux_uint16_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_signalfd (mmux_libc_sigfd_t fd,
+						mmux_libc_sigset_arg_t accepted_ipxsigset,
+						mmux_libc_signalfd_flags_t flags)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_use_fd_as_signalfd (mmux_libc_sigfd_arg_t fd,
+						     mmux_libc_sigset_arg_t accepted_ipxsigset,
+						     mmux_libc_signalfd_flags_t flags)
+  __attribute__((__nonnull__(1,2)));
 
 
 /** --------------------------------------------------------------------

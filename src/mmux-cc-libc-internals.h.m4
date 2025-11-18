@@ -203,6 +203,10 @@ extern "C" {
 #  include <sys/resource.h>
 #endif
 
+#ifdef HAVE_SYS_SIGNALFD_H
+#  include <sys/signalfd.h>
+#endif
+
 #ifdef HAVE_SYS_WAIT_H
 #  include <sys/wait.h>
 #endif
@@ -320,6 +324,10 @@ typedef struct mmux_libc_interprocess_signal_info_t {
 typedef struct mmux_libc_interprocess_signal_value_t {
   union sigval;
 } mmux_libc_interprocess_signal_value_t;
+
+typedef struct mmux_libc_interprocess_signal_fd_info_t {
+  struct signalfd_siginfo;
+} mmux_libc_interprocess_signal_fd_info_t;
 
 typedef mmux_libc_in_addr_t *			mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *		mmux_libc_insix_addr_ptr_t;
