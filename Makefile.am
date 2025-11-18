@@ -755,6 +755,7 @@ check_PROGRAMS	+= \
 	tests/test-interprocess-signals-sigpending		\
 	tests/test-interprocess-signals-sigqueue		\
 	tests/test-interprocess-signals-sigsuspend		\
+	tests/test-interprocess-signals-sigtimedwait		\
 	tests/test-interprocess-signals-sigwait			\
 	tests/test-interprocess-signals-sigwaitinfo		\
 	tests/test-interprocess-signals-struct-sigset
@@ -791,6 +792,9 @@ tests_test_interprocess_signals_sigwaitinfo_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_interprocess_signals_sigqueue_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_interprocess_signals_sigqueue_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_interprocess_signals_sigtimedwait_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_interprocess_signals_sigtimedwait_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 

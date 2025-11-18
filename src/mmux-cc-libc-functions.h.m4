@@ -1454,7 +1454,7 @@ mmux_cc_libc_decl bool mmux_libc_sigwaitinfo (mmux_libc_siginfo_t siginfo_result
 
 mmux_cc_libc_decl bool mmux_libc_sigtimedwait (mmux_libc_siginfo_t siginfo_result,
 					       mmux_libc_sigset_arg_t set_of_signals_to_wait_for,
-					       mmux_libc_timespec_t timeout)
+					       mmux_libc_timespec_arg_t timeout)
   __attribute__((__nonnull__(1,2,3)));
 
 /* ------------------------------------------------------------------ */

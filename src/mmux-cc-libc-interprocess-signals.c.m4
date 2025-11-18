@@ -514,10 +514,11 @@ mmux_libc_sigwaitinfo (mmux_libc_siginfo_t siginfo_result, mmux_libc_sigset_arg_
 bool
 mmux_libc_sigtimedwait (mmux_libc_siginfo_t siginfo_result,
 			mmux_libc_sigset_arg_t set_of_signals_to_wait_for,
-			mmux_libc_timespec_t timeout)
+			mmux_libc_timespec_arg_t timeout)
 {
   int	rv = sigtimedwait(set_of_signals_to_wait_for, siginfo_result, timeout);
 
+  /* If there where no signals delivered: errno is set to EAGAIN. */
   return (-1 != rv)? false : true;
 }
 

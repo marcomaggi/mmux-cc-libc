@@ -6018,6 +6018,54 @@ set to @code{MMUX_LIBC_EINTR}.
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_sigtimedwait (mmux_libc_siginfo_t @var{delivered_siginfo_result}, mmux_libc_sigset_arg_t @var{set_of_signals_to_wait_for}, mmux_libc_timespec_arg_t @var{timeout})
+@MmuxCInterface{sigtimedwait}.
+
+@example
+/* Let's say this process blocks all the signals. */
+@{
+  mmux_libc_sigset_t  new_blocking_mask;
+
+  mmux_libc_sigfillset(new_blocking_mask);
+  if (mmux_libc_interprocess_signals_blocking_mask_set(new_blocking_mask, NULL)) @{
+    /* error */
+  @}
+@}
+
+/* Wait for SIGUSR1 and SIGUSR2. */
+@{
+  mmux_libc_siginfo_t   delivered_siginfo;
+  mmux_libc_sigset_t    ipxsigset_to_wait_for;
+  mmux_libc_timespec_t  timeout;
+
+  mmux_libc_sigemptyset(ipxsigset_to_wait_for);
+  mmux_libc_sigaddset(ipxsigset_to_wait_for, MMUX_LIBC_SIGUSR1);
+  mmux_libc_sigaddset(ipxsigset_to_wait_for, MMUX_LIBC_SIGUSR2);
+
+  mmux_libc_timespec_set(timeout, mmux_time_literal(1), mmux_slong_literal(0));
+
+  if (mmux_libc_sigtimedwait(delivered_siginfo, ipxsigset_to_wait_for, timeout)) @{
+    mmux_libc_errno_t errnum;
+
+    mmux_libc_errno_consume(&errnum);
+    if (mmux_libc_errno_equal(errnum, MMUX_LIBC_EAGAIN)) @{
+      /* No signal was delivered in the configured timeout. */
+    @} else @{
+      /* error */
+    @}
+  @} else @{
+    mmux_libc_interprocess_signal_t   delivered_ipxsig;
+
+    mmux_libc_si_signo_ref(&delivered_ipxsig, delivered_siginfo);
+    if (mmux_libc_interprocess_signal_equal(delivered_ipxsig, MMUX_LIBC_SIGUSR1)) @{
+      (* Successufully received SIGUSR1. */
+    @}
+  @}
+@}
+@end example
+@end deftypefun
+
 @c page
 @node signals sets action
 @subsection Advanced interprocess signals handling

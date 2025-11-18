@@ -4,9 +4,7 @@
 
 * Interface shared memory: shm_open, shm_unlink.
 
-* Add interprocess signals API: sigwait, sigwaitinfo, sigtimedwait, signalfd.
-
-* Add interprocess signals API for everything related to the use of "siginfo_t" see sigaction(2).
+* Add interprocess signals API: signalfd.
 
 * FIXME Cleanup the messy code in "mmux-libc-file-system-pathnames.c": rationalise the definition of
   helper macros and inline functions.
