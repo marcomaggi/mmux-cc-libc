@@ -4,8 +4,6 @@
 
 * Interface shared memory: shm_open, shm_unlink.
 
-* Add interprocess signals API: signalfd.
-
 * Add interface for eventfd(2).
 
 * Add interface for timerfd_create(2).
