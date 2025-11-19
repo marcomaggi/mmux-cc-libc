@@ -65,6 +65,7 @@ CLEANFILES		+= doc/mmux-cc-libc.css
 doc_mmux_cc_libc_TEXINFOS	= \
 	doc/macros.texi			\
 	doc/overview-linking.texi	\
+	doc/mmux-cc-libc-macros.texi	\
 	doc/mmux-version.texi		\
 	doc/gpl-3.0.texi		\
 	doc/fdl-1.3.texi
@@ -881,6 +882,15 @@ check_PROGRAMS	+= \
 
 tests_test_interface_specifications_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_interface_specifications_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+## ------------------------------------------------------------------------
+## networking sockets
+
+check_PROGRAMS	+= \
+	tests/test-networking-sockets-interface-names
+
+tests_test_networking_sockets_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_sockets_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

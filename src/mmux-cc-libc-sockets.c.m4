@@ -392,6 +392,90 @@ socket_internet_protocol_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_socke
 
 
 /** --------------------------------------------------------------------
+ ** Interface naming.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_if_index_set (mmux_libc_if_nameindex_t struct_p, mmux_libc_network_interface_index_t new_field_value)
+{
+  struct_p->if_index = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_if_index_ref (mmux_libc_network_interface_index_t * field_value_result_p, mmux_libc_if_nameindex_arg_t struct_p)
+{
+  *field_value_result_p = mmux_libc_network_interface_index(struct_p->if_index);
+  return false;
+}
+
+bool
+mmux_libc_if_name_set (mmux_libc_if_nameindex_t struct_p, mmux_asciizcp_t new_field_value)
+{
+  struct_p->if_name = (mmux_asciizp_t)new_field_value;
+  return false;
+}
+bool
+mmux_libc_if_name_ref (mmux_asciizcpp_t field_value_result_p, mmux_libc_if_nameindex_arg_t struct_p)
+{
+  *field_value_result_p = mmux_asciizp(struct_p->if_name);
+  return false;
+}
+
+bool
+mmux_libc_if_nameindex_dump (mmux_libc_fd_arg_t fd, mmux_libc_if_nameindex_arg_t nameindex_p, mmux_asciizcp_t struct_name)
+{
+  if (NULL == struct_name) {
+    struct_name = "struct if_nameindex";
+  }
+
+  DPRINTF(fd, "%s.if_index = \"%d\"\n", struct_name, nameindex_p->if_index);
+  DPRINTF(fd, "%s.if_name  = \"%s\"\n", struct_name, nameindex_p->if_name);
+
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_if_nametoindex (mmux_libc_network_interface_index_t * index_result_p, mmux_asciizcp_t network_interface_name)
+{
+  mmux_standard_uint_t	rv = if_nametoindex(network_interface_name);
+
+  if (0 < rv) {
+    *index_result_p = mmux_libc_network_interface_index(rv);
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_if_indextoname (mmux_asciizp_t buffer, mmux_libc_network_interface_index_t index)
+{
+  char *	rv = if_indextoname(index.value, buffer);
+
+  return ((NULL != rv)? false : true);
+}
+bool
+mmux_libc_if_nameindex (mmux_libc_network_interface_name_index_t const * * result_nameindex_p)
+{
+  auto	nameindex_p = (mmux_libc_network_interface_name_index_t const *) if_nameindex();
+
+  if (NULL != nameindex_p) {
+    *result_nameindex_p = nameindex_p;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_if_freenameindex (mmux_libc_network_interface_name_index_t const * nameindex_array)
+{
+  if_freenameindex(nameindex_array);
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
  ** Struct in_addr.
  ** ----------------------------------------------------------------- */
 
@@ -1599,67 +1683,6 @@ mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
   } else {
     return true;
   }
-}
-
-
-/** --------------------------------------------------------------------
- ** Interface naming.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_SETTER_GETTER(if_nameindex,		if_index,	libc_network_interface_index)
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(if_nameindex,	if_name)
-
-bool
-mmux_libc_if_nameindex_dump (mmux_libc_fd_arg_t fd, mmux_libc_if_nameindex_t const * nameindex_p, mmux_asciizcp_t struct_name)
-{
-  if (NULL == struct_name) {
-    struct_name = "struct if_nameindex";
-  }
-
-  DPRINTF(fd, "%s.if_index = \"%d\"\n", struct_name, nameindex_p->if_index);
-  DPRINTF(fd, "%s.if_name  = \"%s\"\n", struct_name, nameindex_p->if_name);
-
-  return false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_if_nametoindex (mmux_libc_network_interface_index_t * index_p, mmux_asciizcp_t network_interface_name)
-{
-  mmux_standard_uint_t	rv = if_nametoindex(network_interface_name);
-
-  if (0 < rv) {
-    *index_p = mmux_libc_network_interface_index(rv);
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_if_indextoname (mmux_asciizp_t buffer, mmux_libc_network_interface_index_t index)
-{
-  char *	rv = if_indextoname(index.value, buffer);
-
-  return ((NULL != rv)? false : true);
-}
-bool
-mmux_libc_if_nameindex (mmux_libc_if_nameindex_t const * * result_nameindex_p)
-{
-  mmux_libc_if_nameindex_t const *	nameindex_p = if_nameindex();
-
-  if (NULL != nameindex_p) {
-    *result_nameindex_p = nameindex_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_if_freenameindex (mmux_libc_if_nameindex_t const * nameindex_array)
-{
-  if_freenameindex((mmux_libc_if_nameindex_ptr_t)nameindex_array);
-  return false;
 }
 
 

@@ -191,28 +191,6 @@ typedef mmux_libc_file_descriptor_lock_t const *	mmux_libc_flock_arg_t;
 
 
 /** --------------------------------------------------------------------
- ** Networking.
- ** ----------------------------------------------------------------- */
-
-typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
-typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];
-typedef mmux_libc_network_socket_t const *		mmux_libc_sock_arg_t;
-
-typedef struct mmux_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_host_byteorder_uint16_t;
-typedef struct mmux_network_byteorder_uint16_t { mmux_uint16_t; } mmux_network_byteorder_uint16_t;
-
-typedef struct mmux_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_host_byteorder_uint32_t;
-typedef struct mmux_network_byteorder_uint32_t { mmux_uint32_t; } mmux_network_byteorder_uint32_t;
-
-typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;  } mmux_libc_socket_address_family_t;
-typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
-typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
-typedef struct mmux_libc_socket_communication_style_t	{ mmux_sint_t;  } mmux_libc_socket_communication_style_t;
-typedef struct mmux_libc_socket_shutdown_mode_t		{ mmux_sint_t;  } mmux_libc_socket_shutdown_mode_t;
-typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_network_interface_index_t;
-
-
-/** --------------------------------------------------------------------
  ** File system.
  ** ----------------------------------------------------------------- */
 
@@ -369,6 +347,31 @@ typedef struct mmux_libc_sysconf_parameter_t { mmux_sint_t; } mmux_libc_sysconf_
 typedef struct mmux_libc_sysconf_string_parameter_t { mmux_sint_t; } mmux_libc_sysconf_string_parameter_t;
 typedef struct mmux_libc_sysconf_pathname_parameter_t { mmux_sint_t; } mmux_libc_sysconf_pathname_parameter_t;
 typedef struct mmux_libc_sysconf_resource_limit_t { mmux_sint_t; } mmux_libc_sysconf_resource_limit_t;
+
+
+/** --------------------------------------------------------------------
+ ** Networking.
+ ** ----------------------------------------------------------------- */
+
+typedef mmux_libc_network_interface_name_index_t		mmux_libc_if_nameindex_t[1];
+typedef mmux_libc_network_interface_name_index_t const *	mmux_libc_if_nameindex_arg_t;
+
+typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
+typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];
+typedef mmux_libc_network_socket_t const *		mmux_libc_sock_arg_t;
+
+typedef struct mmux_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_host_byteorder_uint16_t;
+typedef struct mmux_network_byteorder_uint16_t { mmux_uint16_t; } mmux_network_byteorder_uint16_t;
+
+typedef struct mmux_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_host_byteorder_uint32_t;
+typedef struct mmux_network_byteorder_uint32_t { mmux_uint32_t; } mmux_network_byteorder_uint32_t;
+
+typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_network_interface_index_t;
+typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;} mmux_libc_socket_address_family_t;
+typedef struct mmux_libc_socket_protocol_family_t	{ mmux_sint_t;  } mmux_libc_socket_protocol_family_t;
+typedef struct mmux_libc_socket_internet_protocol_t	{ mmux_sint_t;  } mmux_libc_socket_internet_protocol_t;
+typedef struct mmux_libc_socket_communication_style_t	{ mmux_sint_t;  } mmux_libc_socket_communication_style_t;
+typedef struct mmux_libc_socket_shutdown_mode_t		{ mmux_sint_t;  } mmux_libc_socket_shutdown_mode_t;
 
 
 /** --------------------------------------------------------------------

@@ -98,9 +98,12 @@ typedef struct mmux_libc_iovec_array_t {
 /* This must be big enough to contain any "struct sockaddr_*" value. */
 typedef struct mmux_libc_sockaddr_t		{ mmux_uint8_t value[256];                             } mmux_libc_sockaddr_t;
 
+typedef struct mmux_libc_network_interface_name_index_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_IF_NAMEINDEX];
+} mmux_libc_network_interface_name_index_t;
+
 typedef struct mmux_libc_in_addr_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_IN_ADDR];        } mmux_libc_in_addr_t;
 typedef struct mmux_libc_insix_addr_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_IN6_ADDR];       } mmux_libc_insix_addr_t;
-typedef struct mmux_libc_if_nameindex_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_IF_NAMEINDEX];   } mmux_libc_if_nameindex_t;
 typedef struct mmux_libc_addrinfo_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_ADDRINFO];       } mmux_libc_addrinfo_t;
 typedef struct mmux_libc_sockaddr_un_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_UN];    } mmux_libc_sockaddr_un_t;
 typedef struct mmux_libc_sockaddr_in_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN];    } mmux_libc_sockaddr_in_t;
@@ -133,7 +136,6 @@ typedef struct mmux_libc_interprocess_signal_fd_info_t {
 
 typedef mmux_libc_in_addr_t *		mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *	mmux_libc_insix_addr_ptr_t;
-typedef mmux_libc_if_nameindex_t *	mmux_libc_if_nameindex_ptr_t;
 typedef mmux_libc_addrinfo_t *		mmux_libc_addrinfo_ptr_t;
 typedef mmux_libc_sockaddr_t *		mmux_libc_sockaddr_ptr_t;
 typedef mmux_libc_sockaddr_un_t *	mmux_libc_sockaddr_un_ptr_t;

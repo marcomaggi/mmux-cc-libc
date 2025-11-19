@@ -294,21 +294,6 @@ typedef struct mmux_libc_file_descriptor_open_how_t {
 } mmux_libc_file_descriptor_open_how_t;
 #endif
 
-typedef struct mmux_libc_in_addr_t	{ struct in_addr  value; } mmux_libc_in_addr_t;
-typedef struct mmux_libc_insix_addr_t	{ struct in6_addr value; } mmux_libc_insix_addr_t;
-
-typedef struct if_nameindex			mmux_libc_if_nameindex_t;
-typedef struct addrinfo				mmux_libc_addrinfo_t;
-typedef struct sockaddr				mmux_libc_sockaddr_t;
-typedef struct sockaddr_un			mmux_libc_sockaddr_un_t;
-typedef struct sockaddr_in			mmux_libc_sockaddr_in_t;
-typedef struct sockaddr_in6			mmux_libc_sockaddr_insix_t;
-typedef struct hostent				mmux_libc_hostent_t;
-typedef struct servent				mmux_libc_servent_t;
-typedef struct protoent				mmux_libc_protoent_t;
-typedef struct netent				mmux_libc_netent_t;
-typedef struct linger				mmux_libc_linger_t;
-
 typedef struct mmux_libc_interprocess_signals_set_t {
   sigset_t;
 } mmux_libc_interprocess_signals_set_t;
@@ -329,10 +314,29 @@ typedef struct mmux_libc_interprocess_signal_fd_info_t {
   struct signalfd_siginfo;
 } mmux_libc_interprocess_signal_fd_info_t;
 
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_in_addr_t	{ struct in_addr  value; } mmux_libc_in_addr_t;
+typedef struct mmux_libc_insix_addr_t	{ struct in6_addr value; } mmux_libc_insix_addr_t;
+
+typedef struct mmux_libc_network_interface_name_index_t {
+  struct if_nameindex;
+} mmux_libc_network_interface_name_index_t;
+
+typedef struct addrinfo				mmux_libc_addrinfo_t;
+typedef struct sockaddr				mmux_libc_sockaddr_t;
+typedef struct sockaddr_un			mmux_libc_sockaddr_un_t;
+typedef struct sockaddr_in			mmux_libc_sockaddr_in_t;
+typedef struct sockaddr_in6			mmux_libc_sockaddr_insix_t;
+typedef struct hostent				mmux_libc_hostent_t;
+typedef struct servent				mmux_libc_servent_t;
+typedef struct protoent				mmux_libc_protoent_t;
+typedef struct netent				mmux_libc_netent_t;
+typedef struct linger				mmux_libc_linger_t;
+
 typedef mmux_libc_in_addr_t *			mmux_libc_in_addr_ptr_t;
 typedef mmux_libc_insix_addr_t *		mmux_libc_insix_addr_ptr_t;
 
-typedef mmux_libc_if_nameindex_t *		mmux_libc_if_nameindex_ptr_t;
 typedef mmux_libc_addrinfo_t *			mmux_libc_addrinfo_ptr_t;
 typedef mmux_libc_sockaddr_t *			mmux_libc_sockaddr_ptr_t;
 typedef mmux_libc_sockaddr_un_t *		mmux_libc_sockaddr_un_ptr_t;

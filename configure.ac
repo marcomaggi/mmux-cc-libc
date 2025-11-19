@@ -94,7 +94,8 @@ AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp s
                 get_current_dir_name
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
                 wait waitid syscall memfd_create strerrorname_np strerrordesc_np
-                strerror_r strerror_l])
+                strerror_r strerror_l
+                signalfd])
 
 AC_CHECK_FUNCS([sigaltstack sigemptyset sigaddset sigfillset sigprocmask sigaction tgkill])
 
