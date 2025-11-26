@@ -108,7 +108,7 @@ EXTRA_DIST	+= \
 	src/mmux-cc-libc-memory.c.m4			\
 	src/mmux-cc-libc-persona.c.m4			\
 	src/mmux-cc-libc-processes.c.m4			\
-	src/mmux-cc-libc-sockets.c.m4			\
+	src/mmux-cc-libc-networking.c.m4			\
 	src/mmux-cc-libc-strings.c.m4			\
 	src/mmux-cc-libc-system-configuration.c.m4	\
 	src/mmux-cc-libc-time.c.m4
@@ -130,7 +130,7 @@ MMUX_CC_LIBC_BUILT_SOURCES	= \
 	src/mmux-cc-libc-memory.c			\
 	src/mmux-cc-libc-persona.c			\
 	src/mmux-cc-libc-processes.c			\
-	src/mmux-cc-libc-sockets.c			\
+	src/mmux-cc-libc-networking.c			\
 	src/mmux-cc-libc-strings.c			\
 	src/mmux-cc-libc-system-configuration.c		\
 	src/mmux-cc-libc-time.c
@@ -173,7 +173,7 @@ libmmux_cc_libc_la_SOURCES	= \
 	src/mmux-cc-libc-memory.c			\
 	src/mmux-cc-libc-persona.c			\
 	src/mmux-cc-libc-processes.c			\
-	src/mmux-cc-libc-sockets.c			\
+	src/mmux-cc-libc-networking.c			\
 	src/mmux-cc-libc-strings.c			\
 	src/mmux-cc-libc-system-configuration.c		\
 	src/mmux-cc-libc-time.c
@@ -887,10 +887,26 @@ tests_test_interface_specifications_LDADD		= $(mmux_cc_libc_tests_ldadd)
 ## networking sockets
 
 check_PROGRAMS	+= \
-	tests/test-networking-sockets-interface-names
+	tests/test-networking-interface-names		\
+	tests/test-networking-internet-protocol-address-conversion	\
+	tests/test-networking-exact-integers-byteorder			\
+	tests/test-networking-struct-ipfour-addr	\
+	tests/test-networking-struct-ipsix-addr
 
-tests_test_networking_sockets_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
-tests_test_networking_sockets_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
+tests_test_networking_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_exact_integers_byteorder_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_exact_integers_byteorder_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_internet_protocol_address_conversion_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_internet_protocol_address_conversion_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_struct_ipfour_addr_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_struct_ipfour_addr_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_struct_ipsix_addr_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_struct_ipsix_addr_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

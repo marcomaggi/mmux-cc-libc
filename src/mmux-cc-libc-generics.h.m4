@@ -42,12 +42,10 @@ DEFINE_COMPARISON([[[equal]]])
   (_Generic((VALUE),									\
 	    mmux_libc_socket_address_family_t:		((VALUE).value),		\
 	    mmux_libc_socket_protocol_family_t:		((VALUE).value),		\
-            mmux_libc_insix_addr_t:			((VALUE).value),		\
-            mmux_libc_in_addr_t:			((VALUE).value),		\
-            mmux_host_byteorder_uint16_t:		((VALUE).value),		\
-            mmux_network_byteorder_uint16_t:		((VALUE).value),		\
-            mmux_host_byteorder_uint32_t:		((VALUE).value),		\
-            mmux_network_byteorder_uint32_t:		((VALUE).value),		\
+            mmux_libc_host_byteorder_uint16_t:		((VALUE).value),		\
+            mmux_libc_network_byteorder_uint16_t:	((VALUE).value),		\
+            mmux_libc_host_byteorder_uint32_t:		((VALUE).value),		\
+            mmux_libc_network_byteorder_uint32_t:	((VALUE).value),		\
 	    default:					mmux_ctype_value(VALUE)))
 
 

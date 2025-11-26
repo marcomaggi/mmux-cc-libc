@@ -30,6 +30,14 @@
 
 #define DPRINTF(FD,...)		if (mmux_libc_dprintf(FD,__VA_ARGS__)) { return true; }
 
+#undef  MMUX_LIBC_IPFOUR_ADDR_RESET
+#define MMUX_LIBC_IPFOUR_ADDR_RESET(ADDRESS)	\
+  (memset((ADDRESS), '\0', sizeof(mmux_libc_internet_protocol_address_four_t)))
+
+#undef  MMUX_LIBC_IPSIX_ADDR_RESET
+#define MMUX_LIBC_IPSIX_ADDR_RESET(ADDRESS)	\
+  (memset((ADDRESS), '\0', sizeof(mmux_libc_internet_protocol_address_six_t)))
+
 
 /** --------------------------------------------------------------------
  ** Struct dumpers helpers.
@@ -476,125 +484,221 @@ mmux_libc_if_freenameindex (mmux_libc_network_interface_name_index_t const * nam
 
 
 /** --------------------------------------------------------------------
- ** Struct in_addr.
+ ** Byte order.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_s_addr_set (mmux_libc_in_addr_t * const P, mmux_uint32_t value)
+mmux_libc_htons (mmux_libc_network_byteorder_uint16_t * result_p, mmux_libc_host_byteorder_uint16_t value)
 {
-  P->value.s_addr = mmux_libc_ctype_value(value);
+  *result_p = mmux_libc_network_byteorder_uint16(htons(value.value));
   return false;
 }
 bool
-mmux_libc_s_addr_ref (mmux_uint32_t * result_p, mmux_libc_in_addr_t const * const P)
+mmux_libc_ntohs (mmux_libc_host_byteorder_uint16_t * result_p, mmux_libc_network_byteorder_uint16_t value)
 {
-  *result_p = mmux_uint32(P->value.s_addr);
+  *result_p = mmux_libc_host_byteorder_uint16(ntohs(value.value));
+  return false;
+}
+bool
+mmux_libc_htonl (mmux_libc_network_byteorder_uint32_t * result_p, mmux_libc_host_byteorder_uint32_t value)
+{
+  *result_p = mmux_libc_network_byteorder_uint32(htonl(value.value));
+  return false;
+}
+bool
+mmux_libc_ntohl (mmux_libc_host_byteorder_uint32_t * result_p, mmux_libc_network_byteorder_uint32_t value)
+{
+  *result_p = mmux_libc_host_byteorder_uint32(ntohl(value.value));
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Struct ipfour_addr.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_s_addr_set (mmux_libc_ipfour_addr_t ipfour_addr, mmux_libc_network_byteorder_uint32_t value)
+{
+  /* The field  "s_addr" of "struct  in_addr" is  a "uint32_t" in  network byteorder,
+     which is big-endian.  When in doubt about it: read the manual page ip(7). */
+  ipfour_addr->value->s_addr = value.value;
+  return false;
+}
+bool
+mmux_libc_s_addr_ref (mmux_libc_network_byteorder_uint32_t * result_p, mmux_libc_ipfour_addr_arg_t ipfour_addr)
+{
+  *result_p = mmux_libc_network_byteorder_uint32(ipfour_addr->value->s_addr);
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_make_in_addr (mmux_libc_in_addr_t * in_addr_p, mmux_standard_uint32_t network_byteorder_value)
+mmux_libc_make_ipfour_addr (mmux_libc_ipfour_addr_t address_result,
+			    mmux_libc_network_byteorder_uint32_t raw_internet_address)
 {
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
   /* Stored in network byte order. */
-  in_addr_p->value.s_addr = network_byteorder_value;
+  address_result->value->s_addr = raw_internet_address.value;
+  return false;
+
+}
+static bool
+mmux_libc_make_ipfour_addr_from_struct_in_addr (mmux_libc_ipfour_addr_t address_result, struct in_addr input)
+{
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  address_result->value[0] = input;
   return false;
 }
 bool
-mmux_libc_make_in_addr_none (mmux_libc_in_addr_t * in_addr_p)
+mmux_libc_make_ipfour_addr_none (mmux_libc_ipfour_addr_t address_result)
 {
-  /* Stored in network byte order. */
-  *in_addr_p = MMUX_LIBC_INADDR_NONE;
-  return false;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  {
+    mmux_libc_network_byteorder_uint32_t	raw_address;
+
+    mmux_libc_htonl(&raw_address, MMUX_LIBC_INADDR_NONE);
+    return mmux_libc_make_ipfour_addr(address_result, raw_address);
+  }
 }
 bool
-mmux_libc_make_in_addr_any (mmux_libc_in_addr_t * in_addr_p)
+mmux_libc_make_ipfour_addr_any (mmux_libc_ipfour_addr_t address_result)
 {
-  /* Stored in network byte order. */
-  *in_addr_p = MMUX_LIBC_INADDR_ANY;
-  return false;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  {
+    mmux_libc_network_byteorder_uint32_t	raw_address;
+
+    mmux_libc_htonl(&raw_address, MMUX_LIBC_INADDR_ANY);
+    return mmux_libc_make_ipfour_addr(address_result, raw_address);
+  }
 }
 bool
-mmux_libc_make_in_addr_broadcast (mmux_libc_in_addr_t * in_addr_p)
+mmux_libc_make_ipfour_addr_broadcast (mmux_libc_ipfour_addr_t address_result)
 {
-  /* Stored in network byte order. */
-  *in_addr_p = MMUX_LIBC_INADDR_BROADCAST;
-  return false;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  {
+    mmux_libc_network_byteorder_uint32_t	raw_address;
+
+    mmux_libc_htonl(&raw_address, MMUX_LIBC_INADDR_BROADCAST);
+    return mmux_libc_make_ipfour_addr(address_result, raw_address);
+  }
 }
 bool
-mmux_libc_make_in_addr_loopback (mmux_libc_in_addr_t * in_addr_p)
+mmux_libc_make_ipfour_addr_loopback (mmux_libc_ipfour_addr_t address_result)
 {
-  /* Stored in network byte order. */
-  *in_addr_p = MMUX_LIBC_INADDR_LOOPBACK;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  {
+    mmux_libc_network_byteorder_uint32_t	raw_address;
+
+    mmux_libc_htonl(&raw_address, MMUX_LIBC_INADDR_LOOPBACK);
+    return mmux_libc_make_ipfour_addr(address_result, raw_address);
+  }
+}
+bool
+mmux_libc_make_ipfour_addr_from_asciiz (mmux_libc_ipfour_addr_t address_result, mmux_asciizcp_t dotted_quad)
+{
+  return mmux_libc_inet_pton(address_result, MMUX_LIBC_AF_INET, dotted_quad);
+}
+bool
+mmux_libc_ipfour_addr_reset (mmux_libc_ipfour_addr_t address)
+{
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address);
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_in_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_in_addr_t const * in_addr_p,
-			mmux_asciizcp_t struct_name)
+mmux_libc_ipfour_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_ipfour_addr_arg_t ipfour_addr, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct in_addr";
   }
 
-  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)in_addr_p);
+  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)ipfour_addr);
 
   {
-    mmux_uint32_t	raw_number;
+    mmux_libc_network_byteorder_uint32_t	raw_address_number;
 
-    mmux_libc_s_addr_ref(&raw_number, in_addr_p);
-    DPRINTF(fd, "%s.s_addr = ", struct_name);
-    if (mmux_libc_dprintf_uint32(fd, raw_number)) {
-      return true;
-    } else {
+    mmux_libc_s_addr_ref(&raw_address_number, ipfour_addr);
+
+    DPRINTF(fd, "%s.s_addr = 0x%08x", struct_name, raw_address_number.value);
+    {
       auto const	provided_nchars = mmux_usize_literal(512);
       char		str[provided_nchars.value];
 
-      if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET, in_addr_p)) {
+      if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET, ipfour_addr)) {
 	return true;
       }
-      DPRINTF(fd, " (%s)\n", str);
+      DPRINTF(fd, " (%s) [network byteorder]\n", str);
     }
   }
 
   return false;
 }
 
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_ipfour_addr_equal (bool * result_p,
+			     mmux_libc_ipfour_addr_arg_t ipfour_addr_1,
+			     mmux_libc_ipfour_addr_arg_t ipfour_addr_2)
+{
+  mmux_libc_network_byteorder_uint32_t	raw_address_1, raw_address_2;
+
+  mmux_libc_s_addr_ref(&raw_address_1, ipfour_addr_1);
+  mmux_libc_s_addr_ref(&raw_address_2, ipfour_addr_2);
+
+  *result_p = (ipfour_addr_1->value->s_addr == ipfour_addr_2->value->s_addr)? true : false;
+  return false;
+}
+
 
 /** --------------------------------------------------------------------
- ** Struct insix_addr.
+ ** Struct ipsix_addr.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_insix_addr_loopback (mmux_libc_insix_addr_t * insix_addr_p)
+mmux_libc_make_ipsix_addr_loopback (mmux_libc_ipsix_addr_t address_result)
 {
-  insix_addr_p->value = in6addr_loopback;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  address_result->value[0] = in6addr_loopback;
   return false;
 }
 bool
-mmux_libc_make_insix_addr_any (mmux_libc_insix_addr_t * insix_addr_p)
+mmux_libc_make_ipsix_addr_any (mmux_libc_ipsix_addr_t address_result)
 {
-  insix_addr_p->value = in6addr_any;
+  MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+  address_result->value[0] = in6addr_any;
+  return false;
+}
+bool
+mmux_libc_make_ipsix_addr_from_asciiz (mmux_libc_ipsix_addr_t address_result, mmux_asciizcp_t dotted_quad)
+{
+  return mmux_libc_inet_pton(address_result, MMUX_LIBC_AF_INET6, dotted_quad);
+}
+bool
+mmux_libc_ipsix_addr_reset (mmux_libc_ipsix_addr_t address)
+{
+  MMUX_LIBC_IPSIX_ADDR_RESET(address);
   return false;
 }
 
 bool
-mmux_libc_insix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_insix_addr_t const * insix_addr_p, mmux_asciizcp_t struct_name)
+mmux_libc_ipsix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_ipsix_addr_arg_t ipsix_addr, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct in6_addr";
   }
 
-  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)insix_addr_p);
+  DPRINTF(fd, "%s * = %p\n", struct_name, (mmux_pointerc_t)ipsix_addr);
 
   {
     auto const	provided_nchars = mmux_usize_literal(512);
     char	str[provided_nchars.value];
 
-    if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET6, (mmux_pointer_t)insix_addr_p)) {
+    if (mmux_libc_inet_ntop(str, provided_nchars, MMUX_LIBC_AF_INET6, (mmux_pointer_t)ipsix_addr)) {
       return true;
     }
     DPRINTF(fd, "%s = (%s)\n", struct_name, str);
@@ -602,6 +706,22 @@ mmux_libc_insix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_insix_addr_t const *
 
   return false;
 }
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_ipsix_addr_equal (bool * result_p,
+			    mmux_libc_ipsix_addr_arg_t ipsix_addr_1,
+			    mmux_libc_ipsix_addr_arg_t ipsix_addr_2)
+{
+  mmux_ternary_comparison_result_t	cmpnum;
+
+  mmux_libc_memcmp(&cmpnum, ipsix_addr_1, ipsix_addr_2, mmux_usize(sizeof(mmux_libc_internet_protocol_address_six_t)));
+  *result_p = mmux_ternary_comparison_result_is_equal(cmpnum);
+  return false;
+}
+
+#if 0
 
 
 /** --------------------------------------------------------------------
@@ -708,31 +828,53 @@ mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const
  ** Struct sockaddr_in.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_family,	libc_socket_address_family)
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_in, sin_addr,	libc_in_addr)
+bool
+mmux_libc_sin_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_socket_address_family_t new_field_value)
+{
+  P->sin_family = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sin_family_ref (mmux_libc_socket_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+{
+  *field_value_result_p = mmux_libc_socket_address_family(P->sin_family);
+  return false;
+}
 
 bool
-mmux_libc_sin_port_set (mmux_libc_sockaddr_in_t * const P, mmux_host_byteorder_uint16_t host_byteorder_value)
+mmux_libc_sin_addr_set (mmux_libc_sockaddr_in_t * P, mmux_libc_ipfour_addr_arg_t new_field_value)
 {
-  mmux_network_byteorder_uint16_t	network_byteorder_value;
+  P->sin_addr.s_addr = new_field_value->s_addr;
+  return false;
+}
+bool
+mmux_libc_sin_addr_ref (mmux_libc_ipfour_addr_t field_value_result, mmux_libc_sockaddr_in_t const * P)
+{
+  field_value_result->s_addr = P->sin_addr.s_addr;
+  return false;
+}
+bool
+mmux_libc_sin_port_set (mmux_libc_sockaddr_in_t * const P, mmux_libc_host_byteorder_uint16_t host_byteorder_value)
+{
+  mmux_libc_network_byteorder_uint16_t	network_byteorder_value;
 
   mmux_libc_htons(&network_byteorder_value, host_byteorder_value);
   P->sin_port = network_byteorder_value.value;
   return false;
 }
 bool
-mmux_libc_sin_port_ref (mmux_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_in_t const * const P)
+mmux_libc_sin_port_ref (mmux_libc_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_in_t const * const P)
 {
-  auto					network_byteorder_value = mmux_network_byteorder_uint16( P->sin_port );
+  auto					network_byteorder_value = mmux_libc_network_byteorder_uint16( P->sin_port );
 
   mmux_libc_ntohs(result_host_byteorder_p, network_byteorder_value);
   return false;
 }
 
 bool
-mmux_libc_sin_addr_pp_ref (mmux_libc_in_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
+mmux_libc_sin_addr_pp_ref (mmux_libc_ipfour_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
 {
-  *sin_addr_pp = (mmux_libc_in_addr_t *) &(sockaddr_p->sin_addr);
+  *sin_addr_pp = (mmux_libc_ipfour_addr_t *) &(sockaddr_p->sin_addr);
   return false;
 }
 
@@ -755,15 +897,15 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
   /* Dump the field "sin_addr". */
   {
     mmux_libc_socket_address_family_t	family;
-    mmux_libc_in_addr_t			addr;
+    mmux_libc_ipfour_addr_t		addr;
 
     auto const	provided_nchars = mmux_usize_literal(512);
     char	presentation_buf[provided_nchars.value];
 
     mmux_libc_sin_family_ref (&family, sockaddr_in_p);
-    mmux_libc_sin_addr_ref   (&addr,   sockaddr_in_p);
+    mmux_libc_sin_addr_ref   (addr,    sockaddr_in_p);
 
-    mmux_libc_inet_ntop(presentation_buf, provided_nchars, family, &addr.value);
+    mmux_libc_inet_ntop(presentation_buf, provided_nchars, family, addr);
     presentation_buf[provided_nchars.value - 1] = '\0';
     DPRINTF(fd, "%s.sin_addr = \"%s\"\n", struct_name, presentation_buf);
   }
@@ -780,26 +922,40 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
  ** Struct sockaddr_in6.
  ** ----------------------------------------------------------------- */
 
+bool
+mmux_libc_sinsix_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_socket_address_family_t new_field_value)
+{
+  P->sinsix_family = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sinsix_family_ref (mmux_libc_socket_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+{
+  *field_value_result_p = mmux_libc_socket_address_family(P->sinsix_family);
+  return false;
+}
+
+
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family,   libc_socket_address_family,  sinsix_family)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_addr,     libc_insix_addr,	      sinsix_addr)
+DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_addr,     libc_ipsix_addr,	      sipsix_addr)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_flowinfo, uint32,		      sinsix_flowinfo)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_scope_id, uint32,		      sinsix_scope_id)
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sinsix_port_set (mmux_libc_sockaddr_insix_t * const P, mmux_host_byteorder_uint16_t host_byteorder_value)
+mmux_libc_sinsix_port_set (mmux_libc_sockaddr_insix_t * const P, mmux_libc_host_byteorder_uint16_t host_byteorder_value)
 {
-  mmux_network_byteorder_uint16_t	network_byteorder_value;
+  mmux_libc_network_byteorder_uint16_t	network_byteorder_value;
 
   mmux_libc_htons(&network_byteorder_value, host_byteorder_value);
   P->sin6_port = network_byteorder_value.value;
   return false;
 }
 bool
-mmux_libc_sinsix_port_ref (mmux_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_insix_t const * const P)
+mmux_libc_sinsix_port_ref (mmux_libc_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_insix_t const * const P)
 {
-  auto	network_byteorder_value = mmux_network_byteorder_uint16( P->sin6_port );
+  auto	network_byteorder_value = mmux_libc_network_byteorder_uint16( P->sin6_port );
 
   mmux_libc_ntohs(result_host_byteorder_p, network_byteorder_value);
   return false;
@@ -808,9 +964,9 @@ mmux_libc_sinsix_port_ref (mmux_host_byteorder_uint16_t * result_host_byteorder_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sinsix_addr_p_ref (mmux_libc_insix_addr_t ** sinsix_addr_pp, mmux_libc_sockaddr_insix_t const * sockaddr_p)
+mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** sipsix_addr_pp, mmux_libc_sockaddr_insix_t const * sockaddr_p)
 {
-  *sinsix_addr_pp = (mmux_libc_insix_addr_t *) &(sockaddr_p->sin6_addr);
+  *sipsix_addr_pp = (mmux_libc_ipsix_addr_t *) &(sockaddr_p->sin6_addr);
   return false;
 }
 
@@ -838,12 +994,12 @@ mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t
   /* Dump the field "sin6_addr". */
   {
     mmux_libc_socket_address_family_t	family;
-    mmux_libc_insix_addr_t *		addr_p;
+    mmux_libc_ipsix_addr_t *		addr_p;
     auto const				provided_nchars = mmux_usize_literal(512);
     char				bufptr[provided_nchars.value];
 
     MMUX_LIBC_CALL(mmux_libc_sinsix_family_ref(&family, sockaddr_insix_p));
-    MMUX_LIBC_CALL(mmux_libc_sinsix_addr_p_ref(&addr_p, sockaddr_insix_p));
+    MMUX_LIBC_CALL(mmux_libc_sipsix_addr_p_ref(&addr_p, sockaddr_insix_p));
     MMUX_LIBC_CALL(mmux_libc_inet_ntop(bufptr, provided_nchars, family, addr_p));
     bufptr[provided_nchars.value - 1] = '\0';
     DPRINTF(fd, "%s.sin6_addr = \"%s\"\n", struct_name, bufptr);
@@ -1315,53 +1471,34 @@ mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_
 
 
 /** --------------------------------------------------------------------
- ** Byte order.
+ ** Address conversion to/from ASCII presentation.
  ** ----------------------------------------------------------------- */
 
-bool
-mmux_libc_htons (mmux_network_byteorder_uint16_t * result_p, mmux_host_byteorder_uint16_t value)
-{
-  *result_p = mmux_network_byteorder_uint16(htons(value.value));
-  return false;
-}
-bool
-mmux_libc_ntohs (mmux_host_byteorder_uint16_t * result_p, mmux_network_byteorder_uint16_t value)
-{
-  *result_p = mmux_host_byteorder_uint16(ntohs(value.value));
-  return false;
-}
-bool
-mmux_libc_htonl (mmux_network_byteorder_uint32_t * result_p, mmux_host_byteorder_uint32_t value)
-{
-  *result_p = mmux_network_byteorder_uint32(htonl(value.value));
-  return false;
-}
-bool
-mmux_libc_ntohl (mmux_host_byteorder_uint32_t * result_p, mmux_network_byteorder_uint32_t value)
-{
-  *result_p = mmux_host_byteorder_uint32(ntohl(value.value));
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Address convertion to/from ASCII presentation.
- ** ----------------------------------------------------------------- */
+#endif
 
 bool
-mmux_libc_inet_aton (mmux_libc_in_addr_ptr_t ouput_addr_p, mmux_asciizcp_t input_presentation_p)
+mmux_libc_inet_aton (mmux_libc_ipfour_addr_t address_result, mmux_asciizcp_t input_presentation_p)
 {
-  int	rv = inet_aton(input_presentation_p, &(ouput_addr_p->value));
+  struct in_addr	ad;
+  int			rv = inet_aton(input_presentation_p, &ad);
 
-  return ((0 != rv)? false : true);
+  if (0 != rv) {
+    MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
+    address_result->value[0] = ad;
+    return false;
+  } else {
+    return true;
+  }
 }
 bool
 mmux_libc_inet_ntoa (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-		     mmux_libc_in_addr_ptr_t input_addr_p)
+		     mmux_libc_ipfour_addr_arg_t input_addr_p)
 {
   /* This is the dotted-quad string. */
-  mmux_asciizcp_t	presentation_ptr = inet_ntoa(input_addr_p->value);
-  mmux_usize_t		presentation_len = mmux_usize_strlen(presentation_ptr);
+  mmux_asciizcp_t	presentation_ptr = inet_ntoa(input_addr_p->value[0]);
+  mmux_usize_t		presentation_len;
+
+  mmux_libc_strlen(&presentation_len, presentation_ptr);
 
   /* The number of bytes "ouput_presentation_provided_nchars" is meant to include the
      trailing nul character.  The number of bytes "presentation_len" does not include
@@ -1377,27 +1514,58 @@ mmux_libc_inet_ntoa (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_pre
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_inet_pton (mmux_pointer_t ouput_addr_p,
+mmux_libc_inet_pton (mmux_libc_ip_addr_t address_result,
 		     mmux_libc_socket_address_family_t family, mmux_asciizcp_t input_presentation_p)
 {
-  int	rv = inet_pton(family.value, input_presentation_p, ouput_addr_p);
+  switch (family.value) {
+  case AF_INET:
+    {
+      struct in_addr	ad;
+      int		rv = inet_pton(family.value, input_presentation_p, &ad);
 
-  return ((0 != rv)? false : true);
+      if (0 != rv) {
+	auto	the_address_result = (mmux_libc_internet_protocol_address_four_t *) address_result;
+
+	MMUX_LIBC_IPFOUR_ADDR_RESET(the_address_result);
+	the_address_result->value[0] = ad;
+	return false;
+      } else {
+	return true;
+      }
+    }
+  case AF_INET6:
+    {
+      struct in6_addr	ad;
+      int		rv = inet_pton(family.value, input_presentation_p, &ad);
+
+      if (0 != rv) {
+	auto	the_address_result = (mmux_libc_internet_protocol_address_six_t *) address_result;
+
+	MMUX_LIBC_IPSIX_ADDR_RESET(the_address_result);
+	the_address_result->value[0] = ad;
+	return false;
+      } else {
+	return true;
+      }
+    }
+  default:
+    return true;
+  }
 }
 bool
 mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-		     mmux_libc_socket_address_family_t family, mmux_pointerc_t const input_addr_p)
+		     mmux_libc_socket_address_family_t family,
+		     mmux_libc_ip_addr_arg_t input_addr)
 {
   auto const		provided_nchars = mmux_usize_literal(512);
-  mmux_libc_char_array(presentation,provided_nchars);
-  mmux_asciizcp_t	rv = inet_ntop(family.value, input_addr_p, presentation, provided_nchars.value);
+  char			presentation[provided_nchars.value];
+  mmux_asciizcp_t	rv = inet_ntop(family.value, input_addr, presentation, provided_nchars.value);
 
   if (NULL != rv) {
     auto	presentation_generated_nchars = mmux_usize_strlen(presentation);
 
     if (mmux_ctype_greater(ouput_presentation_provided_nchars, presentation_generated_nchars)) {
-      mmux_libc_strncpy(ouput_presentation_p, presentation, ouput_presentation_provided_nchars);
-      return false;
+      return mmux_libc_strncpy(ouput_presentation_p, presentation, ouput_presentation_provided_nchars);
     }
   }
   return true;
@@ -1406,52 +1574,108 @@ mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_pre
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_inet_addr (mmux_libc_in_addr_ptr_t result_in_addr_p, mmux_asciizcp_t presentation_in_addr_p)
+mmux_libc_inet_addr (mmux_libc_ipfour_addr_t result_ip_addr_p, mmux_asciizcp_t presentation_ip_addr_p)
 {
-  mmux_standard_uint32_t	network_byteorder_s_addr = inet_addr(presentation_in_addr_p);
+  /* The return value of "inet_addr()" is in network byteorder. */
+  auto	raw_address = mmux_libc_network_byteorder_uint32(inet_addr(presentation_ip_addr_p));
 
-  if (MMUX_LIBC_VALUEOF_INADDR_NONE != network_byteorder_s_addr) {
-    return mmux_libc_make_in_addr(result_in_addr_p, network_byteorder_s_addr);
+  if (MMUX_LIBC_VALUEOF_INADDR_NONE != raw_address.value) {
+    return mmux_libc_make_ipfour_addr(result_ip_addr_p, raw_address);
   } else {
     return true;
   }
 }
 bool
-mmux_libc_inet_network (mmux_libc_in_addr_ptr_t result_in_addr_p, mmux_asciizcp_t presentation_in_addr_p)
+mmux_libc_inet_network (mmux_libc_ipfour_addr_t address_result, mmux_asciizcp_t presentation_ip_addr_p)
 {
-  mmux_standard_uint32_t	network_byteorder_s_addr = inet_network(presentation_in_addr_p);
+  /* The function "inet_network()" returns a value in host byteorder. */
+  auto	rv = mmux_libc_host_byteorder_uint32(inet_network(presentation_ip_addr_p));
 
-  if (MMUX_LIBC_VALUEOF_INADDR_NONE != network_byteorder_s_addr) {
-    return mmux_libc_make_in_addr(result_in_addr_p, network_byteorder_s_addr);
+  if (MMUX_LIBC_VALUEOF_INADDR_NONE != rv.value) {
+    mmux_libc_network_byteorder_uint32_t	raw_address;
+
+    mmux_libc_htonl(&raw_address, rv);
+    return mmux_libc_make_ipfour_addr(address_result, raw_address);
   } else {
     return true;
   }
 }
 bool
-mmux_libc_inet_makeaddr (mmux_libc_in_addr_ptr_t result_in_addr_p,
-			 mmux_libc_in_addr_ptr_t net_in_addr_p, mmux_libc_in_addr_ptr_t local_in_addr_p)
+mmux_libc_inet_makeaddr (mmux_libc_ipfour_addr_t ipfour_addr_result,
+			 mmux_libc_host_byteorder_uint32_t network_address_number,
+			 mmux_libc_host_byteorder_uint32_t local_address_number)
 {
-  mmux_libc_in_addr_t	in_addr = {
-    .value = inet_makeaddr(net_in_addr_p->value.s_addr, local_in_addr_p->value.s_addr)
-  };
+  struct in_addr	addr = inet_makeaddr(network_address_number.value, local_address_number.value);
+  auto			raw_address = mmux_libc_network_byteorder_uint32(addr.s_addr);
 
-  *result_in_addr_p = in_addr;
+  return mmux_libc_make_ipfour_addr(ipfour_addr_result, raw_address);
+}
+bool
+mmux_libc_inet_lnaof (mmux_libc_host_byteorder_uint32_t * local_address_number_result_p,
+		      mmux_libc_ipfour_addr_arg_t ipfour_addr)
+{
+  *local_address_number_result_p = mmux_libc_host_byteorder_uint32(inet_lnaof(ipfour_addr->value[0]));
   return false;
 }
 bool
-mmux_libc_inet_lnaof (mmux_libc_in_addr_ptr_t local_in_addr_p, mmux_libc_in_addr_ptr_t in_addr_p)
+mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t * network_address_number_result_p,
+		      mmux_libc_ipfour_addr_arg_t ipfour_addr)
 {
-  mmux_standard_uint32_t	uint32_local_in_addr = inet_lnaof(in_addr_p->value);
+  *network_address_number_result_p = mmux_libc_host_byteorder_uint32(inet_netof(ipfour_addr->value[0]));
+  return false;
+}
 
-  return mmux_libc_make_in_addr(local_in_addr_p, uint32_local_in_addr);
+bool
+mmux_libc_inet_net_pton (mmux_libc_ip_addr_t address_result,
+			 mmux_uint_t * number_of_bits_result,
+			 mmux_libc_socket_address_family_t family,
+			 mmux_asciizcp_t presentation)
+{
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_PTON]]],[[[
+  if (MMUX_LIBC_VALUEOF_AF_INET == family.value) {
+    struct in_addr	result = { .s_addr = mmux_standard_uint32_constant_zero() };
+    int			rv = inet_net_pton(family.value, presentation, &result, sizeof(result));
+
+    if (-1 == rv) {
+      return true;
+    } else {
+      auto	the_address_result = (mmux_libc_internet_protocol_address_four_t *) address_result;
+
+      if (mmux_libc_make_ipfour_addr_from_struct_in_addr(the_address_result, result)) {
+	return true;
+      } else {
+	*number_of_bits_result = mmux_uint(rv);
+	return false;
+      }
+    }
+  } else {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+]]])
 }
 bool
-mmux_libc_inet_netof (mmux_libc_in_addr_ptr_t net_in_addr_p, mmux_libc_in_addr_ptr_t in_addr_p)
+mmux_libc_inet_net_ntop (mmux_asciizp_t presentation_result, mmux_usize_t presentation_provided_nbytes,
+			 mmux_libc_socket_address_family_t family,
+			 mmux_libc_ip_addr_arg_t address,
+			 mmux_uint_t number_of_bits)
 {
-  mmux_standard_uint32_t	uint32_net_in_addr = inet_netof(in_addr_p->value);
+MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_NTOP]]],[[[
+  if (MMUX_LIBC_VALUEOF_AF_INET == family.value) {
+    auto		the_address = (mmux_libc_internet_protocol_address_four_t *) address;
+    mmux_asciizp_t	rv = inet_net_ntop(family.value, the_address->value, number_of_bits.value,
+					   presentation_result, presentation_provided_nbytes.value);
 
-  return mmux_libc_make_in_addr(net_in_addr_p, uint32_net_in_addr);
+    return (NULL == rv)? true : false;
+  } else {
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+]]])
 }
+
+
+#if 0
 
 
 /** --------------------------------------------------------------------
@@ -1672,7 +1896,7 @@ mmux_libc_getnetbyname (mmux_libc_netent_t const * * result_netent_pp, mmux_asci
 }
 bool
 mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
-			mmux_host_byteorder_uint32_t network_number,
+			mmux_libc_host_byteorder_uint32_t network_number,
 			mmux_libc_socket_address_family_t family)
 {
   mmux_libc_netent_t const *	netent_p = getnetbyaddr(network_number.value, family.value);
@@ -1965,5 +2189,7 @@ mmux_libc_setsockopt (mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmu
 
   return ((0 == rv)? false : true);
 }
+
+#endif
 
 /* end of file */

@@ -30,7 +30,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-networking-sockets-interface-names.c";
+    PROGNAME = "test-networking-sockets-interface-names";
   }
 
   /* Converting a network interface name to its conventional index. */

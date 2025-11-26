@@ -143,6 +143,14 @@ Data structure type aliasing the standard type @MmuxCStruct{\STANDARDNAME\}.
 
 @end macro
 
+@macro MmuxCWrapperStructWithParentOpaqueTypedef{STRUCTNAME,STANDARDNAME,PARENT}
+@deftp {Opaque Struct Typedef} mmux_libc_\STRUCTNAME\_t
+@deftpx {Parent Struct Typedef} \PARENT\
+Data structure type aliasing the standard type @MmuxCStruct{\STANDARDNAME\}.
+@end deftp
+
+@end macro
+
 @c ------------------------------------------------------------------------
 
 @macro MmuxCWrapperStructArrayOneTypedef{ARRAYNAME,STRUCTNAME}
@@ -150,7 +158,7 @@ Data structure type aliasing the standard type @MmuxCStruct{\STANDARDNAME\}.
 Pointer type defined as follows:
 
 @example
-typedef mmux_\STRUCTNAME\_t  mmux_\ARRAYNAME\_t[1];
+typedef mmux_libc_\STRUCTNAME\_t  mmux_\ARRAYNAME\_t[1];
 @end example
 
 @noindent
@@ -167,7 +175,7 @@ result of a computation, so the referenced @objtype{mmux_libc_\STRUCTNAME\_t} mu
 Pointer type defined as follows:
 
 @example
-typedef mmux_\STRUCTNAME\_t const *  mmux_\POINTERNAME\_arg_t;
+typedef mmux_libc_\STRUCTNAME\_t const *  mmux_\POINTERNAME\_arg_t;
 @end example
 
 @noindent

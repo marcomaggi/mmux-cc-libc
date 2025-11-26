@@ -353,18 +353,27 @@ typedef struct mmux_libc_sysconf_resource_limit_t { mmux_sint_t; } mmux_libc_sys
  ** Networking.
  ** ----------------------------------------------------------------- */
 
+typedef struct mmux_libc_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_libc_host_byteorder_uint16_t;
+typedef struct mmux_libc_network_byteorder_uint16_t { mmux_uint16_t; } mmux_libc_network_byteorder_uint16_t;
+
+typedef struct mmux_libc_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_libc_host_byteorder_uint32_t;
+typedef struct mmux_libc_network_byteorder_uint32_t { mmux_uint32_t; } mmux_libc_network_byteorder_uint32_t;
+
 typedef mmux_libc_network_interface_name_index_t		mmux_libc_if_nameindex_t[1];
 typedef mmux_libc_network_interface_name_index_t const *	mmux_libc_if_nameindex_arg_t;
+
+typedef mmux_libc_internet_protocol_address_t *			mmux_libc_ip_addr_t;
+typedef mmux_libc_internet_protocol_address_t const *		mmux_libc_ip_addr_arg_t;
+
+typedef mmux_libc_internet_protocol_address_four_t		mmux_libc_ipfour_addr_t[1];
+typedef mmux_libc_internet_protocol_address_four_t const *	mmux_libc_ipfour_addr_arg_t;
+
+typedef mmux_libc_internet_protocol_address_six_t		mmux_libc_ipsix_addr_t[1];
+typedef mmux_libc_internet_protocol_address_six_t const *	mmux_libc_ipsix_addr_arg_t;
 
 typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
 typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];
 typedef mmux_libc_network_socket_t const *		mmux_libc_sock_arg_t;
-
-typedef struct mmux_host_byteorder_uint16_t    { mmux_uint16_t; } mmux_host_byteorder_uint16_t;
-typedef struct mmux_network_byteorder_uint16_t { mmux_uint16_t; } mmux_network_byteorder_uint16_t;
-
-typedef struct mmux_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_host_byteorder_uint32_t;
-typedef struct mmux_network_byteorder_uint32_t { mmux_uint32_t; } mmux_network_byteorder_uint32_t;
 
 typedef struct mmux_libc_network_interface_index_t	{ mmux_uint_t;  } mmux_libc_network_interface_index_t;
 typedef struct mmux_libc_socket_address_family_t	{ mmux_sshort_t;} mmux_libc_socket_address_family_t;

@@ -316,12 +316,26 @@ typedef struct mmux_libc_interprocess_signal_fd_info_t {
 
 /* ------------------------------------------------------------------ */
 
-typedef struct mmux_libc_in_addr_t	{ struct in_addr  value; } mmux_libc_in_addr_t;
-typedef struct mmux_libc_insix_addr_t	{ struct in6_addr value; } mmux_libc_insix_addr_t;
-
 typedef struct mmux_libc_network_interface_name_index_t {
   struct if_nameindex;
 } mmux_libc_network_interface_name_index_t;
+
+/* Make GCC stay silent about a data structure with no fields. */
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wpedantic\"")
+typedef struct mmux_libc_internet_protocol_address_t {
+} mmux_libc_internet_protocol_address_t;
+_Pragma("GCC diagnostic pop")
+
+typedef struct mmux_libc_internet_protocol_address_four_t {
+  mmux_libc_internet_protocol_address_t;
+  struct in_addr	value[1];
+} mmux_libc_internet_protocol_address_four_t;
+
+typedef struct mmux_libc_internet_protocol_address_six_t {
+  mmux_libc_internet_protocol_address_t;
+  struct in6_addr	value[1];
+} mmux_libc_internet_protocol_address_six_t;
 
 typedef struct addrinfo				mmux_libc_addrinfo_t;
 typedef struct sockaddr				mmux_libc_sockaddr_t;
@@ -333,9 +347,6 @@ typedef struct servent				mmux_libc_servent_t;
 typedef struct protoent				mmux_libc_protoent_t;
 typedef struct netent				mmux_libc_netent_t;
 typedef struct linger				mmux_libc_linger_t;
-
-typedef mmux_libc_in_addr_t *			mmux_libc_in_addr_ptr_t;
-typedef mmux_libc_insix_addr_t *		mmux_libc_insix_addr_ptr_t;
 
 typedef mmux_libc_addrinfo_t *			mmux_libc_addrinfo_ptr_t;
 typedef mmux_libc_sockaddr_t *			mmux_libc_sockaddr_ptr_t;
@@ -360,22 +371,6 @@ mmux_cc_libc_private_decl mmux_libc_memory_allocator_t const mmux_libc_fake_memo
 
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_static_class;
 mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_system_pathname_dynami_class;
-
-
-/** --------------------------------------------------------------------
- ** Helper macros and functions.
- ** ----------------------------------------------------------------- */
-
-mmux_cc_libc_inline_decl mmux_libc_in_addr_t
-mmux_libc_in_addr (struct in_addr value)
-{
-  return (mmux_libc_in_addr_t) { .value = value };
-}
-mmux_cc_libc_inline_decl mmux_libc_insix_addr_t
-mmux_libc_insix_addr (struct in6_addr value)
-{
-  return (mmux_libc_insix_addr_t) { .value = value };
-}
 
 
 /** --------------------------------------------------------------------

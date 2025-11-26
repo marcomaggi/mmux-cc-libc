@@ -202,30 +202,22 @@ MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_WR)
  *
  *    struct in_addr { uint32_t s_addr; };
  *
- * the "INADDR_*"  constants are the  32-bit values of  the "s_addr" field.   MMUX CC
- * Libc defines:
- *
- *    typedef struct mmux_libc_in_addr_t {
- *      struct in_addr value;
- *    } mmux_libc_in_addr_t;
- *
- * and we want the "MMUX_LIBC_INADDR_*" constants  to be expressions evaluating to an
- * instance of "mmux_libc_in_addr_t".
- *
+ * the "INADDR_*"  constants are  the HOST  byteorder 32-bit  values of  the "s_addr"
+ * field.
  */
 
 m4_divert(-1)
-m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT]]],[[[m4_dnl
+m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
-#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_in_addr_t){ .value.s_addr = mmux_libc_VALUEOF_$1})]]])]]])
+#define MMUX_LIBC_VALUEOF_$1	mmux_standard_uint32_literal(mmux_libc_VALUEOF_$1)
+#define MMUX_LIBC_$1	((mmux_libc_host_byteorder_uint32_t) { .value = MMUX_LIBC_VALUEOF_$1 }) ]]])]]])
 m4_divert(0)m4_dnl
-MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_ANY)
-MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_BROADCAST)
-MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_LOOPBACK)
-MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESSE_CONSTANT(INADDR_NONE)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_ANY)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_BROADCAST)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_LOOPBACK)
+MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_NONE)
 
 
 /** --------------------------------------------------------------------

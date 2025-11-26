@@ -139,7 +139,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 * signals::                     Interprocess signals handling.
 * fds::                         File descriptors.
 * fs::                          File system.
-* sockets::                     Networking sockets.
+* networking::                  Networking sockets.
 * interface specifications::    Interface specifications.
 
 Appendices
@@ -410,10 +410,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{SO_SNDBUF}
 @MmuxDefineConstant{SO_STYLE}
 @MmuxDefineConstant{SO_TYPE}
-@MmuxDefineConstant{INADDR_ANY}
-@MmuxDefineConstant{INADDR_BROADCAST}
-@MmuxDefineConstant{INADDR_LOOPBACK}
-@MmuxDefineConstant{INADDR_NONE}
 @MmuxDefineConstant{AI_ADDRCONFIG}
 @MmuxDefineConstant{AI_ADDRCONFIG}
 @MmuxDefineConstant{AI_ALL}
@@ -14809,37 +14805,34 @@ mmux_libc_fs_ptn_t  fs_ptn;
 @end deftypefun
 
 @c page
-@node sockets
+@node networking
 @chapter Networking sockets
 
 
 @menu
-* sockets inames::              Socket interface names.
-* sockets in_addr::             Address format @objtype{mmux_libc_in_addr_t}.
-* sockets insix_addr::          Address format @objtype{mmux_libc_insix_addr_t}.
-* sockets sockaddr_un::         Address format @objtype{mmux_libc_sockaddr_un_t}.
-* sockets sockaddr_in::         Address format @objtype{mmux_libc_sockaddr_in_t}.
-* sockets sockaddr_insix::      Address format @objtype{mmux_libc_sockaddr_insix_t}.
-* sockets sockaddr::            Address format @objtype{mmux_libc_sockaddr_t}.
-* sockets addrinfo::            Address informations.
-* sockets hostsdb::             Hosts database.
-* sockets servicesdb::          Services database.
-* sockets protocolsdb::         Protocols database.
-* sockets networksdb::          Networks database.
-* sockets byteorder::           Converting byte order in socket addresses.
-* sockets convaddr::            Converting socket addresses between formats.
-* sockets getaddrinfo::         Getting address informations.
-* sockets getnameinfo::         Getting address name informations.
-* sockets creating::            Sockets: creating, pairs, shutting down, inspecting.
-* sockets stream::              Sending and receiving data through a stream socket.
-* sockets server::              Stream socket servers.
-* sockets client::              Stream socket clients.
-* sockets dgram::               Sending and receiving data through a datagram socket.
-* sockets options::             Socket options.
+* networking inames::              Socket interface names.
+* networking ip addresses::        Internet Protocol addresses.
+* networking sockaddr_un::         Address format @objtype{mmux_libc_sockaddr_un_t}.
+* networking sockaddr_in::         Address format @objtype{mmux_libc_sockaddr_in_t}.
+* networking sockaddr_insix::      Address format @objtype{mmux_libc_sockaddr_insix_t}.
+* networking sockaddr::            Address format @objtype{mmux_libc_sockaddr_t}.
+* networking addrinfo::            Address informations.
+* networking hostsdb::             Hosts database.
+* networking servicesdb::          Services database.
+* networking protocolsdb::         Protocols database.
+* networking networksdb::          Networks database.
+* networking getaddrinfo::         Getting address informations.
+* networking getnameinfo::         Getting address name informations.
+* networking creating::            Sockets: creating, pairs, shutting down, inspecting.
+* networking stream::              Sending and receiving data through a stream socket.
+* networking server::              Stream socket servers.
+* networking client::              Stream socket clients.
+* networking dgram::               Sending and receiving data through a datagram socket.
+* networking options::             Socket options.
 @end menu
 
 @c page
-@node sockets inames
+@node networking inames
 @section Socket interface names
 
 
@@ -14852,7 +14845,7 @@ aliased by @objtype{mmux_libc_network_interface_name_index_t}.
 @MmuxCWrapperStructOpaqueTypedef{network_interface_name_index,if_nameindex}
 @MmuxCWrapperStructArrayOneTypedef{if_nameindex,network_interface_name_index}
 @MmuxCWrapperStructPointerTypedef{if_nameindex,network_interface_name_index}
-@MmuxCWrapperStructSetterGetter{if_nameindex, if_index, mmux_uint_t}
+@MmuxCWrapperStructSetterGetter{if_nameindex, if_index, mmux_libc_network_interface_index_t}
 @MmuxCWrapperStructSetterGetter{if_nameindex, if_name,  mmux_asciizcp_t}
 @MmuxCWrapperStructDumper{if_nameindex,if_nameindex}
 
@@ -14961,78 +14954,718 @@ struct if_nameindex.if_name  = "wlan0"
 @end deftypefun
 
 @c page
-@node sockets in_addr
-@section Address format @objtype{mmux_libc_in_addr_t}
+@node networking ip addresses
+@section @emph{Internet Protocol} addresses
 
 
-Data structures of type @objtype{mmux_libc_in_addr_t} represent IPv4 addresses in numerical form, as
-32-bit values stored in network byte order.
+@menu
+* networking ip addresses byteorder::   Converting byte order in socket addresses.
+* networking ip addresses base::        Base @emph{Internet Protocol} address type.
+* networking ip addresses four::        @emph{Internet Protocol} address format IPv4.
+* networking ip addresses six::         @emph{Internet Protocol} address format IPv6.
+* networking ip addresses strings::     Converting address objects to/from string presentation.
+* networking ip addresses ops::         Operations on @emph{Internet Protocol} addresses.
+@end menu
+
+@c page
+@node networking ip addresses byteorder
+@subsection Converting byte order in socket addresses
 
 
-@MmuxCStructOpaqueTypedef{in_addr}
-@MmuxCStructPointerOpaqueTypedef{in_addr}
-@MmuxSetterGetter{in_addr, s_addr, mmux_uint32_t}
-@MmuxStructDumper{in_addr}
+The code examples below where run on a @code{x86_64-pc-linux-gnu}, which is a little--endian system,
+@glibcref{Byte Order, Byte Order Conversion}.  We must remember that network byte order is
+big--endian.
 
 
-@deftypefun bool mmux_libc_make_in_addr (mmux_libc_in_addr_t * in_addr_p, mmux_uint32_t network_byteorder_value)
-Initialise the data structure referenced by @var{in_addr_p} to the address
-@var{network_byteorder_value}.
+@deftp {Struct Typedef} mmux_libc_host_byteorder_uint16_t
+@deftpx {Parent Struct Typedef} mmux_uint16_t
+Data structure type representing an unsigned 16-bit exact integer in host byteorder.
+@end deftp
+
+
+@deftp {Struct Typedef} mmux_network_host_byteorder_uint16_t
+@deftpx {Parent Struct Typedef} mmux_uint16_t
+Data structure type representing an unsigned 16-bit exact integer in network byteorder, which is
+big--endian.
+@end deftp
+
+
+@deftp {Struct Typedef} mmux_libc_host_byteorder_uint32_t
+@deftpx {Parent Struct Typedef} mmux_uint32_t
+Data structure type representing an unsigned 32-bit exact integer in host byteorder.
+@end deftp
+
+
+@deftp {Struct Typedef} mmux_network_host_byteorder_uint32_t
+@deftpx {Parent Struct Typedef} mmux_uint32_t
+Data structure type representing an unsigned 32-bit exact integer in network byteorder, which is
+big--endian.
+@end deftp
+
+
+@deftypefun mmux_libc_host_byteorder_uint16_t mmux_libc_host_byteorder_uint16 (mmux_standard_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_host_byteorder_uint16_t}.  @var{value} must
+be in host byteorder.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_in_addr_none (mmux_libc_in_addr_t * @var{in_addr_p})
-Initialise the data structure referenced by @var{in_addr_p} to the predefined standard address
+@deftypefun mmux_libc_network_byteorder_uint16_t mmux_libc_network_byteorder_uint16 (mmux_standard_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_byteorder_uint16_t}.  @var{value} must
+be in network byteorder.
+@end deftypefun
+
+
+@deftypefun mmux_libc_host_byteorder_uint32_t mmux_libc_host_byteorder_uint32 (mmux_standard_uint32_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_host_byteorder_uint32_t}.  @var{value} must be
+in host byteorder.
+@end deftypefun
+
+
+@deftypefun mmux_libc_network_byteorder_uint32_t mmux_libc_network_byteorder_uint32 (mmux_standard_uint32_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_byteorder_uint32_t}.  @var{value} must
+be in network byteorder.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_htons (mmux_libc_network_byteorder_uint16_t * @var{result_p}, mmux_libc_host_byteorder_uint16_t @var{value})
+@MmuxCInterface{htons}.  Host--to--network short--number byte order conversion.
+
+@example
+auto                                  A = mmux_libc_host_byteorder_uint16(0x1122);
+mmux_libc_network_byteorder_uint16_t  B;
+
+mmux_libc_htons(&B, A);
+mmux_libc_printfer("host byteorder uint16 is '0x%x', corresponding network byte order is: '0x%x'\n",
+  A.value, B.value);
+@print{} host byteorder uint16 is '0x1122', corresponding network byte order is: '0x2211'
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_ntohs (mmux_libc_host_byteorder_uint16_t * @var{result_p}, mmux_libc_network_byteorder_uint16_t @var{value})
+@MmuxCInterface{ntohs}.  Network--to--host short--number byte order conversion.
+
+@example
+auto                               A = mmux_libc_network_byteorder_uint16(0x1122);
+mmux_libc_host_byteorder_uint16_t  B;
+
+mmux_libc_ntohs(&B, A);
+mmux_libc_printfer("network byteorder uint16 is '0x%x', corresponding host byte order is: '0x%x'\n",
+  A.value, B.value);
+@print{} network byteorder uint16 is '0x1122', corresponding host byte order is: '0x2211'
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_htonl (mmux_libc_network_byteorder_uint32_t * @var{result_p}, mmux_libc_host_byteorder_uint32_t @var{value})
+@MmuxCInterface{htonl}.  Host--to--network long--number byte order conversion.
+
+@example
+auto                                  A = mmux_libc_host_byteorder_uint32(0x11223344);
+mmux_libc_network_byteorder_uint32_t  B;
+
+mmux_libc_htonl(&B, A);
+mmux_libc_dprintfer("host byteorder uint32 is '0x%x', corresponding network byte order is: '0x%x'\n",
+  A.value, B.value);
+@print{} host byteorder uint32 is '0x11223344', corresponding network byte order is: '0x44332211'
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_ntohl (mmux_libc_host_byteorder_uint32_t * @var{result_p}, mmux_libc_network_byteorder_uint32_t @var{value})
+@MmuxCInterface{ntohl}.  Network--to--host long--number byte order conversion.
+
+@example
+auto                               A = mmux_libc_network_byteorder_uint32(0x11223344);
+mmux_libc_host_byteorder_uint32_t  B;
+
+mmux_libc_ntohl(&B, A);
+mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte order is: '0x%x'\n",
+  A.value, B.value);
+@print{} network byteorder uint32 is '0x11223344', corresponding host byte order is: '0x44332211'
+@end example
+@end deftypefun
+
+@c page
+@node networking ip addresses base
+@subsection Base @emph{Internet Protocol} address type
+
+
+@deftp {Abstract Opaque Struct Typedef} mmux_libc_internet_protocol_address_t
+Data structure type representing an Internet Protocol address.  This type is ``abstract'' in the
+sense that: it must not be instantiated by itself; rather we have to use subtypes like
+@objtype{mmux_libc_internet_protocol_address_four_t} or
+@objtype{mmux_libc_internet_protocol_address_six_t}.
+
+This type exists because: there are functions that accept as argument a pointer to data structure
+representing either an IPv4 or IPv6 address; a pointer to a data structure of this type represents
+both.
+@end deftp
+
+
+@deftp {Struct Pointer Typedef} mmux_libc_ip_addr_t
+Pointer type defined as follows:
+
+@example
+typedef mmux_libc_internet_protocol_address_t *  mmux_ip_addr_t;
+@end example
+
+@noindent
+it is meant to be used to define arguments to functions representing the result of a computation, so
+the referenced @objtype{mmux_libc_internet_protocol_address_t} must be mutable.
+@end deftp
+
+
+@MmuxCWrapperStructPointerTypedef{ip_addr,internet_protocol_address}
+
+@c page
+@node networking ip addresses four
+@subsection @emph{Internet Protocol} address format IPv4
+
+
+According to the standard: IPv4 addresses are represented by data structures of type
+@MmuxCStruct{in_addr}, which contain the single field @code{s_addr} being an unsigned 32-bit exact
+integer representing the address as dotted quad in network byteorder (which is big--endian).  Under
+@value{PACKAGE}: such type is aliased by @objtype{mmux_libc_internet_protocol_address_four_t}; it is
+often better to use the type @objtype{mmux_libc_ipfour_addr_t}.
+
+To build and inspect an @emph{Internet Protocol} address object we do:
+
+@example
+mmux_asciizcp_t          dotted_quad = "127.0.0.1";
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_make_ipfour_addr_from_asciiz(address, dotted_quad)) @{
+  /* error */
+@} else @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_ipfour_addr_dump(er, address, NULL);
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct in_addr * = 0x7fff4f6a6edc
+struct in_addr.s_addr = 0x100007F (127.0.0.1) [network byteorder]
+@end example
+
+
+@MmuxCWrapperStructWithParentOpaqueTypedef{internet_protocol_address_four,in_addr,mmux_libc_internet_protocol_address_t}
+@MmuxCWrapperStructArrayOneTypedef{ipfour_addr,internet_protocol_address_four}
+@MmuxCWrapperStructPointerTypedef{ipfour_addr,internet_protocol_address_four}
+@MmuxCWrapperStructSetterGetter{ipfour_addr, s_addr, mmux_libc_network_byteorder_uint32_t}
+@MmuxCWrapperStructDumper{ipfour_addr,in_addr}
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_ipfour_addr (mmux_libc_ipfour_addr_t @var{ipfour_addr}, mmux_libc_network_byteorder_uint32_t @var{raw_address})
+Initialise the data structure referenced by @var{ipfour_addr} to the address
+@var{raw_address}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_ipfour_addr_none (mmux_libc_ipfour_addr_t @var{ipfour_addr})
+Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_NONE}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_in_addr_any (mmux_libc_in_addr_t * @var{in_addr_p})
-Initialise the data structure referenced by @var{in_addr_p} to the predefined standard address
+@deftypefun bool mmux_libc_make_ipfour_addr_any (mmux_libc_ipfour_addr_t @var{ipfour_addr})
+Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_ANY}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_in_addr_broadcast (mmux_libc_in_addr_t * @var{in_addr_p})
-Initialise the data structure referenced by @var{in_addr_p} to the predefined standard address
+@deftypefun bool mmux_libc_make_ipfour_addr_broadcast (mmux_libc_ipfour_addr_t @var{ipfour_addr})
+Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_BROADCAST}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_in_addr_loopback (mmux_libc_in_addr_t * @var{in_addr_p})
-Initialise the data structure referenced by @var{in_addr_p} to the predefined standard address
+@deftypefun bool mmux_libc_make_ipfour_addr_loopback (mmux_libc_ipfour_addr_t @var{ipfour_addr})
+Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_LOOPBACK}.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_ipfour_addr_reset (mmux_libc_ipfour_addr_t @var{address})
+Reset to zero bytes the memory block referenced by @var{address}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineInaddrConstant{NAME}
+@deftypevr {Constant} mmux_libc_host_byteorder_uint32_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} mmux_standard_uint32_t MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{MMUX_LIBC_\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
+either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
+features of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{MMUX_LIBC_\NAME\} is available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineInaddrConstant{INADDR_ANY}
+@MmuxDefineInaddrConstant{INADDR_BROADCAST}
+@MmuxDefineInaddrConstant{INADDR_LOOPBACK}
+@MmuxDefineInaddrConstant{INADDR_NONE}
+
 @c page
-@node sockets insix_addr
-@section Address format @objtype{mmux_libc_insix_addr_t}
+@node networking ip addresses six
+@subsection @emph{Internet Protocol} address format IPv6
 
 
-Data structures of type @objtype{mmux_libc_insix_addr_t} represent IPv6 addresses in binary format.
+According to the standard: IPv6 addresses are represented by data structures of type
+@MmuxCStruct{in6_addr}, whose internal representation is reserved.  Under @value{PACKAGE}: such type
+is aliased by @objtype{mmux_libc_internet_protocol_address_six_t}; it is often better to use the
+type @objtype{mmux_libc_ipsix_addr_t}.
+
+To build and inspect an @emph{Internet Protocol} address object we do:
+
+@example
+mmux_asciizcp_t         address_presentation = "1:2:3:4:5:6:7:8";
+mmux_libc_ipsix_addr_t  address;
+
+if (mmux_libc_make_ipsix_addr_from_asciiz(address, address_presentation)) @{
+  /* error */
+@} else @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_ipsix_addr_dump(er, address, NULL);
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct in6_addr * = 0x7fff535b2780
+struct in6_addr = (1:2:3:4:5:6:7:8)
+@end example
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_insix_addr_t
-An opaque alias for @code{struct in6_addr}.
-@end deftp
-
-@MmuxCStructPointerOpaqueTypedef{insix_addr}
-@MmuxStructDumper{insix_addr}
+@MmuxCWrapperStructWithParentOpaqueTypedef{internet_protocol_address_six,in_addr,mmux_libc_internet_protocol_address_t}
+@MmuxCWrapperStructArrayOneTypedef{ipsix_addr,internet_protocol_address_six}
+@MmuxCWrapperStructPointerTypedef{ipsix_addr,internet_protocol_address_six}
+@MmuxCWrapperStructDumper{ipsix_addr,in6_addr}
 
 
-@deftypefun bool mmux_libc_make_insix_addr_loopback (mmux_libc_insix_addr_t * @var{insix_addr_p})
-Initialise the data structure referenced by @var{insix_addr_p} to the predefined standard
+@deftypefun bool mmux_libc_make_ipsix_addr_loopback (mmux_libc_ipsix_addr_t * @var{ipsix_addr_p})
+Initialise the data structure referenced by @var{ipsix_addr_p} to the predefined standard
 @code{in6addr_loopback}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_insix_addr_any (mmux_libc_insix_addr_t * @var{insix_addr_p})
-Initialise the data structure referenced by @var{insix_addr_p} to the predefined standard
+@deftypefun bool mmux_libc_make_ipsix_addr_any (mmux_libc_ipsix_addr_t * @var{ipsix_addr_p})
+Initialise the data structure referenced by @var{ipsix_addr_p} to the predefined standard
 @code{in6addr_any}.
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_ipsix_addr_reset (mmux_libc_ipsix_addr_t @var{address})
+Reset to zero bytes the memory block referenced by @var{address}.
+@end deftypefun
+
 @c page
-@node sockets sockaddr_un
+@node networking ip addresses strings
+@subsection Converting address objects to/from string presentation
+
+
+To convert an @emph{Internet Protocol} address between the binary representation as C language data
+structure and the string representation as @MmuxAsciiZ{} array of characters we should prefer the
+functions @cfunc{mmux_libc_inet_pton}, @cfunc{mmux_libc_inet_ntop}, @cfunc{mmux_libc_inet_net_pton},
+@cfunc{mmux_libc_inet_net_ntop}.
+
+@menu
+* networking ip addresses strings one::    The @cfunc{pton} and @cfunc{ntop} functions.
+* networking ip addresses strings two::    The @cfunc{net_pton} and @cfunc{net_ntop} functions.
+* networking ip addresses strings three::  The @cfunc{aton} and @cfunc{ntoa} functions.
+* networking ip addresses strings four::   Other functions.
+@end menu
+
+@c page
+@node networking ip addresses strings one
+@subsubsection The @cfunc{pton} and @cfunc{ntop} functions
+
+
+@deftypefun bool mmux_libc_inet_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{input_presentation_p})
+@MmuxCInterface{inet_pton}.
+
+Convert the @MmuxAsciiZ{} Internet address presentation referenced by @var{input_presentation_p}
+into a binary data structure; the presentation is expected to represent an address in the format
+specified by @var{af_family}, for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}.
+
+When successful, the resulting data structure is stored in the buffer referenced by
+@var{address_result}; when @var{af_family} equals:
+
+@table @samp
+@item MMUX_LIBC_AF_INET
+the referenced buffer must be a data structure of type @objtype{mmux_libc_ipfour_addr_t};
+
+@example
+mmux_asciizcp_t          dotted_quad = "127.0.0.1";
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_inet_pton(address, MMUX_LIBC_AF_INET, dotted_quad)) @{
+  /* error */
+@}
+@end example
+
+@item MMUX_LIBC_AF_INET6
+the referenced buffer must be a data structure of type @objtype{mmux_libc_ipsix_addr_t}.
+
+@example
+mmux_asciizcp_t         presentation = "1:2:3:4:5:6:7:8";
+mmux_libc_ipsix_addr_t  address;
+
+if (mmux_libc_inet_pton(address, MMUX_LIBC_AF_INET6, presentation)) @{
+  /* error */
+@}
+@end example
+@end table
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{input_address})
+@MmuxCInterface{inet_ntop}.
+
+Convert the Internet address data structure referenced by @var{input_address} to its @MmuxAsciiZ{}
+presentation and copy it into the buffer referenced by @var{presentation_result_p}; this output
+buffer must be at least @var{presentation_result_provided_nchars} characters wide.
+
+If the length of the @MmuxAsciiZ{} presentation, including its terminating nul byte, is less than or
+equal to @var{presentation_result_provided_nchars}: the whole string, including its terminating nul,
+is written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written
+and the return value is @ctrue{}.
+
+The data structure is expected to represent an address in the format specified by @var{af_family},
+for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}; when @var{af_family} equals:
+
+@table @samp
+@item MMUX_LIBC_AF_INET
+the referenced data structure must be of type @objtype{mmux_libc_ipfour_addr_t};
+
+@example
+mmux_libc_ipfour_addr_t     address;
+
+if (mmux_libc_make_ipfour_addr_broadcast(&address)) @{
+  /* error */
+@}
+
+@{
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK	32
+  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+
+  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET, &address)) @{
+    /* error */
+  @}
+
+  /* do something with the presentation in "str" */
+@}
+@end example
+
+@item MMUX_LIBC_AF_INET6
+the referenced data structure must be of type @objtype{mmux_libc_ipsix_addr_t}.
+
+@example
+mmux_libc_ipsix_addr_t     address;
+
+if (mmux_libc_make_ipsix_addr_loopback(&address)) @{
+  /* error */
+@}
+
+@{
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK	32
+  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+
+  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET6, &address)) @{
+    /* error */
+  @}
+
+  /* do something with the presentation in "str" */
+@}
+@end example
+@end table
+@end deftypefun
+
+@c page
+@node networking ip addresses strings two
+@subsubsection The @cfunc{net_pton} and @cfunc{net_ntop} functions
+
+
+The functions @cfunc{mmux_libc_inet_net_pton} and @cfunc{mmux_libc_inet_net_ntop} are available only
+if, at package building time, the core library was linked with the external library
+@file{libresolv}.
+
+
+@deftypefun bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_uint_t * @var{number_of_bits_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation})
+@MmuxCInterface{inet_net_pton}.
+
+Convert the @MmuxAsciiZ{} address presentation referenced by @var{presentation} into a binary data
+structure; the presentation is expected to represent an address in the format specified by
+@var{af_family}.  While the @api{} of this function is open to support multiple @emph{Internet
+Protocol} address formats, at present: only the family @samp{MMUX_LIBC_AF_INET} is supported.
+
+When successful, the resulting data structure is stored in the buffer referenced by
+@var{address_result}.  At present: @var{address_result} must reference a data structure of type
+@objtype{mmux_libc_internet_protocol_address_four_t}.
+
+In a way or the other the address presentation always specifies an address having a number of bits;
+such number is determined and stored in the variable referenced by @var{number_of_bits_result}.  For
+example: if the presentation is the string @samp{193.168.1.128/24}, the number of bits is @samp{24};
+if the presentation is the string @samp{127.0.0.1}, the number of bits is @samp{32}.
+
+@example
+mmux_asciizcp_t          dotted_quad = "193.168.1.128/24";
+mmux_libc_ipfour_addr_t  address;
+mmux_uint_t              number_of_bits;
+
+if (mmux_libc_inet_net_pton(address, &number_of_bits, MMUX_LIBC_AF_INET, dotted_quad)) @{
+  /* error */
+@}
+
+@{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_ipfour_addr_dump(er, address, NULL);
+  mmux_libc_dprintfer("number of bits in the address: %u\n", number_of_bits.value);
+@}
+@end example
+
+@noindent
+this code example prints something like:
+
+@example
+struct in_addr * = 0x7ffff00f24cc
+struct in_addr.s_addr = 0x8001a8c1 (193.168.1.128) [network byteorder]
+number of bits in the address: 24
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_inet_net_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{input_address}, mmux_uint_t @var{number_of_bits})
+@MmuxCInterface{inet_net_ntop}.
+
+Convert the @emph{Internet Protocol} address data structure referenced by @var{input_address} to its
+@MmuxAsciiZ{} presentation and copy it into the buffer referenced by @var{presentation_result}; this
+output buffer must be at least @var{presentation_result_provided_nchars} characters wide.
+
+If the length of the @MmuxAsciiZ{} presentation, including its terminating nul byte, is less than or
+equal to @var{presentation_result_provided_nchars}: the whole string, including its terminating nul,
+is written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written
+and the return value is @ctrue{}.
+
+The binary representation of the input address is expected to represent an address in the format
+specified by @var{af_family}.  While the @api{} of this function is open to support multiple
+@emph{Internet Protocol} address formats, at present: only the family @samp{MMUX_LIBC_AF_INET} is
+supported; so @var{input_address} must reference a data structure of type
+@objtype{mmux_libc_internet_protocol_address_four_t}.
+
+Only the @var{number_of_bits} bits from the binary address are taken to represent the generated
+address.
+
+@example
+mmux_libc_ipfour_addr_t  address;
+
+/* Build the address. */
+@{
+  mmux_asciizcp_t  dotted_quad = "193.168.1.128";
+
+  if (mmux_libc_inet_pton(address, MMUX_LIBC_AF_INET, dotted_quad)) @{
+    /* error */
+  @}
+@}
+
+/* Build the presentation from the data structure. */
+@{
+  auto  number_of_bits = mmux_uint_literal(24);
+  auto  buflen         = mmux_usize_literal(32);
+  char  bufptr[buflen.value];
+
+  if (mmux_libc_inet_net_ntop(bufptr, buflen, MMUX_LIBC_AF_INET, address, number_of_bits)) @{
+    /* error */
+  @}
+
+  mmux_libc_dprintfer("the presentation is: %s\n", bufptr);
+@}
+@end example
+
+@noindent
+this code example prints:
+
+@example
+the presentation is: 193.168.1/24
+@end example
+@end deftypefun
+
+@c page
+@node networking ip addresses strings three
+@subsubsection The @cfunc{aton} and @cfunc{ntoa} functions
+
+
+@deftypefun bool mmux_libc_inet_aton (mmux_libc_ipfour_addr_ptr_t @var{ouput_addr_p}, mmux_asciizcp_t @var{input_presentation_p})
+@MmuxCInterface{inet_aton}.
+
+Convert the dotted--quad @MmuxAsciiZ{} representation of an IPv4 address referenced by
+@var{input_presentation_p} into a data structure of type @objtype{mmux_libc_ipfour_addr_t}; store the
+result in the data structure referenced by @var{ouput_addr_p}.
+
+@example
+mmux_asciizcp_t          dotted_quad = "127.0.0.1";
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_inet_aton(address, dotted_quad)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_inet_ntoa (mmux_asciizp_t @var{presentation_result_p}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_ipfour_addr_t * @var{input_addr_p})
+@MmuxCInterface{inet_ntoa}.
+
+Convert the IPv4 address referenced by @var{input_addr_p} in its dotted--quad @MmuxAsciiZ{} presentation
+and copy it into the buffer referenced by @var{presentation_result_p}.
+
+If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or
+equal to @var{presentation_result_provided_nchars}: the whole string, including its terminating nul,
+is written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written
+and the return value is @ctrue{}.
+
+@example
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_make_ipfour_addr_broadcast(address)) @{
+  /* error */
+@}
+
+@{
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK	32
+  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+
+  if (mmux_libc_inet_ntoa(str, IS_THIS_ENOUGH_QUESTION_MARK, address)) @{
+    /* error */
+  @}
+
+  /* do something with the presentation in "str" */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node networking ip addresses strings four
+@subsubsection Other functions
+
+
+@deftypefun bool mmux_libc_inet_addr (mmux_libc_ipfour_addr_t @var{address_result}, mmux_asciizcp_t @var{address_presentation})
+@MmuxCInterface{inet_addr}.  If an error occurs: the location referenced by @var{address_result} is
+left untouched; the return value if @ctrue{}.
+
+@example
+mmux_asciizcp_t          presentation = "127.0.0.1";
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_inet_addr(address, presentation)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_inet_network (mmux_libc_ipfour_addr_t @var{address_result}, mmux_asciizcp_t @var{address_presentation})
+@MmuxCInterface{inet_network}.  If an error occurs: the location referenced by @var{address_result}
+is left untouched; the return value if @ctrue{}.
+
+@quotation
+@strong{NOTE} The standard function @cfunc{inet_network} returns an unsigned 32-bit exact integer in
+host byteorder; the function @cfunc{mmux_libc_inet_network} converts such number into an object of
+type @objtype{mmux_libc_ipfour_addr_t}, appropriately converting from host to network byteorder.
+@end quotation
+
+@example
+mmux_asciizcp_t          address_presentation = "192.168.0.0";
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_inet_network(address, address_presentation)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node networking ip addresses ops
+@subsection Operations on @emph{Internet Protocol} addresses
+
+
+The functions @cfunc{mmux_libc_inet_lnaof} and @cfunc{mmux_libc_inet_netof} split an IPv4 address
+object into its host--byteorder component--numbers; the function @cfunc{mmux_libc_inet_makeaddr}
+recombines such numbers into a full address.
+
+@example
+mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_address_number;
+mmux_libc_ipfour_addr_t             original_address;
+
+/* Build an address object. */
+@{
+  mmux_asciizcp_t   original_address_presentation = "192.168.77.88";
+
+  if (mmux_libc_make_ipfour_addr_from_asciiz(original_address, original_address_presentation)) @{
+    /* error */
+  @}
+@}
+
+/* Split the original address into components. */
+@{
+  if (mmux_libc_inet_lnaof(&local_network_address_number, original_address)) @{
+    /* error */
+  @}
+  if (mmux_libc_inet_netof(&network_address_number, original_address)) @{
+    /* error */
+  @}
+@}
+
+/* Recombine a full address object. */
+@{
+  mmux_libc_ipfour_addr_t   recombined_address;
+
+  if (mmux_libc_inet_makeaddr(recombined_address, network_address_number, local_network_address_number)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_inet_lnaof (mmux_libc_host_byteorder_uint32_t * @var{local_address_number_result_p}, mmux_libc_ipfour_addr_arg_t @var{ipfour_addr})
+@MmuxCInterface{inet_lnaof}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t * @var{network_address_number_result_p}, mmux_libc_ipfour_addr_arg_t @var{ipfour_addr})
+@MmuxCInterface{inet_netof}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_inet_makeaddr (mmux_libc_ipfour_addr_t @var{ipfour_addr_result}, mmux_libc_host_byteorder_uint32_t @var{network_address_number}, mmux_libc_host_byteorder_uint32_t @var{local_address_number})
+@MmuxCInterface{inet_makeaddr}.
+@end deftypefun
+
+@c page
+@node networking sockaddr_un
 @section Address format @objtype{mmux_libc_sockaddr_un_t}
 
 
@@ -15068,25 +15701,25 @@ The returned size is the correct value to hand to functions requiring the addres
 @end deftypefun
 
 @c page
-@node sockets sockaddr_in
+@node networking sockaddr_in
 @section Address format @objtype{mmux_libc_sockaddr_in_t}
 
 
 @MmuxCStructOpaqueTypedef{sockaddr_in}
 @MmuxCStructPointerOpaqueTypedef{sockaddr_in}
 @MmuxSetterGetter{sockaddr_in, sin_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_in, sin_addr,   mmux_libc_in_addr_t}
+@MmuxSetterGetter{sockaddr_in, sipfour_addr,   mmux_libc_ipfour_addr_t}
 @MmuxSetterGetter{sockaddr_in, sin_port,   mmux_host_byteorder_ushort_t}
 @MmuxStructDumper{sockaddr_in}
 
 
-@deftypefun bool mmux_libc_sin_addr_p_ref (mmux_libc_in_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
-Store in the location referenced by @var{sin_addr_pp} a pointer to the field @code{sin_addr} of the
+@deftypefun bool mmux_libc_sipfour_addr_p_ref (mmux_libc_ipfour_addr_t ** sipfour_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
+Store in the location referenced by @var{sipfour_addr_pp} a pointer to the field @code{sipfour_addr} of the
 data structure referenced by @var{sockaddr_p}.
 @end deftypefun
 
 @c page
-@node sockets sockaddr_insix
+@node networking sockaddr_insix
 @section Address format @objtype{mmux_libc_sockaddr_insix_t}
 
 
@@ -15102,20 +15735,20 @@ An opaque alias for @code{struct sockaddr_in6}.
 
 @MmuxCStructPointerOpaqueTypedef{sockaddr_insix}
 @MmuxSetterGetter{sockaddr_insix, sinsix_family,   mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_addr,     mmux_libc_insix_addr_t}
+@MmuxSetterGetter{sockaddr_insix, sipsix_addr,     mmux_libc_ipsix_addr_t}
 @MmuxSetterGetter{sockaddr_insix, sinsix_flowinfo, mmux_uint32_t}
 @MmuxSetterGetter{sockaddr_insix, sinsix_scope_id, mmux_uint32_t}
 @MmuxSetterGetter{sockaddr_insix, sinsix_port,     mmux_host_byteorder_uint16_t}
 @MmuxStructDumper{sockaddr_insix}
 
 
-@deftypefun bool mmux_libc_sinsix_addr_p_ref (mmux_libc_insix_addr_t ** @var{sin_addr_pp}, mmux_libc_sockaddr_in_t * @var{sockaddr_p})
-Store in the location referenced by @var{sinsix_addr_pp} a pointer to the field @code{sinsix_addr}
+@deftypefun bool mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** @var{sipfour_addr_pp}, mmux_libc_sockaddr_in_t * @var{sockaddr_p})
+Store in the location referenced by @var{sipsix_addr_pp} a pointer to the field @code{sipsix_addr}
 of the data structure referenced by @var{sockaddr_p}.
 @end deftypefun
 
 @c page
-@node sockets sockaddr
+@node networking sockaddr
 @section Address format @objtype{mmux_libc_sockaddr_t}
 
 
@@ -15130,7 +15763,7 @@ type as alias for @MmuxCStruct{sockaddr}.
 @MmuxStructDumper{sockaddr}
 
 @c page
-@node sockets addrinfo
+@node networking addrinfo
 @section Address informations
 
 
@@ -15147,7 +15780,7 @@ type as alias for @MmuxCStruct{sockaddr}.
 @MmuxStructDumper{addrinfo}
 
 @c page
-@node sockets hostsdb
+@node networking hostsdb
 @section Hosts database
 
 
@@ -15177,7 +15810,7 @@ type as alias for @MmuxCStruct{sockaddr}.
 @end deftypefun
 
 @c page
-@node sockets servicesdb
+@node networking servicesdb
 @section Services database
 
 
@@ -15239,7 +15872,7 @@ if (mmux_libc_getservbyport(&servent_p, host_byteorder_port, protocol_name_p)) @
 @end deftypefun
 
 @c page
-@node sockets protocolsdb
+@node networking protocolsdb
 @section Protocols database
 
 
@@ -15297,7 +15930,7 @@ if (mmux_libc_getprotobyname(&protoent_p, MMUX_LIBC_IPPROTO_TCP)) @{
 @end deftypefun
 
 @c page
-@node sockets networksdb
+@node networking networksdb
 @section Networks database
 
 
@@ -15351,7 +15984,7 @@ The argument @var{n_net} is homogeneous to the values of the field @samp{n_net} 
 
 @example
 mmux_asciizcp_t                 dotted_quad = "127.0.0.0";
-mmux_libc_in_addr_t             address;
+mmux_libc_ipfour_addr_t             address;
 mmux_uint32_t                   netw_byteorder_n_net;
 mmux_uint32_t                   host_byteorder_n_net;
 mmux_libc_netent_t const *      netent_p;
@@ -15369,236 +16002,7 @@ if (mmux_libc_getnetbyaddr(&netent_p, host_byteorder_n_net, MMUX_LIBC_AF_INET)) 
 @end deftypefun
 
 @c page
-@node sockets byteorder
-@section Converting byte order in socket addresses
-
-
-@deftypefun bool mmux_libc_htons (mmux_uint16_t * network_byteorder_value_p, mmux_uint16_t host_byteorder_value)
-@MmuxCInterface{htons}.  Host--to--network short--number byte order conversion.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_ntohs (mmux_uint16_t * host_byteorder_value_p, mmux_uint16_t network_byteorder_value)
-@MmuxCInterface{ntohs}.  Network--to--host short--number byte order conversion.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_htonl (mmux_uint32_t * network_byteorder_value_p, mmux_uint32_t host_byteorder_value)
-@MmuxCInterface{htonl}.  Host--to--network long--number byte order conversion.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_ntohl (mmux_uint32_t * host_byteorder_value_p, mmux_uint32_t network_byteorder_value)
-@MmuxCInterface{ntohl}.  Network--to--host long--number byte order conversion.
-@end deftypefun
-
-@c page
-@node sockets convaddr
-@section Converting socket addresses between formats
-
-
-@deftypefun bool mmux_libc_inet_pton (mmux_pointer_t @var{ouput_addr_p}, mmux_sint_t @var{input_af_family}, mmux_asciizcp_t @var{input_presentation_p})
-@MmuxCInterface{inet_pton}.
-
-Convert the @MmuxAsciiZ{} Internet address presentation referenced by @var{input_presentation_p} into a
-binary data structure; the presentation is expected to represent an address in the format specified
-by @var{input_af_family}, for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}.
-
-When successful, the resulting data structure is stored in the buffer referenced by
-@var{ouput_addr_p}; when @var{input_af_family} equals:
-
-@table @samp
-@item MMUX_LIBC_AF_INET
-The referenced buffer must be a data structure of type @objtype{mmux_libc_in_addr_t}.
-
-@item MMUX_LIBC_AF_INET6
-The referenced buffer must be a data structure of type @objtype{mmux_libc_insix_addr_t}.
-@end table
-
-Example:
-
-@example
-mmux_asciizcp_t         dotted_quad = "127.0.0.1";
-mmux_libc_in_addr_t     address;
-
-if (mmux_libc_inet_pton(&address, MMUX_LIBC_AF_INET, dotted_quad)) @{
-  /* error */
-@}
-@end example
-
-Example:
-
-@example
-mmux_asciizcp_t         presentation = "1:2:3:4:5:6:7:8";
-mmux_libc_insix_addr_t  address;
-
-if (mmux_libc_inet_pton(&address, MMUX_LIBC_AF_INET6, presentation)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{ouput_presentation_p}, mmux_usize_t @var{ouput_presentation_provided_nchars}, mmux_sint_t @var{input_af_family}, mmux_pointer_t @var{input_addr_p})
-@MmuxCInterface{inet_ntop}.
-
-Convert the Internet address data structure referenced by @var{input_addr_p} in its @MmuxAsciiZ{}
-presentation and copy it into the buffer referenced by @var{ouput_presentation_p}; the data
-structure is expected to represent an address in the format specified by @var{input_af_family}, for
-example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}; when @var{input_af_family} equals:
-
-@table @samp
-@item MMUX_LIBC_AF_INET
-The referenced data structure must be of type @objtype{mmux_libc_in_addr_t}.
-
-@item MMUX_LIBC_AF_INET6
-The referenced data structure must be of type @objtype{mmux_libc_insix_addr_t}.
-@end table
-
-If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or equal to
-@var{ouput_presentation_provided_nchars}: the whole string, including its terminating nul, is
-written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written and
-the return value is @ctrue{}.
-
-Example:
-
-@example
-mmux_libc_in_addr_t     address;
-
-if (mmux_libc_make_in_addr_broadcast(&address)) @{
-  /* error */
-@}
-
-@{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
-
-  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET, &address)) @{
-    /* error */
-  @}
-
-  /* do something with the presentation in "str" */
-@}
-@end example
-
-Example:
-
-@example
-mmux_libc_insix_addr_t     address;
-
-if (mmux_libc_make_insix_addr_loopback(&address)) @{
-  /* error */
-@}
-
-@{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
-
-  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET6, &address)) @{
-    /* error */
-  @}
-
-  /* do something with the presentation in "str" */
-@}
-@end example
-@end deftypefun
-
-@c ------------------------------------------------------------------------
-
-@deftypefun bool mmux_libc_inet_aton (mmux_libc_in_addr_ptr_t @var{ouput_addr_p}, mmux_asciizcp_t @var{input_presentation_p})
-@MmuxCInterface{inet_aton}.
-
-Convert the dotted--quad @MmuxAsciiZ{} representation of an IPv4 address referenced by
-@var{input_presentation_p} into a data structure of type @objtype{mmux_libc_in_addr_t}; store the
-result in the data structure referenced by @var{ouput_addr_p}.
-
-@example
-mmux_asciizcp_t         dotted_quad = "127.0.0.1";
-mmux_libc_in_addr_t     address;
-
-if (mmux_libc_inet_aton(&address, dotted_quad)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_ntoa (mmux_asciizp_t @var{ouput_presentation_p}, mmux_usize_t @var{ouput_presentation_provided_nchars}, mmux_libc_in_addr_t * @var{input_addr_p})
-@MmuxCInterface{inet_ntoa}.
-
-Convert the IPv4 address referenced by @var{input_addr_p} in its dotted--quad @MmuxAsciiZ{} presentation
-and copy it into the buffer referenced by @var{ouput_presentation_p}.
-
-If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or equal to
-@var{ouput_presentation_provided_nchars}: the whole string, including its terminating nul, is
-written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written and
-the return value is @ctrue{}.
-
-@example
-mmux_libc_in_addr_t     in_addr;
-
-if (mmux_libc_make_in_addr_broadcast(&in_addr)) @{
-  /* error */
-@}
-
-@{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
-
-  if (mmux_libc_inet_ntoa(str, IS_THIS_ENOUGH_QUESTION_MARK, &in_addr)) @{
-    /* error */
-  @}
-
-  /* do something with the presentation in "str" */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_addr (mmux_libc_in_addr_ptr_t @var{result_in_addr_p}, mmux_asciizcp_t @var{presentation_in_addr_p})
-@MmuxCInterface{inet_addr}.
-
-If an error occurs: the location referenced by @var{result_in_addr_p} is left untouched; the return
-value if @ctrue{}.
-
-@example
-mmux_asciizcp_t         dotted_quad = "127.0.0.1";
-mmux_libc_in_addr_t     address;
-
-if (mmux_libc_inet_addr(&address, dotted_quad)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_network (mmux_libc_in_addr_ptr_t @var{result_in_addr_p}, mmux_asciizcp_t @var{presentation_in_addr_p})
-@MmuxCInterface{inet_addr}.
-
-If an error occurs: the location referenced by @var{result_in_addr_p} is left untouched; the return
-value if @ctrue{}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_makeaddr (mmux_libc_in_addr_ptr_t @var{result_in_addr_p}, mmux_libc_in_addr_ptr_t @var{net_in_addr_p}, mmux_libc_in_addr_ptr_t @var{local_in_addr_p})
-@MmuxCInterface{inet_makeaddr}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_lnaof (mmux_libc_in_addr_ptr_t @var{local_in_addr_p}, mmux_libc_in_addr_ptr_t @var{in_addr_p})
-@MmuxCInterface{inet_lnaof}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_inet_netof (mmux_libc_in_addr_ptr_t @var{net_in_addr_p}, mmux_libc_in_addr_ptr_t @var{in_addr_p})
-@MmuxCInterface{inet_netof}.
-@end deftypefun
-
-@c page
-@node sockets getaddrinfo
+@node networking getaddrinfo
 @section Getting address informations
 
 
@@ -15645,7 +16049,7 @@ if (mmux_libc_getaddrinfo(&addrinfo_linked_list, &error_code, node, service, &hi
 @end deftypefun
 
 @c page
-@node sockets getnameinfo
+@node networking getnameinfo
 @section Getting address name informations
 
 
@@ -15682,7 +16086,7 @@ if (mmux_libc_getnameinfo (hostname, IS_THIS_ENOUGH_QUESTION_MARK,
 @end deftypefun
 
 @c page
-@node sockets creating
+@node networking creating
 @section Sockets: creating, pairs, shutting down, inspecting
 
 
@@ -15769,7 +16173,7 @@ if (mmux_libc_getsockname(sock, &sockaddr, &sockaddr_size)) @{
 @end deftypefun
 
 @c page
-@node sockets stream
+@node networking stream
 @section Sending and receiving data through a stream socket
 
 
@@ -15783,7 +16187,7 @@ if (mmux_libc_getsockname(sock, &sockaddr, &sockaddr_size)) @{
 @end deftypefun
 
 @c page
-@node sockets server
+@node networking server
 @section Stream socket servers
 
 
@@ -15827,7 +16231,7 @@ to the actual size of the client address.
 @end deftypefn
 
 @c page
-@node sockets client
+@node networking client
 @section Stream socket clients
 
 
@@ -15836,7 +16240,7 @@ to the actual size of the client address.
 @end deftypefun
 
 @c page
-@node sockets dgram
+@node networking dgram
 @section Sending and receiving data through a datagram socket
 
 
@@ -15864,7 +16268,7 @@ sender address.
 @end deftypefun
 
 @c page
-@node sockets options
+@node networking options
 @section Socket options
 
 

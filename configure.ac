@@ -69,6 +69,7 @@ MMUX_CHECK_PKG_CONFIG_MACROS
 #AC_CHECK_HEADERS([libgen.h])
 
 AC_SEARCH_LIBS(cos, m,, [AC_MSG_ERROR([Cannot find libm])])
+AC_SEARCH_LIBS(inet_net_ntop, resolv,, [AC_MSG_WARN([Cannot find libresolv])])
 PKG_CHECK_MODULES([MMUX_CC_TYPES],[mmux-cc-types >= 0.1.0])
 
 AC_CACHE_SAVE
@@ -94,10 +95,12 @@ AC_CHECK_FUNCS([mempcpy memrchr strnlen strndup stpncpy strcasecmp strncasecmp s
                 get_current_dir_name
                 renameat2 group_member dup3 accept4 copy_file_range gettid prlimit
                 wait waitid syscall memfd_create strerrorname_np strerrordesc_np
-                strerror_r strerror_l
-                signalfd])
+                strerror_r strerror_l])
 
-AC_CHECK_FUNCS([sigaltstack sigemptyset sigaddset sigfillset sigprocmask sigaction tgkill])
+AC_CHECK_FUNCS([sigaltstack sigemptyset sigaddset sigfillset sigprocmask sigaction tgkill signalfd])
+
+dnl These are in "libresolv".
+AC_CHECK_FUNCS([inet_net_ntop inet_net_pton])
 
 dnl --------------------------------------------------------------------
 

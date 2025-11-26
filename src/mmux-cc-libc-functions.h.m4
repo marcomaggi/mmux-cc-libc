@@ -2696,7 +2696,7 @@ mmux_cc_libc_decl bool mmux_libc_utimensat (mmux_libc_dirfd_arg_t dirfd,
 
 
 /** --------------------------------------------------------------------
- ** Sockets.
+ ** Networking sockets: exact integer wrappers.
  ** ----------------------------------------------------------------- */
 
 mmux_cc_libc_inline_decl mmux_libc_socket_address_family_t
@@ -2725,7 +2725,51 @@ mmux_libc_network_interface_index (mmux_standard_uint_t value)
   return (mmux_libc_network_interface_index_t) { .value = value };
 }
 
+
+/** --------------------------------------------------------------------
+ ** Networking sockets: byte-order conversion.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_inline_decl mmux_libc_network_byteorder_uint32_t
+mmux_libc_network_byteorder_uint32 (mmux_standard_uint32_t value)
+{
+  return (mmux_libc_network_byteorder_uint32_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_host_byteorder_uint32_t
+mmux_libc_host_byteorder_uint32 (mmux_standard_uint32_t value)
+{
+  return (mmux_libc_host_byteorder_uint32_t) { .value = value };
+}
+
+#define mmux_libc_network_byteorder_uint32_literal(LITERAL_VALUE)	\
+  (mmux_libc_network_byteorder_uint32(mmux_standard_uint32_literal(LITERAL_VALUE)))
+
+#define mmux_libc_host_byteorder_uint32_literal(LITERAL_VALUE)	\
+  (mmux_libc_host_byteorder_uint32(mmux_standard_uint32_literal(LITERAL_VALUE)))
+
 /* ------------------------------------------------------------------ */
+
+mmux_cc_libc_inline_decl mmux_libc_host_byteorder_uint16_t
+mmux_libc_host_byteorder_uint16 (mmux_standard_uint16_t value)
+{
+  return (mmux_libc_host_byteorder_uint16_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_network_byteorder_uint16_t
+mmux_libc_network_byteorder_uint16 (mmux_standard_uint16_t value)
+{
+  return (mmux_libc_network_byteorder_uint16_t) { .value = value };
+}
+
+#define mmux_libc_network_byteorder_uint16_literal(LITERAL_VALUE)	\
+  (mmux_libc_network_byteorder_uint16(mmux_standard_uint16_literal(LITERAL_VALUE)))
+
+#define mmux_libc_host_byteorder_uint16_literal(LITERAL_VALUE)	\
+  (mmux_libc_host_byteorder_uint16(mmux_standard_uint16_literal(LITERAL_VALUE)))
+
+
+/** --------------------------------------------------------------------
+ ** Networking sockets: networking interface name-index association.
+ ** ----------------------------------------------------------------- */
 
 mmux_cc_libc_decl bool mmux_libc_if_index_set (mmux_libc_if_nameindex_t struct_p,
 					       mmux_libc_network_interface_index_t new_field_value)
@@ -2760,33 +2804,78 @@ mmux_cc_libc_decl bool mmux_libc_if_nameindex (mmux_libc_network_interface_name_
 mmux_cc_libc_decl bool mmux_libc_if_freenameindex (mmux_libc_network_interface_name_index_t const * nameindex_array)
   __attribute__((__nonnull__(1)));
 
+
+/** --------------------------------------------------------------------
+ ** Networking sockets: internet protocol addresses.
+ ** ----------------------------------------------------------------- */
+
+bool mmux_libc_s_addr_set (mmux_libc_ipfour_addr_t ipfour_addr, mmux_libc_network_byteorder_uint32_t raw_address_number)
+  __attribute__((__nonnull__(1)));
+
+bool mmux_libc_s_addr_ref (mmux_libc_network_byteorder_uint32_t * raw_address_number_result_p,
+			   mmux_libc_ipfour_addr_arg_t ipfour_addr)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr (mmux_libc_ipfour_addr_t in_addr_p,
+						   mmux_libc_network_byteorder_uint32_t raw_internet_address)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr_none (mmux_libc_ipfour_addr_t in_addr_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr_any (mmux_libc_ipfour_addr_t in_addr_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr_broadcast (mmux_libc_ipfour_addr_t in_addr_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr_loopback (mmux_libc_ipfour_addr_t in_addr_p)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_ipfour_addr_from_asciiz (mmux_libc_ipfour_addr_t ipfour_addr_result,
+							       mmux_asciizcp_t dotted_quad)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ipfour_addr_reset (mmux_libc_ipfour_addr_t address)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ipfour_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_ipfour_addr_arg_t ipfour_addr,
+						   mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ipfour_addr_equal (bool * result_p,
+						    mmux_libc_ipfour_addr_arg_t ipfour_addr_1,
+						    mmux_libc_ipfour_addr_arg_t ipfour_addr_2)
+  __attribute__((__nonnull__(1,2,3)));
+
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_inline_decl mmux_host_byteorder_uint16_t
-mmux_host_byteorder_uint16 (mmux_standard_uint16_t value)
-{
-  return (mmux_host_byteorder_uint16_t) { .value = value };
-}
-mmux_cc_libc_inline_decl mmux_network_byteorder_uint16_t
-mmux_network_byteorder_uint16 (mmux_standard_uint16_t value)
-{
-  return (mmux_network_byteorder_uint16_t) { .value = value };
-}
+mmux_cc_libc_decl bool mmux_libc_make_ipsix_addr_loopback (mmux_libc_ipsix_addr_t ipsix_addr_result)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_inline_decl mmux_host_byteorder_uint32_t
-mmux_host_byteorder_uint32 (mmux_standard_uint32_t value)
-{
-  return (mmux_host_byteorder_uint32_t) { .value = value };
-}
-mmux_cc_libc_inline_decl mmux_network_byteorder_uint32_t
-mmux_network_byteorder_uint32 (mmux_standard_uint32_t value)
-{
-  return (mmux_network_byteorder_uint32_t) { .value = value };
-}
+mmux_cc_libc_decl bool mmux_libc_make_ipsix_addr_any (mmux_libc_ipsix_addr_t ipsix_addr_result)
+  __attribute__((__nonnull__(1)));
 
-/* ------------------------------------------------------------------ */
+mmux_cc_libc_decl bool mmux_libc_make_ipsix_addr_from_asciiz (mmux_libc_ipsix_addr_t ipsix_addr_result,
+							      mmux_asciizcp_t dotted_quad)
+  __attribute__((__nonnull__(1,2)));
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(in_addr,		s_addr,		mmux_uint32_t)
+mmux_cc_libc_decl bool mmux_libc_ipsix_addr_reset (mmux_libc_ipsix_addr_t address)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_ipsix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_ipsix_addr_arg_t ipsix_addr,
+						  mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_ipsix_addr_equal (bool * result_p,
+						   mmux_libc_ipsix_addr_arg_t ipsix_addr_1,
+						   mmux_libc_ipsix_addr_arg_t ipsix_addr_2)
+  __attribute__((__nonnull__(1,2,3)));
+
+
+/** --------------------------------------------------------------------
+ ** Networking sockets.
+ ** ----------------------------------------------------------------- */
 
 DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr,		sa_family,	mmux_libc_socket_address_family_t)
 
@@ -2794,23 +2883,38 @@ DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_un,		sun_family,	mmux_libc_socket_ad
 
 mmux_cc_libc_decl bool mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_fs_ptn_arg_t pathname)
   __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_sun_path_ref (mmux_libc_fs_ptn_t fs_ptn_result, mmux_libc_sockaddr_un_t const * const P)
   __attribute__((__nonnull__(1,2)));
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_family,	mmux_libc_socket_address_family_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_addr,	mmux_libc_in_addr_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(sockaddr_in,		sin_port,	mmux_host_byteorder_uint16_t)
+mmux_cc_libc_decl bool mmux_libc_sin_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_socket_address_family_t new_field_value)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_sin_addr_p_ref (mmux_libc_in_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
+mmux_cc_libc_decl bool mmux_libc_sin_family_ref (mmux_libc_socket_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sin_addr_set (mmux_libc_sockaddr_in_t * P, mmux_libc_ipfour_addr_arg_t new_field_value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sin_addr_ref (mmux_libc_ipfour_addr_t field_value_result, mmux_libc_sockaddr_in_t const * P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sin_port_set (mmux_libc_sockaddr_in_t * const P, mmux_libc_host_byteorder_uint16_t host_byteorder_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sin_port_ref (mmux_libc_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_in_t const * const P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sin_addr_p_ref (mmux_libc_ipfour_addr_t sin_addr, mmux_libc_sockaddr_in_t * sockaddr_p)
   __attribute__((__nonnull__(1,2)));
 
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_family,   mmux_libc_socket_address_family_t, sinsix_family)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_addr,     mmux_libc_insix_addr_t, sinsix_addr)
+DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_addr,     mmux_libc_ipsix_addr_t, sipsix_addr)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_flowinfo, mmux_uint32_t,          sinsix_flowinfo)
 DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_scope_id, mmux_uint32_t,          sinsix_scope_id)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_port,     mmux_host_byteorder_uint16_t, sinsix_port)
+DEFINE_STRUCT_SETTER_GETTER_SPLIT_PROTOS(sockaddr_insix, sin6_port,     mmux_libc_host_byteorder_uint16_t, sinsix_port)
 
-mmux_cc_libc_decl bool mmux_libc_sinsix_addr_p_ref (mmux_libc_insix_addr_t ** sinsix_addr_pp,
+mmux_cc_libc_decl bool mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** sipsix_addr_pp,
 						    mmux_libc_sockaddr_insix_t const * sockaddr_p)
   __attribute__((__nonnull__(1,2)));
 
@@ -2851,14 +2955,6 @@ mmux_cc_libc_decl mmux_usize_t mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const 
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
-
-mmux_cc_libc_decl bool mmux_libc_in_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_in_addr_t const * in_addr_p,
-					       mmux_asciizcp_t struct_name)
-  __attribute__((__nonnull__(2)));
-
-mmux_cc_libc_decl bool mmux_libc_insix_addr_dump (mmux_libc_fd_arg_t fd, mmux_libc_insix_addr_t const * insix_addr_p,
-						  mmux_asciizcp_t struct_name)
-  __attribute__((__nonnull__(2)));
 
 mmux_cc_libc_decl bool mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 						mmux_libc_sockaddr_t const * sockaddr_p,
@@ -2903,76 +2999,72 @@ mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_l
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_in_addr (mmux_libc_in_addr_t * in_addr_p,
-					       mmux_standard_uint32_t network_byteorder_value)
+mmux_cc_libc_decl bool mmux_libc_htons (mmux_libc_network_byteorder_uint16_t * result_p, mmux_libc_host_byteorder_uint16_t value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_in_addr_none (mmux_libc_in_addr_t * in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_ntohs (mmux_libc_host_byteorder_uint16_t * result_p, mmux_libc_network_byteorder_uint16_t value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_in_addr_any (mmux_libc_in_addr_t * in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_htonl (mmux_libc_network_byteorder_uint32_t * result_p, mmux_libc_host_byteorder_uint32_t value)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_in_addr_broadcast (mmux_libc_in_addr_t * in_addr_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_make_in_addr_loopback (mmux_libc_in_addr_t * in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_ntohl (mmux_libc_host_byteorder_uint32_t * result_p, mmux_libc_network_byteorder_uint32_t value)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_make_insix_addr_loopback (mmux_libc_insix_addr_t * insix_addr_p)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_make_insix_addr_any (mmux_libc_insix_addr_t * insix_addr_p)
-  __attribute__((__nonnull__(1)));
-
-/* ------------------------------------------------------------------ */
-
-mmux_cc_libc_decl bool mmux_libc_htons (mmux_network_byteorder_uint16_t * result_p, mmux_host_byteorder_uint16_t value)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_ntohs (mmux_host_byteorder_uint16_t * result_p, mmux_network_byteorder_uint16_t value)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_htonl (mmux_network_byteorder_uint32_t * result_p, mmux_host_byteorder_uint32_t value)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_ntohl (mmux_host_byteorder_uint32_t * result_p, mmux_network_byteorder_uint32_t value)
-  __attribute__((__nonnull__(1)));
-
-/* ------------------------------------------------------------------ */
-
-mmux_cc_libc_decl bool mmux_libc_inet_aton (mmux_libc_in_addr_ptr_t ouput_addr_p, mmux_asciizcp_t input_presentation_p)
+mmux_cc_libc_decl bool mmux_libc_inet_aton (mmux_libc_ipfour_addr_t ouput_addr_p,
+					    mmux_asciizcp_t input_presentation_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_ntoa (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-					    mmux_libc_in_addr_ptr_t input_addr_p)
+mmux_cc_libc_decl bool mmux_libc_inet_ntoa (mmux_asciizp_t ouput_presentation_p,
+					    mmux_usize_t ouput_presentation_provided_nchars,
+					    mmux_libc_ipfour_addr_arg_t input_addr_p)
   __attribute__((__nonnull__(1,3)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_pton (mmux_pointer_t ouput_addr_p,
-					    mmux_libc_socket_address_family_t input_af_family, mmux_asciizcp_t input_presentation_p)
-  __attribute__((__nonnull__(1,3)));
-
-mmux_cc_libc_decl bool mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
+mmux_cc_libc_decl bool mmux_libc_inet_pton (mmux_libc_ip_addr_t ouput_addr_p,
 					    mmux_libc_socket_address_family_t input_af_family,
-					    mmux_pointerc_t const input_addr_p)
+					    mmux_asciizcp_t input_presentation_p)
+  __attribute__((__nonnull__(1,3)));
+
+mmux_cc_libc_decl bool mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p,
+					    mmux_usize_t ouput_presentation_provided_nchars,
+					    mmux_libc_socket_address_family_t input_af_family,
+					    mmux_libc_ip_addr_arg_t input_addr)
   __attribute__((__nonnull__(1,4)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_addr (mmux_libc_in_addr_ptr_t result_in_addr_p, mmux_asciizcp_t presentation_in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t address_result,
+						mmux_uint_t * number_of_bits_result,
+						mmux_libc_socket_address_family_t family,
+						mmux_asciizcp_t presentation)
+  __attribute__((__nonnull__(1,4)));
+
+mmux_cc_libc_decl bool mmux_libc_inet_net_ntop (mmux_asciizp_t presentation_result,
+						mmux_usize_t presentation_provided_nbytes,
+						mmux_libc_socket_address_family_t family,
+						mmux_libc_ip_addr_arg_t address,
+						mmux_uint_t number_of_bits)
+  __attribute__((__nonnull__(1,4)));
+
+mmux_cc_libc_decl bool mmux_libc_inet_addr (mmux_libc_ipfour_addr_t result_ip_addr_p,
+					    mmux_asciizcp_t presentation_ip_addr_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_network (mmux_libc_in_addr_ptr_t result_in_addr_p, mmux_asciizcp_t presentation_in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_inet_network (mmux_libc_ipfour_addr_t result_ip_addr_p,
+					       mmux_asciizcp_t presentation_ip_addr_p)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_makeaddr (mmux_libc_in_addr_ptr_t result_in_addr,
-						mmux_libc_in_addr_ptr_t net_in_addr, mmux_libc_in_addr_ptr_t local_in_addr)
-  __attribute__((__nonnull__(1,2,3)));
+mmux_cc_libc_decl bool mmux_libc_inet_makeaddr (mmux_libc_ipfour_addr_t ipfour_addr_result,
+						mmux_libc_host_byteorder_uint32_t network_address_number,
+						mmux_libc_host_byteorder_uint32_t local_address_number)
+  __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_lnaof (mmux_libc_in_addr_ptr_t local_in_addr_p, mmux_libc_in_addr_ptr_t in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_inet_lnaof (mmux_libc_host_byteorder_uint32_t * local_address_number_result_p,
+					     mmux_libc_ipfour_addr_arg_t ipfour_addr)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_inet_netof (mmux_libc_in_addr_ptr_t net_in_addr_p, mmux_libc_in_addr_ptr_t in_addr_p)
+mmux_cc_libc_decl bool mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t * network_address_number_result_p,
+					     mmux_libc_ipfour_addr_arg_t ipfour_addr)
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */
@@ -3053,7 +3145,7 @@ mmux_cc_libc_decl bool mmux_libc_getnetbyname (mmux_libc_netent_t const * * resu
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
-					       mmux_host_byteorder_uint32_t network_number,
+					       mmux_libc_host_byteorder_uint32_t network_number,
 					       mmux_libc_socket_address_family_t family)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
