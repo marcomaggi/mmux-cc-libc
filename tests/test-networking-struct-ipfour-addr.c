@@ -78,6 +78,62 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     }
   }
 
+  /* Setting the IPv4 address value to INADDR_NONE. */
+  {
+    mmux_libc_ipfour_addr_t	address;
+
+    if (mmux_libc_make_ipfour_addr_none(address)) {
+      handle_error();
+    } else {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_ipfour_addr_dump(er, address, "INADDR_NONE");
+    }
+  }
+
+  /* Setting the IPv4 address value to INADDR_ANY. */
+  {
+    mmux_libc_ipfour_addr_t	address;
+
+    if (mmux_libc_make_ipfour_addr_any(address)) {
+      handle_error();
+    } else {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_ipfour_addr_dump(er, address, "INADDR_ANY");
+    }
+  }
+
+  /* Setting the IPv4 address value to INADDR_BROADCAST. */
+  {
+    mmux_libc_ipfour_addr_t	address;
+
+    if (mmux_libc_make_ipfour_addr_broadcast(address)) {
+      handle_error();
+    } else {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_ipfour_addr_dump(er, address, "INADDR_BROADCAST");
+    }
+  }
+
+  /* Setting the IPv4 address value to INADDR_LOOPBACK. */
+  {
+    mmux_libc_ipfour_addr_t	address;
+
+    if (mmux_libc_make_ipfour_addr_loopback(address)) {
+      handle_error();
+    } else {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_ipfour_addr_dump(er, address, "INADDR_LOOPBACK");
+    }
+  }
+
   mmux_libc_exit_success();
 }
 

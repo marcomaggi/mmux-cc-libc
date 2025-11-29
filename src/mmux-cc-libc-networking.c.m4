@@ -536,19 +536,19 @@ mmux_libc_s_addr_ref (mmux_libc_network_byteorder_uint32_t * result_p, mmux_libc
 
 bool
 mmux_libc_make_ipfour_addr (mmux_libc_ipfour_addr_t address_result,
-			    mmux_libc_network_byteorder_uint32_t raw_internet_address)
+			    mmux_libc_network_byteorder_uint32_t raw_address)
 {
   MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
   /* Stored in network byte order. */
-  address_result->value->s_addr = raw_internet_address.value;
+  address_result->value->s_addr = raw_address.value;
   return false;
-
 }
 static bool
-mmux_libc_make_ipfour_addr_from_struct_in_addr (mmux_libc_ipfour_addr_t address_result, struct in_addr input)
+mmux_libc_make_ipfour_addr_from_struct_in_addr (mmux_libc_ipfour_addr_t address_result, struct in_addr input_address)
+/* This is reserved for internal use only. */
 {
   MMUX_LIBC_IPFOUR_ADDR_RESET(address_result);
-  address_result->value[0] = input;
+  address_result->value[0] = input_address;
   return false;
 }
 bool

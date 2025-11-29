@@ -14972,9 +14972,14 @@ struct if_nameindex.if_name  = "wlan0"
 @subsection Converting byte order in socket addresses
 
 
-The code examples below where run on a @code{x86_64-pc-linux-gnu}, which is a little--endian system,
-@glibcref{Byte Order, Byte Order Conversion}.  We must remember that network byte order is
-big--endian.
+@menu
+* networking ip addresses byteorder typedefs::          Numeric representations.
+* networking ip addresses byteorder conversion::        Converting number representations.
+@end menu
+
+@c page
+@node networking ip addresses byteorder typedefs
+@subsubsection Numeric representations
 
 
 @deftp {Struct Typedef} mmux_libc_host_byteorder_uint16_t
@@ -14983,7 +14988,7 @@ Data structure type representing an unsigned 16-bit exact integer in host byteor
 @end deftp
 
 
-@deftp {Struct Typedef} mmux_network_host_byteorder_uint16_t
+@deftp {Struct Typedef} mmux_libc_network_byteorder_uint16_t
 @deftpx {Parent Struct Typedef} mmux_uint16_t
 Data structure type representing an unsigned 16-bit exact integer in network byteorder, which is
 big--endian.
@@ -14996,7 +15001,7 @@ Data structure type representing an unsigned 32-bit exact integer in host byteor
 @end deftp
 
 
-@deftp {Struct Typedef} mmux_network_host_byteorder_uint32_t
+@deftp {Struct Typedef} mmux_libc_network_byteorder_uint32_t
 @deftpx {Parent Struct Typedef} mmux_uint32_t
 Data structure type representing an unsigned 32-bit exact integer in network byteorder, which is
 big--endian.
@@ -15026,63 +15031,72 @@ Build and return a new instance of @objtype{mmux_libc_network_byteorder_uint32_t
 be in network byteorder.
 @end deftypefun
 
+@c page
+@node networking ip addresses byteorder conversion
+@subsubsection Converting number representations
+
+
+The code examples below where run on a @code{x86_64-pc-linux-gnu}, which is a little--endian system,
+@glibcref{Byte Order, Byte Order Conversion}.  We must remember that network byteorder is
+big--endian.
+
 
 @deftypefun bool mmux_libc_htons (mmux_libc_network_byteorder_uint16_t * @var{result_p}, mmux_libc_host_byteorder_uint16_t @var{value})
-@MmuxCInterface{htons}.  Host--to--network short--number byte order conversion.
+@MmuxCInterface{htons}.  Host--to--network short--number byteorder conversion.
 
 @example
-auto                                  A = mmux_libc_host_byteorder_uint16(0x1122);
+auto  A = mmux_libc_host_byteorder_uint16_literal(0x1122);
 mmux_libc_network_byteorder_uint16_t  B;
 
 mmux_libc_htons(&B, A);
-mmux_libc_printfer("host byteorder uint16 is '0x%x', corresponding network byte order is: '0x%x'\n",
+mmux_libc_printfer("host byteorder uint16 is '0x%x', corresponding network byteorder is: '0x%x'\n",
   A.value, B.value);
-@print{} host byteorder uint16 is '0x1122', corresponding network byte order is: '0x2211'
+@print{} host byteorder uint16 is '0x1122', corresponding network byteorder is: '0x2211'
 @end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_ntohs (mmux_libc_host_byteorder_uint16_t * @var{result_p}, mmux_libc_network_byteorder_uint16_t @var{value})
-@MmuxCInterface{ntohs}.  Network--to--host short--number byte order conversion.
+@MmuxCInterface{ntohs}.  Network--to--host short--number byteorder conversion.
 
 @example
-auto                               A = mmux_libc_network_byteorder_uint16(0x1122);
+auto  A = mmux_libc_network_byteorder_uint16_literal(0x1122);
 mmux_libc_host_byteorder_uint16_t  B;
 
 mmux_libc_ntohs(&B, A);
-mmux_libc_printfer("network byteorder uint16 is '0x%x', corresponding host byte order is: '0x%x'\n",
+mmux_libc_printfer("network byteorder uint16 is '0x%x', corresponding host byteorder is: '0x%x'\n",
   A.value, B.value);
-@print{} network byteorder uint16 is '0x1122', corresponding host byte order is: '0x2211'
+@print{} network byteorder uint16 is '0x1122', corresponding host byteorder is: '0x2211'
 @end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_htonl (mmux_libc_network_byteorder_uint32_t * @var{result_p}, mmux_libc_host_byteorder_uint32_t @var{value})
-@MmuxCInterface{htonl}.  Host--to--network long--number byte order conversion.
+@MmuxCInterface{htonl}.  Host--to--network long--number byteorder conversion.
 
 @example
-auto                                  A = mmux_libc_host_byteorder_uint32(0x11223344);
+auto  A = mmux_libc_host_byteorder_uint32_literal(0x11223344);
 mmux_libc_network_byteorder_uint32_t  B;
 
 mmux_libc_htonl(&B, A);
-mmux_libc_dprintfer("host byteorder uint32 is '0x%x', corresponding network byte order is: '0x%x'\n",
+mmux_libc_dprintfer("host byteorder uint32 is '0x%x', corresponding network byteorder is: '0x%x'\n",
   A.value, B.value);
-@print{} host byteorder uint32 is '0x11223344', corresponding network byte order is: '0x44332211'
+@print{} host byteorder uint32 is '0x11223344', corresponding network byteorder is: '0x44332211'
 @end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_ntohl (mmux_libc_host_byteorder_uint32_t * @var{result_p}, mmux_libc_network_byteorder_uint32_t @var{value})
-@MmuxCInterface{ntohl}.  Network--to--host long--number byte order conversion.
+@MmuxCInterface{ntohl}.  Network--to--host long--number byteorder conversion.
 
 @example
-auto                               A = mmux_libc_network_byteorder_uint32(0x11223344);
+auto  A = mmux_libc_network_byteorder_uint32_literal(0x11223344);
 mmux_libc_host_byteorder_uint32_t  B;
 
 mmux_libc_ntohl(&B, A);
-mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte order is: '0x%x'\n",
+mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byteorder is: '0x%x'\n",
   A.value, B.value);
-@print{} network byteorder uint32 is '0x11223344', corresponding host byte order is: '0x44332211'
+@print{} network byteorder uint32 is '0x11223344', corresponding host byteorder is: '0x44332211'
 @end example
 @end deftypefun
 
@@ -15092,8 +15106,8 @@ mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte
 
 
 @deftp {Abstract Opaque Struct Typedef} mmux_libc_internet_protocol_address_t
-Data structure type representing an Internet Protocol address.  This type is ``abstract'' in the
-sense that: it must not be instantiated by itself; rather we have to use subtypes like
+Data structure type representing an @emph{Internet Protocol} address.  This type is ``abstract'' in
+the sense that: it must not be instantiated by itself; rather we have to use subtypes like
 @objtype{mmux_libc_internet_protocol_address_four_t} or
 @objtype{mmux_libc_internet_protocol_address_six_t}.
 
@@ -15129,7 +15143,7 @@ integer representing the address as dotted quad in network byteorder (which is b
 @value{PACKAGE}: such type is aliased by @objtype{mmux_libc_internet_protocol_address_four_t}; it is
 often better to use the type @objtype{mmux_libc_ipfour_addr_t}.
 
-To build and inspect an @emph{Internet Protocol} address object we do:
+To build and inspect an IPv4 address object we do:
 
 @example
 mmux_asciizcp_t          dotted_quad = "127.0.0.1";
@@ -15171,24 +15185,57 @@ Initialise the data structure referenced by @var{ipfour_addr} to the address
 @deftypefun bool mmux_libc_make_ipfour_addr_none (mmux_libc_ipfour_addr_t @var{ipfour_addr})
 Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_NONE}.
+
+@example
+mmux_libc_ipfour_addr_t  address;
+
+if (mmux_libc_make_ipfour_addr_none(address)) @{
+  handle_error();
+@} else @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_ipfour_addr_dump(er, address, "INADDR_NONE");
+@}
+@end example
+
+@noindent
+this example prints something like:
+
+@example
+INADDR_NONE * = 0x7ffc3fc28784
+INADDR_NONE.s_addr = 0xffffffff (255.255.255.255) [network byteorder]
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_make_ipfour_addr_any (mmux_libc_ipfour_addr_t @var{ipfour_addr})
 Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_ANY}.
+
+@example
+INADDR_ANY.s_addr = 0x00000000 (0.0.0.0) [network byteorder]
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_make_ipfour_addr_broadcast (mmux_libc_ipfour_addr_t @var{ipfour_addr})
 Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_BROADCAST}.
+
+@example
+INADDR_BROADCAST.s_addr = 0xffffffff (255.255.255.255) [network byteorder]
+@end example
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_make_ipfour_addr_loopback (mmux_libc_ipfour_addr_t @var{ipfour_addr})
 Initialise the data structure referenced by @var{ipfour_addr} to the predefined standard address
 @code{INADDR_LOOPBACK}.
+
+@example
+INADDR_LOOPBACK.s_addr = 0x0100007f (127.0.0.1) [network byteorder]
+@end example
 @end deftypefun
 
 
@@ -15227,7 +15274,7 @@ According to the standard: IPv6 addresses are represented by data structures of 
 is aliased by @objtype{mmux_libc_internet_protocol_address_six_t}; it is often better to use the
 type @objtype{mmux_libc_ipsix_addr_t}.
 
-To build and inspect an @emph{Internet Protocol} address object we do:
+To build and inspect an IPv6 address object we do:
 
 @example
 mmux_asciizcp_t         address_presentation = "1:2:3:4:5:6:7:8";
@@ -15252,21 +15299,46 @@ struct in6_addr = (1:2:3:4:5:6:7:8)
 @end example
 
 
-@MmuxCWrapperStructWithParentOpaqueTypedef{internet_protocol_address_six,in_addr,mmux_libc_internet_protocol_address_t}
+@MmuxCWrapperStructWithParentOpaqueTypedef{internet_protocol_address_six,in6_addr,mmux_libc_internet_protocol_address_t}
 @MmuxCWrapperStructArrayOneTypedef{ipsix_addr,internet_protocol_address_six}
 @MmuxCWrapperStructPointerTypedef{ipsix_addr,internet_protocol_address_six}
 @MmuxCWrapperStructDumper{ipsix_addr,in6_addr}
 
 
-@deftypefun bool mmux_libc_make_ipsix_addr_loopback (mmux_libc_ipsix_addr_t * @var{ipsix_addr_p})
-Initialise the data structure referenced by @var{ipsix_addr_p} to the predefined standard
-@code{in6addr_loopback}.
-@end deftypefun
-
-
 @deftypefun bool mmux_libc_make_ipsix_addr_any (mmux_libc_ipsix_addr_t * @var{ipsix_addr_p})
 Initialise the data structure referenced by @var{ipsix_addr_p} to the predefined standard
 @code{in6addr_any}.
+
+@example
+mmux_libc_ipsix_addr_t  address;
+
+if (mmux_libc_make_ipsix_addr_any(address)) @{
+  /* error */
+@} else @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_ipsix_addr_dump(er, address, "in6addr_any");
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+in6addr_any * = 0x7ffc9c240560
+in6addr_any = (::)
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_make_ipsix_addr_loopback (mmux_libc_ipsix_addr_t * @var{ipsix_addr_p})
+Initialise the data structure referenced by @var{ipsix_addr_p} to the predefined standard
+@code{in6addr_loopback}.
+
+@example
+in6addr_loopback = (::1)
+@end example
 @end deftypefun
 
 

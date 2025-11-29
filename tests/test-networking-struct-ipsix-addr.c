@@ -50,7 +50,7 @@ test_address_any (void)
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      mmux_libc_ipsix_addr_dump(er, address, NULL);
+      mmux_libc_ipsix_addr_dump(er, address, "in6addr_any");
     }
     {
       auto	buflen = mmux_usize_literal(1024);
@@ -85,7 +85,7 @@ test_address_loopback (void)
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      mmux_libc_ipsix_addr_dump(er, address, NULL);
+      mmux_libc_ipsix_addr_dump(er, address, "in6addr_loopback");
     }
     {
       auto	buflen = mmux_usize_literal(1024);

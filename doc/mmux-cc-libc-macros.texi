@@ -180,7 +180,7 @@ typedef mmux_libc_\STRUCTNAME\_t const *  mmux_\POINTERNAME\_arg_t;
 
 @noindent
 it is meant to be used to declare arguments to functions representing an input parameter, so the
-referenced @objtype{mmux_libc_\STRUCTNAME\_t} must be immutable.
+referenced @objtype{mmux_libc_\STRUCTNAME\_t} is handled as immutable.
 @end deftp
 
 @end macro
