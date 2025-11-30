@@ -15679,24 +15679,24 @@ recombines such numbers into a full address.
 
 @example
 mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_address_number;
-mmux_libc_ipfour_addr_t             original_address;
 
 /* Build an address object. */
 @{
   mmux_asciizcp_t   original_address_presentation = "192.168.77.88";
+  mmux_libc_ipfour_addr_t  original_address;
 
   if (mmux_libc_make_ipfour_addr_from_asciiz(original_address, original_address_presentation)) @{
     /* error */
   @}
-@}
 
-/* Split the original address into components. */
-@{
-  if (mmux_libc_inet_lnaof(&local_network_address_number, original_address)) @{
-    /* error */
-  @}
-  if (mmux_libc_inet_netof(&network_address_number, original_address)) @{
-    /* error */
+  /* Split the original address into components. */
+  @{
+    if (mmux_libc_inet_lnaof(&local_network_address_number, original_address)) @{
+      /* error */
+    @}
+    if (mmux_libc_inet_netof(&network_address_number, original_address)) @{
+      /* error */
+    @}
   @}
 @}
 
