@@ -15368,12 +15368,13 @@ functions @cfunc{mmux_libc_inet_pton}, @cfunc{mmux_libc_inet_ntop}, @cfunc{mmux_
 @subsubsection The @cfunc{pton} and @cfunc{ntop} functions
 
 
-@deftypefun bool mmux_libc_inet_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{input_presentation_p})
+@deftypefun bool mmux_libc_inet_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation_input})
 @MmuxCInterface{inet_pton}.
 
-Convert the @MmuxAsciiZ{} Internet address presentation referenced by @var{input_presentation_p}
-into a binary data structure; the presentation is expected to represent an address in the format
-specified by @var{af_family}, for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}.
+Convert the @MmuxAsciiZ{} @emph{Internet Protocol} address presentation referenced by
+@var{presentation_input} into a binary data structure; the presentation is expected to represent an
+address in the format specified by @var{af_family}, for example @samp{MMUX_LIBC_AF_INET} or
+@samp{MMUX_LIBC_AF_INET6}.
 
 When successful, the resulting data structure is stored in the buffer referenced by
 @var{address_result}; when @var{af_family} equals:
@@ -15407,17 +15408,17 @@ if (mmux_libc_inet_pton(address, MMUX_LIBC_AF_INET6, presentation)) @{
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{input_address})
+@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{address_input})
 @MmuxCInterface{inet_ntop}.
 
-Convert the Internet address data structure referenced by @var{input_address} to its @MmuxAsciiZ{}
-presentation and copy it into the buffer referenced by @var{presentation_result_p}; this output
-buffer must be at least @var{presentation_result_provided_nchars} characters wide.
+Convert the Internet address data structure referenced by @var{address_input} to its @MmuxAsciiZ{}
+presentation and copy it into the buffer referenced by @var{presentation_result}; this output buffer
+must be at least @var{presentation_result_provided_nchars} characters wide.
 
-If the length of the @MmuxAsciiZ{} presentation, including its terminating nul byte, is less than or
-equal to @var{presentation_result_provided_nchars}: the whole string, including its terminating nul,
-is written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written
-and the return value is @ctrue{}.
+If the length of the @MmuxAsciiZ{} presentation, @strong{including} its terminating nul byte, is
+less than or equal to @var{presentation_result_provided_nchars}: the whole string,
+@strong{including} its terminating nul, is written in the output buffer; then the return value if
+@cfalse{}.  Otherwise nothing is written and the return value is @ctrue{}.
 
 The data structure is expected to represent an address in the format specified by @var{af_family},
 for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}; when @var{af_family} equals:
@@ -15427,22 +15428,18 @@ for example @samp{MMUX_LIBC_AF_INET} or @samp{MMUX_LIBC_AF_INET6}; when @var{af_
 the referenced data structure must be of type @objtype{mmux_libc_ipfour_addr_t};
 
 @example
-mmux_libc_ipfour_addr_t     address;
+mmux_libc_ipfour_addr_t  address;
 
-if (mmux_libc_make_ipfour_addr_broadcast(&address)) @{
-  /* error */
-@}
-
+gimme_an_ipfour_address(address);
 @{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+  auto  buflen = mmux_usize_literal(64);
+  char  bufptr[buflen.value];
 
-  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET, &address)) @{
+  if (mmux_libc_inet_ntop(bufptr, buflen, MMUX_LIBC_AF_INET, address)) @{
     /* error */
   @}
 
-  /* do something with the presentation in "str" */
+  /* do something with the presentation in "bufptr" */
 @}
 @end example
 
@@ -15450,22 +15447,18 @@ if (mmux_libc_make_ipfour_addr_broadcast(&address)) @{
 the referenced data structure must be of type @objtype{mmux_libc_ipsix_addr_t}.
 
 @example
-mmux_libc_ipsix_addr_t     address;
+mmux_libc_ipsix_addr_t  address;
 
-if (mmux_libc_make_ipsix_addr_loopback(&address)) @{
-  /* error */
-@}
-
+gimme_an_ipsix_address(address);
 @{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+  auto  buflen = mmux_usize_literal(64);
+  char  bufptr[buflen.value];
 
-  if (mmux_libc_inet_ntop(str, IS_THIS_ENOUGH_QUESTION_MARK, MMUX_LIBC_AF_INET6, &address)) @{
+  if (mmux_libc_inet_ntop(bufptr, buflen, MMUX_LIBC_AF_INET6, address)) @{
     /* error */
   @}
 
-  /* do something with the presentation in "str" */
+  /* do something with the presentation in "bufptr" */
 @}
 @end example
 @end table
@@ -15481,7 +15474,7 @@ if, at package building time, the core library was linked with the external libr
 @file{libresolv}.
 
 
-@deftypefun bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_uint_t * @var{number_of_bits_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation})
+@deftypefun bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_uint_t * @var{number_of_bits_result_p}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation})
 @MmuxCInterface{inet_net_pton}.
 
 Convert the @MmuxAsciiZ{} address presentation referenced by @var{presentation} into a binary data
@@ -15494,9 +15487,9 @@ When successful, the resulting data structure is stored in the buffer referenced
 @objtype{mmux_libc_internet_protocol_address_four_t}.
 
 In a way or the other the address presentation always specifies an address having a number of bits;
-such number is determined and stored in the variable referenced by @var{number_of_bits_result}.  For
-example: if the presentation is the string @samp{193.168.1.128/24}, the number of bits is @samp{24};
-if the presentation is the string @samp{127.0.0.1}, the number of bits is @samp{32}.
+such number is determined and stored in the variable referenced by @var{number_of_bits_result_p}.
+For example: if the presentation is the string @samp{193.168.1.128/24}, the number of bits is
+@samp{24}; if the presentation is the string @samp{127.0.0.1}, the number of bits is @samp{32}.
 
 @example
 mmux_asciizcp_t          dotted_quad = "193.168.1.128/24";
@@ -15588,12 +15581,12 @@ the presentation is: 193.168.1/24
 @subsubsection The @cfunc{aton} and @cfunc{ntoa} functions
 
 
-@deftypefun bool mmux_libc_inet_aton (mmux_libc_ipfour_addr_ptr_t @var{ouput_addr_p}, mmux_asciizcp_t @var{input_presentation_p})
+@deftypefun bool mmux_libc_inet_aton (mmux_libc_ipfour_addr_ptr_t @var{address_result}, mmux_asciizcp_t @var{input_presentation})
 @MmuxCInterface{inet_aton}.
 
 Convert the dotted--quad @MmuxAsciiZ{} representation of an IPv4 address referenced by
-@var{input_presentation_p} into a data structure of type @objtype{mmux_libc_ipfour_addr_t}; store the
-result in the data structure referenced by @var{ouput_addr_p}.
+@var{input_presentation} into a data structure of type @objtype{mmux_libc_ipfour_addr_t}; store the
+result in the data structure referenced by @var{address_result}.
 
 @example
 mmux_asciizcp_t          dotted_quad = "127.0.0.1";
@@ -15607,34 +15600,30 @@ if (mmux_libc_inet_aton(address, dotted_quad)) @{
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_inet_ntoa (mmux_asciizp_t @var{presentation_result_p}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_ipfour_addr_t * @var{input_addr_p})
+@deftypefun bool mmux_libc_inet_ntoa (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_ipfour_addr_arg_t @var{address})
 @MmuxCInterface{inet_ntoa}.
 
-Convert the IPv4 address referenced by @var{input_addr_p} in its dotted--quad @MmuxAsciiZ{} presentation
-and copy it into the buffer referenced by @var{presentation_result_p}.
+Convert the IPv4 address referenced by @var{address} in its dotted--quad @MmuxAsciiZ{} presentation
+and copy it into the buffer referenced by @var{presentation_result}.
 
 If the length of the @MmuxAsciiZ{} presentation, including its terminating nul, is less than or
-equal to @var{presentation_result_provided_nchars}: the whole string, including its terminating nul,
-is written in the output buffer; then the return value if @cfalse{}.  Otherwise nothing is written
-and the return value is @ctrue{}.
+equal to @var{presentation_result_provided_nchars}: the whole string, @strong{including} its
+terminating nul, is written in the output buffer; then the return value if @cfalse{}.  Otherwise
+nothing is written and the return value is @ctrue{}.
 
 @example
 mmux_libc_ipfour_addr_t  address;
 
-if (mmux_libc_make_ipfour_addr_broadcast(address)) @{
-  /* error */
-@}
-
+gimme_an_ipfour_address(address);
 @{
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	32
-  char  str[IS_THIS_ENOUGH_QUESTION_MARK];
+  auto  buflen = mmux_usize_literal(64);
+  char  bufptr[buflen.value];
 
-  if (mmux_libc_inet_ntoa(str, IS_THIS_ENOUGH_QUESTION_MARK, address)) @{
+  if (mmux_libc_inet_ntoa(bufptr, buflen, address)) @{
     /* error */
   @}
 
-  /* do something with the presentation in "str" */
+  /* do something with the presentation in "bufptr" */
 @}
 @end example
 @end deftypefun
