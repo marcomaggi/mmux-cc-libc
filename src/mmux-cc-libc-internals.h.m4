@@ -244,7 +244,7 @@ extern "C" {
 
 
 /** --------------------------------------------------------------------
- ** Type definitions.
+ ** Internal type definitions: time and dates.
  ** ----------------------------------------------------------------- */
 
 typedef struct mmux_libc_time_value_t {
@@ -259,10 +259,27 @@ typedef struct mmux_libc_broken_down_time_t {
   struct tm;
 } mmux_libc_broken_down_time_t;
 
-typedef struct iovec		mmux_libc_iovec_t;
-typedef struct rlimit		mmux_libc_rlimit_t;
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: persona.
+ ** ----------------------------------------------------------------- */
+
 typedef struct passwd		mmux_libc_passwd_t;
 typedef struct group		mmux_libc_group_t;
+
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: system resources.
+ ** ----------------------------------------------------------------- */
+
+typedef struct rlimit		mmux_libc_rlimit_t;
+
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: input/output.
+ ** ----------------------------------------------------------------- */
+
+typedef struct iovec		mmux_libc_iovec_t;
 typedef struct stat		mmux_libc_file_system_stat_t;
 typedef struct utimbuf		mmux_libc_file_system_utimbuf_t;
 
@@ -294,6 +311,11 @@ typedef struct mmux_libc_file_descriptor_open_how_t {
 } mmux_libc_file_descriptor_open_how_t;
 #endif
 
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: interprocess signals.
+ ** ----------------------------------------------------------------- */
+
 typedef struct mmux_libc_interprocess_signals_set_t {
   sigset_t;
 } mmux_libc_interprocess_signals_set_t;
@@ -314,11 +336,16 @@ typedef struct mmux_libc_interprocess_signal_fd_info_t {
   struct signalfd_siginfo;
 } mmux_libc_interprocess_signal_fd_info_t;
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: networking.
+ ** ----------------------------------------------------------------- */
 
 typedef struct mmux_libc_network_interface_name_index_t {
   struct if_nameindex;
 } mmux_libc_network_interface_name_index_t;
+
+/* ------------------------------------------------------------------ */
 
 /* Make GCC stay silent about a data structure with no fields. */
 _Pragma("GCC diagnostic push")
@@ -337,15 +364,31 @@ typedef struct mmux_libc_internet_protocol_address_six_t {
   struct in6_addr	value[1];
 } mmux_libc_internet_protocol_address_six_t;
 
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_network_database_host_t {
+  struct hostent;
+} mmux_libc_network_database_host_t;
+
+typedef struct mmux_libc_network_database_service_t {
+  struct servent;
+} mmux_libc_network_database_service_t;
+
+typedef struct mmux_libc_network_database_protocol_t {
+  struct protoent;
+} mmux_libc_network_database_protocol_t;
+
+typedef struct mmux_libc_network_database_network_t {
+  struct netent;
+} mmux_libc_network_database_network_t;
+
+/* ------------------------------------------------------------------ */
+
 typedef struct addrinfo				mmux_libc_addrinfo_t;
 typedef struct sockaddr				mmux_libc_sockaddr_t;
 typedef struct sockaddr_un			mmux_libc_sockaddr_un_t;
 typedef struct sockaddr_in			mmux_libc_sockaddr_in_t;
 typedef struct sockaddr_in6			mmux_libc_sockaddr_insix_t;
-typedef struct hostent				mmux_libc_hostent_t;
-typedef struct servent				mmux_libc_servent_t;
-typedef struct protoent				mmux_libc_protoent_t;
-typedef struct netent				mmux_libc_netent_t;
 typedef struct linger				mmux_libc_linger_t;
 
 typedef mmux_libc_addrinfo_t *			mmux_libc_addrinfo_ptr_t;
@@ -353,13 +396,16 @@ typedef mmux_libc_sockaddr_t *			mmux_libc_sockaddr_ptr_t;
 typedef mmux_libc_sockaddr_un_t *		mmux_libc_sockaddr_un_ptr_t;
 typedef mmux_libc_sockaddr_in_t *		mmux_libc_sockaddr_in_ptr_t;
 typedef mmux_libc_sockaddr_insix_t *		mmux_libc_sockaddr_insix_ptr_t;
-typedef mmux_libc_hostent_t *			mmux_libc_hostent_ptr_t;
-typedef mmux_libc_servent_t *			mmux_libc_servent_ptr_t;
-typedef mmux_libc_protoent_t *			mmux_libc_protoent_ptr_t;
-typedef mmux_libc_netent_t *			mmux_libc_netent_ptr_t;
 typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
 
+
+/** --------------------------------------------------------------------
+ ** Subordinate includes.
+ ** ----------------------------------------------------------------- */
+
 #include <mmux-cc-libc-typedefs.h>
+#include <mmux-cc-libc-functions.h>
+#include <mmux-cc-libc-generics.h>
 
 
 /** --------------------------------------------------------------------
@@ -376,9 +422,6 @@ mmux_cc_libc_decl mmux_libc_file_system_pathname_class_t const mmux_libc_file_sy
 /** --------------------------------------------------------------------
  ** Done.
  ** ----------------------------------------------------------------- */
-
-#include <mmux-cc-libc-functions.h>
-#include <mmux-cc-libc-generics.h>
 
 #ifdef __cplusplus
 } // extern "C"

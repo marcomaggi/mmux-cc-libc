@@ -887,17 +887,23 @@ tests_test_interface_specifications_LDADD		= $(mmux_cc_libc_tests_ldadd)
 ## networking sockets
 
 check_PROGRAMS	+= \
-	tests/test-networking-interface-names		\
+	tests/test-networking-interface-names				\
 	tests/test-networking-internet-protocol-address-conversion	\
 	tests/test-networking-exact-integers-byteorder			\
-	tests/test-networking-struct-ipfour-addr	\
-	tests/test-networking-struct-ipsix-addr
+	tests/test-networking-network-port-numbers			\
+	tests/test-networking-struct-ipfour-addr			\
+	tests/test-networking-struct-ipsix-addr				\
+	tests/test-networking-struct-hostent				\
+	tests/test-networking-struct-servent
 
 tests_test_networking_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_networking_exact_integers_byteorder_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_exact_integers_byteorder_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_network_port_numbers_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_network_port_numbers_LDADD	= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_networking_internet_protocol_address_conversion_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_internet_protocol_address_conversion_LDADD	= $(mmux_cc_libc_tests_ldadd)
@@ -907,6 +913,12 @@ tests_test_networking_struct_ipfour_addr_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_networking_struct_ipsix_addr_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_struct_ipsix_addr_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_struct_hostent_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_struct_hostent_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_struct_servent_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_struct_servent_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

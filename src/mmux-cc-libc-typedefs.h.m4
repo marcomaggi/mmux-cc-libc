@@ -359,6 +359,12 @@ typedef struct mmux_libc_network_byteorder_uint16_t { mmux_uint16_t; } mmux_libc
 typedef struct mmux_libc_host_byteorder_uint32_t    { mmux_uint32_t; } mmux_libc_host_byteorder_uint32_t;
 typedef struct mmux_libc_network_byteorder_uint32_t { mmux_uint32_t; } mmux_libc_network_byteorder_uint32_t;
 
+typedef struct mmux_libc_network_port_number_t {
+  mmux_libc_network_byteorder_uint16_t;
+} mmux_libc_network_port_number_t;
+
+/* ------------------------------------------------------------------ */
+
 typedef mmux_libc_network_interface_name_index_t		mmux_libc_if_nameindex_t[1];
 typedef mmux_libc_network_interface_name_index_t const *	mmux_libc_if_nameindex_arg_t;
 
@@ -370,6 +376,22 @@ typedef mmux_libc_internet_protocol_address_four_t const *	mmux_libc_ipfour_addr
 
 typedef mmux_libc_internet_protocol_address_six_t		mmux_libc_ipsix_addr_t[1];
 typedef mmux_libc_internet_protocol_address_six_t const *	mmux_libc_ipsix_addr_arg_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef mmux_libc_network_database_host_t		mmux_libc_hostent_t[1];
+typedef mmux_libc_network_database_host_t const *	mmux_libc_hostent_arg_t;
+
+typedef mmux_libc_network_database_service_t		mmux_libc_servent_t[1];
+typedef mmux_libc_network_database_service_t const *	mmux_libc_servent_arg_t;
+
+typedef mmux_libc_network_database_protocol_t		mmux_libc_protoent_t[1];
+typedef mmux_libc_network_database_protocol_t const *	mmux_libc_protoent_arg_t;
+
+typedef mmux_libc_network_database_network_t		mmux_libc_netent_t[1];
+typedef mmux_libc_network_database_network_t const *	mmux_libc_netent_arg_t;
+
+/* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_network_socket_t { mmux_libc_file_descriptor_t; } mmux_libc_network_socket_t;
 typedef mmux_libc_network_socket_t	 		mmux_libc_sock_t[1];

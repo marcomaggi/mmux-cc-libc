@@ -14810,25 +14810,23 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 
 @menu
-* networking inames::              Socket interface names.
-* networking ip addresses::        Internet Protocol addresses.
-* networking sockaddr_un::         Address format @objtype{mmux_libc_sockaddr_un_t}.
-* networking sockaddr_in::         Address format @objtype{mmux_libc_sockaddr_in_t}.
-* networking sockaddr_insix::      Address format @objtype{mmux_libc_sockaddr_insix_t}.
-* networking sockaddr::            Address format @objtype{mmux_libc_sockaddr_t}.
-* networking addrinfo::            Address informations.
-* networking hostsdb::             Hosts database.
-* networking servicesdb::          Services database.
-* networking protocolsdb::         Protocols database.
-* networking networksdb::          Networks database.
-* networking getaddrinfo::         Getting address informations.
-* networking getnameinfo::         Getting address name informations.
-* networking creating::            Sockets: creating, pairs, shutting down, inspecting.
-* networking stream::              Sending and receiving data through a stream socket.
-* networking server::              Stream socket servers.
-* networking client::              Stream socket clients.
-* networking dgram::               Sending and receiving data through a datagram socket.
-* networking options::             Socket options.
+* networking inames::           Socket interface names.
+* networking ip addresses::     Internet Protocol addresses.
+* networking typedefs::         Type definitions for networking.
+* networking databases::        Networking information databases.
+* networking sockaddr_un::      Address format @objtype{mmux_libc_sockaddr_un_t}.
+* networking sockaddr_in::      Address format @objtype{mmux_libc_sockaddr_in_t}.
+* networking sockaddr_insix::   Address format @objtype{mmux_libc_sockaddr_insix_t}.
+* networking sockaddr::         Address format @objtype{mmux_libc_sockaddr_t}.
+* networking addrinfo::         Address informations.
+* networking getaddrinfo::      Getting address informations.
+* networking getnameinfo::      Getting address name informations.
+* networking creating::         Sockets: creating, pairs, shutting down, inspecting.
+* networking stream::           Sending and receiving data through a stream socket.
+* networking server::           Stream socket servers.
+* networking client::           Stream socket clients.
+* networking dgram::            Sending and receiving data through a datagram socket.
+* networking options::          Socket options.
 @end menu
 
 @c page
@@ -15726,6 +15724,440 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 @end deftypefun
 
 @c page
+@node networking typedefs
+@section Type definitions for networking
+
+
+@menu
+* networking typedefs port::    Networking port numbers.
+@end menu
+
+@c page
+@node networking typedefs port
+@subsection Networking port numbers
+
+
+@deftp {Struct Typedef} mmux_libc_network_port_number_t
+@deftpx {Parent Struct Typedef} mmux_libc_network_byteorder_uint16_t
+Data structure type representing networking port numbers stored in network byteorder, which is
+big--endian.
+@end deftp
+
+
+@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number (mmux_libc_network_byteorder_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
+exact, unsigned integer stored in network byteorder value.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  value = mmux_libc_network_byteorder_uint16_literal(0x1900);
+auto  port  = mmux_libc_network_port_number(value);
+@end example
+@end deftypefun
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
+@deftypefnx {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_network_byteorder_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
+The two macros are synonyms: build and return a new instance of
+@objtype{mmux_libc_network_port_number_t} from a standard 16-bit, exact, unsigned integer stored in
+network byteorder literal.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port1 = mmux_libc_network_port_number_literal(0x1900);
+auto  port2 = mmux_libc_network_port_number_from_network_byteorder_literal(0x1900);
+@end example
+@end deftypefn
+
+
+@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorder_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
+exact, unsigned integer stored in host byteorder value.  Internally this function uses
+@cfunc{mmux_libc_htons} to convert the value.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  value = mmux_libc_host_byteorder_uint16_literal(25);
+auto  port  = mmux_libc_network_port_number_from_host_byteorder_value(value);
+@end example
+@end deftypefun
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
+unsigned exact integer literal in host byteorder.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+@end example
+@end deftypefn
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
+unsigned exact integer literal in host byteorder.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+@end example
+@end deftypefn
+
+@c page
+@node networking databases
+@section Networking information databases
+
+
+@menu
+* networking databases hosts::      Hosts database.
+* networking databases services::   Services database.
+* networking databases protocols::  Protocols database.
+* networking databases networks::   Networks database.
+@end menu
+
+@c page
+@node networking databases hosts
+@subsection Hosts database
+
+
+It is customary to represent network hosts listed in the file @file{/etc/hosts} with instances of
+the data structure type @MmuxCStruct{hostent}.  Under @value{PACKAGE} such type is aliased by the
+type @objtype{mmux_libc_network_database_host_t}, it is usually better to use the type
+@objtype{mmux_libc_hostent_t}.
+
+To access and inspect the entries of @file{/etc/hosts}, we do:
+
+@example
+mmux_libc_oufd_t    er;
+
+mmux_libc_stder(er);
+mmux_libc_sethostent(true);
+@{
+  for (bool there_is_one_more = false;;) @{
+    mmux_libc_hostent_t  hostent;
+
+    mmux_libc_gethostent(&there_is_one_more, hostent);
+    if (there_is_one_more) @{
+      mmux_libc_hostent_dump(er, hostent, NULL);
+    @} else @{
+      break;
+    @}
+  @}
+@}
+mmux_libc_endhostent();
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct hostent.h_name = "localhost"
+struct hostent.h_aliases = "0x0"
+struct hostent.h_addrtype = "2" (AF_INET)
+struct hostent.h_length = "4" (sizeof(struct in_addr))
+struct hostent.h_addr_list[0] = "127.0.0.1"
+struct hostent.h_addr = "127.0.0.1"
+...
+@end example
+
+
+@MmuxCWrapperStructOpaqueTypedef{network_database_host,hostent}
+@MmuxCWrapperStructArrayOneTypedef{hostent,network_database_host}
+@MmuxCWrapperStructPointerTypedef{hostent,network_database_host}
+@MmuxCWrapperStructSetterGetter{hostent, h_name,        mmux_asciizp_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_aliases,     mmux_asciizpp_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_addrtype,    mmux_libc_socket_address_family_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_length,      mmux_usize_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_addr_list,   mmux_asciizpp_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_addr,        mmux_asciizp_t}
+@MmuxCWrapperStructDumper{hostent,hostent}
+
+
+@deftypefun bool mmux_libc_sethostent (bool @var{stayopen})
+@MmuxCInterface{sethostent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_endhostent (void)
+@MmuxCInterface{endhostent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_gethostent (bool * @var{there_is_one_more}, mmux_libc_hostent_t @var{hostent_result})
+@MmuxCInterface{gethostent}.
+@end deftypefun
+
+@c page
+@node networking databases services
+@subsection Services database
+
+
+It is customary to represent network services listed in the file @file{/etc/services} with instances
+of the data structure type @MmuxCStruct{servent}.  Under @value{PACKAGE} such type is aliased by the
+type @objtype{mmux_libc_network_database_service_t}, it is usually better to use the type
+@objtype{mmux_libc_servent_t}.
+
+To access and inspect the entries of @file{/etc/services}, we do:
+
+@example
+mmux_libc_oufd_t    er;
+
+mmux_libc_stder(er);
+mmux_libc_setservent(true);
+@{
+  for (bool there_is_one_more = false;;) @{
+    mmux_libc_servent_t  servent;
+
+    mmux_libc_getservent(&there_is_one_more, servent);
+    if (there_is_one_more) @{
+      mmux_libc_servent_dump(er, servent, NULL);
+    @} else @{
+      break;
+    @}
+  @}
+@}
+mmux_libc_endservent();
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct servent.s_name = "rtmp"
+struct servent.s_aliases = "0x0"
+struct servent.s_port = 0x100 [network byteorder] (host byteorder: 1)
+struct servent.s_proto = "ddp"
+...
+struct servent.s_name = "smtp"
+struct servent.s_aliases[0] = "mail"
+struct servent.s_port = 0x1900 [network byteorder] (host byteorder: 25)
+struct servent.s_proto = "tcp"
+...
+struct servent.s_name = "http"
+struct servent.s_aliases[0] = "www"
+struct servent.s_aliases[1] = "www-http"
+struct servent.s_port = 0x5000 [network byteorder] (host byteorder: 80)
+struct servent.s_proto = "tcp"
+...
+@end example
+
+
+@MmuxCWrapperStructOpaqueTypedef{network_database_service,servent}
+@MmuxCWrapperStructArrayOneTypedef{servent,network_database_service}
+@MmuxCWrapperStructPointerTypedef{servent,network_database_service}
+@MmuxCWrapperStructSetterGetter{servent, s_name,        mmux_asciizp_t}
+@MmuxCWrapperStructSetterGetter{servent, s_aliases,     mmux_asciizpp_t}
+@MmuxCWrapperStructSetterGetter{servent, s_port,        mmux_libc_network_port_number_t}
+@MmuxCWrapperStructSetterGetter{servent, s_proto,       mmux_asciizp_t}
+@MmuxCWrapperStructDumper{servent,servent}
+
+
+@deftypefun bool mmux_libc_setservent (bool @var{stayopen})
+@MmuxCInterface{setservent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_endservent (void)
+@MmuxCInterface{endservent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getservent (bool * @var{there_is_one_more}, mmux_libc_servent_t @var{servent_result})
+@MmuxCInterface{getservent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getservbyname (bool * @var{there_is_one_p}, mmux_libc_servent_t @var{servent_result}, mmux_asciizcp_t @var{service_name}, mmux_asciizcp_t @var{protocol_name})
+@MmuxCInterface{getservbyname}.  When successful:
+
+@itemize
+@item
+if a matching service is found: the variable referenced by @var{there_is_one_p} is set to @ctrue{};
+otherwise it is set to @cfalse{};
+
+@item
+if there is no matching service: the variable referenced by @var{servent_result} is left untouched.
+@end itemize
+
+@example
+mmux_asciizcp_t     service_name  = "smtp";
+mmux_asciizcp_t     protocol_name = "tcp";
+bool                there_is_one;
+mmux_libc_servent_t servent;
+
+if (mmux_libc_getservbyname(&there_is_one, servent, service_name, protocol_name)) @{
+  /* error */
+@} else if (there_is_one) @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_servent_dump(er, servent, NULL);
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getservbyport (bool * @var{there_is_one_p}, mmux_libc_servent_t @var{servent_result}, mmux_libc_network_port_number_t @var{port}, mmux_asciizcp_t @var{protocol_name})
+@MmuxCInterface{getservbyport}.  When successful:
+
+@itemize
+@item
+if a matching service is found: the variable referenced by @var{there_is_one_p} is set to @ctrue{};
+otherwise it is set to @cfalse{};
+
+@item
+if there is no matching service: the variable referenced by @var{servent_result} is left untouched.
+@end itemize
+
+@example
+auto                port  = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+mmux_asciizcp_t     protocol_name = "tcp";
+bool                there_is_one;
+mmux_libc_servent_t servent;
+
+if (mmux_libc_getservbyport(&there_is_one, servent, port, protocol_name)) @{
+  /* error */
+@} else if (there_is_one) @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_servent_dump(er, servent, NULL);
+@}
+@end example
+@end deftypefun
+
+@c page
+@node networking databases protocols
+@subsection Protocols database
+
+
+@MmuxCStructOpaqueTypedef{protoent}
+@MmuxCStructPointerOpaqueTypedef{protoent}
+@MmuxSetterGetter{protoent, p_name,		mmux_asciizp_t}
+@MmuxSetterGetter{protoent, p_aliases,		mmux_asciizpp_t}
+@MmuxSetterGetter{protoent, p_proto,		mmux_sint_t}
+@MmuxStructDumper{protoent}
+
+
+@deftypefun bool mmux_libc_setprotoent (bool @var{stayopen})
+@MmuxCInterface{setprotoent}.
+@end deftypefun
+
+
+@deftypefun decl bool mmux_libc_endprotoent (void)
+@MmuxCInterface{endprotoent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getprotoent (mmux_libc_protoent_t const * * @var{result_protoent_pp})
+@MmuxCInterface{getprotoent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getprotobyname (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_asciizcp_t @var{protocol_name_p})
+@MmuxCInterface{getprotobyname}.  If an error occurs: @var{result_protoent_pp} is left untouched and
+the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set to
+@cnull{}.
+
+@example
+mmux_asciizcp_t                 protocol_name_p = "tcp";
+mmux_libc_protoent_t const *    protoent_p;
+
+if (mmux_libc_getprotobyname(&protoent_p, protocol_name_p)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getprotobynumber (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_sint_t @var{proto})
+@MmuxCInterface{getprotobynumber}.  If an error occurs: @var{result_protoent_pp} is left untouched
+and the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set
+to @cnull{}.
+
+@example
+mmux_libc_protoent_t const *    protoent_p;
+
+if (mmux_libc_getprotobyname(&protoent_p, MMUX_LIBC_IPPROTO_TCP)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+@c page
+@node networking databases networks
+@subsection Networks database
+
+
+@MmuxCStructOpaqueTypedef{netent}
+@MmuxCStructPointerOpaqueTypedef{netent}
+@MmuxSetterGetter{netent, n_name,		mmux_asciizp_t}
+@MmuxSetterGetter{netent, n_aliases,		mmux_asciizpp_t}
+@MmuxSetterGetter{netent, n_addrtype,		mmux_sint_t}
+@MmuxSetterGetter{netent, n_net,		mmux_ulong_t}
+@MmuxStructDumper{netent}
+
+
+@deftypefun bool mmux_libc_setnetent (bool @var{stayopen})
+@MmuxCInterface{setnetent}.
+@end deftypefun
+
+
+@deftypefun decl bool mmux_libc_endnetent (void)
+@MmuxCInterface{endnetent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getnetent (mmux_libc_netent_t const * * @var{result_netent_pp})
+@MmuxCInterface{getnetent}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getnetbyname (mmux_libc_netent_t const * * @var{result_netent_pp}, mmux_asciizcp_t @var{network_name_p})
+@MmuxCInterface{getnetbyname}.  If an error occurs: @var{result_netent_pp} is left untouched and the
+return value is @ctrue{}.  The location referenced by @var{result_netent_pp} is never set to
+@cnull{}.
+
+@example
+mmux_asciizcp_t                 network_name_p = "loopback";
+mmux_libc_netent_t const *      netent_p;
+
+if (mmux_libc_getnetbyname(&netent_p, network_name_p)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * @var{result_netent_pp}, mmux_uint32_t @var{n_net}, mmux_sint_t @var{af_type})
+@MmuxCInterface{getnetbyaddr}.  If an error occurs: @var{result_netent_pp} is left untouched and the
+return value is @ctrue{}.  The location referenced by @var{result_netent_pp} is never set to
+@cnull{}.
+
+The argument @var{n_net} is homogeneous to the values of the field @samp{n_net} of
+@MmuxCStruct{netent}: the network address in host byteorder.
+
+@example
+mmux_asciizcp_t                 dotted_quad = "127.0.0.0";
+mmux_libc_ipfour_addr_t             address;
+mmux_uint32_t                   netw_byteorder_n_net;
+mmux_uint32_t                   host_byteorder_n_net;
+mmux_libc_netent_t const *      netent_p;
+
+if (mmux_libc_inet_pton(&address, MMUX_LIBC_AF_INET, dotted_quad)) @{
+  /* error */
+@}
+mmux_libc_s_addr_ref(&netw_byteorder_n_net, &address);
+mmux_libc_ntohl(&host_byteorder_n_net, netw_byteorder_n_net);
+if (mmux_libc_getnetbyaddr(&netent_p, host_byteorder_n_net, MMUX_LIBC_AF_INET)) @{
+  /* error */
+@}
+/* do something with "netent_p" */
+@end example
+@end deftypefun
+
+@c page
 @node networking sockaddr_un
 @section Address format @objtype{mmux_libc_sockaddr_un_t}
 
@@ -15839,228 +16271,6 @@ type as alias for @MmuxCStruct{sockaddr}.
 @MmuxSetterGetter{addrinfo, ai_canonname,       mmux_asciizp_t}
 @MmuxSetterGetter{addrinfo, ai_next,            mmux_libc_addrinfo_t *}
 @MmuxStructDumper{addrinfo}
-
-@c page
-@node networking hostsdb
-@section Hosts database
-
-
-@MmuxCStructOpaqueTypedef{hostent}
-@MmuxCStructPointerOpaqueTypedef{hostent}
-@MmuxSetterGetter{hostent, h_name,              mmux_asciizp_t}
-@MmuxSetterGetter{hostent, h_aliases,           mmux_asciizpp_t}
-@MmuxSetterGetter{hostent, h_addrtype,          mmux_sint_t}
-@MmuxSetterGetter{hostent, h_length,            mmux_sint_t}
-@MmuxSetterGetter{hostent, h_addr_list,         mmux_asciizpp_t}
-@MmuxSetterGetter{hostent, h_addr,              mmux_asciizp_t}
-@MmuxStructDumper{hostent}
-
-
-@deftypefun bool mmux_libc_sethostent (bool @var{stayopen})
-@MmuxCInterface{sethostent}.
-@end deftypefun
-
-
-@deftypefun decl bool mmux_libc_endhostent (void)
-@MmuxCInterface{endhostent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gethostent (mmux_libc_hostent_t const * * @var{result_hostent_pp})
-@MmuxCInterface{gethostent}.
-@end deftypefun
-
-@c page
-@node networking servicesdb
-@section Services database
-
-
-@MmuxCStructOpaqueTypedef{servent}
-@MmuxCStructPointerOpaqueTypedef{servent}
-@MmuxSetterGetter{servent, s_name,		mmux_asciizp_t}
-@MmuxSetterGetter{servent, s_aliases,		mmux_asciizpp_t}
-@MmuxSetterGetter{servent, s_port,		mmux_sint_t}
-@MmuxSetterGetter{servent, s_proto,		mmux_asciizp_t}
-@MmuxStructDumper{servent}
-
-
-@deftypefun bool mmux_libc_setservent (bool @var{stayopen})
-@MmuxCInterface{setservent}.
-@end deftypefun
-
-
-@deftypefun decl bool mmux_libc_endservent (void)
-@MmuxCInterface{endservent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getservent (mmux_libc_servent_t const * * @var{result_servent_pp})
-@MmuxCInterface{getservent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getservbyname(mmux_libc_servent_t const * * @var{result_servent_pp}, mmux_asciizcp_t @var{service_name_p}, mmux_asciizcp_t @var{protocol_name_p})
-@MmuxCInterface{getservbyname}.  If an error occurs: @var{result_servent_pp} is left untouched and
-the return value is @ctrue{}.  The location referenced by @var{result_servent_pp} is never set to
-@cnull{}.
-
-@example
-mmux_asciizcp_t                 service_name_p  = "smtp";
-mmux_asciizcp_t                 protocol_name_p = "tcp";
-mmux_libc_servent_t const *     servent_p;
-
-if (mmux_libc_getservbyname(&servent_p, service_name_p, protocol_name_p)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getservbyport (mmux_libc_servent_t const * * @var{result_servent_pp}, mmux_sint_t @var{host_byteorder_port}, mmux_asciizcp_t @var{protocol_name_p})
-@MmuxCInterface{getservbyport}.  If an error occurs: @var{result_servent_pp} is left untouched and
-the return value is @ctrue{}.  The location referenced by @var{result_servent_pp} is never set to
-@cnull{}.
-
-@example
-mmux_sint_t                     host_byteorder_port = 25;
-mmux_asciizcp_t                 protocol_name_p     = "tcp";
-mmux_libc_servent_t const *     servent_p;
-
-if (mmux_libc_getservbyport(&servent_p, host_byteorder_port, protocol_name_p)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-@c page
-@node networking protocolsdb
-@section Protocols database
-
-
-@MmuxCStructOpaqueTypedef{protoent}
-@MmuxCStructPointerOpaqueTypedef{protoent}
-@MmuxSetterGetter{protoent, p_name,		mmux_asciizp_t}
-@MmuxSetterGetter{protoent, p_aliases,		mmux_asciizpp_t}
-@MmuxSetterGetter{protoent, p_proto,		mmux_sint_t}
-@MmuxStructDumper{protoent}
-
-
-@deftypefun bool mmux_libc_setprotoent (bool @var{stayopen})
-@MmuxCInterface{setprotoent}.
-@end deftypefun
-
-
-@deftypefun decl bool mmux_libc_endprotoent (void)
-@MmuxCInterface{endprotoent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getprotoent (mmux_libc_protoent_t const * * @var{result_protoent_pp})
-@MmuxCInterface{getprotoent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getprotobyname (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_asciizcp_t @var{protocol_name_p})
-@MmuxCInterface{getprotobyname}.  If an error occurs: @var{result_protoent_pp} is left untouched and
-the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set to
-@cnull{}.
-
-@example
-mmux_asciizcp_t                 protocol_name_p = "tcp";
-mmux_libc_protoent_t const *    protoent_p;
-
-if (mmux_libc_getprotobyname(&protoent_p, protocol_name_p)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getprotobynumber (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_sint_t @var{proto})
-@MmuxCInterface{getprotobynumber}.  If an error occurs: @var{result_protoent_pp} is left untouched
-and the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set
-to @cnull{}.
-
-@example
-mmux_libc_protoent_t const *    protoent_p;
-
-if (mmux_libc_getprotobyname(&protoent_p, MMUX_LIBC_IPPROTO_TCP)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-@c page
-@node networking networksdb
-@section Networks database
-
-
-@MmuxCStructOpaqueTypedef{netent}
-@MmuxCStructPointerOpaqueTypedef{netent}
-@MmuxSetterGetter{netent, n_name,		mmux_asciizp_t}
-@MmuxSetterGetter{netent, n_aliases,		mmux_asciizpp_t}
-@MmuxSetterGetter{netent, n_addrtype,		mmux_sint_t}
-@MmuxSetterGetter{netent, n_net,		mmux_ulong_t}
-@MmuxStructDumper{netent}
-
-
-@deftypefun bool mmux_libc_setnetent (bool @var{stayopen})
-@MmuxCInterface{setnetent}.
-@end deftypefun
-
-
-@deftypefun decl bool mmux_libc_endnetent (void)
-@MmuxCInterface{endnetent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getnetent (mmux_libc_netent_t const * * @var{result_netent_pp})
-@MmuxCInterface{getnetent}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getnetbyname (mmux_libc_netent_t const * * @var{result_netent_pp}, mmux_asciizcp_t @var{network_name_p})
-@MmuxCInterface{getnetbyname}.  If an error occurs: @var{result_netent_pp} is left untouched and the
-return value is @ctrue{}.  The location referenced by @var{result_netent_pp} is never set to
-@cnull{}.
-
-@example
-mmux_asciizcp_t                 network_name_p = "loopback";
-mmux_libc_netent_t const *      netent_p;
-
-if (mmux_libc_getnetbyname(&netent_p, network_name_p)) @{
-  /* error */
-@}
-@end example
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * @var{result_netent_pp}, mmux_uint32_t @var{n_net}, mmux_sint_t @var{af_type})
-@MmuxCInterface{getnetbyaddr}.  If an error occurs: @var{result_netent_pp} is left untouched and the
-return value is @ctrue{}.  The location referenced by @var{result_netent_pp} is never set to
-@cnull{}.
-
-The argument @var{n_net} is homogeneous to the values of the field @samp{n_net} of
-@MmuxCStruct{netent}: the network address in host byteorder.
-
-@example
-mmux_asciizcp_t                 dotted_quad = "127.0.0.0";
-mmux_libc_ipfour_addr_t             address;
-mmux_uint32_t                   netw_byteorder_n_net;
-mmux_uint32_t                   host_byteorder_n_net;
-mmux_libc_netent_t const *      netent_p;
-
-if (mmux_libc_inet_pton(&address, MMUX_LIBC_AF_INET, dotted_quad)) @{
-  /* error */
-@}
-mmux_libc_s_addr_ref(&netw_byteorder_n_net, &address);
-mmux_libc_ntohl(&host_byteorder_n_net, netw_byteorder_n_net);
-if (mmux_libc_getnetbyaddr(&netent_p, host_byteorder_n_net, MMUX_LIBC_AF_INET)) @{
-  /* error */
-@}
-/* do something with "netent_p" */
-@end example
-@end deftypefun
 
 @c page
 @node networking getaddrinfo

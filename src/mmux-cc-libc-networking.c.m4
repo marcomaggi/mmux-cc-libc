@@ -400,6 +400,20 @@ socket_internet_protocol_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_socke
 
 
 /** --------------------------------------------------------------------
+ ** Types handling.
+ ** ----------------------------------------------------------------- */
+
+mmux_libc_network_port_number_t
+mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorder_uint16_t host_byteorder_value)
+{
+  mmux_libc_network_byteorder_uint16_t	network_byteorder_value;
+
+  mmux_libc_htons(&network_byteorder_value, host_byteorder_value);
+  return (mmux_libc_network_port_number_t) { .value = network_byteorder_value.value };
+}
+
+
+/** --------------------------------------------------------------------
  ** Interface naming.
  ** ----------------------------------------------------------------- */
 
@@ -721,7 +735,452 @@ mmux_libc_ipsix_addr_equal (bool * result_p,
   return false;
 }
 
+
+/** --------------------------------------------------------------------
+ ** Struct hostent.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_h_name_set (mmux_libc_hostent_t P, mmux_asciizp_t value)
+{
+  P->h_name = value;
+  return false;
+}
+bool
+mmux_libc_h_name_ref (mmux_asciizpp_t result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->h_name);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_h_aliases_set (mmux_libc_hostent_t P, mmux_asciizpp_t value)
+{
+  P->h_aliases = value;
+  return false;
+}
+bool
+mmux_libc_h_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->h_aliases);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_h_addrtype_set (mmux_libc_hostent_t P, mmux_libc_socket_address_family_t value)
+{
+  P->h_addrtype = value.value;
+  return false;
+}
+bool
+mmux_libc_h_addrtype_ref (mmux_libc_socket_address_family_t * result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = mmux_libc_socket_address_family(P->h_addrtype);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_h_length_set (mmux_libc_hostent_t P, mmux_usize_t value)
+{
+  P->h_length = (int) value.value;
+  return false;
+}
+bool
+mmux_libc_h_length_ref (mmux_usize_t * result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = mmux_usize(P->h_length);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_h_addr_list_set (mmux_libc_hostent_t P, mmux_asciizpp_t value)
+{
+  P->h_addr_list = value;
+  return false;
+}
+bool
+mmux_libc_h_addr_list_ref (mmux_asciizpp_t * result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = P->h_addr_list;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_h_addr_set (mmux_libc_hostent_t P, mmux_asciizp_t value)
+{
+  P->h_addr = value;
+  return false;
+}
+bool
+mmux_libc_h_addr_ref (mmux_asciizp_t * result_p, mmux_libc_hostent_arg_t P)
+{
+  *result_p = P->h_addr;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_hostent_dump (mmux_libc_fd_arg_t fd, mmux_libc_hostent_arg_t hostent_p, mmux_asciizcp_t struct_name)
+{
+  int	aliases_idx   = 0;
+  int	addr_list_idx = 0;
+
+  if (NULL == struct_name) {
+    struct_name = "struct hostent";
+  }
+
+  DPRINTF(fd, "%s.h_name = \"%s\"\n", struct_name, hostent_p->h_name);
+
+  if (NULL != hostent_p->h_aliases) {
+    for (; hostent_p->h_aliases[aliases_idx]; ++aliases_idx) {
+      DPRINTF(fd, "%s.h_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, hostent_p->h_aliases[aliases_idx]);
+    }
+  }
+  if (0 == aliases_idx) {
+    DPRINTF(fd, "%s.h_aliases = \"0x0\"\n", struct_name);
+  }
+
+  DPRINTF(fd, "%s.h_addrtype = \"%d\"", struct_name, hostent_p->h_addrtype);
+
+  switch (hostent_p->h_addrtype) {
+  case MMUX_LIBC_VALUEOF_AF_INET:
+    DPRINTF(fd, " (AF_INET)\n");
+    break;
+  case MMUX_LIBC_VALUEOF_AF_INET6:
+    DPRINTF(fd, " (AF_INET6)\n");
+    break;
+  default:
+    DPRINTF(fd, "\n");
+    break;
+  }
+
+  /* Dump the field "h_length". */
+  {
+    if (sizeof(struct in_addr) == hostent_p->h_length) {
+      DPRINTF(fd, "%s.h_length = \"%d\" (sizeof(struct in_addr))\n", struct_name, hostent_p->h_length);
+    } else if (sizeof(struct in6_addr) == hostent_p->h_length) {
+      DPRINTF(fd, "%s.h_length = \"%d\" (sizeof(struct in6_addr))\n", struct_name, hostent_p->h_length);
+    } else {
+      DPRINTF(fd, "%s.h_length = \"%d\"\n", struct_name, hostent_p->h_length);
+    }
+  }
+
+
+  if (NULL != hostent_p->h_addr_list) {
+    auto const	provided_nchars = mmux_usize_literal(512);
+
+    for (; hostent_p->h_addr_list[addr_list_idx]; ++addr_list_idx) {
+      char	presentation_buf[provided_nchars.value];
+
+      inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr_list[addr_list_idx], presentation_buf, provided_nchars.value);
+      presentation_buf[provided_nchars.value - 1] = '\0';
+      DPRINTF(fd, "%s.h_addr_list[%d] = \"%s\"\n", struct_name, addr_list_idx, presentation_buf);
+    }
+  }
+  if (0 == addr_list_idx) {
+    DPRINTF(fd, "%s.h_addr_list = \"0x0\"\n", struct_name);
+  }
+
+  if (NULL != hostent_p->h_addr) {
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK	512
+    char	presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK];
+
+    inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr, presentation_buf, IS_THIS_ENOUGH_QUESTION_MARK);
+    presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK-1] = '\0';
+    DPRINTF(fd, "%s.h_addr = \"%s\"\n", struct_name, presentation_buf);
+  } else {
+    DPRINTF(fd, "%s.h_addr = \"0x0\"\n", struct_name);
+  }
+
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sethostent (bool stayopen)
+{
+  sethostent((mmux_standard_sint_t)stayopen);
+  return false;
+}
+bool
+mmux_libc_endhostent (void)
+{
+  endhostent();
+  return false;
+}
+bool
+mmux_libc_gethostent (bool * there_is_one_more_p, mmux_libc_hostent_t hostent_result)
+{
+  struct hostent *	rv = gethostent();
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine words, and  doing it makes the "/etc/hosts" database  access API uniform
+     with the way other APIs are implemented. */
+  if (rv) {
+    *hostent_result = *((mmux_libc_network_database_host_t *) rv);
+    *there_is_one_more_p = true;
+  } else {
+    *there_is_one_more_p = false;
+  }
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Struct servent.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_s_name_set (mmux_libc_servent_t P, mmux_asciizp_t value)
+{
+  P->s_name = value;
+  return false;
+}
+bool
+mmux_libc_s_name_ref (mmux_asciizpp_t result_p, mmux_libc_servent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->s_name);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_s_aliases_set (mmux_libc_servent_t P, mmux_asciizpp_t value)
+{
+  P->s_aliases = value;
+  return false;
+}
+bool
+mmux_libc_s_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_servent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->s_aliases);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_s_port_set (mmux_libc_servent_t P, mmux_libc_network_port_number_t value)
+{
+  P->s_port = (int)value.value;
+  return false;
+}
+bool
+mmux_libc_s_port_ref (mmux_libc_network_port_number_t * result_p, mmux_libc_servent_arg_t P)
+{
+  *result_p = mmux_libc_network_port_number(mmux_libc_network_byteorder_uint16(P->s_port));
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_s_proto_set (mmux_libc_servent_t P, mmux_asciizp_t value)
+{
+  P->s_proto = value;
+  return false;
+}
+bool
+mmux_libc_s_proto_ref (mmux_asciizpp_t result_p, mmux_libc_servent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->s_proto);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_servent_dump (mmux_libc_fd_arg_t fd, mmux_libc_servent_arg_t servent_p, mmux_asciizcp_t struct_name)
+{
+  int	aliases_idx = 0;
+
+  if (NULL == struct_name) {
+    struct_name = "struct servent";
+  }
+
+  DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, servent_p->s_name);
+
+  if (NULL != servent_p->s_aliases) {
+    for (; servent_p->s_aliases[aliases_idx]; ++aliases_idx) {
+      DPRINTF(fd, "%s.s_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, servent_p->s_aliases[aliases_idx]);
+    }
+  }
+  if (0 == aliases_idx) {
+    DPRINTF(fd, "%s.s_aliases = \"0x0\"\n", struct_name);
+  }
+
+  DPRINTF(fd, "%s.s_port = 0x%X [network byteorder] (host byteorder: %u)\n",
+	  struct_name, servent_p->s_port, ntohs(servent_p->s_port));
+  DPRINTF(fd, "%s.s_proto = \"%s\"\n", struct_name, servent_p->s_proto);
+
+  return false;
+}
+
+bool
+mmux_libc_setservent (bool stayopen)
+{
+  setservent((mmux_standard_sint_t)stayopen);
+  return false;
+}
+bool
+mmux_libc_endservent (void)
+{
+  endservent();
+  return false;
+}
+bool
+mmux_libc_getservent (bool * there_is_one_more_p, mmux_libc_servent_t servent_result)
+{
+  struct servent *	rv = getservent();
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine words, and  doing it makes the "/etc/servs" database  access API uniform
+     with the way other APIs are implemented. */
+  if (rv) {
+    *servent_result = *((mmux_libc_network_database_service_t *) rv);
+    *there_is_one_more_p = true;
+  } else {
+    *there_is_one_more_p = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getservbyname (bool * there_is_one_p, mmux_libc_servent_t servent_result,
+			 mmux_asciizcp_t service_name_p, mmux_asciizcp_t protocol_name_p)
+{
+  struct servent *	rv = getservbyname(service_name_p, protocol_name_p);
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine  words, and  doing  it  makes the  "/etc/services"  database access  API
+     uniform with the way other APIs are implemented. */
+  if (rv) {
+    *servent_result = *((mmux_libc_network_database_service_t *) rv);
+    *there_is_one_p = true;
+  } else {
+    *there_is_one_p = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getservbyport (bool * there_is_one_p, mmux_libc_servent_t servent_result,
+			 mmux_libc_network_port_number_t port, mmux_asciizcp_t protocol_name_p)
+{
+  struct servent *	rv = getservbyport(port.value, protocol_name_p);
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine  words, and  doing  it  makes the  "/etc/services"  database access  API
+     uniform with the way other APIs are implemented. */
+  if (rv) {
+    *servent_result = *((mmux_libc_network_database_service_t *) rv);
+    *there_is_one_p = true;
+  } else {
+    *there_is_one_p = false;
+  }
+  return false;
+}
+
 #if 0
+
+
+/** --------------------------------------------------------------------
+ ** Struct protoent.
+ ** ----------------------------------------------------------------- */
+
+DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(protoent,	p_name)
+DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent,	p_aliases)
+DEFINE_STRUCT_SETTER_GETTER(protoent,		p_proto,	sint)
+
+bool
+mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
+{
+  int	aliases_idx = 0;
+
+  if (NULL == struct_name) {
+    struct_name = "struct protoent";
+  }
+
+  DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, protoent_p->p_name);
+
+  if (NULL != protoent_p->p_aliases) {
+    for (; protoent_p->p_aliases[aliases_idx]; ++aliases_idx) {
+      DPRINTF(fd, "%s.s_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, protoent_p->p_aliases[aliases_idx]);
+    }
+  }
+  if (0 == aliases_idx) {
+    DPRINTF(fd, "%s.s_aliases = \"0x0\"\n", struct_name);
+  }
+
+  DPRINTF(fd, "%s.s_proto = \"%d\"\n", struct_name, protoent_p->p_proto);
+
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Struct netent.
+ ** ----------------------------------------------------------------- */
+
+DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(netent,	n_name)
+DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(netent,	n_aliases)
+DEFINE_STRUCT_SETTER_GETTER(netent,		n_addrtype,	sint)
+DEFINE_STRUCT_SETTER_GETTER(netent,		n_net,		ulong)
+
+bool
+mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
+{
+  if (NULL == struct_name) {
+    struct_name = "struct netent";
+  }
+
+  DPRINTF(fd, "%s.n_name = \"%s\"\n", struct_name, netent_p->n_name);
+
+  {
+    int		aliases_idx = 0;
+
+    if (NULL != netent_p->n_aliases) {
+      for (; netent_p->n_aliases[aliases_idx]; ++aliases_idx) {
+	DPRINTF(fd, "%s.n_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, netent_p->n_aliases[aliases_idx]);
+      }
+    }
+    if (0 == aliases_idx) {
+      DPRINTF(fd, "%s.n_aliases = \"0x0\"\n", struct_name);
+    }
+  }
+
+  {
+    auto		field_value = mmux_libc_socket_address_family(netent_p->n_addrtype);
+    mmux_asciizcp_t	name;
+
+    sa_family_to_asciiz_name(&name, field_value);
+    DPRINTF(fd, "%s.n_addrtype = \"%d\" (%s)\n", struct_name, (int)field_value.value, name);
+  }
+
+  /* The value "netent_p->n_net" is in host byte order. */
+  {
+    auto const	buflen = mmux_libc_socklen_literal(512);
+    char	net_str[buflen.value];
+    auto	network_byteorder_net = mmux_uint32(htonl(netent_p->n_net));
+
+    inet_ntop(netent_p->n_addrtype, &(network_byteorder_net.value), net_str, buflen.value);
+
+    DPRINTF(fd, "%s.n_net = \"%lu\" (%s)\n", struct_name, (mmux_standard_ulong_t)(netent_p->n_net), net_str);
+  }
+  return false;
+}
 
 
 /** --------------------------------------------------------------------
@@ -1237,240 +1696,6 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * add
 
 
 /** --------------------------------------------------------------------
- ** Struct hostent.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(hostent,	h_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(hostent,	h_aliases)
-DEFINE_STRUCT_SETTER_GETTER(hostent,		h_addrtype,	sint)
-DEFINE_STRUCT_SETTER_GETTER(hostent,		h_length,	sint)
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_h_addr_list_set (mmux_libc_hostent_t * const P, mmux_asciizpp_t value)
-{
-  P->h_addr_list = value;
-  return false;
-}
-bool
-mmux_libc_h_addr_list_ref (mmux_asciizpp_t * result_p, mmux_libc_hostent_t const * const P)
-{
-  *result_p = P->h_addr_list;
-  return false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_h_addr_set (mmux_libc_hostent_t * const P, mmux_asciizp_t value)
-{
-  P->h_addr = value;
-  return false;
-}
-bool
-mmux_libc_h_addr_ref (mmux_asciizp_t * result_p, mmux_libc_hostent_t const * const P)
-{
-  *result_p = P->h_addr;
-  return false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_hostent_dump (mmux_libc_fd_arg_t fd, mmux_libc_hostent_t const * hostent_p, mmux_asciizcp_t struct_name)
-{
-  int	aliases_idx   = 0;
-  int	addr_list_idx = 0;
-
-  if (NULL == struct_name) {
-    struct_name = "struct hostent";
-  }
-
-  DPRINTF(fd, "%s.h_name = \"%s\"\n", struct_name, hostent_p->h_name);
-
-  if (NULL != hostent_p->h_aliases) {
-    for (; hostent_p->h_aliases[aliases_idx]; ++aliases_idx) {
-      DPRINTF(fd, "%s.h_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, hostent_p->h_aliases[aliases_idx]);
-    }
-  }
-  if (0 == aliases_idx) {
-    DPRINTF(fd, "%s.h_aliases = \"0x0\"\n", struct_name);
-  }
-
-  DPRINTF(fd, "%s.h_addrtype = \"%d\"", struct_name, hostent_p->h_addrtype);
-
-  switch (hostent_p->h_addrtype) {
-  case MMUX_LIBC_VALUEOF_AF_INET:
-    DPRINTF(fd, " (AF_INET)\n");
-    break;
-  case MMUX_LIBC_VALUEOF_AF_INET6:
-    DPRINTF(fd, " (AF_INET6)\n");
-    break;
-  default:
-    DPRINTF(fd, "\n");
-    break;
-  }
-
-  DPRINTF(fd, "%s.h_length = \"%d\"\n", struct_name, hostent_p->h_length);
-
-  if (NULL != hostent_p->h_addr_list) {
-    auto const	provided_nchars = mmux_usize_literal(512);
-
-    for (; hostent_p->h_addr_list[addr_list_idx]; ++addr_list_idx) {
-      char	presentation_buf[provided_nchars.value];
-
-      inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr_list[addr_list_idx], presentation_buf, provided_nchars.value);
-      presentation_buf[provided_nchars.value - 1] = '\0';
-      DPRINTF(fd, "%s.h_addr_list[%d] = \"%s\"\n", struct_name, addr_list_idx, presentation_buf);
-    }
-  }
-  if (0 == addr_list_idx) {
-    DPRINTF(fd, "%s.h_addr_list = \"0x0\"\n", struct_name);
-  }
-
-  if (NULL != hostent_p->h_addr) {
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-    char	presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK];
-
-    inet_ntop(hostent_p->h_addrtype, hostent_p->h_addr, presentation_buf, IS_THIS_ENOUGH_QUESTION_MARK);
-    presentation_buf[IS_THIS_ENOUGH_QUESTION_MARK-1] = '\0';
-    DPRINTF(fd, "%s.h_addr = \"%s\"\n", struct_name, presentation_buf);
-  } else {
-    DPRINTF(fd, "%s.h_addr = \"0x0\"\n", struct_name);
-  }
-
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Struct servent.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(servent,	s_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(servent,	s_aliases)
-DEFINE_STRUCT_SETTER_GETTER(servent,		s_port,		sint)
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(servent,	s_proto)
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_servent_dump (mmux_libc_fd_arg_t fd, mmux_libc_servent_t const * servent_p, mmux_asciizcp_t struct_name)
-{
-  int	aliases_idx = 0;
-
-  if (NULL == struct_name) {
-    struct_name = "struct servent";
-  }
-
-  DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, servent_p->s_name);
-
-  if (NULL != servent_p->s_aliases) {
-    for (; servent_p->s_aliases[aliases_idx]; ++aliases_idx) {
-      DPRINTF(fd, "%s.s_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, servent_p->s_aliases[aliases_idx]);
-    }
-  }
-  if (0 == aliases_idx) {
-    DPRINTF(fd, "%s.s_aliases = \"0x0\"\n", struct_name);
-  }
-
-  DPRINTF(fd, "%s.s_port = \"%d\"\n", struct_name, ntohs(servent_p->s_port));
-  DPRINTF(fd, "%s.s_proto = \"%s\"\n", struct_name, servent_p->s_proto);
-
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Struct protoent.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(protoent,	p_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent,	p_aliases)
-DEFINE_STRUCT_SETTER_GETTER(protoent,		p_proto,	sint)
-
-bool
-mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
-{
-  int	aliases_idx = 0;
-
-  if (NULL == struct_name) {
-    struct_name = "struct protoent";
-  }
-
-  DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, protoent_p->p_name);
-
-  if (NULL != protoent_p->p_aliases) {
-    for (; protoent_p->p_aliases[aliases_idx]; ++aliases_idx) {
-      DPRINTF(fd, "%s.s_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, protoent_p->p_aliases[aliases_idx]);
-    }
-  }
-  if (0 == aliases_idx) {
-    DPRINTF(fd, "%s.s_aliases = \"0x0\"\n", struct_name);
-  }
-
-  DPRINTF(fd, "%s.s_proto = \"%d\"\n", struct_name, protoent_p->p_proto);
-
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Struct netent.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(netent,	n_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(netent,	n_aliases)
-DEFINE_STRUCT_SETTER_GETTER(netent,		n_addrtype,	sint)
-DEFINE_STRUCT_SETTER_GETTER(netent,		n_net,		ulong)
-
-bool
-mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
-{
-  if (NULL == struct_name) {
-    struct_name = "struct netent";
-  }
-
-  DPRINTF(fd, "%s.n_name = \"%s\"\n", struct_name, netent_p->n_name);
-
-  {
-    int		aliases_idx = 0;
-
-    if (NULL != netent_p->n_aliases) {
-      for (; netent_p->n_aliases[aliases_idx]; ++aliases_idx) {
-	DPRINTF(fd, "%s.n_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, netent_p->n_aliases[aliases_idx]);
-      }
-    }
-    if (0 == aliases_idx) {
-      DPRINTF(fd, "%s.n_aliases = \"0x0\"\n", struct_name);
-    }
-  }
-
-  {
-    auto		field_value = mmux_libc_socket_address_family(netent_p->n_addrtype);
-    mmux_asciizcp_t	name;
-
-    sa_family_to_asciiz_name(&name, field_value);
-    DPRINTF(fd, "%s.n_addrtype = \"%d\" (%s)\n", struct_name, (int)field_value.value, name);
-  }
-
-  /* The value "netent_p->n_net" is in host byte order. */
-  {
-    auto const	buflen = mmux_libc_socklen_literal(512);
-    char	net_str[buflen.value];
-    auto	network_byteorder_net = mmux_uint32(htonl(netent_p->n_net));
-
-    inet_ntop(netent_p->n_addrtype, &(network_byteorder_net.value), net_str, buflen.value);
-
-    DPRINTF(fd, "%s.n_net = \"%lu\" (%s)\n", struct_name, (mmux_standard_ulong_t)(netent_p->n_net), net_str);
-  }
-  return false;
-}
-
-
-/** --------------------------------------------------------------------
  ** Address conversion to/from ASCII presentation.
  ** ----------------------------------------------------------------- */
 
@@ -1728,11 +1953,6 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
   }
 }
 
-
-/** --------------------------------------------------------------------
- ** Host database.
- ** ----------------------------------------------------------------- */
-
 bool
 mmux_libc_sethostent (bool stayopen)
 {
@@ -1752,58 +1972,6 @@ mmux_libc_gethostent (mmux_libc_hostent_t const * * result_hostent_pp)
 
   *result_hostent_pp = hostent_p;
   return false;
-}
-
-
-/** --------------------------------------------------------------------
- ** Services database.
- ** ----------------------------------------------------------------- */
-
-bool
-mmux_libc_setservent (bool stayopen)
-{
-  setservent((mmux_standard_sint_t)stayopen);
-  return false;
-}
-bool
-mmux_libc_endservent (void)
-{
-  endservent();
-  return false;
-}
-bool
-mmux_libc_getservent (mmux_libc_servent_t const * * result_servent_pp)
-{
-  mmux_libc_servent_t const *	servent_p = getservent();
-
-  *result_servent_pp = servent_p;
-  return false;
-}
-bool
-mmux_libc_getservbyname (mmux_libc_servent_t const * * result_servent_pp,
-			 mmux_asciizcp_t service_name_p, mmux_asciizcp_t protocol_name_p)
-{
-  mmux_libc_servent_t const *	 servent_p = getservbyname(service_name_p, protocol_name_p);
-
-  if (NULL != servent_p) {
-    *result_servent_pp = servent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getservbyport (mmux_libc_servent_t const * * result_servent_pp,
-			 mmux_sint_t port, mmux_asciizcp_t protocol_name_p)
-{
-  mmux_libc_servent_t const *	 servent_p = getservbyport(port.value, protocol_name_p);
-
-  if (NULL != servent_p) {
-    *result_servent_pp = servent_p;
-    return false;
-  } else {
-    return true;
-  }
 }
 
 

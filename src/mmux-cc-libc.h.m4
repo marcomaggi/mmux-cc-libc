@@ -41,7 +41,7 @@ extern "C" {
 
 
 /** --------------------------------------------------------------------
- ** Type definitions.
+ ** Public type definitions: time and dates.
  ** ----------------------------------------------------------------- */
 
 typedef struct mmux_libc_time_value_t {
@@ -56,10 +56,27 @@ typedef struct mmux_libc_broken_down_time_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_TM];
 } mmux_libc_broken_down_time_t;
 
-typedef struct mmux_libc_iovec_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_IOVEC];    } mmux_libc_iovec_t;
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: system resources.
+ ** ----------------------------------------------------------------- */
+
 typedef struct mmux_libc_rlimit_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_RLIMIT];   } mmux_libc_rlimit_t;
+
+
+/** --------------------------------------------------------------------
+ ** Internal type definitions: persona.
+ ** ----------------------------------------------------------------- */
+
 typedef struct mmux_libc_passwd_t   { mmux_uint8_t value[MMUX_LIBC_SIZEOF_PASSWD];   } mmux_libc_passwd_t;
 typedef struct mmux_libc_group_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_GROUP];    } mmux_libc_group_t;
+
+
+/** --------------------------------------------------------------------
+ ** Public type definitions: input/output.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_iovec_t    { mmux_uint8_t value[MMUX_LIBC_SIZEOF_IOVEC];    } mmux_libc_iovec_t;
 
 typedef struct mmux_libc_file_descriptor_lock_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_FLOCK];
@@ -73,6 +90,11 @@ typedef struct mmux_libc_file_descriptors_set_t {
 typedef struct mmux_libc_file_descriptor_open_how_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_OPEN_HOW];
 } mmux_libc_file_descriptor_open_how_t;
+
+
+/** --------------------------------------------------------------------
+ ** Public type definitions: file system.
+ ** ----------------------------------------------------------------- */
 
 typedef struct mmux_libc_file_system_dirstream_ptr_t {
   mmux_pointer_t value;
@@ -95,6 +117,11 @@ typedef struct mmux_libc_iovec_array_t {
   mmux_standard_usize_t	iova_len;
 } mmux_libc_iovec_array_t;
 
+
+/** --------------------------------------------------------------------
+ ** Public type definitions: interprocess signals.
+ ** ----------------------------------------------------------------- */
+
 typedef struct mmux_libc_interprocess_signals_set_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_SIGSET];
 } mmux_libc_interprocess_signals_set_t;
@@ -115,6 +142,15 @@ typedef struct mmux_libc_interprocess_signal_fd_info_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_SIGNALFD_SIGINFO];
 } mmux_libc_interprocess_signal_fd_info_t;
 
+
+/** --------------------------------------------------------------------
+ ** Public type definitions: networking.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_network_interface_name_index_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_IF_NAMEINDEX];
+} mmux_libc_network_interface_name_index_t;
+
 /* ------------------------------------------------------------------ */
 
 /* Make GCC stay silent about a data structure with no fields. */
@@ -134,21 +170,33 @@ typedef struct mmux_libc_internet_protocol_address_six_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_IN6_ADDR];
 } mmux_libc_internet_protocol_address_six_t;
 
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_network_database_host_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_HOSTENT];
+} mmux_libc_network_database_host_t;
+
+typedef struct mmux_libc_network_database_service_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SERVENT];
+} mmux_libc_network_database_service_t;
+
+typedef struct mmux_libc_network_database_protocol_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_PROTOENT];
+} mmux_libc_network_database_protocol_t;
+
+typedef struct mmux_libc_network_database_network_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_NETENT];
+} mmux_libc_network_database_network_t;
+
+/* ------------------------------------------------------------------ */
+
 /* This must be big enough to contain any "struct sockaddr_*" value. */
 typedef struct mmux_libc_sockaddr_t		{ mmux_uint8_t value[256];                             } mmux_libc_sockaddr_t;
-
-typedef struct mmux_libc_network_interface_name_index_t {
-  mmux_uint8_t value[MMUX_LIBC_SIZEOF_IF_NAMEINDEX];
-} mmux_libc_network_interface_name_index_t;
 
 typedef struct mmux_libc_addrinfo_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_ADDRINFO];       } mmux_libc_addrinfo_t;
 typedef struct mmux_libc_sockaddr_un_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_UN];    } mmux_libc_sockaddr_un_t;
 typedef struct mmux_libc_sockaddr_in_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN];    } mmux_libc_sockaddr_in_t;
 typedef struct mmux_libc_sockaddr_insix_t	{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN6];   } mmux_libc_sockaddr_insix_t;
-typedef struct mmux_libc_hostent_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_HOSTENT];        } mmux_libc_hostent_t;
-typedef struct mmux_libc_servent_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SERVENT];        } mmux_libc_servent_t;
-typedef struct mmux_libc_protoent_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_PROTOENT];       } mmux_libc_protoent_t;
-typedef struct mmux_libc_netent_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_NETENT];         } mmux_libc_netent_t;
 typedef struct mmux_libc_linger_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_LINGER];         } mmux_libc_linger_t;
 
 typedef mmux_libc_addrinfo_t *		mmux_libc_addrinfo_ptr_t;
@@ -156,15 +204,16 @@ typedef mmux_libc_sockaddr_t *		mmux_libc_sockaddr_ptr_t;
 typedef mmux_libc_sockaddr_un_t *	mmux_libc_sockaddr_un_ptr_t;
 typedef mmux_libc_sockaddr_in_t *	mmux_libc_sockaddr_in_ptr_t;
 typedef mmux_libc_sockaddr_insix_t *	mmux_libc_sockaddr_insix_ptr_t;
-typedef mmux_libc_hostent_t *		mmux_libc_hostent_ptr_t;
-typedef mmux_libc_servent_t *		mmux_libc_servent_ptr_t;
-typedef mmux_libc_protoent_t *		mmux_libc_protoent_ptr_t;
-typedef mmux_libc_netent_t *		mmux_libc_netent_ptr_t;
 typedef mmux_libc_linger_t *		mmux_libc_linger_ptr_t;
 
-/* ------------------------------------------------------------------ */
+
+/** --------------------------------------------------------------------
+ ** Subordinate includes.
+ ** ----------------------------------------------------------------- */
 
 #include <mmux-cc-libc-typedefs.h>
+#include <mmux-cc-libc-functions.h>
+#include <mmux-cc-libc-generics.h>
 
 
 /** --------------------------------------------------------------------
@@ -179,9 +228,6 @@ mmux_cc_libc_decl mmux_libc_interface_specification_t const * mmux_libc_interfac
 /** --------------------------------------------------------------------
  ** Done.
  ** ----------------------------------------------------------------- */
-
-#include <mmux-cc-libc-functions.h>
-#include <mmux-cc-libc-generics.h>
 
 #ifdef __cplusplus
 } // extern "C"
