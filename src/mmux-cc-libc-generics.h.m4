@@ -40,8 +40,8 @@ DEFINE_COMPARISON([[[equal]]])
 
 #define mmux_libc_ctype_value(VALUE)							\
   (_Generic((VALUE),									\
-	    mmux_libc_socket_address_family_t:		((VALUE).value),		\
-	    mmux_libc_socket_protocol_family_t:		((VALUE).value),		\
+	    mmux_libc_network_address_family_t:		((VALUE).value),		\
+	    mmux_libc_network_protocol_family_t:	((VALUE).value),		\
             mmux_libc_host_byteorder_uint16_t:		((VALUE).value),		\
             mmux_libc_network_byteorder_uint16_t:	((VALUE).value),		\
             mmux_libc_host_byteorder_uint32_t:		((VALUE).value),		\

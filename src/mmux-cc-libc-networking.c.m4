@@ -44,7 +44,7 @@
  ** ----------------------------------------------------------------- */
 
 static void
-sa_family_to_asciiz_name(mmux_asciizcp_t * name_p, mmux_libc_socket_address_family_t sa_family)
+sa_family_to_asciiz_name(mmux_asciizcp_t * name_p, mmux_libc_network_address_family_t sa_family)
 {
   switch (sa_family.value) {
 #if (defined MMUX_HAVE_LIBC_AF_ALG)
@@ -771,15 +771,15 @@ mmux_libc_h_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_hostent_arg_t P)
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_h_addrtype_set (mmux_libc_hostent_t P, mmux_libc_socket_address_family_t value)
+mmux_libc_h_addrtype_set (mmux_libc_hostent_t P, mmux_libc_network_address_family_t value)
 {
   P->h_addrtype = value.value;
   return false;
 }
 bool
-mmux_libc_h_addrtype_ref (mmux_libc_socket_address_family_t * result_p, mmux_libc_hostent_arg_t P)
+mmux_libc_h_addrtype_ref (mmux_libc_network_address_family_t * result_p, mmux_libc_hostent_arg_t P)
 {
-  *result_p = mmux_libc_socket_address_family(P->h_addrtype);
+  *result_p = mmux_libc_network_address_family(P->h_addrtype);
   return false;
 }
 
@@ -1162,7 +1162,7 @@ mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_
   }
 
   {
-    auto		field_value = mmux_libc_socket_address_family(netent_p->n_addrtype);
+    auto		field_value = mmux_libc_network_address_family(netent_p->n_addrtype);
     mmux_asciizcp_t	name;
 
     sa_family_to_asciiz_name(&name, field_value);
@@ -1198,7 +1198,7 @@ mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
   }
 
   {
-    mmux_libc_socket_address_family_t	sa_family;
+    mmux_libc_network_address_family_t	sa_family;
     mmux_asciizcp_t			family_name = "unknown";
 
     mmux_libc_sa_family_ref(&sa_family, sockaddr_p);
@@ -1271,7 +1271,7 @@ mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const
 
   {
     mmux_asciizcp_t			sun_name = "unknown";
-    mmux_libc_socket_address_family_t	family;
+    mmux_libc_network_address_family_t	family;
 
     mmux_libc_sun_family_ref(&family, sockaddr_un_p);
     sa_family_to_asciiz_name(&sun_name, family);
@@ -1288,15 +1288,15 @@ mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sin_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_socket_address_family_t new_field_value)
+mmux_libc_sin_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_network_address_family_t new_field_value)
 {
   P->sin_family = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_sin_family_ref (mmux_libc_socket_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+mmux_libc_sin_family_ref (mmux_libc_network_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
 {
-  *field_value_result_p = mmux_libc_socket_address_family(P->sin_family);
+  *field_value_result_p = mmux_libc_network_address_family(P->sin_family);
   return false;
 }
 
@@ -1346,7 +1346,7 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
 
   /* Dump the field "sin_family". */
   {
-    auto		field_value = mmux_libc_socket_address_family(sockaddr_in_p->sin_family);
+    auto		field_value = mmux_libc_network_address_family(sockaddr_in_p->sin_family);
     mmux_asciizcp_t	sin_name = "unknown";
 
     sa_family_to_asciiz_name(&sin_name, field_value);
@@ -1355,7 +1355,7 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
 
   /* Dump the field "sin_addr". */
   {
-    mmux_libc_socket_address_family_t	family;
+    mmux_libc_network_address_family_t	family;
     mmux_libc_ipfour_addr_t		addr;
 
     auto const	provided_nchars = mmux_usize_literal(512);
@@ -1382,15 +1382,15 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sinsix_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_socket_address_family_t new_field_value)
+mmux_libc_sinsix_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_network_address_family_t new_field_value)
 {
   P->sinsix_family = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_sinsix_family_ref (mmux_libc_socket_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+mmux_libc_sinsix_family_ref (mmux_libc_network_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
 {
-  *field_value_result_p = mmux_libc_socket_address_family(P->sinsix_family);
+  *field_value_result_p = mmux_libc_network_address_family(P->sinsix_family);
   return false;
 }
 
@@ -1441,7 +1441,7 @@ mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t
 
   /* Dump the field "sin6_family". */
   {
-    auto		field_value = mmux_libc_socket_address_family(sockaddr_insix_p->sin6_family);
+    auto		field_value = mmux_libc_network_address_family(sockaddr_insix_p->sin6_family);
     mmux_asciizcp_t	sin6_name = "unknown";
 
     sa_family_to_asciiz_name(&sin6_name, field_value);
@@ -1452,7 +1452,7 @@ mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t
 
   /* Dump the field "sin6_addr". */
   {
-    mmux_libc_socket_address_family_t	family;
+    mmux_libc_network_address_family_t	family;
     mmux_libc_ipsix_addr_t *		addr_p;
     auto const				provided_nchars = mmux_usize_literal(512);
     char				bufptr[provided_nchars.value];
@@ -1620,7 +1620,7 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * add
 
   /* Inspect the field: ai_family */
   {
-    auto		field_value = mmux_libc_socket_address_family(addrinfo_p->ai_family);
+    auto		field_value = mmux_libc_network_address_family(addrinfo_p->ai_family);
     mmux_asciizcp_t	ai_name = "unknown";
 
     sa_family_to_asciiz_name(&ai_name, field_value);
@@ -1740,7 +1740,7 @@ mmux_libc_inet_ntoa (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_pre
 
 bool
 mmux_libc_inet_pton (mmux_libc_ip_addr_t address_result,
-		     mmux_libc_socket_address_family_t family, mmux_asciizcp_t input_presentation_p)
+		     mmux_libc_network_address_family_t family, mmux_asciizcp_t input_presentation_p)
 {
   switch (family.value) {
   case AF_INET:
@@ -1779,7 +1779,7 @@ mmux_libc_inet_pton (mmux_libc_ip_addr_t address_result,
 }
 bool
 mmux_libc_inet_ntop (mmux_asciizp_t ouput_presentation_p, mmux_usize_t ouput_presentation_provided_nchars,
-		     mmux_libc_socket_address_family_t family,
+		     mmux_libc_network_address_family_t family,
 		     mmux_libc_ip_addr_arg_t input_addr)
 {
   auto const		provided_nchars = mmux_usize_literal(512);
@@ -1853,7 +1853,7 @@ mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t * network_address_number
 bool
 mmux_libc_inet_net_pton (mmux_libc_ip_addr_t address_result,
 			 mmux_uint_t * number_of_bits_result,
-			 mmux_libc_socket_address_family_t family,
+			 mmux_libc_network_address_family_t family,
 			 mmux_asciizcp_t presentation)
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_PTON]]],[[[
@@ -1881,7 +1881,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_PTON]]],[[[
 }
 bool
 mmux_libc_inet_net_ntop (mmux_asciizp_t presentation_result, mmux_usize_t presentation_provided_nbytes,
-			 mmux_libc_socket_address_family_t family,
+			 mmux_libc_network_address_family_t family,
 			 mmux_libc_ip_addr_arg_t address,
 			 mmux_uint_t number_of_bits)
 {
@@ -2065,7 +2065,7 @@ mmux_libc_getnetbyname (mmux_libc_netent_t const * * result_netent_pp, mmux_asci
 bool
 mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
 			mmux_libc_host_byteorder_uint32_t network_number,
-			mmux_libc_socket_address_family_t family)
+			mmux_libc_network_address_family_t family)
 {
   mmux_libc_netent_t const *	netent_p = getnetbyaddr(network_number.value, family.value);
 
@@ -2090,7 +2090,7 @@ mmux_libc_make_network_socket (mmux_libc_network_socket_t * result_p, mmux_stand
 }
 bool
 mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
-		  mmux_libc_socket_protocol_family_t namespace,
+		  mmux_libc_network_protocol_family_t namespace,
 		  mmux_libc_socket_communication_style_t style,
 		  mmux_libc_socket_internet_protocol_t ipproto)
 {
@@ -2112,7 +2112,7 @@ mmux_libc_shutdown (mmux_libc_network_socket_t * sockp, mmux_libc_socket_shutdow
 bool
 mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
 		      mmux_libc_network_socket_t * result_sock2_p,
-		      mmux_libc_socket_protocol_family_t namespace,
+		      mmux_libc_network_protocol_family_t namespace,
 		      mmux_libc_socket_communication_style_t style,
 		      mmux_libc_socket_internet_protocol_t ipproto)
 {

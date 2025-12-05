@@ -354,38 +354,7 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{MFD_HUGETLB}
 @MmuxDefineConstant{W_OK}
 @MmuxDefineConstant{X_OK}
-@MmuxDefineConstant{AF_ALG}
-@MmuxDefineConstant{AF_APPLETALK}
-@MmuxDefineConstant{AF_AX25}
-@MmuxDefineConstant{AF_BLUETOOTH}
-@MmuxDefineConstant{AF_CAN}
-@MmuxDefineConstant{AF_DECnet}
-@MmuxDefineConstant{AF_IB}
-@MmuxDefineConstant{AF_INET6}
-@MmuxDefineConstant{AF_INET}
-@MmuxDefineConstant{AF_IPX}
-@MmuxDefineConstant{AF_KCM}
-@MmuxDefineConstant{AF_KEY}
-@MmuxDefineConstant{AF_LLC}
-@MmuxDefineConstant{AF_LOCAL}
-@MmuxDefineConstant{AF_MPLS}
-@MmuxDefineConstant{AF_NETLINK}
-@MmuxDefineConstant{AF_PACKET}
-@MmuxDefineConstant{AF_PPPOX}
-@MmuxDefineConstant{AF_RDS}
-@MmuxDefineConstant{AF_TIPC}
-@MmuxDefineConstant{AF_UNIX}
-@MmuxDefineConstant{AF_UNSPEC}
-@MmuxDefineConstant{AF_VSOCK}
-@MmuxDefineConstant{AF_X25}
-@MmuxDefineConstant{AF_XDP}
 @MmuxDefineConstant{IFNAMSIZ}
-@MmuxDefineConstant{PF_FILE}
-@MmuxDefineConstant{PF_INET6}
-@MmuxDefineConstant{PF_INET}
-@MmuxDefineConstant{PF_LOCAL}
-@MmuxDefineConstant{PF_UNIX}
-@MmuxDefineConstant{PF_UNSPEC}
 @MmuxDefineConstant{SHUT_RDWR}
 @MmuxDefineConstant{SHUT_RD}
 @MmuxDefineConstant{SHUT_WR}
@@ -14810,17 +14779,10 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 
 @menu
-* networking inames::           Socket interface names.
-* networking ip addresses::     Internet Protocol addresses.
-* networking typedefs::         Type definitions for networking.
+* networking inames::           Networking interface names.
+* networking byteorder::        Converting byte order storage in networking data structures.
+* networking addresses::        Networking addresses.
 * networking databases::        Networking information databases.
-* networking sockaddr_un::      Address format @objtype{mmux_libc_sockaddr_un_t}.
-* networking sockaddr_in::      Address format @objtype{mmux_libc_sockaddr_in_t}.
-* networking sockaddr_insix::   Address format @objtype{mmux_libc_sockaddr_insix_t}.
-* networking sockaddr::         Address format @objtype{mmux_libc_sockaddr_t}.
-* networking addrinfo::         Address informations.
-* networking getaddrinfo::      Getting address informations.
-* networking getnameinfo::      Getting address name informations.
 * networking creating::         Sockets: creating, pairs, shutting down, inspecting.
 * networking stream::           Sending and receiving data through a stream socket.
 * networking server::           Stream socket servers.
@@ -14831,7 +14793,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 @c page
 @node networking inames
-@section Socket interface names
+@section Networking interface names
 
 
 The standard data structure type @code{struct if_nameindex} represents the association between a
@@ -14952,32 +14914,18 @@ struct if_nameindex.if_name  = "wlan0"
 @end deftypefun
 
 @c page
-@node networking ip addresses
-@section @emph{Internet Protocol} addresses
+@node networking byteorder
+@section Converting byte order storage in networking data structures
 
 
 @menu
-* networking ip addresses byteorder::   Converting byte order in socket addresses.
-* networking ip addresses base::        Base @emph{Internet Protocol} address type.
-* networking ip addresses four::        @emph{Internet Protocol} address format IPv4.
-* networking ip addresses six::         @emph{Internet Protocol} address format IPv6.
-* networking ip addresses strings::     Converting address objects to/from string presentation.
-* networking ip addresses ops::         Operations on @emph{Internet Protocol} addresses.
+* networking byteorder typedefs::    Numeric representations.
+* networking byteorder conversion::  Converting number representations.
 @end menu
 
 @c page
-@node networking ip addresses byteorder
-@subsection Converting byte order in socket addresses
-
-
-@menu
-* networking ip addresses byteorder typedefs::          Numeric representations.
-* networking ip addresses byteorder conversion::        Converting number representations.
-@end menu
-
-@c page
-@node networking ip addresses byteorder typedefs
-@subsubsection Numeric representations
+@node networking byteorder typedefs
+@subsection Numeric representations
 
 
 @deftp {Struct Typedef} mmux_libc_host_byteorder_uint16_t
@@ -15030,8 +14978,8 @@ be in network byteorder.
 @end deftypefun
 
 @c page
-@node networking ip addresses byteorder conversion
-@subsubsection Converting number representations
+@node networking byteorder conversion
+@subsection Converting number representations
 
 
 The code examples below where run on a @code{x86_64-pc-linux-gnu}, which is a little--endian system,
@@ -15099,8 +15047,228 @@ mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte
 @end deftypefun
 
 @c page
-@node networking ip addresses base
-@subsection Base @emph{Internet Protocol} address type
+@node networking addresses
+@section Networking addresses
+
+
+@menu
+* networking addresses address family::   Networking address families.
+* networking addresses protocol family::  Networking protocol families.
+* networking addresses port number::      Networking port numbers.
+* networking addresses ip::               @emph{Internet Protocol} addresses.
+* networking addresses sockets::          Networking socket addresses.
+@end menu
+
+@c page
+@node networking addresses address family
+@subsection Networking address families
+
+
+According to the standard: the constants @samp{AF_INET}, @samp{AF_INET6}, @samp{AF_LOCAL}, and
+others are identifiers for families of networking addresses.  Under @value{PACKAGE}: these values
+are instances of the type @objtype{mmux_libc_network_address_family_t}.
+
+
+@deftp {Struct Typedef} mmux_libc_network_address_family_t
+@deftpx {Parent Struct Typedef} mmux_sshort_t
+Data structure type representing the identifiers of networking address families.  Such values are
+stored in host byteorder.
+@end deftp
+
+
+@deftypefun mmux_libc_network_address_family_t mmux_libc_network_address_family (mmux_standard_sshort_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_address_family_t}.  This function is
+seldom useful because we should use the predefined constants @samp{MMUX_LIBC_AF_*}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants are predefined, if available on the underlying platform, to represent
+networking address families.
+
+@macro MmuxDefineNetworkingAddressFamilyConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_address_family_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_address_family_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingAddressFamilyConstant{AF_ALG}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_APPLETALK}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_AX25}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_BLUETOOTH}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_CAN}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_DECnet}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_IB}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_INET6}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_INET}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_IPX}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_KCM}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_KEY}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_LLC}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_LOCAL}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_MPLS}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_NETLINK}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_PACKET}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_PPPOX}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_RDS}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_TIPC}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_UNIX}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_UNSPEC}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_VSOCK}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_X25}
+@MmuxDefineNetworkingAddressFamilyConstant{AF_XDP}
+
+@c page
+@node networking addresses protocol family
+@subsection Networking protocol families
+
+
+According to the standard: the constants @samp{PF_INET}, @samp{PF_INET6}, @samp{PF_LOCAL}, and
+others are identifiers for families of networking protocols.  Under @value{PACKAGE}: these values
+are instances of the type @objtype{mmux_libc_network_protocol_family_t}.
+
+
+@deftp {Struct Typedef} mmux_libc_network_protocol_family_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing the identifiers of networking protocol families.  Such values are
+stored in host byteorder.
+@end deftp
+
+
+@deftypefun mmux_libc_network_protocol_family_t mmux_libc_network_protocol_family (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_protocol_family_t}.  This function is
+seldom useful because we should use the predefined constants @samp{MMUX_LIBC_PF_*}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants are predefined, if available on the underlying platform, to represent
+networking protocol families.
+
+@macro MmuxDefineNetworkingAddressProtocolConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_protocol_family_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_protocol_family_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingAddressProtocolConstant{PF_FILE}
+@MmuxDefineNetworkingAddressProtocolConstant{PF_INET6}
+@MmuxDefineNetworkingAddressProtocolConstant{PF_INET}
+@MmuxDefineNetworkingAddressProtocolConstant{PF_LOCAL}
+@MmuxDefineNetworkingAddressProtocolConstant{PF_UNIX}
+@MmuxDefineNetworkingAddressProtocolConstant{PF_UNSPEC}
+
+@c page
+@node networking addresses port number
+@subsection Networking port numbers
+
+
+@deftp {Struct Typedef} mmux_libc_network_port_number_t
+@deftpx {Parent Struct Typedef} mmux_libc_network_byteorder_uint16_t
+Data structure type representing networking port numbers stored in network byteorder, which is
+big--endian.
+@end deftp
+
+
+@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number (mmux_libc_network_byteorder_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
+exact, unsigned integer stored in network byteorder value.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  value = mmux_libc_network_byteorder_uint16_literal(0x1900);
+auto  port  = mmux_libc_network_port_number(value);
+@end example
+@end deftypefun
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
+@deftypefnx {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_network_byteorder_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
+The two macros are synonyms: build and return a new instance of
+@objtype{mmux_libc_network_port_number_t} from a standard 16-bit, exact, unsigned integer stored in
+network byteorder literal.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port1 = mmux_libc_network_port_number_literal(0x1900);
+auto  port2 = mmux_libc_network_port_number_from_network_byteorder_literal(0x1900);
+@end example
+@end deftypefn
+
+
+@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorder_uint16_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
+exact, unsigned integer stored in host byteorder value.  Internally this function uses
+@cfunc{mmux_libc_htons} to convert the value.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  value = mmux_libc_host_byteorder_uint16_literal(25);
+auto  port  = mmux_libc_network_port_number_from_host_byteorder_value(value);
+@end example
+@end deftypefun
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
+unsigned exact integer literal in host byteorder.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+@end example
+@end deftypefn
+
+
+@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
+Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
+unsigned exact integer literal in host byteorder.
+
+@example
+/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+@end example
+@end deftypefn
+
+@c page
+@node networking addresses ip
+@subsection @emph{Internet Protocol} addresses
+
+
+@menu
+* networking addresses ip base::        Base @emph{Internet Protocol} address type.
+* networking addresses ip four::        @emph{Internet Protocol} address format IPv4.
+* networking addresses ip six::         @emph{Internet Protocol} address format IPv6.
+* networking addresses ip strings::     Converting @emph{Internet Protocol} between
+                                        binary and string representation.
+* networking addresses ip ops::         Operations on @emph{Internet Protocol} addresses.
+@end menu
+
+@c page
+@node networking addresses ip base
+@subsubsection Base @emph{Internet Protocol} address type
 
 
 @deftp {Abstract Opaque Struct Typedef} mmux_libc_internet_protocol_address_t
@@ -15131,8 +15299,8 @@ the referenced @objtype{mmux_libc_internet_protocol_address_t} must be mutable.
 @MmuxCWrapperStructPointerTypedef{ip_addr,internet_protocol_address}
 
 @c page
-@node networking ip addresses four
-@subsection @emph{Internet Protocol} address format IPv4
+@node networking addresses ip four
+@subsubsection @emph{Internet Protocol} address format IPv4
 
 
 According to the standard: IPv4 addresses are represented by data structures of type
@@ -15263,8 +15431,8 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineInaddrConstant{INADDR_NONE}
 
 @c page
-@node networking ip addresses six
-@subsection @emph{Internet Protocol} address format IPv6
+@node networking addresses ip six
+@subsubsection @emph{Internet Protocol} address format IPv6
 
 
 According to the standard: IPv6 addresses are represented by data structures of type
@@ -15345,8 +15513,8 @@ Reset to zero bytes the memory block referenced by @var{address}.
 @end deftypefun
 
 @c page
-@node networking ip addresses strings
-@subsection Converting address objects to/from string presentation
+@node networking addresses ip strings
+@subsubsection Converting @emph{Internet Protocol} between binary and string representation
 
 
 To convert an @emph{Internet Protocol} address between the binary representation as C language data
@@ -15354,19 +15522,12 @@ structure and the string representation as @MmuxAsciiZ{} array of characters we 
 functions @cfunc{mmux_libc_inet_pton}, @cfunc{mmux_libc_inet_ntop}, @cfunc{mmux_libc_inet_net_pton},
 @cfunc{mmux_libc_inet_net_ntop}.
 
-@menu
-* networking ip addresses strings one::    The @cfunc{pton} and @cfunc{ntop} functions.
-* networking ip addresses strings two::    The @cfunc{net_pton} and @cfunc{net_ntop} functions.
-* networking ip addresses strings three::  The @cfunc{aton} and @cfunc{ntoa} functions.
-* networking ip addresses strings four::   Other functions.
-@end menu
+@c ------------------------------------------------------------------------
 
-@c page
-@node networking ip addresses strings one
-@subsubsection The @cfunc{pton} and @cfunc{ntop} functions
+@subsubheading The @cfunc{pton} and @cfunc{ntop} functions
 
 
-@deftypefun bool mmux_libc_inet_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation_input})
+@deftypefun bool mmux_libc_inet_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_libc_network_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation_input})
 @MmuxCInterface{inet_pton}.
 
 Convert the @MmuxAsciiZ{} @emph{Internet Protocol} address presentation referenced by
@@ -15406,7 +15567,7 @@ if (mmux_libc_inet_pton(address, MMUX_LIBC_AF_INET6, presentation)) @{
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{address_input})
+@deftypefun bool mmux_libc_inet_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_network_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{address_input})
 @MmuxCInterface{inet_ntop}.
 
 Convert the Internet address data structure referenced by @var{address_input} to its @MmuxAsciiZ{}
@@ -15462,9 +15623,9 @@ gimme_an_ipsix_address(address);
 @end table
 @end deftypefun
 
-@c page
-@node networking ip addresses strings two
-@subsubsection The @cfunc{net_pton} and @cfunc{net_ntop} functions
+@c ------------------------------------------------------------------------
+
+@subsubheading The @cfunc{net_pton} and @cfunc{net_ntop} functions
 
 
 The functions @cfunc{mmux_libc_inet_net_pton} and @cfunc{mmux_libc_inet_net_ntop} are available only
@@ -15472,7 +15633,7 @@ if, at package building time, the core library was linked with the external libr
 @file{libresolv}.
 
 
-@deftypefun bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_uint_t * @var{number_of_bits_result_p}, mmux_libc_socket_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation})
+@deftypefun bool mmux_libc_inet_net_pton (mmux_libc_ip_addr_t @var{address_result}, mmux_uint_t * @var{number_of_bits_result_p}, mmux_libc_network_address_family_t @var{af_family}, mmux_asciizcp_t @var{presentation})
 @MmuxCInterface{inet_net_pton}.
 
 Convert the @MmuxAsciiZ{} address presentation referenced by @var{presentation} into a binary data
@@ -15519,7 +15680,7 @@ number of bits in the address: 24
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_inet_net_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_socket_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{input_address}, mmux_uint_t @var{number_of_bits})
+@deftypefun bool mmux_libc_inet_net_ntop (mmux_asciizp_t @var{presentation_result}, mmux_usize_t @var{presentation_result_provided_nchars}, mmux_libc_network_address_family_t @var{af_family}, mmux_libc_ip_addr_arg_t @var{input_address}, mmux_uint_t @var{number_of_bits})
 @MmuxCInterface{inet_net_ntop}.
 
 Convert the @emph{Internet Protocol} address data structure referenced by @var{input_address} to its
@@ -15574,9 +15735,9 @@ the presentation is: 193.168.1/24
 @end example
 @end deftypefun
 
-@c page
-@node networking ip addresses strings three
-@subsubsection The @cfunc{aton} and @cfunc{ntoa} functions
+@c ------------------------------------------------------------------------
+
+@subsubheading The @cfunc{aton} and @cfunc{ntoa} functions
 
 
 @deftypefun bool mmux_libc_inet_aton (mmux_libc_ipfour_addr_ptr_t @var{address_result}, mmux_asciizcp_t @var{input_presentation})
@@ -15626,9 +15787,9 @@ gimme_an_ipfour_address(address);
 @end example
 @end deftypefun
 
-@c page
-@node networking ip addresses strings four
-@subsubsection Other functions
+@c ------------------------------------------------------------------------
+
+@subsubheading Other functions
 
 
 @deftypefun bool mmux_libc_inet_addr (mmux_libc_ipfour_addr_t @var{address_result}, mmux_asciizcp_t @var{address_presentation})
@@ -15667,8 +15828,8 @@ if (mmux_libc_inet_network(address, address_presentation)) @{
 @end deftypefun
 
 @c page
-@node networking ip addresses ops
-@subsection Operations on @emph{Internet Protocol} addresses
+@node networking addresses ip ops
+@subsubsection Operations on @emph{Internet Protocol} addresses
 
 
 The functions @cfunc{mmux_libc_inet_lnaof} and @cfunc{mmux_libc_inet_netof} split an IPv4 address
@@ -15724,85 +15885,218 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 @end deftypefun
 
 @c page
-@node networking typedefs
-@section Type definitions for networking
+@node networking addresses sockets
+@subsection Networking socket addresses
 
 
 @menu
-* networking typedefs port::    Networking port numbers.
+* networking addresses sockets base::         Base networking socket address.
+* networking addresses sockets local::        Local networking socket address.
+* networking addresses sockets ipfour::       @emph{Internet Protocol} version four socket address.
+* networking addresses sockets ipsix::        @emph{Internet Protocol} version six socket address.
+* networking addresses sockets addrinfo::     Address informations.
+* networking addresses sockets getaddrinfo::  Getting address informations.
+* networking addresses sockets getnameinfo::  Getting address name informations.
 @end menu
 
 @c page
-@node networking typedefs port
-@subsection Networking port numbers
+@node networking addresses sockets base
+@subsubsection Base networking socket address
 
 
-@deftp {Struct Typedef} mmux_libc_network_port_number_t
-@deftpx {Parent Struct Typedef} mmux_libc_network_byteorder_uint16_t
-Data structure type representing networking port numbers stored in network byteorder, which is
-big--endian.
+@deftp {Opaque Struct Typedef} mmux_libc_network_address_socket_t
+An opaque alias for a non--standard data structure type: we can handle this type as being big enough
+to contain any of the data structure types @code{struct sockaddr_*}.  @value{PACKAGE} uses this data
+type as alias for @MmuxCStruct{sockaddr}.
+@end deftp
+
+@MmuxCStructPointerOpaqueTypedef{sockaddr}
+@MmuxSetterGetter{sockaddr, sa_family,   mmux_sshort_t}
+@MmuxStructDumper{sockaddr}
+
+@c page
+@node networking addresses sockets local
+@subsubsection Local networking socket address
+
+
+@MmuxCStructOpaqueTypedef{sockaddr_un}
+@MmuxCStructPointerOpaqueTypedef{sockaddr_un}
+@MmuxSetterGetter{sockaddr_un, sun_family, mmux_sshort_t}
+@MmuxSetterGetter{sockaddr_un, sun_path,   mmux_libc_fs_ptn_arg_t}
+@MmuxStructDumper{sockaddr_un}
+
+
+The file system pathname associated to an address of format @objtype{mmux_libc_sockaddr_un_t} is
+embedded in the data structure itself; it has maximum length of fixed size, hard--coded in the data
+structure definition.  The pathname must be an @MmuxAsciiZ{} string and the terminating nul must be
+included in the embedded @MmuxAsciiZ{} string.
+
+If we want to allocate a block of memory wide enough to contain a pathname of maximum length we have
+to take the @cfunc{sizeof} of the data structure type.  If we want to compute the address size
+needed as arguments by some socket functions: we have to use the following function.
+
+
+@deftypefun mmux_usize_t mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * @var{sockaddr_un_p})
+Return the address size, measured in bytes, of the address data structure referenced by
+@var{sockaddr_un_p}.
+
+@itemize
+@item
+The returned size does @strong{not} include the terminating nul of the included file pathname.
+
+@item
+The returned size is the correct value to hand to functions requiring the address size, like
+@cfunc{mmux_libc_bind}.
+@end itemize
+@end deftypefun
+
+@c page
+@node networking addresses sockets ipfour
+@subsubsection @emph{Internet Protocol} version four socket address
+
+
+@MmuxCStructOpaqueTypedef{sockaddr_in}
+@MmuxCStructPointerOpaqueTypedef{sockaddr_in}
+@MmuxSetterGetter{sockaddr_in, sin_family, mmux_sshort_t}
+@MmuxSetterGetter{sockaddr_in, sipfour_addr,   mmux_libc_ipfour_addr_t}
+@MmuxSetterGetter{sockaddr_in, sin_port,   mmux_host_byteorder_ushort_t}
+@MmuxStructDumper{sockaddr_in}
+
+
+@deftypefun bool mmux_libc_sipfour_addr_p_ref (mmux_libc_ipfour_addr_t ** sipfour_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
+Store in the location referenced by @var{sipfour_addr_pp} a pointer to the field @code{sipfour_addr} of the
+data structure referenced by @var{sockaddr_p}.
+@end deftypefun
+
+@c page
+@node networking addresses sockets ipsix
+@subsubsection @emph{Internet Protocol} version six socket address
+
+
+To ease typing on keyboards, @value{PACKAGE} renames: the name of the data structure @code{struct
+sockaddr_in6} to @objtype{mmux_libc_sockaddr_insix_t}; the fields @code{sin6_} of @code{struct
+sockaddr_in6} to @code{sinsix_}.
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_sockaddr_insix_t
+An opaque alias for @code{struct sockaddr_in6}.
 @end deftp
 
 
-@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number (mmux_libc_network_byteorder_uint16_t @var{value})
-Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
-exact, unsigned integer stored in network byteorder value.
+@MmuxCStructPointerOpaqueTypedef{sockaddr_insix}
+@MmuxSetterGetter{sockaddr_insix, sinsix_family,   mmux_sshort_t}
+@MmuxSetterGetter{sockaddr_insix, sipsix_addr,     mmux_libc_ipsix_addr_t}
+@MmuxSetterGetter{sockaddr_insix, sinsix_flowinfo, mmux_uint32_t}
+@MmuxSetterGetter{sockaddr_insix, sinsix_scope_id, mmux_uint32_t}
+@MmuxSetterGetter{sockaddr_insix, sinsix_port,     mmux_host_byteorder_uint16_t}
+@MmuxStructDumper{sockaddr_insix}
+
+
+@deftypefun bool mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** @var{sipfour_addr_pp}, mmux_libc_sockaddr_in_t * @var{sockaddr_p})
+Store in the location referenced by @var{sipsix_addr_pp} a pointer to the field @code{sipsix_addr}
+of the data structure referenced by @var{sockaddr_p}.
+@end deftypefun
+
+@c page
+@node networking addresses sockets addrinfo
+@subsubsection Address informations
+
+
+@MmuxCStructOpaqueTypedef{addrinfo}
+@MmuxCStructPointerOpaqueTypedef{addrinfo}
+@MmuxSetterGetter{addrinfo, ai_flags,           mmux_sint_t}
+@MmuxSetterGetter{addrinfo, ai_family,          mmux_sint_t}
+@MmuxSetterGetter{addrinfo, ai_socktype,        mmux_sint_t}
+@MmuxSetterGetter{addrinfo, ai_protocol,        mmux_sint_t}
+@MmuxSetterGetter{addrinfo, ai_addrlen,         mmux_socklen_t}
+@MmuxSetterGetter{addrinfo, ai_addr,            mmux_libc_sockaddr_t *}
+@MmuxSetterGetter{addrinfo, ai_canonname,       mmux_asciizp_t}
+@MmuxSetterGetter{addrinfo, ai_next,            mmux_libc_addrinfo_t *}
+@MmuxStructDumper{addrinfo}
+
+@c page
+@node networking addresses sockets getaddrinfo
+@subsubsection Getting address informations
+
+
+Usage example:
 
 @example
-/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-auto  value = mmux_libc_network_byteorder_uint16_literal(0x1900);
-auto  port  = mmux_libc_network_port_number(value);
+mmux_asciizcp_t                 node    = "localhost";
+mmux_asciizcp_t                 service = "smtp";
+mmux_libc_addrinfo_t            hints;
+
+mmux_libc_addrinfo_ptr_t        addrinfo_linked_list_p;
+mmux_sint_t                     error_code;
+
+mmux_libc_ai_flags_set    (&hints, MMUX_LIBC_AI_V4MAPPED | MMUX_LIBC_AI_ADDRCONFIG | MMUX_LIBC_AI_CANONNAME);
+mmux_libc_ai_family_set   (&hints, MMUX_LIBC_AF_UNSPEC);
+mmux_libc_ai_socktype_set (&hints, MMUX_LIBC_SOCK_STREAM);
+mmux_libc_ai_protocol_set (&hints, MMUX_LIBC_IPPROTO_TCP);
+
+if (mmux_libc_getaddrinfo(&addrinfo_linked_list, &error_code, node, service, &hints)) @{
+  mmux_asciizcp_t      error_message;
+
+  mmux_libc_gai_strerror(&error_message, error_code);
+  /* handle the error */
+@} else @{
+  /* do something with "addrinfo_linked_list_p" */
+
+  mmux_libc_freeaddrinfo(addrinfo_linked_list_p);
+@}
 @end example
+
+
+@deftypefun bool mmux_libc_getaddrinfo (mmux_libc_addrinfo_ptr_t * @var{result_addrinfo_linked_list_pp}, mmux_sint_t * @var{result_error_code_p}, mmux_asciizcp_t @var{node}, mmux_asciizcp_t @var{service}, mmux_libc_addrinfo_ptr_t @var{hints_p})
+@MmuxCInterface{getaddrinfo}.
 @end deftypefun
 
 
-@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
-@deftypefnx {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_network_byteorder_literal (mmux_standard_uint16_t @var{network_byteroder_literal})
-The two macros are synonyms: build and return a new instance of
-@objtype{mmux_libc_network_port_number_t} from a standard 16-bit, exact, unsigned integer stored in
-network byteorder literal.
-
-@example
-/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-auto  port1 = mmux_libc_network_port_number_literal(0x1900);
-auto  port2 = mmux_libc_network_port_number_from_network_byteorder_literal(0x1900);
-@end example
-@end deftypefn
-
-
-@deftypefun mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorder_uint16_t @var{value})
-Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a wrapped 16-bit,
-exact, unsigned integer stored in host byteorder value.  Internally this function uses
-@cfunc{mmux_libc_htons} to convert the value.
-
-@example
-/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-auto  value = mmux_libc_host_byteorder_uint16_literal(25);
-auto  port  = mmux_libc_network_port_number_from_host_byteorder_value(value);
-@end example
+@deftypefun bool mmux_libc_freeaddrinfo (mmux_libc_addrinfo_ptr_t @var{addrinfo_linked_list_p})
+@MmuxCInterface{freeaddrinfo}.
 @end deftypefun
 
 
-@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
-Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
-unsigned exact integer literal in host byteorder.
+@deftypefun bool mmux_libc_gai_strerror (mmux_asciizcp_t * @var{result_error_message_p}, mmux_sint_t @var{errnum})
+@MmuxCInterface{gai_strerror}.
+@end deftypefun
+
+@c page
+@node networking addresses sockets getnameinfo
+@subsubsection Getting address name informations
+
+
+Usage example:
 
 @example
-/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+mmux_libc_sockaddr_in_t input_sockaddr;
+mmux_sint_t             error_code;
+mmux_sint_t             flags = 0;
+
+#undef  IS_THIS_ENOUGH_QUESTION_MARK
+#define IS_THIS_ENOUGH_QUESTION_MARK	512
+char                    hostname[IS_THIS_ENOUGH_QUESTION_MARK];
+char                    servname[IS_THIS_ENOUGH_QUESTION_MARK];
+
+gimme_an_address(&input_sockaddr);
+
+if (mmux_libc_getnameinfo (hostname, IS_THIS_ENOUGH_QUESTION_MARK,
+                           servname, IS_THIS_ENOUGH_QUESTION_MARK,
+                           &error_code,
+                           &input_sockaddr, sizeof(mmux_libc_sockaddr_in_t), flags)) @{
+  mmux_asciizcp_t      error_message;
+
+  mmux_libc_gai_strerror(&error_message, error_code);
+  /* handle the error */
+@} else @{
+  /* do something with "hostname" and "servname" */
+@}
 @end example
-@end deftypefn
 
 
-@deftypefn {Preprocessor Macro} mmux_libc_network_port_number_t mmux_libc_network_port_number_from_host_byteorder_literal (mmux_standard_uint16_t @var{host_byteorder_literal})
-Build and return a new instance of @objtype{mmux_libc_network_port_number_t} from a standard 16-bit,
-unsigned exact integer literal in host byteorder.
-
-@example
-/* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
-@end example
-@end deftypefn
+@deftypefun bool mmux_libc_getnameinfo (mmux_asciizcp_t @var{result_hostname_p}, mmux_socklen_t @var{provided_hostname_len}, mmux_asciizcp_t @var{result_servname_p}, mmux_socklen_t @var{provided_servname_len}, mmux_sint_t * @var{result_error_code_p}, mmux_libc_sockaddr_ptr_t @var{input_sockaddr_p}, mmux_socklen_t @var{input_sockaddr_size}, mmux_sint_t @var{flags})
+@MmuxCInterface{getnameinfo}.
+@end deftypefun
 
 @c page
 @node networking databases
@@ -15867,7 +16161,7 @@ struct hostent.h_addr = "127.0.0.1"
 @MmuxCWrapperStructPointerTypedef{hostent,network_database_host}
 @MmuxCWrapperStructSetterGetter{hostent, h_name,        mmux_asciizp_t}
 @MmuxCWrapperStructSetterGetter{hostent, h_aliases,     mmux_asciizpp_t}
-@MmuxCWrapperStructSetterGetter{hostent, h_addrtype,    mmux_libc_socket_address_family_t}
+@MmuxCWrapperStructSetterGetter{hostent, h_addrtype,    mmux_libc_network_address_family_t}
 @MmuxCWrapperStructSetterGetter{hostent, h_length,      mmux_usize_t}
 @MmuxCWrapperStructSetterGetter{hostent, h_addr_list,   mmux_asciizpp_t}
 @MmuxCWrapperStructSetterGetter{hostent, h_addr,        mmux_asciizp_t}
@@ -16155,205 +16449,6 @@ if (mmux_libc_getnetbyaddr(&netent_p, host_byteorder_n_net, MMUX_LIBC_AF_INET)) 
 @}
 /* do something with "netent_p" */
 @end example
-@end deftypefun
-
-@c page
-@node networking sockaddr_un
-@section Address format @objtype{mmux_libc_sockaddr_un_t}
-
-
-@MmuxCStructOpaqueTypedef{sockaddr_un}
-@MmuxCStructPointerOpaqueTypedef{sockaddr_un}
-@MmuxSetterGetter{sockaddr_un, sun_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_un, sun_path,   mmux_libc_fs_ptn_arg_t}
-@MmuxStructDumper{sockaddr_un}
-
-
-The file system pathname associated to an address of format @objtype{mmux_libc_sockaddr_un_t} is
-embedded in the data structure itself; it has maximum length of fixed size, hard--coded in the data
-structure definition.  The pathname must be an @MmuxAsciiZ{} string and the terminating nul must be
-included in the embedded @MmuxAsciiZ{} string.
-
-If we want to allocate a block of memory wide enough to contain a pathname of maximum length we have
-to take the @cfunc{sizeof} of the data structure type.  If we want to compute the address size
-needed as arguments by some socket functions: we have to use the following function.
-
-
-@deftypefun mmux_usize_t mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * @var{sockaddr_un_p})
-Return the address size, measured in bytes, of the address data structure referenced by
-@var{sockaddr_un_p}.
-
-@itemize
-@item
-The returned size does @strong{not} include the terminating nul of the included file pathname.
-
-@item
-The returned size is the correct value to hand to functions requiring the address size, like
-@cfunc{mmux_libc_bind}.
-@end itemize
-@end deftypefun
-
-@c page
-@node networking sockaddr_in
-@section Address format @objtype{mmux_libc_sockaddr_in_t}
-
-
-@MmuxCStructOpaqueTypedef{sockaddr_in}
-@MmuxCStructPointerOpaqueTypedef{sockaddr_in}
-@MmuxSetterGetter{sockaddr_in, sin_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_in, sipfour_addr,   mmux_libc_ipfour_addr_t}
-@MmuxSetterGetter{sockaddr_in, sin_port,   mmux_host_byteorder_ushort_t}
-@MmuxStructDumper{sockaddr_in}
-
-
-@deftypefun bool mmux_libc_sipfour_addr_p_ref (mmux_libc_ipfour_addr_t ** sipfour_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
-Store in the location referenced by @var{sipfour_addr_pp} a pointer to the field @code{sipfour_addr} of the
-data structure referenced by @var{sockaddr_p}.
-@end deftypefun
-
-@c page
-@node networking sockaddr_insix
-@section Address format @objtype{mmux_libc_sockaddr_insix_t}
-
-
-To ease typing on keyboards, @value{PACKAGE} renames: the name of the data structure @code{struct
-sockaddr_in6} to @objtype{mmux_libc_sockaddr_insix_t}; the fields @code{sin6_} of @code{struct
-sockaddr_in6} to @code{sinsix_}.
-
-
-@deftp {Opaque Struct Typedef} mmux_libc_sockaddr_insix_t
-An opaque alias for @code{struct sockaddr_in6}.
-@end deftp
-
-
-@MmuxCStructPointerOpaqueTypedef{sockaddr_insix}
-@MmuxSetterGetter{sockaddr_insix, sinsix_family,   mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_insix, sipsix_addr,     mmux_libc_ipsix_addr_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_flowinfo, mmux_uint32_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_scope_id, mmux_uint32_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_port,     mmux_host_byteorder_uint16_t}
-@MmuxStructDumper{sockaddr_insix}
-
-
-@deftypefun bool mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** @var{sipfour_addr_pp}, mmux_libc_sockaddr_in_t * @var{sockaddr_p})
-Store in the location referenced by @var{sipsix_addr_pp} a pointer to the field @code{sipsix_addr}
-of the data structure referenced by @var{sockaddr_p}.
-@end deftypefun
-
-@c page
-@node networking sockaddr
-@section Address format @objtype{mmux_libc_sockaddr_t}
-
-
-@deftp {Opaque Struct Typedef} mmux_libc_sockaddr_t
-An opaque alias for a non--standard data structure type: we can handle this type as being big enough
-to contain any of the data structure types @code{struct sockaddr_*}.  @value{PACKAGE} uses this data
-type as alias for @MmuxCStruct{sockaddr}.
-@end deftp
-
-@MmuxCStructPointerOpaqueTypedef{sockaddr}
-@MmuxSetterGetter{sockaddr, sa_family,   mmux_sshort_t}
-@MmuxStructDumper{sockaddr}
-
-@c page
-@node networking addrinfo
-@section Address informations
-
-
-@MmuxCStructOpaqueTypedef{addrinfo}
-@MmuxCStructPointerOpaqueTypedef{addrinfo}
-@MmuxSetterGetter{addrinfo, ai_flags,           mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_family,          mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_socktype,        mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_protocol,        mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_addrlen,         mmux_socklen_t}
-@MmuxSetterGetter{addrinfo, ai_addr,            mmux_libc_sockaddr_t *}
-@MmuxSetterGetter{addrinfo, ai_canonname,       mmux_asciizp_t}
-@MmuxSetterGetter{addrinfo, ai_next,            mmux_libc_addrinfo_t *}
-@MmuxStructDumper{addrinfo}
-
-@c page
-@node networking getaddrinfo
-@section Getting address informations
-
-
-Usage example:
-
-@example
-mmux_asciizcp_t                 node    = "localhost";
-mmux_asciizcp_t                 service = "smtp";
-mmux_libc_addrinfo_t            hints;
-
-mmux_libc_addrinfo_ptr_t        addrinfo_linked_list_p;
-mmux_sint_t                     error_code;
-
-mmux_libc_ai_flags_set    (&hints, MMUX_LIBC_AI_V4MAPPED | MMUX_LIBC_AI_ADDRCONFIG | MMUX_LIBC_AI_CANONNAME);
-mmux_libc_ai_family_set   (&hints, MMUX_LIBC_AF_UNSPEC);
-mmux_libc_ai_socktype_set (&hints, MMUX_LIBC_SOCK_STREAM);
-mmux_libc_ai_protocol_set (&hints, MMUX_LIBC_IPPROTO_TCP);
-
-if (mmux_libc_getaddrinfo(&addrinfo_linked_list, &error_code, node, service, &hints)) @{
-  mmux_asciizcp_t      error_message;
-
-  mmux_libc_gai_strerror(&error_message, error_code);
-  /* handle the error */
-@} else @{
-  /* do something with "addrinfo_linked_list_p" */
-
-  mmux_libc_freeaddrinfo(addrinfo_linked_list_p);
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_getaddrinfo (mmux_libc_addrinfo_ptr_t * @var{result_addrinfo_linked_list_pp}, mmux_sint_t * @var{result_error_code_p}, mmux_asciizcp_t @var{node}, mmux_asciizcp_t @var{service}, mmux_libc_addrinfo_ptr_t @var{hints_p})
-@MmuxCInterface{getaddrinfo}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_freeaddrinfo (mmux_libc_addrinfo_ptr_t @var{addrinfo_linked_list_p})
-@MmuxCInterface{freeaddrinfo}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_gai_strerror (mmux_asciizcp_t * @var{result_error_message_p}, mmux_sint_t @var{errnum})
-@MmuxCInterface{gai_strerror}.
-@end deftypefun
-
-@c page
-@node networking getnameinfo
-@section Getting address name informations
-
-
-Usage example:
-
-@example
-mmux_libc_sockaddr_in_t input_sockaddr;
-mmux_sint_t             error_code;
-mmux_sint_t             flags = 0;
-
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-char                    hostname[IS_THIS_ENOUGH_QUESTION_MARK];
-char                    servname[IS_THIS_ENOUGH_QUESTION_MARK];
-
-gimme_an_address(&input_sockaddr);
-
-if (mmux_libc_getnameinfo (hostname, IS_THIS_ENOUGH_QUESTION_MARK,
-                           servname, IS_THIS_ENOUGH_QUESTION_MARK,
-                           &error_code,
-                           &input_sockaddr, sizeof(mmux_libc_sockaddr_in_t), flags)) @{
-  mmux_asciizcp_t      error_message;
-
-  mmux_libc_gai_strerror(&error_message, error_code);
-  /* handle the error */
-@} else @{
-  /* do something with "hostname" and "servname" */
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_getnameinfo (mmux_asciizcp_t @var{result_hostname_p}, mmux_socklen_t @var{provided_hostname_len}, mmux_asciizcp_t @var{result_servname_p}, mmux_socklen_t @var{provided_servname_len}, mmux_sint_t * @var{result_error_code_p}, mmux_libc_sockaddr_ptr_t @var{input_sockaddr_p}, mmux_socklen_t @var{input_sockaddr_size}, mmux_sint_t @var{flags})
-@MmuxCInterface{getnameinfo}.
 @end deftypefun
 
 @c page

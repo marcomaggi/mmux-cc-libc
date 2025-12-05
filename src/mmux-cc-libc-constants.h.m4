@@ -52,7 +52,7 @@
 
 
 /** --------------------------------------------------------------------
- ** Sockets address family.
+ ** Networking address family.
  ** ----------------------------------------------------------------- */
 
 m4_divert(-1)
@@ -61,7 +61,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_address_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_network_address_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_ALG)
 MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_APPLETALK)
@@ -91,7 +91,7 @@ MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_XDP)
 
 
 /** --------------------------------------------------------------------
- ** Sockets protocol family.
+ ** Networking protocol family.
  ** ----------------------------------------------------------------- */
 
 m4_divert(-1)
@@ -100,7 +100,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_protocol_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_network_protocol_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT(PF_FILE)
 MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT(PF_INET6)
