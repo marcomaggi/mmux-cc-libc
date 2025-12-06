@@ -1228,72 +1228,83 @@ mmux_libc_getprotobynumber (bool * there_is_one_p,
   return false;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Networks database.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_setnetent (bool stayopen)
+mmux_libc_n_name_set (mmux_libc_netent_t P, mmux_asciizp_t value)
 {
-  setnetent((mmux_standard_sint_t)stayopen);
+  P->n_name = value;
   return false;
 }
 bool
-mmux_libc_endnetent (void)
+mmux_libc_n_name_ref (mmux_asciizpp_t result_p, mmux_libc_netent_arg_t P)
 {
-  endnetent();
+  *result_p = mmux_asciizp(P->n_name);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_n_aliases_set (mmux_libc_netent_t P, mmux_asciizpp_t value)
+{
+  P->n_aliases = value;
   return false;
 }
 bool
-mmux_libc_getnetent (mmux_libc_netent_t const * * result_netent_pp)
+mmux_libc_n_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_netent_arg_t P)
 {
-  mmux_libc_netent_ptr_t	netent_p = getnetent();
+  *result_p = mmux_asciizp(P->n_aliases);
+  return false;
+}
 
-  *result_netent_pp = netent_p;
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_n_addrtype_set (mmux_libc_netent_t P, mmux_libc_network_address_family_t value)
+{
+  P->n_addrtype = value.value;
   return false;
 }
 bool
-mmux_libc_getnetbyname (mmux_libc_netent_t const * * result_netent_pp, mmux_asciizcp_t network_name_p)
+mmux_libc_n_addrtype_ref (mmux_libc_network_address_family_t * result_p, mmux_libc_netent_arg_t P)
 {
-  mmux_libc_netent_t const *	netent_p = getnetbyname(network_name_p);
-
-  if (netent_p) {
-    *result_netent_pp = netent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
-			mmux_libc_host_byteorder_uint32_t network_number,
-			mmux_libc_network_address_family_t family)
-{
-  mmux_libc_netent_t const *	netent_p = getnetbyaddr(network_number.value, family.value);
-
-  if (netent_p) {
-    *result_netent_pp = netent_p;
-    return false;
-  } else {
-    return true;
-  }
+  *result_p = mmux_libc_network_address_family(P->n_addrtype);
+  return false;
 }
 
-
-/** --------------------------------------------------------------------
- ** Struct netent.
- ** ----------------------------------------------------------------- */
-
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(netent,	n_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(netent,	n_aliases)
-DEFINE_STRUCT_SETTER_GETTER(netent,		n_addrtype,	sint)
-DEFINE_STRUCT_SETTER_GETTER(netent,		n_net,		ulong)
+/* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_p, mmux_asciizcp_t struct_name)
+mmux_libc_n_net_set (mmux_libc_netent_t P, mmux_libc_ipfour_addr_arg_t value)
+/* Let's assume "P->n_net" is a "uint32_t" in host byteorder. */
+{
+  mmux_libc_network_byteorder_uint32_t	NN;
+  mmux_libc_host_byteorder_uint32_t	HN;
+
+  mmux_libc_s_addr_ref(&NN, value);
+  mmux_libc_ntohl(&HN, NN);
+  P->n_net = NN.value;
+  return false;
+}
+bool
+mmux_libc_n_net_ref (mmux_libc_ipfour_addr_t result, mmux_libc_netent_arg_t P)
+/* Let's assume "P->n_net" is a "uint32_t" in host byteorder. */
+{
+  mmux_libc_host_byteorder_uint32_t	HN = mmux_libc_host_byteorder_uint32(P->n_net);
+  mmux_libc_network_byteorder_uint32_t	NN;
+
+  mmux_libc_htonl(&NN, HN);
+  return mmux_libc_make_ipfour_addr(result, NN);
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_arg_t netent_p, mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct netent";
@@ -1315,11 +1326,12 @@ mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_
   }
 
   {
-    auto		field_value = mmux_libc_network_address_family(netent_p->n_addrtype);
-    mmux_asciizcp_t	name;
+    mmux_libc_network_address_family_t	field_value;
+    mmux_asciizcp_t			family_name = "<unknown>";
 
-    sa_family_to_asciiz_name(&name, field_value);
-    DPRINTF(fd, "%s.n_addrtype = \"%d\" (%s)\n", struct_name, (int)field_value.value, name);
+    mmux_libc_n_addrtype_ref(&field_value, netent_p);
+    sa_family_to_asciiz_name(&family_name, field_value);
+    DPRINTF(fd, "%s.n_addrtype = \"%d\" (%s)\n", struct_name, (int)field_value.value, family_name);
   }
 
   /* The value "netent_p->n_net" is in host byte order. */
@@ -1330,10 +1342,80 @@ mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_t const * netent_
 
     inet_ntop(netent_p->n_addrtype, &(network_byteorder_net.value), net_str, buflen.value);
 
-    DPRINTF(fd, "%s.n_net = \"%lu\" (%s)\n", struct_name, (mmux_standard_ulong_t)(netent_p->n_net), net_str);
+    DPRINTF(fd, "%s.n_net = \"0x%lX\" [host=%s byteorder] (%s)\n", struct_name,
+	    (mmux_standard_ulong_t)(netent_p->n_net), MMUX_LIBC_ENDIANNESS_STRING, net_str);
   }
   return false;
 }
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_setnetent (bool stayopen)
+{
+  setnetent((mmux_standard_sint_t)stayopen);
+  return false;
+}
+bool
+mmux_libc_endnetent (void)
+{
+  endnetent();
+  return false;
+}
+bool
+mmux_libc_getnetent (bool * there_is_one_more_p, mmux_libc_netent_t netent_result)
+{
+  struct netent *	rv = getnetent();
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine  words, and  doing  it  makes the  "/etc/networks"  database access  API
+     uniform with the way other APIs are implemented. */
+  if (rv) {
+    *netent_result = *((mmux_libc_network_database_network_t *) rv);
+    *there_is_one_more_p = true;
+  } else {
+    *there_is_one_more_p = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getnetbyname (bool * there_is_one_p, mmux_libc_netent_t netent_result, mmux_asciizcp_t network_name_p)
+{
+  struct netent *	rv = getnetbyname(network_name_p);
+
+  if (rv) {
+    *netent_result = *((mmux_libc_network_database_network_t *) rv);
+    *there_is_one_p = true;
+  } else {
+    *there_is_one_p = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getnetbyaddr (bool * there_is_one_p,
+			mmux_libc_netent_t netent_result,
+			mmux_libc_ipfour_addr_arg_t network_address,
+			mmux_libc_network_address_family_t family)
+{
+  mmux_libc_network_byteorder_uint32_t	NN;
+  mmux_libc_host_byteorder_uint32_t	HN;
+
+  mmux_libc_s_addr_ref(&NN, network_address);
+  mmux_libc_ntohl(&HN, NN);
+  {
+    struct netent *	rv = getnetbyaddr(HN.value, family.value);
+
+    if (rv) {
+      *netent_result = *((mmux_libc_network_database_network_t *) rv);
+      *there_is_one_p = true;
+    } else {
+      *there_is_one_p = false;
+    }
+  }
+  return false;
+}
+
+#if 0
 
 
 /** --------------------------------------------------------------------

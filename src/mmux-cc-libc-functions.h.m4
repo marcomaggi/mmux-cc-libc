@@ -3034,8 +3034,32 @@ mmux_cc_libc_decl bool mmux_libc_getprotobynumber (bool * there_is_one_p,
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_n_name_set (mmux_libc_netent_t P, mmux_asciizp_t value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_name_ref (mmux_asciizpp_t result_p, mmux_libc_netent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_aliases_set (mmux_libc_netent_t P, mmux_asciizpp_t value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_netent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_addrtype_set (mmux_libc_netent_t P, mmux_libc_network_address_family_t value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_n_addrtype_ref (mmux_libc_network_address_family_t * result_p, mmux_libc_netent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_net_set (mmux_libc_netent_t P, mmux_libc_ipfour_addr_arg_t value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_n_net_ref (mmux_libc_ipfour_addr_t result, mmux_libc_netent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_arg_t netent_p,
-					      mmux_asciizcp_t const struct_name)
+					      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_setnetent (bool stayopen);
@@ -3045,13 +3069,16 @@ mmux_cc_libc_decl bool mmux_libc_endnetent (void);
 mmux_cc_libc_decl bool mmux_libc_getnetent (bool * there_is_one_more_p, mmux_libc_netent_t netent_result)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_getnetbyname (mmux_libc_netent_t netent_result, mmux_asciizcp_t network_name_p)
-  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getnetbyname (bool * there_is_one_p,
+					       mmux_libc_netent_t netent_result,
+					       mmux_asciizcp_t network_name_p)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getnetbyaddr (mmux_libc_netent_t netent_result,
-					       mmux_libc_host_byteorder_uint32_t network_number,
+mmux_cc_libc_decl bool mmux_libc_getnetbyaddr (bool * there_is_one_p,
+					       mmux_libc_netent_t netent_result,
+					       mmux_libc_ipfour_addr_arg_t network_address,
 					       mmux_libc_network_address_family_t family)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

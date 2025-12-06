@@ -242,6 +242,13 @@ extern "C" {
 #undef  MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_NO_NUL_ARBITRARY_LIMIT
 #define MMUX_LIBC_FILE_SYSTEM_PATHNAME_LENGTH_NO_NUL_ARBITRARY_LIMIT	mmux_usize_literal(4095)
 
+#undef  MMUX_LIBC_ENDIANNESS_STRING
+#ifdef WORDS_BIGENDIAN
+#  define MMUX_LIBC_ENDIANNESS_STRING	"big-endian"
+#else
+#  define MMUX_LIBC_ENDIANNESS_STRING	"little-endian"
+#endif
+
 
 /** --------------------------------------------------------------------
  ** Internal type definitions: time and dates.
