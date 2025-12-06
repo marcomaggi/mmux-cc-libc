@@ -228,7 +228,7 @@ socket_communication_style_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_soc
 /* ------------------------------------------------------------------ */
 
 static void
-socket_internet_protocol_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_socket_internet_protocol_t protocol)
+socket_internet_protocol_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_network_internet_protocol_t protocol)
 {
   switch (protocol.value) {
 #if (defined MMUX_HAVE_LIBC_IPPROTO_AH)
@@ -1048,8 +1048,8 @@ mmux_libc_getservent (bool * there_is_one_more_p, mmux_libc_servent_t servent_re
   struct servent *	rv = getservent();
 
   /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
-     machine words, and  doing it makes the "/etc/servs" database  access API uniform
-     with the way other APIs are implemented. */
+     machine  words, and  doing  it  makes the  "/etc/services"  database access  API
+     uniform with the way other APIs are implemented. */
   if (rv) {
     *servent_result = *((mmux_libc_network_database_service_t *) rv);
     *there_is_one_more_p = true;
@@ -1093,19 +1093,58 @@ mmux_libc_getservbyport (bool * there_is_one_p, mmux_libc_servent_t servent_resu
   return false;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
- ** Struct protoent.
+ ** Internet Protocols database.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_ASCIIZP_SETTER_GETTER(protoent,	p_name)
-DEFINE_STRUCT_ASCIIZPP_SETTER_GETTER(protoent,	p_aliases)
-DEFINE_STRUCT_SETTER_GETTER(protoent,		p_proto,	sint)
+bool
+mmux_libc_p_name_set (mmux_libc_protoent_t P, mmux_asciizp_t value)
+{
+  P->p_name = value;
+  return false;
+}
+bool
+mmux_libc_p_name_ref (mmux_asciizpp_t result_p, mmux_libc_protoent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->p_name);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * protoent_p, mmux_asciizcp_t struct_name)
+mmux_libc_p_aliases_set (mmux_libc_protoent_t P, mmux_asciizpp_t value)
+{
+  P->p_aliases = value;
+  return false;
+}
+bool
+mmux_libc_p_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_protoent_arg_t P)
+{
+  *result_p = mmux_asciizp(P->p_aliases);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_p_proto_set (mmux_libc_protoent_t P, mmux_libc_network_internet_protocol_t value)
+{
+  P->p_proto = value.value;
+  return false;
+}
+bool
+mmux_libc_p_proto_ref (mmux_libc_network_internet_protocol_t * result_p, mmux_libc_protoent_arg_t P)
+{
+  *result_p = mmux_libc_network_internet_protocol(P->p_proto);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_arg_t protoent_p, mmux_asciizcp_t struct_name)
 {
   int	aliases_idx = 0;
 
@@ -1113,20 +1152,134 @@ mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_t const * pro
     struct_name = "struct protoent";
   }
 
-  DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, protoent_p->p_name);
+  DPRINTF(fd, "%s.p_name = \"%s\"\n", struct_name, protoent_p->p_name);
 
   if (NULL != protoent_p->p_aliases) {
     for (; protoent_p->p_aliases[aliases_idx]; ++aliases_idx) {
-      DPRINTF(fd, "%s.s_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, protoent_p->p_aliases[aliases_idx]);
+      DPRINTF(fd, "%s.p_aliases[%d] = \"%s\"\n", struct_name, aliases_idx, protoent_p->p_aliases[aliases_idx]);
     }
   }
   if (0 == aliases_idx) {
-    DPRINTF(fd, "%s.s_aliases = \"0x0\"\n", struct_name);
+    DPRINTF(fd, "%s.p_aliases = \"0x0\"\n", struct_name);
   }
 
   DPRINTF(fd, "%s.s_proto = \"%d\"\n", struct_name, protoent_p->p_proto);
 
   return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_setprotoent (bool stayopen)
+{
+  setprotoent((mmux_standard_sint_t)stayopen);
+  return false;
+}
+bool
+mmux_libc_endprotoent (void)
+{
+  endprotoent();
+  return false;
+}
+bool
+mmux_libc_getprotoent (bool * there_is_one_more_p, mmux_libc_protoent_t protoent_result)
+{
+  struct protoent *	rv = getprotoent();
+
+  /* Yes, we  are copying  the whole  data structure: it  is just  a small  number of
+     machine  words, and  doing it  makes  the "/etc/protocols"  database access  API
+     uniform with the way other APIs are implemented. */
+  if (rv) {
+    *protoent_result = *((mmux_libc_network_database_protocol_t *) rv);
+    *there_is_one_more_p = true;
+  } else {
+    *there_is_one_more_p = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getprotobyname (bool * there_is_one_p,
+			  mmux_libc_protoent_t protoent_result, mmux_asciizcp_t protocol_name_p)
+{
+  struct protoent *	rv = getprotobyname(protocol_name_p);
+
+  if (rv) {
+    *protoent_result = *((mmux_libc_network_database_protocol_t *) rv);
+    *there_is_one_p  = true;
+  } else {
+    *there_is_one_p  = false;
+  }
+  return false;
+}
+bool
+mmux_libc_getprotobynumber (bool * there_is_one_p,
+			    mmux_libc_protoent_t protoent_result,
+			    mmux_libc_network_internet_protocol_t protocol)
+{
+  struct protoent *	rv = getprotobynumber(protocol.value);
+
+  if (rv) {
+    *protoent_result = *((mmux_libc_network_database_protocol_t *) rv);
+    *there_is_one_p  = true;
+  } else {
+    *there_is_one_p  = false;
+  }
+  return false;
+}
+
+#if 0
+
+
+/** --------------------------------------------------------------------
+ ** Networks database.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_setnetent (bool stayopen)
+{
+  setnetent((mmux_standard_sint_t)stayopen);
+  return false;
+}
+bool
+mmux_libc_endnetent (void)
+{
+  endnetent();
+  return false;
+}
+bool
+mmux_libc_getnetent (mmux_libc_netent_t const * * result_netent_pp)
+{
+  mmux_libc_netent_ptr_t	netent_p = getnetent();
+
+  *result_netent_pp = netent_p;
+  return false;
+}
+bool
+mmux_libc_getnetbyname (mmux_libc_netent_t const * * result_netent_pp, mmux_asciizcp_t network_name_p)
+{
+  mmux_libc_netent_t const *	netent_p = getnetbyname(network_name_p);
+
+  if (netent_p) {
+    *result_netent_pp = netent_p;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
+			mmux_libc_host_byteorder_uint32_t network_number,
+			mmux_libc_network_address_family_t family)
+{
+  mmux_libc_netent_t const *	netent_p = getnetbyaddr(network_number.value, family.value);
+
+  if (netent_p) {
+    *result_netent_pp = netent_p;
+    return false;
+  } else {
+    return true;
+  }
 }
 
 
@@ -1638,7 +1791,7 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * add
 
   /* Inspect the field: ai_protocol */
   {
-    auto		protocol = mmux_libc_socket_internet_protocol(addrinfo_p->ai_protocol);
+    auto		protocol = mmux_libc_network_internet_protocol(addrinfo_p->ai_protocol);
     mmux_asciizcp_t	ai_name  = "unknown";
 
     socket_internet_protocol_to_asciiz_name(&ai_name, protocol);
@@ -1976,109 +2129,6 @@ mmux_libc_gethostent (mmux_libc_hostent_t const * * result_hostent_pp)
 
 
 /** --------------------------------------------------------------------
- ** Protocols database.
- ** ----------------------------------------------------------------- */
-
-bool
-mmux_libc_setprotoent (bool stayopen)
-{
-  setprotoent((mmux_standard_sint_t)stayopen);
-  return false;
-}
-bool
-mmux_libc_endprotoent (void)
-{
-  endprotoent();
-  return false;
-}
-bool
-mmux_libc_getprotoent (mmux_libc_protoent_t const * * result_protoent_pp)
-{
-  mmux_libc_protoent_ptr_t	protoent_p = getprotoent();
-
-  *result_protoent_pp = protoent_p;
-  return false;
-}
-bool
-mmux_libc_getprotobyname (mmux_libc_protoent_t const * * result_protoent_pp, mmux_asciizcp_t protocol_name_p)
-{
-  mmux_libc_protoent_t const *	protoent_p = getprotobyname(protocol_name_p);
-
-  if (NULL != protoent_p) {
-    *result_protoent_pp = protoent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getprotobynumber (mmux_libc_protoent_t const * * result_protoent_pp,
-			    mmux_libc_socket_internet_protocol_t protocol)
-{
-  mmux_libc_protoent_t const *	protoent_p = getprotobynumber(protocol.value);
-
-  if (NULL != protoent_p) {
-    *result_protoent_pp = protoent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-
-
-/** --------------------------------------------------------------------
- ** Networks database.
- ** ----------------------------------------------------------------- */
-
-bool
-mmux_libc_setnetent (bool stayopen)
-{
-  setnetent((mmux_standard_sint_t)stayopen);
-  return false;
-}
-bool
-mmux_libc_endnetent (void)
-{
-  endnetent();
-  return false;
-}
-bool
-mmux_libc_getnetent (mmux_libc_netent_t const * * result_netent_pp)
-{
-  mmux_libc_netent_ptr_t	netent_p = getnetent();
-
-  *result_netent_pp = netent_p;
-  return false;
-}
-bool
-mmux_libc_getnetbyname (mmux_libc_netent_t const * * result_netent_pp, mmux_asciizcp_t network_name_p)
-{
-  mmux_libc_netent_t const *	netent_p = getnetbyname(network_name_p);
-
-  if (netent_p) {
-    *result_netent_pp = netent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getnetbyaddr (mmux_libc_netent_t const * * result_netent_pp,
-			mmux_libc_host_byteorder_uint32_t network_number,
-			mmux_libc_network_address_family_t family)
-{
-  mmux_libc_netent_t const *	netent_p = getnetbyaddr(network_number.value, family.value);
-
-  if (netent_p) {
-    *result_netent_pp = netent_p;
-    return false;
-  } else {
-    return true;
-  }
-}
-
-
-/** --------------------------------------------------------------------
  ** Sockets: creation, pairs, shutdown.
  ** ----------------------------------------------------------------- */
 
@@ -2092,7 +2142,7 @@ bool
 mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
 		  mmux_libc_network_protocol_family_t namespace,
 		  mmux_libc_socket_communication_style_t style,
-		  mmux_libc_socket_internet_protocol_t ipproto)
+		  mmux_libc_network_internet_protocol_t ipproto)
 {
   int	sock_num = socket(namespace.value, style.value, ipproto.value);
 
@@ -2114,7 +2164,7 @@ mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
 		      mmux_libc_network_socket_t * result_sock2_p,
 		      mmux_libc_network_protocol_family_t namespace,
 		      mmux_libc_socket_communication_style_t style,
-		      mmux_libc_socket_internet_protocol_t ipproto)
+		      mmux_libc_network_internet_protocol_t ipproto)
 {
   int	socks[2];
   int	rv = socketpair(namespace.value, style.value, ipproto.value, socks);

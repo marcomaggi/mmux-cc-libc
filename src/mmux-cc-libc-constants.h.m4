@@ -120,7 +120,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_internet_protocol_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_network_internet_protocol_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_AH)
 MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_BEETPH)

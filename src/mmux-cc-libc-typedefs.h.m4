@@ -368,7 +368,7 @@ typedef struct mmux_libc_network_port_number_t {
 typedef struct mmux_libc_network_interface_index_t    { mmux_uint_t;   } mmux_libc_network_interface_index_t;
 typedef struct mmux_libc_network_address_family_t     { mmux_sshort_t; } mmux_libc_network_address_family_t;
 typedef struct mmux_libc_network_protocol_family_t    { mmux_sint_t;   } mmux_libc_network_protocol_family_t;
-typedef struct mmux_libc_socket_internet_protocol_t   { mmux_sint_t;   } mmux_libc_socket_internet_protocol_t;
+typedef struct mmux_libc_network_internet_protocol_t  { mmux_sint_t;   } mmux_libc_network_internet_protocol_t;
 typedef struct mmux_libc_socket_communication_style_t { mmux_sint_t;   } mmux_libc_socket_communication_style_t;
 typedef struct mmux_libc_socket_shutdown_mode_t       { mmux_sint_t;   } mmux_libc_socket_shutdown_mode_t;
 

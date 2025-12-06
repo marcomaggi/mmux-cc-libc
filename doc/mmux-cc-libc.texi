@@ -401,34 +401,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{RWF_NOWAIT}
 @MmuxDefineConstant{RWF_SYNC}
 
-@MmuxDefineConstant{IPPROTO_AH}
-@MmuxDefineConstant{IPPROTO_BEETPH}
-@MmuxDefineConstant{IPPROTO_COMP}
-@MmuxDefineConstant{IPPROTO_DCCP}
-@MmuxDefineConstant{IPPROTO_EGP}
-@MmuxDefineConstant{IPPROTO_ENCAP}
-@MmuxDefineConstant{IPPROTO_ESP}
-@MmuxDefineConstant{IPPROTO_ETHERNET}
-@MmuxDefineConstant{IPPROTO_GRE}
-@MmuxDefineConstant{IPPROTO_ICMP}
-@MmuxDefineConstant{IPPROTO_IDP}
-@MmuxDefineConstant{IPPROTO_IGMP}
-@MmuxDefineConstant{IPPROTO_IP}
-@MmuxDefineConstant{IPPROTO_IPIP}
-@MmuxDefineConstant{IPPROTO_IPV6}
-@MmuxDefineConstant{IPPROTO_MPLS}
-@MmuxDefineConstant{IPPROTO_MPTCP}
-@MmuxDefineConstant{IPPROTO_MTP}
-@MmuxDefineConstant{IPPROTO_PIM}
-@MmuxDefineConstant{IPPROTO_PUP}
-@MmuxDefineConstant{IPPROTO_RAW}
-@MmuxDefineConstant{IPPROTO_RSVP}
-@MmuxDefineConstant{IPPROTO_SCTP}
-@MmuxDefineConstant{IPPROTO_TCP}
-@MmuxDefineConstant{IPPROTO_TP}
-@MmuxDefineConstant{IPPROTO_UDP}
-@MmuxDefineConstant{IPPROTO_UDPLITE}
-
 @MmuxDefineConstant{IPPORT_BIFFUDP}
 @MmuxDefineConstant{IPPORT_CMDSERVER}
 @MmuxDefineConstant{IPPORT_DAYTIME}
@@ -15054,6 +15026,7 @@ mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte
 @menu
 * networking addresses address family::   Networking address families.
 * networking addresses protocol family::  Networking protocol families.
+* networking addresses protocol number::  Networking protocol numbers.
 * networking addresses port number::      Networking port numbers.
 * networking addresses ip::               @emph{Internet Protocol} addresses.
 * networking addresses sockets::          Networking socket addresses.
@@ -15179,6 +15152,78 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 @MmuxDefineNetworkingAddressProtocolConstant{PF_LOCAL}
 @MmuxDefineNetworkingAddressProtocolConstant{PF_UNIX}
 @MmuxDefineNetworkingAddressProtocolConstant{PF_UNSPEC}
+
+@c page
+@node networking addresses protocol number
+@subsection Networking protocol numbers
+
+
+According to the standard: the constants @samp{IPPROTO_IP}, @samp{IPPROTO_TCP}, @samp{IPPROTO_UDP},
+and others are identifiers for @emph{Internet Protocols}.  Under @value{PACKAGE}: these values are
+instances of the type @objtype{mmux_libc_network_internet_protocol_t}.
+
+
+@deftp {Struct Typedef} mmux_libc_network_internet_protocol_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing the identifiers of networking @emph{Internet Protocols}.  Such
+values are stored in host byteorder.
+@end deftp
+
+
+@deftypefun mmux_libc_network_internet_protocol_t mmux_libc_network_internet_protocol (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_internet_protocol_t}.  This function
+is seldom useful because we should use the predefined constants @samp{MMUX_LIBC_IPPROTO_*}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants are predefined, if available on the underlying platform, to represent
+networking @emph{Internet Protocols}.
+
+@macro MmuxDefineNetworkingAddressProtocolNumberConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_internet_protocol_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_internet_protocol_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_AH}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_BEETPH}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_COMP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_DCCP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_EGP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_ENCAP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_ESP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_ETHERNET}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_GRE}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_ICMP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_IDP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_IGMP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_IP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_IPIP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_IPV6}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_MPLS}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_MPTCP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_MTP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_PIM}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_PUP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_RAW}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_RSVP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_SCTP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_TCP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_TP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_UDP}
+@MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_UDPLITE}
 
 @c page
 @node networking addresses port number
@@ -16326,12 +16371,62 @@ if (mmux_libc_getservbyport(&there_is_one, servent, port, protocol_name)) @{
 @subsection Protocols database
 
 
-@MmuxCStructOpaqueTypedef{protoent}
-@MmuxCStructPointerOpaqueTypedef{protoent}
-@MmuxSetterGetter{protoent, p_name,		mmux_asciizp_t}
-@MmuxSetterGetter{protoent, p_aliases,		mmux_asciizpp_t}
-@MmuxSetterGetter{protoent, p_proto,		mmux_sint_t}
-@MmuxStructDumper{protoent}
+It is customary to represent network protocols listed in the file @file{/etc/protocols} with
+instances of the data structure type @MmuxCStruct{protoent}.  Under @value{PACKAGE} such type is
+aliased by the type @objtype{mmux_libc_network_database_protocol_t}, it is usually better to use the
+type @objtype{mmux_libc_protoent_t}.
+
+To access and inspect the entries of @file{/etc/protocols}, we do:
+
+@example
+mmux_libc_oufd_t    er;
+
+mmux_libc_stder(er);
+mmux_libc_setprotoent(true);
+@{
+  for (bool there_is_one_more = false;;) @{
+    mmux_libc_protoent_t  protoent;
+
+    mmux_libc_getprotoent(&there_is_one_more, protoent);
+    if (there_is_one_more) @{
+      mmux_libc_protoent_dump(er, protoent, NULL);
+    @} else @{
+      break;
+    @}
+  @}
+@}
+mmux_libc_endprotoent();
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct protoent.p_name = "ip"
+struct protoent.p_aliases[0] = "IP"
+struct protoent.s_proto = "0"
+struct protoent.p_name = "icmp"
+struct protoent.p_aliases[0] = "ICMP"
+struct protoent.s_proto = "1"
+...
+struct protoent.p_name = "tcp"
+struct protoent.p_aliases[0] = "TCP"
+struct protoent.s_proto = "6"
+...
+struct protoent.p_name = "udp"
+struct protoent.p_aliases[0] = "UDP"
+struct protoent.s_proto = "17"
+...
+@end example
+
+
+@MmuxCWrapperStructOpaqueTypedef{network_database_protocol,protoent}
+@MmuxCWrapperStructArrayOneTypedef{protoent,network_database_protocol}
+@MmuxCWrapperStructPointerTypedef{protoent,network_database_protocol}
+@MmuxCWrapperStructSetterGetter{protoent, p_name,        mmux_asciizp_t}
+@MmuxCWrapperStructSetterGetter{protoent, p_aliases,     mmux_asciizpp_t}
+@MmuxCWrapperStructSetterGetter{protoent, p_proto,       mmux_libc_network_internet_protocol_t}
+@MmuxCWrapperStructDumper{protoent,protoent}
 
 
 @deftypefun bool mmux_libc_setprotoent (bool @var{stayopen})
@@ -16339,42 +16434,69 @@ if (mmux_libc_getservbyport(&there_is_one, servent, port, protocol_name)) @{
 @end deftypefun
 
 
-@deftypefun decl bool mmux_libc_endprotoent (void)
+@deftypefun bool mmux_libc_endprotoent (void)
 @MmuxCInterface{endprotoent}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_getprotoent (mmux_libc_protoent_t const * * @var{result_protoent_pp})
+@deftypefun bool mmux_libc_getprotoent (bool * @var{there_is_one_more}, mmux_libc_protoent_t @var{protoent_result})
 @MmuxCInterface{getprotoent}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_getprotobyname (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_asciizcp_t @var{protocol_name_p})
-@MmuxCInterface{getprotobyname}.  If an error occurs: @var{result_protoent_pp} is left untouched and
-the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set to
-@cnull{}.
+@deftypefun bool mmux_libc_getprotobyname (bool * @var{there_is_one_p}, mmux_libc_protoent_t @var{protoent_result}, mmux_asciizcp_t @var{protocol_name})
+@MmuxCInterface{getprotobyname}.  When successful:
+
+@itemize
+@item
+if a matching protocol is found: the variable referenced by @var{there_is_one_p} is set to @ctrue{};
+otherwise it is set to @cfalse{};
+
+@item
+if there is no matching protocol: the variable referenced by @var{protoent_result} is left untouched.
+@end itemize
 
 @example
-mmux_asciizcp_t                 protocol_name_p = "tcp";
-mmux_libc_protoent_t const *    protoent_p;
+mmux_asciizcp_t       protocol_name  = "tcp";
+bool                  there_is_one;
+mmux_libc_protoent_t  protoent;
 
-if (mmux_libc_getprotobyname(&protoent_p, protocol_name_p)) @{
+if (mmux_libc_getprotobyname(&there_is_one, protoent, protocol_name)) @{
   /* error */
+@} else if (there_is_one) @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_protoent_dump(er, protoent, NULL);
 @}
 @end example
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_getprotobynumber (mmux_libc_protoent_t const * * @var{result_protoent_pp}, mmux_sint_t @var{proto})
-@MmuxCInterface{getprotobynumber}.  If an error occurs: @var{result_protoent_pp} is left untouched
-and the return value is @ctrue{}.  The location referenced by @var{result_protoent_pp} is never set
-to @cnull{}.
+@deftypefun bool mmux_libc_getprotobynumber (bool * @var{there_is_one_p}, mmux_libc_protoent_t @var{protoent_result}, mmux_libc_network_port_number_t @var{port})
+@MmuxCInterface{getprotobynumber}.  When successful:
+
+@itemize
+@item
+if a matching protocol is found: the variable referenced by @var{there_is_one_p} is set to @ctrue{};
+otherwise it is set to @cfalse{};
+
+@item
+if there is no matching protocol: the variable referenced by @var{protoent_result} is left untouched.
+@end itemize
 
 @example
-mmux_libc_protoent_t const *    protoent_p;
+auto                  protocol_number  = MMUX_LIBC_IPPROTO_TCP;
+bool                  there_is_one;
+mmux_libc_protoent_t  protoent;
 
-if (mmux_libc_getprotobyname(&protoent_p, MMUX_LIBC_IPPROTO_TCP)) @{
+if (mmux_libc_getprotobynumber(&there_is_one, protoent, protocol_number)) @{
   /* error */
+@} else if (there_is_one) @{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  mmux_libc_protoent_dump(er, protoent, NULL);
 @}
 @end example
 @end deftypefun

@@ -2709,10 +2709,10 @@ mmux_libc_network_protocol_family (mmux_standard_sint_t value)
 {
   return (mmux_libc_network_protocol_family_t) { .value = value };
 }
-mmux_cc_libc_inline_decl mmux_libc_socket_internet_protocol_t
-mmux_libc_socket_internet_protocol (mmux_standard_sshort_t value)
+mmux_cc_libc_inline_decl mmux_libc_network_internet_protocol_t
+mmux_libc_network_internet_protocol (mmux_standard_sint_t value)
 {
-  return (mmux_libc_socket_internet_protocol_t) { .value = value };
+  return (mmux_libc_network_internet_protocol_t) { .value = value };
 }
 mmux_cc_libc_inline_decl mmux_libc_socket_communication_style_t
 mmux_libc_socket_communication_style (mmux_standard_sint_t value)
@@ -2993,8 +2993,26 @@ mmux_cc_libc_decl bool mmux_libc_getservbyport (bool * there_is_one_p, mmux_libc
 
 /* ------------------------------------------------------------------ */
 
+mmux_cc_libc_decl bool mmux_libc_p_name_set (mmux_libc_protoent_t P, mmux_asciizp_t value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_p_name_ref (mmux_asciizpp_t result_p, mmux_libc_protoent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_p_aliases_set (mmux_libc_protoent_t P, mmux_asciizpp_t value)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_p_aliases_ref (mmux_asciizpp_t result_p, mmux_libc_protoent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_p_proto_set (mmux_libc_protoent_t P, mmux_libc_network_internet_protocol_t value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_p_proto_ref (mmux_libc_network_internet_protocol_t * result_p, mmux_libc_protoent_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_arg_t protoent_p,
-						mmux_asciizcp_t const struct_name)
+						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_setprotoent (bool stayopen);
@@ -3004,12 +3022,15 @@ mmux_cc_libc_decl bool mmux_libc_endprotoent (void);
 mmux_cc_libc_decl bool mmux_libc_getprotoent (bool * there_is_one_more_p, mmux_libc_protoent_t protoent_result)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_getprotobyname (mmux_libc_protoent_t protoent_result, mmux_asciizcp_t protocol_name_p)
-  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getprotobyname (bool * there_is_one_p,
+						 mmux_libc_protoent_t protoent_result,
+						 mmux_asciizcp_t protocol_name_p)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getprotobynumber (mmux_libc_protoent_t protoent_result,
-						   mmux_libc_socket_internet_protocol_t protocol)
-  __attribute__((__nonnull__(1),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getprotobynumber (bool * there_is_one_p,
+						   mmux_libc_protoent_t protoent_result,
+						   mmux_libc_network_internet_protocol_t protocol)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 
@@ -3240,7 +3261,7 @@ mmux_cc_libc_decl bool mmux_libc_make_network_socket (mmux_libc_network_socket_t
 mmux_cc_libc_decl bool mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
 					 mmux_libc_network_protocol_family_t     namespace,
 					 mmux_libc_socket_communication_style_t style,
-					 mmux_libc_socket_internet_protocol_t   ipproto)
+					 mmux_libc_network_internet_protocol_t   ipproto)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_shutdown (mmux_libc_network_socket_t * sockp, mmux_libc_socket_shutdown_mode_t how)
@@ -3250,7 +3271,7 @@ mmux_cc_libc_decl bool mmux_libc_socketpair (mmux_libc_network_socket_t * result
 					     mmux_libc_network_socket_t * result_sock2_p,
 					     mmux_libc_network_protocol_family_t namespace,
 					     mmux_libc_socket_communication_style_t style,
-					     mmux_libc_socket_internet_protocol_t ipproto)
+					     mmux_libc_network_internet_protocol_t ipproto)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
