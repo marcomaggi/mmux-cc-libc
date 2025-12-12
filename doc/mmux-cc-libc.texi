@@ -15037,6 +15037,10 @@ mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte
 @subsection Networking address families
 
 
+For an overview of networking address families, see the manual page
+@ref{address_families,address_families,address_families,*manpages*}.
+
+
 According to the standard: the constants @samp{AF_INET}, @samp{AF_INET6}, @samp{AF_LOCAL}, and
 others are identifiers for families of networking addresses.  Under @value{PACKAGE}: these values
 are instances of the type @objtype{mmux_libc_network_address_family_t}.
@@ -15466,6 +15470,12 @@ INADDR_LOOPBACK.s_addr = 0x0100007f (127.0.0.1) [network byteorder]
 
 @deftypefun bool mmux_libc_ipfour_addr_reset (mmux_libc_ipfour_addr_t @var{address})
 Reset to zero bytes the memory block referenced by @var{address}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_ipfour_addr_equal (bool * @var{are_equal_result_p}, mmux_libc_ipfour_addr_arg_t @vari{ipfour_addr}, mmux_libc_ipfour_addr_arg_t @varii{ipfour_addr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} if the two given addresses are
+equal; otherwise store @cfalse{}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -15963,14 +15973,43 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 @subsubsection Base networking socket address
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_network_address_socket_t
-An opaque alias for a non--standard data structure type: we can handle this type as being big enough
-to contain any of the data structure types @code{struct sockaddr_*}.  @value{PACKAGE} uses this data
-type as alias for @MmuxCStruct{sockaddr}.
+According to the standard: @emph{networking--addresses} to be used with @emph{networking--sockets}
+are generically represented by the data structure type @MmuxCStruct{sockaddr}.  Under
+@value{PACKAGE}: such abstract interface to @emph{networking--socket addresses} is represented by
+the object type @objtype{mmux_libc_network_socket_address_t}; it is usually better to use the types
+@objtype{mmux_libc_sockaddr_t} and @objtype{mmux_libc_sockaddr_arg_t}.
+
+
+@deftp {Abstract Struct Typedef} mmux_libc_network_socket_address_t
+An opaque alias for a non--standard data structure type: we can use this as abstraction for every
+networking--socket address object type, in the same way we can use the standard type
+@MmuxCStruct{sockaddr}.  This type is ``abstract'' in the sense that: we must never instantiate it
+directly.
 @end deftp
 
-@MmuxCStructPointerOpaqueTypedef{sockaddr}
-@MmuxSetterGetter{sockaddr, sa_family,   mmux_sshort_t}
+
+@deftp {Struct Pointer Typedef} mmux_libc_sockaddr_t
+Pointer type defined as follows:
+
+@example
+typedef mmux_libc_network_socket_address_t *  mmux_libc_sockaddr_t;
+@end example
+
+@noindent
+it is meant to be used to declare arguments to functions representing the result of a computation,
+so the referenced @objtype{mmux_libc_network_socket_address_t} is handled as mutable.
+@end deftp
+
+
+@MmuxCWrapperStructPointerTypedef{sockaddr,network_socket_address}
+
+
+@deftypefun bool mmux_libc_sockaddr_family_set (mmux_libc_sockaddr_t @var{sockaddr}, mmux_libc_network_address_family_t @var{family})
+@deftypefunx bool mmux_libc_sockaddr_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr})
+Setter and getter for the field @code{sa_family} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
 @MmuxStructDumper{sockaddr}
 
 @c page
@@ -15978,33 +16017,234 @@ type as alias for @MmuxCStruct{sockaddr}.
 @subsubsection Local networking socket address
 
 
-@MmuxCStructOpaqueTypedef{sockaddr_un}
-@MmuxCStructPointerOpaqueTypedef{sockaddr_un}
-@MmuxSetterGetter{sockaddr_un, sun_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_un, sun_path,   mmux_libc_fs_ptn_arg_t}
-@MmuxStructDumper{sockaddr_un}
+According to the standard: @emph{local networking--addresses} to be used with
+@emph{networking--sockets} are represented by the data structure type @MmuxCStruct{sockaddr_un}.
+Under @value{PACKAGE}: such data type is represented by the object type
+@objtype{mmux_libc_network_socket_address_local_t}; it is usually better to use the types
+@objtype{mmux_libc_sockaddr_local_t} and @objtype{mmux_libc_sockaddr_local_arg_t}.
 
+To instantiate a local networking--socket address, initialising it with raw field values, we do:
 
-The file system pathname associated to an address of format @objtype{mmux_libc_sockaddr_un_t} is
-embedded in the data structure itself; it has maximum length of fixed size, hard--coded in the data
-structure definition.  The pathname must be an @MmuxAsciiZ{} string and the terminating nul must be
-included in the embedded @MmuxAsciiZ{} string.
+@example
+mmux_libc_sockaddr_local_t  sockaddr_local;
 
-If we want to allocate a block of memory wide enough to contain a pathname of maximum length we have
-to take the @cfunc{sizeof} of the data structure type.  If we want to compute the address size
-needed as arguments by some socket functions: we have to use the following function.
+/* Initialise the address. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
 
+  /* Build socket's file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/socket.sock";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
-@deftypefun mmux_usize_t mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * @var{sockaddr_un_p})
-Return the address size, measured in bytes, of the address data structure referenced by
-@var{sockaddr_un_p}.
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  /* Initialise the fields. */
+  @{
+    if (mmux_libc_sockaddr_local_family_set(sockaddr_local, MMUX_LIBC_AF_LOCAL)) @{
+      /* error */
+    @}
+    if (mmux_libc_sockaddr_local_path_set(sockaddr_local, fs_ptn)) @{
+      /* error */
+    @}
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+
+@noindent
+after this, we can perform the following operations:
 
 @itemize
 @item
-The returned size does @strong{not} include the terminating nul of the included file pathname.
+to dump the contents of the address object as @objtype{mmux_libc_network_socket_address_local_t}, we
+do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_local_dump(er, sockaddr_local, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr_un = 0x7ffd8edc1f30
+struct sockaddr_un.sun_family = "1" (AF_LOCAL)
+struct sockaddr_un.sun_path = "/path/to/socket.sock"
+@end example
 
 @item
-The returned size is the correct value to hand to functions requiring the address size, like
+to dump the contents of the address object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_dump(er, sockaddr_local, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr = 0x7ffd73717f20
+struct sockaddr.sa_family = "1" (AF_LOCAL)
+struct sockaddr_un = 0x7ffd73717f20
+struct sockaddr_un.sun_family = "1" (AF_LOCAL)
+struct sockaddr_un.sun_path = "/path/to/socket.sock"
+@end example
+
+@item
+to retrieve the address--family field by viewing the object as
+@objtype{mmux_libc_network_socket_address_local_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_local_family_ref(&family, sockaddr_local);
+@end example
+
+@item
+to retrieve the address--family field by viewing the object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_family_ref(&family, sockaddr_local);
+@end example
+
+@item
+to retrieve the address--path field we do:
+
+@example
+mmux_libc_fs_ptn_t  fs_ptn;
+
+/* Extract the field, making a new file system pathname. */
+@{
+  mmux_libc_fs_ptn_factory_copying_t      fs_ptn_factory;
+
+  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
+  if (mmux_libc_sockaddr_local_path_ref(fs_ptn, fs_ptn_factory, sockaddr_local)) @{
+    /* error */
+  @}
+@}
+
+...
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+notice how we used a ``copying'' file system pathname factory; this is suggested, but not mandatory,
+because the path embedded in the @objtype{mmux_libc_network_address_local_t} object is
+nul--terminated, so it can be referenced while the address object itself exists.
+@end itemize
+
+
+@MmuxCWrapperStructOpaqueTypedef{network_socket_address_local,sockaddr_un}
+@MmuxCWrapperStructArrayOneTypedef{sockaddr_local,network_socket_address_local}
+@MmuxCWrapperStructPointerTypedef{sockaddr_local,network_socket_address_local}
+
+
+@deftypefun bool mmux_libc_sockaddr_local_family_set (mmux_libc_sockaddr_local_t @var{sockaddr_local}, mmux_libc_network_address_family_t @var{family})
+@deftypefunx bool mmux_libc_sockaddr_local_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr_local})
+Setter and getter for the field @code{sun_family} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_local_path_set (mmux_libc_sockaddr_local_t @var{sockaddr_local}, mmux_libc_fs_ptn_arg_t @var{path})
+@deftypefunx bool mmux_libc_sockaddr_local_path_ref (mmux_libc_fs_ptn_t @var{path_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_sockaddr_local_arg_t @var{sockaddr_local})
+Setter and getter for the field @code{sun_path} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+@MmuxCWrapperStructDumper{sockaddr_local,sockaddr_un}
+
+
+The file system pathname associated to an address of format
+@objtype{mmux_libc_network_socket_address_local_t} is embedded in the data structure itself; it has
+maximum length of fixed size, hard--coded in the data structure definition.  The pathname must be an
+@MmuxAsciiZ{} string and the terminating zero byte must be included in the embedded @MmuxAsciiZ{}
+string.
+
+If we want to allocate a block of memory wide enough to contain a pathname of maximum length: we
+have to take the @cfunc{sizeof} of the data structure type; for example:
+
+@example
+mmux_libc_network_socket_address_local_t *  sockaddr_local;
+
+@{
+  auto  item_num = mmux_usize_constant_one();
+  auto  item_siz = mmux_usize(sizeof(mmux_libc_network_socket_address_local_t));
+
+  if (mmux_libc_calloc(&sockaddr_local, item_num, item_siz)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+and we have to remember that the actual file system pathname length might be shorter than the
+maximum size.
+
+If we want to compute the address size needed as argument by some socket functions: we have to use
+@cfunc{mmux_libc_sockaddr_local_length}.  For example, if we want to bind the address defined above
+to a socket file descriptor, we do:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Initialise the server socket, binding it to a local address. */
+@{
+  if (mmux_libc_socket(server_sockfd, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_usize_t  sockaddr_local_length;
+
+    mmux_libc_sockaddr_local_length(&sockaddr_local_length, sockaddr_local);
+    if (mmux_libc_bind(server_sockfd, sockaddr_local, sockaddr_local_length)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_sockaddr_local_length (mmux_usize_t * @var{sockaddr_local_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr_local})
+Store in the variable referenced by @var{sockaddr_local_length_result_p} the address size, measured
+in bytes, of the address data structure referenced by @var{sockaddr_local}.
+
+@itemize
+@item
+The resulting size does @strong{not} include the terminating nul of the included file pathname.
+
+@item
+The resulting size is the correct value to hand to functions requiring the address size, like
 @cfunc{mmux_libc_bind}.
 @end itemize
 @end deftypefun
@@ -16014,18 +16254,172 @@ The returned size is the correct value to hand to functions requiring the addres
 @subsubsection @emph{Internet Protocol} version four socket address
 
 
-@MmuxCStructOpaqueTypedef{sockaddr_in}
-@MmuxCStructPointerOpaqueTypedef{sockaddr_in}
-@MmuxSetterGetter{sockaddr_in, sin_family, mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_in, sipfour_addr,   mmux_libc_ipfour_addr_t}
-@MmuxSetterGetter{sockaddr_in, sin_port,   mmux_host_byteorder_ushort_t}
-@MmuxStructDumper{sockaddr_in}
+According to the standard: @emph{IPv4 networking--addresses} to be used with
+@emph{networking--sockets} are represented by the data structure type @MmuxCStruct{sockaddr_in}.
+Under @value{PACKAGE}: such data type is represented by the object type
+@objtype{mmux_libc_network_socket_address_ipfour_t}; it is usually better to use the types
+@objtype{mmux_libc_sockaddr_ipfour_t} and @objtype{mmux_libc_sockaddr_ipfour_arg_t}.
+
+To instantiate an IPv4 networking--socket address, initialising it with raw field values, we do:
+
+@example
+mmux_libc_sockaddr_ipfour_t  sockaddr_ipfour;
+
+/* Initialise the address. */
+@{
+  mmux_libc_ipfour_addr_t  address_ipfour;
+
+  /* Build the IPv4 address. */
+  @{
+    mmux_asciizcp_t  dotted_quad = "127.0.0.1";
+
+    if (mmux_libc_make_ipfour_addr_from_asciiz(address_ipfour, dotted_quad)) @{
+      /* error */
+    @}
+  @}
+
+  /* Initialise the fields. */
+  @{
+    if (mmux_libc_sockaddr_ipfour_family_set(sockaddr_ipfour, MMUX_LIBC_AF_INET)) @{
+      /* error */
+    @}
+    if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr_ipfour, address_ipfour)) @{
+      /* error */
+    @}
+    @{
+      /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+      auto  port_num = mmux_libc_host_byteorder_uint16_literal(25);
+      auto  port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+
+      if (mmux_libc_sockaddr_ipfour_port_set(sockaddr_ipfour, port)) @{
+        /* error */
+      @}
+    @}
+  @}
+@}
+@end example
+
+@noindent
+after this, we can perform the following operations:
+
+@itemize
+@item
+to dump the contents of the address object as @objtype{mmux_libc_network_socket_address_ipfour_t},
+we do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_ipfour_dump(er, sockaddr_ipfour, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr_in = 0x7ffe92947f80
+struct sockaddr_in.sin_family = "2" (AF_INET)
+struct sockaddr_in.sin_addr = "127.0.0.1"
+struct sockaddr_in.sin_port = 0x1900 [network byteorder] (host byteorder: 25)
+@end example
+
+@item
+to dump the contents of the address object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_dump(er, sockaddr_ipfour, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr = 0x7ffe92947f80
+struct sockaddr.sa_family = "2" (AF_INET)
+struct sockaddr_in = 0x7ffe92947f80
+struct sockaddr_in.sin_family = "2" (AF_INET)
+struct sockaddr_in.sin_addr = "127.0.0.1"
+struct sockaddr_in.sin_port = 0x1900 [network byteorder] (host byteorder: 25)
+@end example
+
+@item
+to retrieve the address--family field by viewing the object as
+@objtype{mmux_libc_network_socket_address_ipfour_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_ipfour_family_ref(&family, sockaddr_ipfour);
+@end example
+
+@item
+to retrieve the address--family field by viewing the object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_family_ref(&family, sockaddr_ipfour);
+@end example
+
+@item
+to retrieve the IPv4 address field we do:
+
+@example
+mmux_libc_ipfour_addr_t   ipfour_address;
+
+if (mmux_libc_sockaddr_ipfour_addr_ref(ipfour_address, sockaddr_ipfour)) @{
+  /* error */
+@}
+@end example
+
+@item
+to retrieve the port number we do:
+
+@example
+mmux_libc_network_port_number_t  port;
+
+if (mmux_libc_sockaddr_ipfour_port_ref(&port, sockaddr_ipfour)) @{
+  /* error */
+@}
+@end example
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+@MmuxCWrapperStructOpaqueTypedef{network_socket_address_ipfour,sockaddr_in}
+@MmuxCWrapperStructArrayOneTypedef{sockaddr_ipfour,network_socket_address_ipfour}
+@MmuxCWrapperStructPointerTypedef{sockaddr_ipfour,network_socket_address_ipfour}
 
 
-@deftypefun bool mmux_libc_sipfour_addr_p_ref (mmux_libc_ipfour_addr_t ** sipfour_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
-Store in the location referenced by @var{sipfour_addr_pp} a pointer to the field @code{sipfour_addr} of the
-data structure referenced by @var{sockaddr_p}.
+@deftypefun bool mmux_libc_sockaddr_ipfour_family_set (mmux_libc_sockaddr_ipfour_t @var{sockaddr_ipfour}, mmux_libc_network_address_family_t @var{family})
+@deftypefunx bool mmux_libc_sockaddr_ipfour_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr_ipfour})
+Setter and getter for the field @code{sin_family} of @objtype{mmux_libc_network_address_local_t}.
 @end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipfour_addr_set (mmux_libc_sockaddr_ipfour_t @var{sockaddr_ipfour}, mmux_libc_fs_ptn_arg_t @var{path})
+@deftypefunx bool mmux_libc_sockaddr_ipfour_addr_ref (mmux_libc_fs_ptn_t @var{path_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr_ipfour})
+Setter and getter for the field @code{sin_addr} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipfour_port_set (mmux_libc_sockaddr_ipfour_t @var{sockaddr_ipfour}, mmux_libc_network_port_number_t @var{port})
+@deftypefunx bool mmux_libc_sockaddr_ipfour_port_ref (mmux_libc_network_port_number_t * @var{port_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr_ipfour})
+Setter and getter for the field @code{sin_port} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@MmuxCWrapperStructDumper{sockaddr_ipfour,sockaddr_in}
 
 @c page
 @node networking addresses sockets ipsix

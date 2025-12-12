@@ -388,6 +388,26 @@ typedef mmux_libc_internet_protocol_address_six_t const *	mmux_libc_ipsix_addr_a
 
 /* ------------------------------------------------------------------ */
 
+typedef mmux_libc_network_socket_address_t *			mmux_libc_sockaddr_t;
+typedef mmux_libc_network_socket_address_t const *		mmux_libc_sockaddr_arg_t;
+
+typedef mmux_libc_network_socket_address_local_t		mmux_libc_sockaddr_local_t[1];
+typedef mmux_libc_network_socket_address_local_t const *	mmux_libc_sockaddr_local_arg_t;
+
+typedef mmux_libc_network_socket_address_ipfour_t		mmux_libc_sockaddr_ipfour_t[1];
+typedef mmux_libc_network_socket_address_ipfour_t const *	mmux_libc_sockaddr_ipfour_arg_t;
+
+typedef mmux_libc_network_socket_address_ipsix_t		mmux_libc_sockaddr_ipsix_t[1];
+typedef mmux_libc_network_socket_address_ipsix_t const *	mmux_libc_sockaddr_ipsix_arg_t;
+
+typedef mmux_libc_network_socket_address_info_t			mmux_libc_addrinfo_t[1];
+typedef mmux_libc_network_socket_address_info_t const *		mmux_libc_addrinfo_arg_t;
+
+typedef mmux_libc_network_socket_address_linger_option_t		mmux_libc_linger_t[1];
+typedef mmux_libc_network_socket_address_linger_option_t const *	mmux_libc_linger_arg_t;
+
+/* ------------------------------------------------------------------ */
+
 typedef mmux_libc_network_database_host_t		mmux_libc_hostent_t[1];
 typedef mmux_libc_network_database_host_t const *	mmux_libc_hostent_arg_t;
 

@@ -450,6 +450,7 @@ mmux_libc_if_nameindex_dump (mmux_libc_fd_arg_t fd, mmux_libc_if_nameindex_arg_t
     struct_name = "struct if_nameindex";
   }
 
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)nameindex_p);
   DPRINTF(fd, "%s.if_index = \"%d\"\n", struct_name, nameindex_p->if_index);
   DPRINTF(fd, "%s.if_name  = \"%s\"\n", struct_name, nameindex_p->if_name);
 
@@ -840,6 +841,7 @@ mmux_libc_hostent_dump (mmux_libc_fd_arg_t fd, mmux_libc_hostent_arg_t hostent_p
     struct_name = "struct hostent";
   }
 
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)hostent_p);
   DPRINTF(fd, "%s.h_name = \"%s\"\n", struct_name, hostent_p->h_name);
 
   if (NULL != hostent_p->h_aliases) {
@@ -1012,6 +1014,7 @@ mmux_libc_servent_dump (mmux_libc_fd_arg_t fd, mmux_libc_servent_arg_t servent_p
     struct_name = "struct servent";
   }
 
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)servent_p);
   DPRINTF(fd, "%s.s_name = \"%s\"\n", struct_name, servent_p->s_name);
 
   if (NULL != servent_p->s_aliases) {
@@ -1152,6 +1155,7 @@ mmux_libc_protoent_dump (mmux_libc_fd_arg_t fd, mmux_libc_protoent_arg_t protoen
     struct_name = "struct protoent";
   }
 
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)protoent_p);
   DPRINTF(fd, "%s.p_name = \"%s\"\n", struct_name, protoent_p->p_name);
 
   if (NULL != protoent_p->p_aliases) {
@@ -1310,6 +1314,7 @@ mmux_libc_netent_dump (mmux_libc_fd_arg_t fd, mmux_libc_netent_arg_t netent_p, m
     struct_name = "struct netent";
   }
 
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)netent_p);
   DPRINTF(fd, "%s.n_name = \"%s\"\n", struct_name, netent_p->n_name);
 
   {
@@ -1415,41 +1420,67 @@ mmux_libc_getnetbyaddr (bool * there_is_one_p,
   return false;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Struct sockaddr.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr, sa_family,	libc_socket_address_family)
+bool
+mmux_libc_sockaddr_family_set (mmux_libc_sockaddr_t P, mmux_libc_network_address_family_t new_field_value)
+{
+  auto	PP = (struct sockaddr *) P;
+
+  PP->sa_family = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_family_ref (mmux_libc_network_address_family_t * field_value_result_p, mmux_libc_sockaddr_arg_t P)
+{
+  auto	PP = (struct sockaddr *) P;
+
+  *field_value_result_p = mmux_libc_network_address_family(PP->sa_family);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
-			 mmux_libc_sockaddr_t const * sockaddr_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_arg_t sockaddr_p,
+			 mmux_asciizcp_t given_struct_name)
 {
+  mmux_asciizcp_t			struct_name = given_struct_name;
+  mmux_libc_network_address_family_t	address_family;
+
   if (NULL == struct_name) {
     struct_name = "struct sockaddr";
   }
 
-  {
-    mmux_libc_network_address_family_t	sa_family;
-    mmux_asciizcp_t			family_name = "unknown";
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
 
-    mmux_libc_sa_family_ref(&sa_family, sockaddr_p);
-    sa_family_to_asciiz_name(&family_name, sa_family);
-    DPRINTF(fd, "%s.sa_family = \"%d\" (%s)\n", struct_name, (sockaddr_p->sa_family), family_name);
+  /* Dump the field "sa_family". */
+  {
+    mmux_asciizcp_t	family_name = "unknown";
+
+    mmux_libc_sockaddr_family_ref(&address_family, sockaddr_p);
+    sa_family_to_asciiz_name(&family_name, address_family);
+    DPRINTF(fd, "%s.sa_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name);
   }
 
-  switch (sockaddr_p->sa_family) {
-  case MMUX_LIBC_VALUEOF_AF_INET:
-    return mmux_libc_sockaddr_in_dump   (fd, (mmux_libc_sockaddr_in_t    const *) sockaddr_p, struct_name);
-  case MMUX_LIBC_VALUEOF_AF_INET6:
-    return mmux_libc_sockaddr_insix_dump(fd, (mmux_libc_sockaddr_insix_t const *) sockaddr_p, struct_name);
-  case MMUX_LIBC_VALUEOF_AF_LOCAL:
-    return mmux_libc_sockaddr_un_dump   (fd, (mmux_libc_sockaddr_un_t    const *) sockaddr_p, struct_name);
-  default:
-    return false;
+  /* Dump the specific data structure. */
+  {
+    switch (address_family.value) {
+    case MMUX_LIBC_VALUEOF_AF_INET:
+      return mmux_libc_sockaddr_ipfour_dump(fd, (mmux_libc_network_socket_address_ipfour_t  const *) sockaddr_p,
+					    ((given_struct_name)? struct_name : given_struct_name));
+    case MMUX_LIBC_VALUEOF_AF_INET6:
+      return mmux_libc_sockaddr_ipsix_dump(fd, (mmux_libc_network_socket_address_ipsix_t const *) sockaddr_p,
+					   ((given_struct_name)? struct_name : given_struct_name));
+    case MMUX_LIBC_VALUEOF_AF_LOCAL:
+      return mmux_libc_sockaddr_local_dump(fd, (mmux_libc_network_socket_address_local_t  const *) sockaddr_p,
+					   ((given_struct_name)? struct_name : given_struct_name));
+    default:
+      return false;
+    }
   }
 }
 
@@ -1458,10 +1489,24 @@ mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
  ** Struct sockaddr_un.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(sockaddr_un, sun_family,	libc_socket_address_family)
+bool
+mmux_libc_sockaddr_local_family_set (mmux_libc_sockaddr_local_t P, mmux_libc_network_address_family_t new_field_value)
+{
+  P->sun_family = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_local_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+				     mmux_libc_sockaddr_local_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_address_family(P->sun_family);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_fs_ptn_arg_t fs_ptn)
+mmux_libc_sockaddr_local_path_set (mmux_libc_sockaddr_local_t P, mmux_libc_fs_ptn_arg_t fs_ptn)
 {
   /* Check if the input pathname is too long  to fit in the data structure along with
      its terminating nul;  we do not want  to truncate it.  Notice  that the pathname
@@ -1477,43 +1522,46 @@ mmux_libc_sun_path_set (mmux_libc_sockaddr_un_t * const P, mmux_libc_fs_ptn_arg_
   }
 }
 bool
-mmux_libc_sun_path_ref (mmux_libc_fs_ptn_t fs_ptn_result, mmux_libc_sockaddr_un_t const * const P)
+mmux_libc_sockaddr_local_path_ref (mmux_libc_fs_ptn_t fs_ptn_result,
+				   mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory,
+				   mmux_libc_sockaddr_local_arg_t P)
 {
-  /* FIXME  Add the  factory as  argument to  this function.   (Marco Maggi;  Oct 22,
-     2025) */
-  mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
-
-  mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
   return mmux_libc_make_file_system_pathname(fs_ptn_result, fs_ptn_factory, P->sun_path);
 }
 
-mmux_usize_t
-mmux_libc_SUN_LEN (mmux_libc_sockaddr_un_t const * P)
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_local_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
 {
   /* NOTE: "SUN_LEN()"  does not  include the  terminating nul  of "sun_path"  in its
      computation; at least this is what I observe.  Notice that the length we pass to
      functions like "bind()" must be the  one returned by "SUN_LEN()".  (Marco Maggi;
      Dec 23, 2024) */
-  return mmux_usize(SUN_LEN(P));
+  *sockaddr_local_length_result_p = mmux_usize(SUN_LEN((struct sockaddr_un *)P));
+  return false;
 }
 
 bool
-mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const * sockaddr_un_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_local_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_local_arg_t sockaddr_local_p,
+			       mmux_asciizcp_t struct_name)
 {
   if (NULL == struct_name) {
     struct_name = "struct sockaddr_un";
   }
 
-  {
-    mmux_asciizcp_t			sun_name = "unknown";
-    mmux_libc_network_address_family_t	family;
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_local_p);
 
-    mmux_libc_sun_family_ref(&family, sockaddr_un_p);
-    sa_family_to_asciiz_name(&sun_name, family);
-    DPRINTF(fd, "%s.sun_family = \"%d\" (%s)\n", struct_name, (int)family.value, sun_name);
+  {
+    mmux_asciizcp_t			family_name = "unknown";
+    mmux_libc_network_address_family_t	address_family;
+
+    mmux_libc_sockaddr_local_family_ref(&address_family, sockaddr_local_p);
+    sa_family_to_asciiz_name(&family_name, address_family);
+    DPRINTF(fd, "%s.sun_family = \"%d\" (%s)\n", struct_name, (int)address_family.value, family_name);
   }
 
-  DPRINTF(fd, "%s.sun_path = \"%s\"\n", struct_name, sockaddr_un_p->sun_path);
+  DPRINTF(fd, "%s.sun_path = \"%s\"\n", struct_name, sockaddr_local_p->sun_path);
   return false;
 }
 
@@ -1523,92 +1571,121 @@ mmux_libc_sockaddr_un_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_un_t const
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sin_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_network_address_family_t new_field_value)
+mmux_libc_sockaddr_ipfour_family_set (mmux_libc_sockaddr_ipfour_t P,
+				      mmux_libc_network_address_family_t new_field_value)
 {
   P->sin_family = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_sin_family_ref (mmux_libc_network_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+mmux_libc_sockaddr_ipfour_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+				      mmux_libc_sockaddr_ipfour_arg_t P)
 {
   *field_value_result_p = mmux_libc_network_address_family(P->sin_family);
   return false;
 }
 
-bool
-mmux_libc_sin_addr_set (mmux_libc_sockaddr_in_t * P, mmux_libc_ipfour_addr_arg_t new_field_value)
-{
-  P->sin_addr.s_addr = new_field_value->s_addr;
-  return false;
-}
-bool
-mmux_libc_sin_addr_ref (mmux_libc_ipfour_addr_t field_value_result, mmux_libc_sockaddr_in_t const * P)
-{
-  field_value_result->s_addr = P->sin_addr.s_addr;
-  return false;
-}
-bool
-mmux_libc_sin_port_set (mmux_libc_sockaddr_in_t * const P, mmux_libc_host_byteorder_uint16_t host_byteorder_value)
-{
-  mmux_libc_network_byteorder_uint16_t	network_byteorder_value;
+/* ------------------------------------------------------------------ */
 
-  mmux_libc_htons(&network_byteorder_value, host_byteorder_value);
-  P->sin_port = network_byteorder_value.value;
+bool
+mmux_libc_sockaddr_ipfour_addr_set (mmux_libc_sockaddr_ipfour_t P, mmux_libc_ipfour_addr_arg_t new_field_value)
+{
+  P->sin_addr.s_addr = new_field_value->value[0].s_addr;
   return false;
 }
 bool
-mmux_libc_sin_port_ref (mmux_libc_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_in_t const * const P)
+mmux_libc_sockaddr_ipfour_addr_ref (mmux_libc_ipfour_addr_t field_value_result, mmux_libc_sockaddr_ipfour_arg_t P)
 {
-  auto					network_byteorder_value = mmux_libc_network_byteorder_uint16( P->sin_port );
-
-  mmux_libc_ntohs(result_host_byteorder_p, network_byteorder_value);
+  field_value_result->value[0].s_addr = P->sin_addr.s_addr;
   return false;
 }
 
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_sin_addr_pp_ref (mmux_libc_ipfour_addr_t ** sin_addr_pp, mmux_libc_sockaddr_in_t * sockaddr_p)
+mmux_libc_sockaddr_ipfour_port_set (mmux_libc_sockaddr_ipfour_t P, mmux_libc_network_port_number_t new_field_value)
 {
-  *sin_addr_pp = (mmux_libc_ipfour_addr_t *) &(sockaddr_p->sin_addr);
+  P->sin_port = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipfour_port_ref (mmux_libc_network_port_number_t * field_value_result_p,
+				    mmux_libc_sockaddr_ipfour_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_port_number(mmux_libc_network_byteorder_uint16( P->sin_port ));
   return false;
 }
 
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const * sockaddr_in_p, mmux_asciizcp_t struct_name)
+mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipfour_arg_t sockaddr_p,
+				mmux_asciizcp_t struct_name)
 {
-  if (NULL == struct_name) {
-    struct_name = "struct sockaddr_in";
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
+
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
   }
-
-  /* Dump the field "sin_family". */
   {
-    auto		field_value = mmux_libc_network_address_family(sockaddr_in_p->sin_family);
-    mmux_asciizcp_t	sin_name = "unknown";
+    mmux_libc_network_address_family_t	address_family;
 
-    sa_family_to_asciiz_name(&sin_name, field_value);
-    DPRINTF(fd, "%s.sin_family = \"%d\" (%s)\n", struct_name, sockaddr_in_p->sin_family, sin_name);
+    if (NULL == struct_name) {
+      struct_name = "struct sockaddr_in";
+    }
+
+    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
+
+    /* Dump the field "sin_family". */
+    {
+      mmux_asciizcp_t	family_name = "unknown";
+
+      mmux_libc_sockaddr_ipfour_family_ref(&address_family, sockaddr_p);
+      sa_family_to_asciiz_name(&family_name, address_family);
+      if (mmux_libc_dprintf(mfd, "%s.sin_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name)) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin_addr". */
+    {
+      mmux_libc_ipfour_addr_t	ipfour_addr;
+      auto const	buflen = mmux_usize_literal(512);
+      char		bufptr[buflen.value];
+
+      mmux_libc_sockaddr_ipfour_addr_ref(ipfour_addr, sockaddr_p);
+      if (mmux_libc_inet_ntop(bufptr, buflen, address_family, ipfour_addr)) {
+	goto exit_function;
+      }
+      bufptr[buflen.value - 1] = '\0';
+      if (mmux_libc_dprintf(mfd, "%s.sin_addr = \"%s\"\n", struct_name, bufptr)) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin_port". */
+    {
+      mmux_libc_network_port_number_t	port;
+
+      mmux_libc_sockaddr_ipfour_port_ref(&port, sockaddr_p);
+      if (mmux_libc_dprintf(mfd, "%s.sin_port = 0x%X [network byteorder] (host byteorder: %u)\n",
+			    struct_name, port.value, ntohs(port.value))) {
+	goto exit_function;
+      }
+    }
+
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
+    }
+
+    rv = false;
   }
-
-  /* Dump the field "sin_addr". */
-  {
-    mmux_libc_network_address_family_t	family;
-    mmux_libc_ipfour_addr_t		addr;
-
-    auto const	provided_nchars = mmux_usize_literal(512);
-    char	presentation_buf[provided_nchars.value];
-
-    mmux_libc_sin_family_ref (&family, sockaddr_in_p);
-    mmux_libc_sin_addr_ref   (addr,    sockaddr_in_p);
-
-    mmux_libc_inet_ntop(presentation_buf, provided_nchars, family, addr);
-    presentation_buf[provided_nchars.value - 1] = '\0';
-    DPRINTF(fd, "%s.sin_addr = \"%s\"\n", struct_name, presentation_buf);
+ exit_function:
+  if (mmux_libc_close(mfd)) {
+    return true;
   }
-
-  /* Dump the field "sin_port". */
-  {
-    DPRINTF(fd, "%s.sin_port = \"%d\"\n", struct_name, (int)ntohs(sockaddr_in_p->sin_port));
-  }
-  return false;
+  return rv;
 }
 
 
@@ -1617,93 +1694,169 @@ mmux_libc_sockaddr_in_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_in_t const
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_sinsix_family_set (mmux_libc_sockaddr_in_t * P, mmux_libc_network_address_family_t new_field_value)
+mmux_libc_sockaddr_ipsix_family_set (mmux_libc_sockaddr_ipsix_t P, mmux_libc_network_address_family_t new_field_value)
 {
-  P->sinsix_family = new_field_value.value;
+  P->sin6_family = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_sinsix_family_ref (mmux_libc_network_address_family_t * field_value_result_p, mmux_libc_sockaddr_in_t const * P)
+mmux_libc_sockaddr_ipsix_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+				     mmux_libc_sockaddr_ipsix_arg_t P)
 {
-  *field_value_result_p = mmux_libc_network_address_family(P->sinsix_family);
-  return false;
-}
-
-
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_family,   libc_socket_address_family,  sinsix_family)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_addr,     libc_ipsix_addr,	      sipsix_addr)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_flowinfo, uint32,		      sinsix_flowinfo)
-DEFINE_STRUCT_SETTER_GETTER_SPLIT(sockaddr_insix, sin6_scope_id, uint32,		      sinsix_scope_id)
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_sinsix_port_set (mmux_libc_sockaddr_insix_t * const P, mmux_libc_host_byteorder_uint16_t host_byteorder_value)
-{
-  mmux_libc_network_byteorder_uint16_t	network_byteorder_value;
-
-  mmux_libc_htons(&network_byteorder_value, host_byteorder_value);
-  P->sin6_port = network_byteorder_value.value;
-  return false;
-}
-bool
-mmux_libc_sinsix_port_ref (mmux_libc_host_byteorder_uint16_t * result_host_byteorder_p, mmux_libc_sockaddr_insix_t const * const P)
-{
-  auto	network_byteorder_value = mmux_libc_network_byteorder_uint16( P->sin6_port );
-
-  mmux_libc_ntohs(result_host_byteorder_p, network_byteorder_value);
+  *field_value_result_p = mmux_libc_network_address_family(P->sin6_family);
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** sipsix_addr_pp, mmux_libc_sockaddr_insix_t const * sockaddr_p)
+mmux_libc_sockaddr_ipsix_addr_set (mmux_libc_sockaddr_ipsix_t P, mmux_libc_ipsix_addr_arg_t new_field_value)
 {
-  *sipsix_addr_pp = (mmux_libc_ipsix_addr_t *) &(sockaddr_p->sin6_addr);
+  P->sin6_addr = new_field_value->value[0];
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipsix_addr_ref (mmux_libc_ipsix_addr_t field_value_result, mmux_libc_sockaddr_ipsix_arg_t P)
+{
+  field_value_result->value[0] = P->sin6_addr;
   return false;
 }
 
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_insix_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_insix_t const * sockaddr_insix_p,
+mmux_libc_sockaddr_ipsix_flowinfo_set (mmux_libc_sockaddr_ipsix_t P, mmux_uint32_t new_field_value)
+{
+  P->sin6_flowinfo = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipsix_flowinfo_ref (mmux_uint32_t * field_value_result_p, mmux_libc_sockaddr_ipsix_arg_t P)
+{
+  *field_value_result_p = mmux_uint32(P->sin6_flowinfo);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_ipsix_scope_id_set (mmux_libc_sockaddr_ipsix_t P, mmux_uint32_t new_field_value)
+{
+  P->sin6_scope_id = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipsix_scope_id_ref (mmux_uint32_t * field_value_result_p, mmux_libc_sockaddr_ipsix_arg_t P)
+{
+  *field_value_result_p = mmux_uint32(P->sin6_scope_id);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_ipsix_port_set (mmux_libc_sockaddr_ipsix_t P, mmux_libc_network_port_number_t new_field_value)
+{
+  P->sin6_port = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port_number_t * field_value_result_p,
+				   mmux_libc_sockaddr_ipsix_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_port_number(mmux_libc_network_byteorder_uint16(P->sin6_port));
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipsix_arg_t sockaddr_p,
 			       mmux_asciizcp_t struct_name)
 {
-  if (NULL == struct_name) {
-    struct_name = "struct sockaddr_in6";
-  }
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
 
-  /* Dump the field "sin6_family". */
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
+  }
   {
-    auto		field_value = mmux_libc_network_address_family(sockaddr_insix_p->sin6_family);
-    mmux_asciizcp_t	sin6_name = "unknown";
+    mmux_libc_network_address_family_t	address_family;
 
-    sa_family_to_asciiz_name(&sin6_name, field_value);
-    DPRINTF(fd, "%s.sin6_family = \"", struct_name);
-    MMUX_LIBC_CALL(mmux_sshort_dprintf_p(fd->value, &field_value));
-    DPRINTF(fd, "\" (%s)\n", sin6_name);
+    if (NULL == struct_name) {
+      struct_name = "struct sockaddr_in6";
+    }
+
+    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
+
+    /* Dump the field "sin6_family". */
+    {
+      mmux_asciizcp_t	family_name = "unknown";
+
+      mmux_libc_sockaddr_ipsix_family_ref(&address_family, sockaddr_p);
+      sa_family_to_asciiz_name(&family_name, address_family);
+      if (mmux_libc_dprintf(mfd, "%s.sin6_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name)) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin6_addr". */
+    {
+      mmux_libc_ipsix_addr_t	ipsix_addr;
+      auto const	buflen = mmux_usize_literal(512);
+      char		bufptr[buflen.value];
+
+      mmux_libc_sockaddr_ipsix_addr_ref(ipsix_addr, sockaddr_p);
+      if (mmux_libc_inet_ntop(bufptr, buflen, address_family, ipsix_addr)) {
+	goto exit_function;
+      }
+      bufptr[buflen.value - 1] = '\0';
+      if (mmux_libc_dprintf(mfd, "%s.sin6_addr = \"%s\"\n", struct_name, bufptr)) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin6_flowinfo". */
+    {
+      if (mmux_libc_dprintf(mfd, "%s.sin6_flowinfo = \"%lu\"\n",
+			    struct_name, (mmux_standard_ulong_t)(sockaddr_p->sin6_flowinfo))) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin6_scope_id". */
+    {
+      if (mmux_libc_dprintf(mfd, "%s.sin6_scope_id = \"%lu\"\n",
+			    struct_name, (mmux_standard_ulong_t)(sockaddr_p->sin6_scope_id))) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the field "sin_port". */
+    {
+      mmux_libc_network_port_number_t	port;
+
+      mmux_libc_sockaddr_ipsix_port_ref(&port, sockaddr_p);
+      if (mmux_libc_dprintf(mfd, "%s.sin_port = 0x%X [network byteorder] (host byteorder: %u)\n",
+			    struct_name, port.value, ntohs(port.value))) {
+	goto exit_function;
+      }
+    }
+
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
+    }
+
+    rv = false;
   }
-
-  /* Dump the field "sin6_addr". */
-  {
-    mmux_libc_network_address_family_t	family;
-    mmux_libc_ipsix_addr_t *		addr_p;
-    auto const				provided_nchars = mmux_usize_literal(512);
-    char				bufptr[provided_nchars.value];
-
-    MMUX_LIBC_CALL(mmux_libc_sinsix_family_ref(&family, sockaddr_insix_p));
-    MMUX_LIBC_CALL(mmux_libc_sipsix_addr_p_ref(&addr_p, sockaddr_insix_p));
-    MMUX_LIBC_CALL(mmux_libc_inet_ntop(bufptr, provided_nchars, family, addr_p));
-    bufptr[provided_nchars.value - 1] = '\0';
-    DPRINTF(fd, "%s.sin6_addr = \"%s\"\n", struct_name, bufptr);
+ exit_function:
+  if (mmux_libc_close(mfd)) {
+    return true;
   }
-
-  DPRINTF(fd, "%s.sin6_flowinfo = \"%lu\"\n", struct_name, (mmux_standard_ulong_t)(sockaddr_insix_p->sin6_flowinfo));
-  DPRINTF(fd, "%s.sin6_scope_id = \"%lu\"\n", struct_name, (mmux_standard_ulong_t)(sockaddr_insix_p->sin6_scope_id));
-  DPRINTF(fd, "%s.sin6_port = \"%d\"\n",      struct_name, ntohs(sockaddr_insix_p->sin6_port));
-  return false;
+  return rv;
 }
+
+#if 0
 
 
 /** --------------------------------------------------------------------
@@ -1767,6 +1920,8 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * add
   if (NULL == struct_name) {
     struct_name = "struct addrinfo";
   }
+
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)addrinfo_p);
 
   /* Inspect the field: ai_flags */
   {
@@ -1885,15 +2040,15 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * add
     mmux_asciizcp_t	known_struct_name = "unknown struct type";
 
     switch (addrinfo_p->ai_addrlen) {
-    case sizeof(mmux_libc_sockaddr_in_t):
+    case sizeof(mmux_libc_sockaddr_ipfour_t):
       known_struct_name ="struct sockaddr_in";
       break;
 
-    case sizeof(mmux_libc_sockaddr_insix_t):
+    case sizeof(mmux_libc_sockaddr_ipsix_t):
       known_struct_name ="struct sockaddr_in6";
       break;
 
-    case sizeof(mmux_libc_sockaddr_un_t):
+    case sizeof(mmux_libc_sockaddr_local_t):
       known_struct_name ="struct sockaddr_un";
       break;
     }
@@ -2462,6 +2617,7 @@ mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_t const * linger_
   if (NULL == struct_name) {
     struct_name = "struct linger";
   }
+  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)linger_p);
   DPRINTF(fd, "%s.l_onoff  = \"%d\"\n", struct_name, linger_p->l_onoff);
   DPRINTF(fd, "%s.l_linger = \"%d\"\n", struct_name, linger_p->l_linger);
   return false;

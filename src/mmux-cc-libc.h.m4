@@ -190,21 +190,37 @@ typedef struct mmux_libc_network_database_network_t {
 
 /* ------------------------------------------------------------------ */
 
-/* This must be big enough to contain any "struct sockaddr_*" value. */
-typedef struct mmux_libc_sockaddr_t		{ mmux_uint8_t value[256];                             } mmux_libc_sockaddr_t;
+/* Make GCC stay silent about a data structure with no fields. */
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wpedantic\"")
+typedef struct mmux_libc_network_socket_address_t {
+} mmux_libc_network_socket_address_t;
+_Pragma("GCC diagnostic pop")
 
-typedef struct mmux_libc_addrinfo_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_ADDRINFO];       } mmux_libc_addrinfo_t;
-typedef struct mmux_libc_sockaddr_un_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_UN];    } mmux_libc_sockaddr_un_t;
-typedef struct mmux_libc_sockaddr_in_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN];    } mmux_libc_sockaddr_in_t;
-typedef struct mmux_libc_sockaddr_insix_t	{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN6];   } mmux_libc_sockaddr_insix_t;
-typedef struct mmux_libc_linger_t		{ mmux_uint8_t value[MMUX_LIBC_SIZEOF_LINGER];         } mmux_libc_linger_t;
+typedef struct mmux_libc_network_socket_address_local_t {
+  mmux_libc_network_socket_address_t;
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_UN];
+} mmux_libc_network_socket_address_local_t;
 
-typedef mmux_libc_addrinfo_t *		mmux_libc_addrinfo_ptr_t;
-typedef mmux_libc_sockaddr_t *		mmux_libc_sockaddr_ptr_t;
-typedef mmux_libc_sockaddr_un_t *	mmux_libc_sockaddr_un_ptr_t;
-typedef mmux_libc_sockaddr_in_t *	mmux_libc_sockaddr_in_ptr_t;
-typedef mmux_libc_sockaddr_insix_t *	mmux_libc_sockaddr_insix_ptr_t;
-typedef mmux_libc_linger_t *		mmux_libc_linger_ptr_t;
+typedef struct mmux_libc_network_socket_address_ipfour_t {
+  mmux_libc_network_socket_address_t;
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN];
+} mmux_libc_network_socket_address_ipfour_t;
+
+typedef struct mmux_libc_network_socket_address_ipsix_t {
+  mmux_libc_network_socket_address_t;
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN6];
+} mmux_libc_network_socket_address_ipsix_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_network_socket_address_info_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_ADDRINFO];
+} mmux_libc_network_socket_address_info_t;
+
+typedef struct mmux_libc_network_socket_address_linger_option_t {
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_LINGER];
+} mmux_libc_network_socket_address_linger_option_t;
 
 
 /** --------------------------------------------------------------------

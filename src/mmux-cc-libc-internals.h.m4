@@ -391,19 +391,37 @@ typedef struct mmux_libc_network_database_network_t {
 
 /* ------------------------------------------------------------------ */
 
-typedef struct addrinfo				mmux_libc_addrinfo_t;
-typedef struct sockaddr				mmux_libc_sockaddr_t;
-typedef struct sockaddr_un			mmux_libc_sockaddr_un_t;
-typedef struct sockaddr_in			mmux_libc_sockaddr_in_t;
-typedef struct sockaddr_in6			mmux_libc_sockaddr_insix_t;
-typedef struct linger				mmux_libc_linger_t;
+/* Make GCC stay silent about a data structure with no fields. */
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wpedantic\"")
+typedef struct mmux_libc_network_socket_address_t {
+} mmux_libc_network_socket_address_t;
+_Pragma("GCC diagnostic pop")
 
-typedef mmux_libc_addrinfo_t *			mmux_libc_addrinfo_ptr_t;
-typedef mmux_libc_sockaddr_t *			mmux_libc_sockaddr_ptr_t;
-typedef mmux_libc_sockaddr_un_t *		mmux_libc_sockaddr_un_ptr_t;
-typedef mmux_libc_sockaddr_in_t *		mmux_libc_sockaddr_in_ptr_t;
-typedef mmux_libc_sockaddr_insix_t *		mmux_libc_sockaddr_insix_ptr_t;
-typedef mmux_libc_linger_t *			mmux_libc_linger_ptr_t;
+typedef struct mmux_libc_network_socket_address_local_t {
+  mmux_libc_network_socket_address_t;
+  struct sockaddr_un;
+} mmux_libc_network_socket_address_local_t;
+
+typedef struct mmux_libc_network_socket_address_ipfour_t {
+  mmux_libc_network_socket_address_t;
+  struct sockaddr_in;
+} mmux_libc_network_socket_address_ipfour_t;
+
+typedef struct mmux_libc_network_socket_address_ipsix_t {
+  mmux_libc_network_socket_address_t;
+  struct sockaddr_in6;
+} mmux_libc_network_socket_address_ipsix_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_network_socket_address_info_t {
+  struct addrinfo;
+} mmux_libc_network_socket_address_info_t;
+
+typedef struct mmux_libc_network_socket_address_linger_option_t {
+  struct linger;
+} mmux_libc_network_socket_address_linger_option_t;
 
 
 /** --------------------------------------------------------------------
