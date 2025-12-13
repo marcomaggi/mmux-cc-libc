@@ -16070,6 +16070,12 @@ mmux_libc_sockfd_t  server_sockfd;
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_sockaddr_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_arg_t @vari{sockaddr}, mmux_libc_sockaddr_arg_t @varii{sockaddr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
+equal when compared field--by--field; otherwise store @cfalse{}.
+@end deftypefun
+
 @c page
 @node networking addresses sockets local
 @subsubsection Local networking socket address
@@ -16314,6 +16320,12 @@ mmux_libc_sockfd_t  server_sockfd;
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_sockaddr_local_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_local_arg_t @vari{sockaddr}, mmux_libc_sockaddr_local_arg_t @varii{sockaddr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
+equal when compared field--by--field; otherwise store @cfalse{}.
+@end deftypefun
+
 @c page
 @node networking addresses sockets ipfour
 @subsubsection @emph{Internet Protocol} version four socket address
@@ -16542,6 +16554,12 @@ mmux_libc_sockfd_t  server_sockfd;
   @}
 @}
 @end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipfour_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_ipfour_arg_t @vari{sockaddr}, mmux_libc_sockaddr_ipfour_arg_t @varii{sockaddr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
+equal when compared field--by--field; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page
@@ -16794,6 +16812,12 @@ mmux_libc_sockfd_t  server_sockfd;
   @}
 @}
 @end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipsix_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_ipsix_arg_t @vari{sockaddr}, mmux_libc_sockaddr_ipsix_arg_t @varii{sockaddr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
+equal when compared field--by--field; otherwise store @cfalse{}.
 @end deftypefun
 
 @c page

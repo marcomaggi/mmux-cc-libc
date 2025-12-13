@@ -3106,6 +3106,11 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_sockaddr_equal (bool * are_equal_result_p,
+						 mmux_libc_sockaddr_arg_t sockaddr_1,
+						 mmux_libc_sockaddr_arg_t sockaddr_2)
+  __attribute__((__nonnull__(1,2,3)));
+
 
 /** --------------------------------------------------------------------
  ** Networking-socket addresses: local address.
@@ -3144,6 +3149,11 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_local_dump (mmux_libc_fd_arg_t fd,
 						      mmux_libc_sockaddr_local_arg_t sockaddr_un_p,
 						      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_local_equal (bool * are_equal_result_p,
+						       mmux_libc_sockaddr_local_arg_t sockaddr_local_1,
+						       mmux_libc_sockaddr_local_arg_t sockaddr_local_2)
+  __attribute__((__nonnull__(1,2,3)));
 
 
 /** --------------------------------------------------------------------
@@ -3192,6 +3202,11 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t fd,
 						       mmux_libc_sockaddr_ipfour_arg_t sockaddr_in_p,
 						       mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_equal (bool * are_equal_result_p,
+							mmux_libc_sockaddr_ipfour_arg_t sockaddr_ipfour_1,
+							mmux_libc_sockaddr_ipfour_arg_t sockaddr_ipfour_2)
+  __attribute__((__nonnull__(1,2,3)));
 
 
 /** --------------------------------------------------------------------
@@ -3260,6 +3275,11 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t fd,
 						      mmux_libc_sockaddr_ipsix_arg_t sockaddr_p,
 						      mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
+						       mmux_libc_sockaddr_ipsix_arg_t sockaddr_ipsix_1,
+						       mmux_libc_sockaddr_ipsix_arg_t sockaddr_ipsix_2)
+  __attribute__((__nonnull__(1,2,3)));
 
 
 /** --------------------------------------------------------------------

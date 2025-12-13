@@ -24,6 +24,8 @@ static void
 test_sockaddr_local (void)
 {
   printf_message("testing: %s", __func__);
+
+  /* Instantiate and inspect a sockaddr_local. */
   {
     mmux_libc_sockaddr_local_t	sockaddr_local;
 
@@ -155,6 +157,165 @@ test_sockaddr_local (void)
       }
     }
   }
+
+  /* Compare objects of type sockaddr_local. */
+  {
+    /* Compare equal sockaddr_local objects. */
+    {
+      mmux_libc_sockaddr_local_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_fs_ptn_t		fs_ptn;
+
+	/* Build socket's file system pathname. */
+	{
+	  mmux_asciizcp_t		ptn_asciiz = "/path/to/socket.sock";
+	  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	  if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) {
+	    handle_error();
+	  }
+	}
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_local_family_set(sockaddr1, MMUX_LIBC_AF_LOCAL)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_family_set(sockaddr2, MMUX_LIBC_AF_LOCAL)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_path_set(sockaddr1, fs_ptn)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_path_set(sockaddr2, fs_ptn)) {
+	    handle_error();
+	  }
+	}
+
+	/* Local cleanup. */
+	{
+	  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_local. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_local_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal local socket addresses as sockaddr_local");
+	} else {
+	  printf_error("wrongly different local socket addresses as sockaddr_local");
+	  handle_error();
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal local socket addresses as sockaddr");
+	} else {
+	  printf_error("wrongly different local socket addresses as sockaddr");
+	  handle_error();
+	}
+      }
+    }
+
+    /* Compare different sockaddr_local objects. */
+    {
+      mmux_libc_sockaddr_local_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_fs_ptn_t		fs_ptn1, fs_ptn2;
+
+	/* Build socket's file system pathname. */
+	{
+	  mmux_asciizcp_t		ptn_asciiz1 = "/path/to/socket.one";
+	  mmux_asciizcp_t		ptn_asciiz2 = "/path/to/socket.two";
+	  mmux_libc_fs_ptn_factory_t	fs_ptn_factory;
+
+	  mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+	  if (mmux_libc_make_file_system_pathname(fs_ptn1, fs_ptn_factory, ptn_asciiz1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_make_file_system_pathname(fs_ptn2, fs_ptn_factory, ptn_asciiz2)) {
+	    handle_error();
+	  }
+	}
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_local_family_set(sockaddr1, MMUX_LIBC_AF_LOCAL)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_family_set(sockaddr2, MMUX_LIBC_AF_LOCAL)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_path_set(sockaddr1, fs_ptn1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_local_path_set(sockaddr2, fs_ptn2)) {
+	    handle_error();
+	  }
+	}
+
+	/* Local cleanup. */
+	{
+	  if (mmux_libc_unmake_file_system_pathname(fs_ptn1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_unmake_file_system_pathname(fs_ptn2)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_local. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_local_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal local socket addresses as sockaddr_local");
+	  handle_error();
+	} else {
+	  printf_message("correctly different local socket addresses as sockaddr_local");
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal local socket addresses as sockaddr");
+	  handle_error();
+	} else {
+	  printf_message("correctly different local socket addresses as sockaddr");
+	}
+      }
+    }
+  }
+
   printf_message("DONE: %s\n", __func__);
 }
 
@@ -290,6 +451,237 @@ test_sockaddr_ipfour (void)
       }
     }
   }
+
+  /* Compare objects of type sockaddr_ipfour. */
+  {
+    /* Compare equal sockaddr_ipfour objects. */
+    {
+      mmux_libc_sockaddr_ipfour_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipfour_addr_t			ipaddr;
+	mmux_libc_network_port_number_t		ipport;
+
+	/* Build the IPv4 address. */
+	{
+	  mmux_asciizcp_t	dotted_quad = "127.0.0.1";
+
+	  if (mmux_libc_make_ipfour_addr_from_asciiz(ipaddr, dotted_quad)) {
+	    handle_error();
+	  }
+	}
+
+	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr1, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr2, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr1, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr2, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr1, ipport)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr2, ipport)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipfour. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipfour_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal ipfour socket addresses as sockaddr_ipfour");
+	} else {
+	  printf_error("wrongly different ipfour socket addresses as sockaddr_ipfour");
+	  handle_error();
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal ipfour socket addresses as sockaddr");
+	} else {
+	  printf_error("wrongly different ipfour socket addresses as sockaddr");
+	  handle_error();
+	}
+      }
+    }
+
+    /* Compare sockaddr_ipfour objects, different by IP address. */
+    {
+      mmux_libc_sockaddr_ipfour_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipfour_addr_t			ipaddr1, ipaddr2;
+	mmux_libc_network_port_number_t		ipport;
+
+	/* Build the IPv4 address. */
+	{
+	  mmux_asciizcp_t	dotted_quad1 = "127.0.0.1";
+	  mmux_asciizcp_t	dotted_quad2 = "127.0.0.2";
+
+	  if (mmux_libc_make_ipfour_addr_from_asciiz(ipaddr1, dotted_quad1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_make_ipfour_addr_from_asciiz(ipaddr2, dotted_quad2)) {
+	    handle_error();
+	  }
+	}
+
+	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr1, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr2, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr1, ipaddr1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr2, ipaddr2)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr1, ipport)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr2, ipport)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipfour. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipfour_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipfour socket addresses as sockaddr_ipfour");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipfour socket addresses as sockaddr_ipfour");
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipfour socket addresses as sockaddr");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipfour socket addresses as sockaddr");
+	}
+      }
+    }
+
+    /* Compare sockaddr_ipfour objects, different by IP port. */
+    {
+      mmux_libc_sockaddr_ipfour_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipfour_addr_t			ipaddr;
+	mmux_libc_network_port_number_t		ipport1, ipport2;
+
+	/* Build the IPv4 address. */
+	{
+	  mmux_asciizcp_t	dotted_quad = "127.0.0.1";
+
+	  if (mmux_libc_make_ipfour_addr_from_asciiz(ipaddr, dotted_quad)) {
+	    handle_error();
+	  }
+	}
+
+	ipport1 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport2 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(80));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr1, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_family_set(sockaddr2, MMUX_LIBC_AF_INET)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr1, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_addr_set(sockaddr2, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr1, ipport1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr2, ipport2)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipfour. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipfour_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipfour socket addresses as sockaddr_ipfour");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipfour socket addresses as sockaddr_ipfour");
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipfour socket addresses as sockaddr");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipfour socket addresses as sockaddr");
+	}
+      }
+    }
+  }
+
   printf_message("DONE: %s\n", __func__);
 }
 
@@ -307,7 +699,7 @@ test_sockaddr_ipsix (void)
 
       /* Build the IPv6 address. */
       {
-	mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+	mmux_asciizcp_t		presentation = "1:2:3:4:5:6:7:8";
 
 	if (mmux_libc_make_ipsix_addr_from_asciiz(address_ipsix, presentation)) {
 	  handle_error();
@@ -398,7 +790,7 @@ test_sockaddr_ipsix (void)
 	handle_error();
       }
       {
-	mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+	mmux_asciizcp_t		presentation = "1:2:3:4:5:6:7:8";
 
 	if (mmux_libc_make_ipsix_addr_from_asciiz(expected_address_ipsix, presentation)) {
 	  handle_error();
@@ -431,6 +823,267 @@ test_sockaddr_ipsix (void)
       }
     }
   }
+
+  /* Compare objects of type sockaddr_ipsix. */
+  {
+    /* Compare equal sockaddr_ipsix objects. */
+    {
+      mmux_libc_sockaddr_ipsix_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipsix_addr_t			ipaddr;
+	mmux_libc_network_port_number_t		ipport;
+
+	/* Build the IPv6 address. */
+	{
+	  mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+
+	  if (mmux_libc_make_ipsix_addr_from_asciiz(ipaddr, presentation)) {
+	    handle_error();
+	  }
+	}
+
+	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr1, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr2, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr1, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr2, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr1, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr1, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr1, ipport)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr2, ipport)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipsix. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipsix_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal ipsix socket addresses as sockaddr_ipsix");
+	} else {
+	  printf_error("wrongly different ipsix socket addresses as sockaddr_ipsix");
+	  handle_error();
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal ipsix socket addresses as sockaddr");
+	} else {
+	  printf_error("wrongly different ipsix socket addresses as sockaddr");
+	  handle_error();
+	}
+      }
+    }
+
+    /* Compare sockaddr_ipsix objects, different by IP address. */
+    {
+      mmux_libc_sockaddr_ipsix_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipsix_addr_t			ipaddr1, ipaddr2;
+	mmux_libc_network_port_number_t		ipport;
+
+	/* Build the IPv6 address. */
+	{
+	  mmux_asciizcp_t	presentation1 = "1:2:3:4:5:6:7:8";
+	  mmux_asciizcp_t	presentation2 = "1:2:3:4:5:6:7:0";
+
+	  if (mmux_libc_make_ipsix_addr_from_asciiz(ipaddr1, presentation1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_make_ipsix_addr_from_asciiz(ipaddr2, presentation2)) {
+	    handle_error();
+	  }
+	}
+
+	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr1, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr2, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr1, ipaddr1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr2, ipaddr2)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr1, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr1, ipport)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr2, ipport)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipsix. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipsix_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipsix socket addresses as sockaddr_ipsix");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipsix socket addresses as sockaddr_ipsix");
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipsix socket addresses as sockaddr");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipsix socket addresses as sockaddr");
+	}
+      }
+    }
+
+    /* Compare sockaddr_ipsix objects, different by IP port. */
+    {
+      mmux_libc_sockaddr_ipsix_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	mmux_libc_ipsix_addr_t			ipaddr;
+	mmux_libc_network_port_number_t		ipport1, ipport2;
+
+	/* Build the IPv6 address. */
+	{
+	  mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+
+	  if (mmux_libc_make_ipsix_addr_from_asciiz(ipaddr, presentation)) {
+	    handle_error();
+	  }
+	}
+
+	ipport1 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport2 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(80));
+
+	/* Initialise the fields. */
+	{
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr1, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_family_set(sockaddr2, MMUX_LIBC_AF_INET6)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr1, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr2, ipaddr)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr1, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr2, mmux_uint32_constant_zero())) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr1, ipport1)) {
+	    handle_error();
+	  }
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr2, ipport2)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      /* Compare the objects as sockaddr_ipsix. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_ipsix_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipsix socket addresses as sockaddr_ipsix");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipsix socket addresses as sockaddr_ipsix");
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_error("wrongly equal ipsix socket addresses as sockaddr");
+	  handle_error();
+	} else {
+	  printf_message("correctly different ipsix socket addresses as sockaddr");
+	}
+      }
+    }
+  }
+
   printf_message("DONE: %s\n", __func__);
 }
 

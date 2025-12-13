@@ -1547,7 +1547,52 @@ mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_arg_t sockadd
       return mmux_libc_sockaddr_local_dump(fd, (mmux_libc_network_socket_address_local_t  const *) sockaddr_p,
 					   ((given_struct_name)? struct_name : given_struct_name));
     default:
-      return false;
+      return true;
+    }
+  }
+}
+
+bool
+mmux_libc_sockaddr_equal (bool * are_equal_result_p,
+			  mmux_libc_sockaddr_arg_t sockaddr_1,
+			  mmux_libc_sockaddr_arg_t sockaddr_2)
+{
+  mmux_libc_network_address_family_t	family1, family2;
+
+  mmux_libc_sockaddr_family_ref(&family1, sockaddr_1);
+  mmux_libc_sockaddr_family_ref(&family2, sockaddr_2);
+
+  if (family1.value != family2.value) {
+    *are_equal_result_p = false;
+    return false;
+  } else {
+    switch (family1.value) {
+    case MMUX_LIBC_VALUEOF_AF_INET:
+      {
+	auto	sockaddr_ipfour_1 = (mmux_libc_network_socket_address_ipfour_t *) sockaddr_1;
+	auto	sockaddr_ipfour_2 = (mmux_libc_network_socket_address_ipfour_t *) sockaddr_2;
+
+	return mmux_libc_sockaddr_ipfour_equal(are_equal_result_p, sockaddr_ipfour_1, sockaddr_ipfour_2);
+      }
+
+    case MMUX_LIBC_VALUEOF_AF_INET6:
+      {
+	auto	sockaddr_ipsix_1 = (mmux_libc_network_socket_address_ipsix_t *) sockaddr_1;
+	auto	sockaddr_ipsix_2 = (mmux_libc_network_socket_address_ipsix_t *) sockaddr_2;
+
+	return mmux_libc_sockaddr_ipsix_equal(are_equal_result_p, sockaddr_ipsix_1, sockaddr_ipsix_2);
+      }
+
+    case MMUX_LIBC_VALUEOF_AF_LOCAL:
+      {
+	auto	sockaddr_local_1 = (mmux_libc_network_socket_address_local_t *) sockaddr_1;
+	auto	sockaddr_local_2 = (mmux_libc_network_socket_address_local_t *) sockaddr_2;
+
+	return mmux_libc_sockaddr_local_equal(are_equal_result_p, sockaddr_local_1, sockaddr_local_2);
+      }
+
+    default:
+      return true;
     }
   }
 }
@@ -1610,7 +1655,8 @@ mmux_libc_sockaddr_local_bind_length (mmux_usize_t * sockaddr_local_length_resul
   return false;
 }
 bool
-mmux_libc_sockaddr_local_alloc_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
+mmux_libc_sockaddr_local_alloc_length (mmux_usize_t * sockaddr_local_length_result_p,
+				       mmux_libc_sockaddr_local_arg_t P MMUX_CC_LIBC_UNUSED)
 {
   *sockaddr_local_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_local_t));
   return false;
@@ -1636,6 +1682,37 @@ mmux_libc_sockaddr_local_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_local_a
   }
 
   DPRINTF(fd, "%s.sun_path = \"%s\"\n", struct_name, sockaddr_local_p->sun_path);
+  return false;
+}
+
+bool
+mmux_libc_sockaddr_local_equal (bool * are_equal_result_p,
+				mmux_libc_sockaddr_local_arg_t sockaddr_local_1,
+				mmux_libc_sockaddr_local_arg_t sockaddr_local_2)
+{
+  /* Compare the fields: family. */
+  {
+    mmux_libc_network_address_family_t	family1, family2;
+
+    mmux_libc_sockaddr_local_family_ref(&family1, sockaddr_local_1);
+    mmux_libc_sockaddr_local_family_ref(&family2, sockaddr_local_2);
+    if (family1.value != family2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: path. */
+  {
+    if (strcmp(sockaddr_local_1->sun_path, sockaddr_local_2->sun_path)) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  *are_equal_result_p = true;
+
+ return_from_function:
   return false;
 }
 
@@ -1775,6 +1852,61 @@ mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipfo
     return true;
   }
   return rv;
+}
+
+bool
+mmux_libc_sockaddr_ipfour_equal (bool * are_equal_result_p,
+				 mmux_libc_sockaddr_ipfour_arg_t sockaddr_ipfour_1,
+				 mmux_libc_sockaddr_ipfour_arg_t sockaddr_ipfour_2)
+{
+  /* Compare the fields: family. */
+  {
+    mmux_libc_network_address_family_t	family1, family2;
+
+    mmux_libc_sockaddr_ipfour_family_ref(&family1, sockaddr_ipfour_1);
+    mmux_libc_sockaddr_ipfour_family_ref(&family2, sockaddr_ipfour_2);
+    if (family1.value != family2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: addr. */
+  {
+    mmux_libc_ipfour_addr_t	ipaddr1, ipaddr2;
+    bool			are_equal;
+
+    if (mmux_libc_sockaddr_ipfour_addr_ref(ipaddr1, sockaddr_ipfour_1)) {
+      return true;
+    }
+    if (mmux_libc_sockaddr_ipfour_addr_ref(ipaddr2, sockaddr_ipfour_2)) {
+      return true;
+    }
+    if (mmux_libc_ipfour_addr_equal(&are_equal, ipaddr1, ipaddr2)) {
+      return true;
+    }
+    if (false == are_equal) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: port. */
+  {
+    mmux_libc_network_port_number_t	port1, port2;
+
+    mmux_libc_sockaddr_ipfour_port_ref(&port1, sockaddr_ipfour_1);
+    mmux_libc_sockaddr_ipfour_port_ref(&port2, sockaddr_ipfour_2);
+    if (port1.value != port2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  *are_equal_result_p = true;
+
+ return_from_function:
+  return false;
 }
 
 
@@ -1974,6 +2106,85 @@ mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipsix
     return true;
   }
   return rv;
+}
+
+bool
+mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
+				mmux_libc_sockaddr_ipsix_arg_t sockaddr_ipsix_1,
+				mmux_libc_sockaddr_ipsix_arg_t sockaddr_ipsix_2)
+{
+  /* Compare the fields: family. */
+  {
+    mmux_libc_network_address_family_t	family1, family2;
+
+    mmux_libc_sockaddr_ipsix_family_ref(&family1, sockaddr_ipsix_1);
+    mmux_libc_sockaddr_ipsix_family_ref(&family2, sockaddr_ipsix_2);
+    if (family1.value != family2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: addr. */
+  {
+    mmux_libc_ipsix_addr_t	ipaddr1, ipaddr2;
+    bool			are_equal;
+
+    if (mmux_libc_sockaddr_ipsix_addr_ref(ipaddr1, sockaddr_ipsix_1)) {
+      return true;
+    }
+    if (mmux_libc_sockaddr_ipsix_addr_ref(ipaddr2, sockaddr_ipsix_2)) {
+      return true;
+    }
+    if (mmux_libc_ipsix_addr_equal(&are_equal, ipaddr1, ipaddr2)) {
+      return true;
+    }
+    if (false == are_equal) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: flowinfo. */
+  {
+    mmux_uint32_t	flowinfo1, flowinfo2;
+
+    mmux_libc_sockaddr_ipsix_flowinfo_ref(&flowinfo1, sockaddr_ipsix_1);
+    mmux_libc_sockaddr_ipsix_flowinfo_ref(&flowinfo2, sockaddr_ipsix_2);
+    if (flowinfo1.value != flowinfo2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: scope_id. */
+  {
+    mmux_uint32_t	scope_id1, scope_id2;
+
+    mmux_libc_sockaddr_ipsix_scope_id_ref(&scope_id1, sockaddr_ipsix_1);
+    mmux_libc_sockaddr_ipsix_scope_id_ref(&scope_id2, sockaddr_ipsix_2);
+    if (scope_id1.value != scope_id2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  /* Compare the fields: port. */
+  {
+    mmux_libc_network_port_number_t	port1, port2;
+
+    mmux_libc_sockaddr_ipsix_port_ref(&port1, sockaddr_ipsix_1);
+    mmux_libc_sockaddr_ipsix_port_ref(&port2, sockaddr_ipsix_2);
+    if (port1.value != port2.value) {
+      *are_equal_result_p = false;
+      goto return_from_function;
+    }
+  }
+
+  *are_equal_result_p = true;
+
+ return_from_function:
+  return false;
 }
 
 #if 0
