@@ -15026,8 +15026,6 @@ mmux_libc_dprintfer("network byteorder uint32 is '0x%x', corresponding host byte
 @menu
 * networking addresses address family::   Networking address families.
 * networking addresses protocol family::  Networking protocol families.
-* networking addresses protocol number::  Networking protocol numbers.
-* networking addresses port number::      Networking port numbers.
 * networking addresses ip::               @emph{Internet Protocol} addresses.
 * networking addresses sockets::          Networking socket addresses.
 @end menu
@@ -15158,8 +15156,24 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 @MmuxDefineNetworkingAddressProtocolConstant{PF_UNSPEC}
 
 @c page
-@node networking addresses protocol number
-@subsection Networking protocol numbers
+@node networking addresses ip
+@subsection @emph{Internet Protocol} addresses
+
+
+@menu
+* networking addresses ip protocol number::  @emph{Internet Protocol} numbers.
+* networking addresses ip port number::      @emph{Internet Protocol} port numbers.
+* networking addresses ip base::             Base @emph{Internet Protocol} address type.
+* networking addresses ip four::             @emph{Internet Protocol} address format IPv4.
+* networking addresses ip six::              @emph{Internet Protocol} address format IPv6.
+* networking addresses ip strings::          Converting @emph{Internet Protocol} between
+                                             binary and string representation.
+* networking addresses ip ops::              Operations on @emph{Internet Protocol} addresses.
+@end menu
+
+@c page
+@node networking addresses ip protocol number
+@subsubsection @emph{Internet Protocol} numbers.
 
 
 According to the standard: the constants @samp{IPPROTO_IP}, @samp{IPPROTO_TCP}, @samp{IPPROTO_UDP},
@@ -15230,14 +15244,14 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 @MmuxDefineNetworkingAddressProtocolNumberConstant{IPPROTO_UDPLITE}
 
 @c page
-@node networking addresses port number
-@subsection Networking port numbers
+@node networking addresses ip port number
+@subsubsection @emph{Internet Protocol} port numbers
 
 
 @deftp {Struct Typedef} mmux_libc_network_port_number_t
 @deftpx {Parent Struct Typedef} mmux_libc_network_byteorder_uint16_t
-Data structure type representing networking port numbers stored in network byteorder, which is
-big--endian.
+Data structure type representing @emph{Internet Protocol} port numbers stored in network byteorder,
+which is big--endian.
 @end deftp
 
 
@@ -15301,19 +15315,11 @@ auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 @end example
 @end deftypefn
 
-@c page
-@node networking addresses ip
-@subsection @emph{Internet Protocol} addresses
 
-
-@menu
-* networking addresses ip base::        Base @emph{Internet Protocol} address type.
-* networking addresses ip four::        @emph{Internet Protocol} address format IPv4.
-* networking addresses ip six::         @emph{Internet Protocol} address format IPv6.
-* networking addresses ip strings::     Converting @emph{Internet Protocol} between
-                                        binary and string representation.
-* networking addresses ip ops::         Operations on @emph{Internet Protocol} addresses.
-@end menu
+@deftypefun bool mmux_libc_network_port_number_equal (bool * @var{are_equal_result_p}, mmux_libc_network_port_number_t @vari{port}, mmux_libc_network_port_number_t @varii{port})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} if the port numbers are equal;
+otherwise store @cfalse{}.
+@end deftypefun
 
 @c page
 @node networking addresses ip base
@@ -16364,9 +16370,7 @@ mmux_libc_sockaddr_ipfour_t  sockaddr_ipfour;
       /* error */
     @}
     @{
-      /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-      auto  port_num = mmux_libc_host_byteorder_uint16_literal(25);
-      auto  port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+      auto  port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
       if (mmux_libc_sockaddr_ipfour_port_set(sockaddr_ipfour, port)) @{
         /* error */
@@ -16600,11 +16604,9 @@ mmux_libc_sockaddr_ipsix_t  sockaddr_ipsix;
       /* error */
     @}
     @{
-      /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-      auto  port_num = mmux_libc_host_byteorder_uint16_literal(25);
-      auto  port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+      auto  ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
-      if (mmux_libc_sockaddr_ipsix_port_set(sockaddr_ipsix, port)) @{
+      if (mmux_libc_sockaddr_ipsix_port_set(sockaddr_ipsix, ipport)) @{
         /* error */
       @}
     @}

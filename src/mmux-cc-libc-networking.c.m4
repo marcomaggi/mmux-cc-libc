@@ -412,6 +412,14 @@ mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorde
   return (mmux_libc_network_port_number_t) { .value = network_byteorder_value.value };
 }
 
+bool
+mmux_libc_network_port_number_equal (bool * are_equal,
+				     mmux_libc_network_port_number_t port1,
+				     mmux_libc_network_port_number_t port2)
+{
+  return mmux_uint16_equal_p(are_equal, &port1, &port2);
+}
+
 
 /** --------------------------------------------------------------------
  ** Interface naming.
@@ -2151,7 +2159,7 @@ mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
 
     mmux_libc_sockaddr_ipsix_flowinfo_ref(&flowinfo1, sockaddr_ipsix_1);
     mmux_libc_sockaddr_ipsix_flowinfo_ref(&flowinfo2, sockaddr_ipsix_2);
-    if (flowinfo1.value != flowinfo2.value) {
+    if (mmux_uint32_not_equal(flowinfo1, flowinfo2)) {
       *are_equal_result_p = false;
       goto return_from_function;
     }
@@ -2163,7 +2171,7 @@ mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
 
     mmux_libc_sockaddr_ipsix_scope_id_ref(&scope_id1, sockaddr_ipsix_1);
     mmux_libc_sockaddr_ipsix_scope_id_ref(&scope_id2, sockaddr_ipsix_2);
-    if (scope_id1.value != scope_id2.value) {
+    if (mmux_uint32_not_equal(scope_id1, scope_id2)) {
       *are_equal_result_p = false;
       goto return_from_function;
     }
@@ -2172,10 +2180,12 @@ mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
   /* Compare the fields: port. */
   {
     mmux_libc_network_port_number_t	port1, port2;
+    bool				are_equal;
 
     mmux_libc_sockaddr_ipsix_port_ref(&port1, sockaddr_ipsix_1);
     mmux_libc_sockaddr_ipsix_port_ref(&port2, sockaddr_ipsix_2);
-    if (port1.value != port2.value) {
+    mmux_libc_network_port_number_equal(&are_equal, port1, port2);
+    if (false == are_equal) {
       *are_equal_result_p = false;
       goto return_from_function;
     }

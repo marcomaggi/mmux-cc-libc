@@ -2725,6 +2725,13 @@ mmux_libc_network_interface_index (mmux_standard_uint_t value)
   return (mmux_libc_network_interface_index_t) { .value = value };
 }
 
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_network_port_number_equal (bool * are_equal,
+							    mmux_libc_network_port_number_t port1,
+							    mmux_libc_network_port_number_t port2)
+  __attribute__((__nonnull__(1)));
+
 
 /** --------------------------------------------------------------------
  ** Networking sockets: byte-order conversion.

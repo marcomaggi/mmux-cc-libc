@@ -350,10 +350,9 @@ test_sockaddr_ipfour (void)
 	}
 	{
 	  /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-          auto	port_num = mmux_libc_host_byteorder_uint16_literal(25);
-	  auto	port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+	  auto	ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
-	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr_ipfour, port)) {
+	  if (mmux_libc_sockaddr_ipfour_port_set(sockaddr_ipfour, ipport)) {
 	    handle_error();
 	  }
 	}
@@ -436,8 +435,7 @@ test_sockaddr_ipfour (void)
 
     /* Extract and check the port number. */
     {
-      auto	expected_port_num = mmux_libc_host_byteorder_uint16_literal(25);
-      auto	expected_port     = mmux_libc_network_port_number_from_host_byteorder_value(expected_port_num);
+      auto	expected_port = mmux_libc_network_port_number_from_host_byteorder_literal(25);
       mmux_libc_network_port_number_t	field_port;
 
       if (mmux_libc_sockaddr_ipfour_port_ref(&field_port, sockaddr_ipfour)) {
@@ -472,7 +470,7 @@ test_sockaddr_ipfour (void)
 	  }
 	}
 
-	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
 	/* Initialise the fields. */
 	{
@@ -550,7 +548,7 @@ test_sockaddr_ipfour (void)
 	  }
 	}
 
-	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
 	/* Initialise the fields. */
 	{
@@ -624,8 +622,8 @@ test_sockaddr_ipfour (void)
 	  }
 	}
 
-	ipport1 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
-	ipport2 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(80));
+	ipport1 = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+	ipport2 = mmux_libc_network_port_number_from_host_byteorder_literal(80);
 
 	/* Initialise the fields. */
 	{
@@ -716,8 +714,7 @@ test_sockaddr_ipsix (void)
 	}
 	{
 	  /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
-          auto	port_num = mmux_libc_host_byteorder_uint16_literal(25);
-	  auto	port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+	  auto	port     = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
 	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr_ipsix, port)) {
 	    handle_error();
@@ -808,8 +805,7 @@ test_sockaddr_ipsix (void)
 
     /* Extract and check the port number. */
     {
-      auto	expected_port_num = mmux_libc_host_byteorder_uint16_literal(25);
-      auto	expected_port     = mmux_libc_network_port_number_from_host_byteorder_value(expected_port_num);
+      auto	expected_port     = mmux_libc_network_port_number_from_host_byteorder_literal(25);
       mmux_libc_network_port_number_t	field_port;
 
       if (mmux_libc_sockaddr_ipsix_port_ref(&field_port, sockaddr_ipsix)) {
@@ -844,7 +840,7 @@ test_sockaddr_ipsix (void)
 	  }
 	}
 
-	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
 	/* Initialise the fields. */
 	{
@@ -934,7 +930,7 @@ test_sockaddr_ipsix (void)
 	  }
 	}
 
-	ipport = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
+	ipport = mmux_libc_network_port_number_from_host_byteorder_literal(25);
 
 	/* Initialise the fields. */
 	{
@@ -1017,8 +1013,8 @@ test_sockaddr_ipsix (void)
 	  }
 	}
 
-	ipport1 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(25));
-	ipport2 = mmux_libc_network_port_number_from_host_byteorder_value(mmux_libc_host_byteorder_uint16_literal(80));
+	ipport1 = mmux_libc_network_port_number_from_host_byteorder_literal(25);
+	ipport2 = mmux_libc_network_port_number_from_host_byteorder_literal(80);
 
 	/* Initialise the fields. */
 	{
