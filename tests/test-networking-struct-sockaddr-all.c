@@ -294,6 +294,147 @@ test_sockaddr_ipfour (void)
 }
 
 
+static void
+test_sockaddr_ipsix (void)
+{
+  printf_message("testing: %s", __func__);
+  {
+    mmux_libc_sockaddr_ipsix_t  sockaddr_ipsix;
+
+    /* Initialise the address. */
+    {
+      mmux_libc_ipsix_addr_t  address_ipsix;
+
+      /* Build the IPv6 address. */
+      {
+	mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+
+	if (mmux_libc_make_ipsix_addr_from_asciiz(address_ipsix, presentation)) {
+	  handle_error();
+	}
+      }
+
+      /* Initialise the fields. */
+      {
+	if (mmux_libc_sockaddr_ipsix_family_set(sockaddr_ipsix, MMUX_LIBC_AF_INET6)) {
+	  handle_error();
+	}
+	if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr_ipsix, address_ipsix)) {
+	  handle_error();
+	}
+	{
+	  /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+          auto	port_num = mmux_libc_host_byteorder_uint16_literal(25);
+	  auto	port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+
+	  if (mmux_libc_sockaddr_ipsix_port_set(sockaddr_ipsix, port)) {
+	    handle_error();
+	  }
+	}
+	if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr_ipsix, mmux_uint32_constant_zero())) {
+	  handle_error();
+	}
+	if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr_ipsix, mmux_uint32_constant_zero())) {
+	  handle_error();
+	}
+      }
+    }
+
+    /* Dump the data structure as a sockaddr_ipsix. */
+    printf_message("dump data structure as sockaddr_ipsix");
+    {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_ipsix_dump(er, sockaddr_ipsix, NULL)) {
+	handle_error();
+      }
+    }
+
+    /* Dump the data structure as a sockaddr. */
+    printf_message("dump data structure as sockaddr");
+    {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_dump(er, sockaddr_ipsix, NULL)) {
+	handle_error();
+      }
+    }
+
+    /* Extract and check the address family as sockaddr_ipsix. */
+    {
+      mmux_libc_network_address_family_t	family;
+
+      mmux_libc_sockaddr_ipsix_family_ref(&family, sockaddr_ipsix);
+      if (MMUX_LIBC_VALUEOF_AF_INET6 == family.value) {
+	printf_message("correct family as sockaddr_ipsix");
+      } else {
+	printf_error("wrong family");
+	handle_error();
+      }
+    }
+
+    /* Extract and check the address family as sockaddr. */
+    {
+      mmux_libc_network_address_family_t	family;
+
+      mmux_libc_sockaddr_family_ref(&family, sockaddr_ipsix);
+      if (MMUX_LIBC_VALUEOF_AF_INET6 == family.value) {
+	printf_message("correct family as sockaddr object");
+      } else {
+	printf_error("wrong family");
+	handle_error();
+      }
+    }
+
+    /* Extract and check the Internet Protocol address. */
+    {
+      mmux_libc_ipsix_addr_t	field_address_ipsix;
+      mmux_libc_ipsix_addr_t	expected_address_ipsix;
+      bool			are_equal;
+
+      if (mmux_libc_sockaddr_ipsix_addr_ref(field_address_ipsix, sockaddr_ipsix)) {
+	handle_error();
+      }
+      {
+	mmux_asciizcp_t	presentation = "1:2:3:4:5:6:7:8";
+
+	if (mmux_libc_make_ipsix_addr_from_asciiz(expected_address_ipsix, presentation)) {
+	  handle_error();
+	}
+      }
+
+      mmux_libc_ipsix_addr_equal(&are_equal, field_address_ipsix, expected_address_ipsix);
+      if (are_equal) {
+	printf_message("correct IPv6 address from sockaddr_ipsix field");
+      } else {
+	printf_error("wrong IPv6 address from sockaddr_ipsix field");
+	handle_error();
+      }
+    }
+
+    /* Extract and check the port number. */
+    {
+      auto	expected_port_num = mmux_libc_host_byteorder_uint16_literal(25);
+      auto	expected_port     = mmux_libc_network_port_number_from_host_byteorder_value(expected_port_num);
+      mmux_libc_network_port_number_t	field_port;
+
+      if (mmux_libc_sockaddr_ipsix_port_ref(&field_port, sockaddr_ipsix)) {
+	handle_error();
+      }
+      if (field_port.value == expected_port.value) {
+	printf_message("correct port number from sockaddr_ipsix field");
+      } else {
+	printf_error("wrong port number from sockaddr_ipsix field");
+	handle_error();
+      }
+    }
+  }
+  printf_message("DONE: %s\n", __func__);
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -309,6 +450,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 
   if (true) {	test_sockaddr_local();		}
   if (true) {	test_sockaddr_ipfour();		}
+  if (true) {	test_sockaddr_ipsix();		}
 
   mmux_libc_exit_success();
 }

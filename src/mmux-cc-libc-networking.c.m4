@@ -1445,6 +1445,74 @@ mmux_libc_sockaddr_family_ref (mmux_libc_network_address_family_t * field_value_
 /* ------------------------------------------------------------------ */
 
 bool
+mmux_libc_sockaddr_bind_length (mmux_usize_t * sockaddr_length_result_p, mmux_libc_sockaddr_arg_t sockaddr_p)
+{
+  mmux_libc_network_address_family_t	address_family;
+
+  mmux_libc_sockaddr_family_ref(&address_family, sockaddr_p);
+  switch (address_family.value) {
+  case MMUX_LIBC_VALUEOF_AF_INET:
+    {
+      auto	sockaddr_ipfour = (mmux_libc_network_socket_address_ipfour_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_ipfour_bind_length(sockaddr_length_result_p, sockaddr_ipfour);
+    }
+
+  case MMUX_LIBC_VALUEOF_AF_INET6:
+    {
+      auto	sockaddr_ipsix = (mmux_libc_network_socket_address_ipsix_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_ipsix_bind_length(sockaddr_length_result_p, sockaddr_ipsix);
+    }
+
+  case MMUX_LIBC_VALUEOF_AF_LOCAL:
+    {
+      auto	sockaddr_local = (mmux_libc_network_socket_address_local_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_local_bind_length(sockaddr_length_result_p, sockaddr_local);
+    }
+
+  default:
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+}
+
+bool
+mmux_libc_sockaddr_alloc_length (mmux_usize_t * sockaddr_length_result_p, mmux_libc_sockaddr_arg_t sockaddr_p)
+{
+  mmux_libc_network_address_family_t	address_family;
+
+  mmux_libc_sockaddr_family_ref(&address_family, sockaddr_p);
+  switch (address_family.value) {
+  case MMUX_LIBC_VALUEOF_AF_INET:
+    {
+      auto	sockaddr_ipfour = (mmux_libc_network_socket_address_ipfour_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_ipfour_alloc_length(sockaddr_length_result_p, sockaddr_ipfour);
+    }
+
+  case MMUX_LIBC_VALUEOF_AF_INET6:
+    {
+      auto	sockaddr_ipsix = (mmux_libc_network_socket_address_ipsix_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_ipsix_alloc_length(sockaddr_length_result_p, sockaddr_ipsix);
+    }
+
+  case MMUX_LIBC_VALUEOF_AF_LOCAL:
+    {
+      auto	sockaddr_local = (mmux_libc_network_socket_address_local_t *) sockaddr_p;
+
+      return mmux_libc_sockaddr_local_alloc_length(sockaddr_length_result_p, sockaddr_local);
+    }
+
+  default:
+    mmux_libc_errno_set(MMUX_LIBC_EINVAL);
+    return true;
+  }
+}
+
+bool
 mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_arg_t sockaddr_p,
 			 mmux_asciizcp_t given_struct_name)
 {
@@ -1532,13 +1600,19 @@ mmux_libc_sockaddr_local_path_ref (mmux_libc_fs_ptn_t fs_ptn_result,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_local_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
+mmux_libc_sockaddr_local_bind_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
 {
   /* NOTE: "SUN_LEN()"  does not  include the  terminating nul  of "sun_path"  in its
      computation; at least this is what I observe.  Notice that the length we pass to
      functions like "bind()" must be the  one returned by "SUN_LEN()".  (Marco Maggi;
      Dec 23, 2024) */
   *sockaddr_local_length_result_p = mmux_usize(SUN_LEN((struct sockaddr_un *)P));
+  return false;
+}
+bool
+mmux_libc_sockaddr_local_alloc_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
+{
+  *sockaddr_local_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_local_t));
   return false;
 }
 
@@ -1617,6 +1691,21 @@ mmux_libc_sockaddr_ipfour_port_ref (mmux_libc_network_port_number_t * field_valu
 }
 
 /* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_ipfour_bind_length (mmux_usize_t * sockaddr_ipfour_length_result_p,
+				       mmux_libc_sockaddr_ipfour_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_ipfour_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipfour_t));
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipfour_alloc_length (mmux_usize_t * sockaddr_ipfour_length_result_p,
+					mmux_libc_sockaddr_ipfour_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_ipfour_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipfour_t));
+  return false;
+}
 
 bool
 mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipfour_arg_t sockaddr_p,
@@ -1771,6 +1860,21 @@ mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port_number_t * field_value
 /* ------------------------------------------------------------------ */
 
 bool
+mmux_libc_sockaddr_ipsix_bind_length (mmux_usize_t * sockaddr_ipsix_length_result_p,
+				      mmux_libc_sockaddr_ipsix_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_ipsix_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipsix_t));
+  return false;
+}
+bool
+mmux_libc_sockaddr_ipsix_alloc_length (mmux_usize_t * sockaddr_ipsix_length_result_p,
+				       mmux_libc_sockaddr_ipsix_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_ipsix_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipsix_t));
+  return false;
+}
+
+bool
 mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipsix_arg_t sockaddr_p,
 			       mmux_asciizcp_t struct_name)
 {
@@ -1818,26 +1922,42 @@ mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipsix
 
     /* Dump the field "sin6_flowinfo". */
     {
-      if (mmux_libc_dprintf(mfd, "%s.sin6_flowinfo = \"%lu\"\n",
-			    struct_name, (mmux_standard_ulong_t)(sockaddr_p->sin6_flowinfo))) {
+      mmux_uint32_t	flowinfo;
+
+      mmux_libc_sockaddr_ipsix_flowinfo_ref(&flowinfo, sockaddr_p);
+      if (mmux_libc_dprintf(mfd, "%s.sin6_flowinfo = ", struct_name)) {
+	goto exit_function;
+      }
+      if (mmux_libc_dprintf_uint32(mfd, flowinfo)) {
+	goto exit_function;
+      }
+      if (mmux_libc_dprintf_newline(mfd)) {
 	goto exit_function;
       }
     }
 
     /* Dump the field "sin6_scope_id". */
     {
-      if (mmux_libc_dprintf(mfd, "%s.sin6_scope_id = \"%lu\"\n",
-			    struct_name, (mmux_standard_ulong_t)(sockaddr_p->sin6_scope_id))) {
+      mmux_uint32_t	scope_id;
+
+      mmux_libc_sockaddr_ipsix_scope_id_ref(&scope_id, sockaddr_p);
+      if (mmux_libc_dprintf(mfd, "%s.sin6_scope_id = ", struct_name)) {
+	goto exit_function;
+      }
+      if (mmux_libc_dprintf_uint32(mfd, scope_id)) {
+	goto exit_function;
+      }
+      if (mmux_libc_dprintf_newline(mfd)) {
 	goto exit_function;
       }
     }
 
-    /* Dump the field "sin_port". */
+    /* Dump the field "sin6_port". */
     {
       mmux_libc_network_port_number_t	port;
 
       mmux_libc_sockaddr_ipsix_port_ref(&port, sockaddr_p);
-      if (mmux_libc_dprintf(mfd, "%s.sin_port = 0x%X [network byteorder] (host byteorder: %u)\n",
+      if (mmux_libc_dprintf(mfd, "%s.sin6_port = 0x%X [network byteorder] (host byteorder: %u)\n",
 			    struct_name, port.value, ntohs(port.value))) {
 	goto exit_function;
       }

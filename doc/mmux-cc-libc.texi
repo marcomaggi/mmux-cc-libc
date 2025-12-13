@@ -16012,6 +16012,64 @@ Setter and getter for the field @code{sa_family} of @objtype{mmux_libc_network_a
 
 @MmuxStructDumper{sockaddr}
 
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sockaddr_alloc_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address memory size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+If we have a networking socket address and we want to allocate a block of memory wide enough to
+contain a clone of such an address: we have to use this function.  For example:
+
+@example
+mmux_libc_sockaddr_t  sockaddr_src, sockaddr_dst;
+
+gimme_a_sockaddr(&sockaddr_src);
+@{
+  auto          item_num = mmux_usize_constant_one();
+  mmux_usize_t  item_siz;
+
+  mmux_libc_sockaddr_alloc_length(&item_siz, sockaddr_src);
+  if (mmux_libc_calloc(&sockaddr_dst, item_num, item_siz)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
+correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
+
+If we want to compute the address size needed as argument by some socket functions: we have to use
+this function.  For example, if we want to bind the address defined to a socket file descriptor, we
+do:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Initialise the server socket, binding it to a local address. */
+@{
+  if (mmux_libc_socket(server_sockfd, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_libc_sockaddr_t  sockaddr;
+    mmux_usize_t          sockaddr_length;
+
+    gimme_a_sockaddr(&sockaddr);
+    mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr);
+    if (mmux_libc_bind(server_sockfd, sockaddr, sockaddr_length)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+@end deftypefun
+
 @c page
 @node networking addresses sockets local
 @subsubsection Local networking socket address
@@ -16165,7 +16223,7 @@ nul--terminated, so it can be referenced while the address object itself exists.
 @end itemize
 
 
-@MmuxCWrapperStructOpaqueTypedef{network_socket_address_local,sockaddr_un}
+@MmuxCWrapperStructWithParentOpaqueTypedef{network_socket_address_local,sockaddr_un,mmux_libc_network_socket_address_t}
 @MmuxCWrapperStructArrayOneTypedef{sockaddr_local,network_socket_address_local}
 @MmuxCWrapperStructPointerTypedef{sockaddr_local,network_socket_address_local}
 
@@ -16183,6 +16241,7 @@ Setter and getter for the field @code{sun_path} of @objtype{mmux_libc_network_ad
 
 @MmuxCWrapperStructDumper{sockaddr_local,sockaddr_un}
 
+@c ------------------------------------------------------------------------
 
 The file system pathname associated to an address of format
 @objtype{mmux_libc_network_socket_address_local_t} is embedded in the data structure itself; it has
@@ -16190,29 +16249,47 @@ maximum length of fixed size, hard--coded in the data structure definition.  The
 @MmuxAsciiZ{} string and the terminating zero byte must be included in the embedded @MmuxAsciiZ{}
 string.
 
-If we want to allocate a block of memory wide enough to contain a pathname of maximum length: we
-have to take the @cfunc{sizeof} of the data structure type; for example:
+
+@deftypefun bool mmux_libc_sockaddr_local_alloc_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address memory size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+If we have a local networking socket address and we want to allocate a block of memory wide enough
+to contain a clone of such an address: we have to use this function.  For example:
 
 @example
-mmux_libc_network_socket_address_local_t *  sockaddr_local;
+mmux_libc_network_socket_address_local_t  *sockaddr_src, *sockaddr_dst;
 
+gimme_a_sockaddr_local(&sockaddr_src);
 @{
-  auto  item_num = mmux_usize_constant_one();
-  auto  item_siz = mmux_usize(sizeof(mmux_libc_network_socket_address_local_t));
+  auto          item_num = mmux_usize_constant_one();
+  mmux_usize_t  item_siz;
 
-  if (mmux_libc_calloc(&sockaddr_local, item_num, item_siz)) @{
+  mmux_libc_sockaddr_local_alloc_length(&item_siz, sockaddr_src);
+  if (mmux_libc_calloc(&sockaddr_dst, item_num, item_siz)) @{
     /* error */
   @}
 @}
 @end example
+@end deftypefun
 
-@noindent
-and we have to remember that the actual file system pathname length might be shorter than the
-maximum size.
+
+@deftypefun bool mmux_libc_sockaddr_local_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+@itemize
+@item
+The resulting size does @strong{not} include the terminating nul of the included file pathname.
+
+@item
+The resulting size is the correct value to hand to functions requiring the address size, like
+@cfunc{mmux_libc_bind}.
+@end itemize
 
 If we want to compute the address size needed as argument by some socket functions: we have to use
-@cfunc{mmux_libc_sockaddr_local_length}.  For example, if we want to bind the address defined above
-to a socket file descriptor, we do:
+this function.  For example, if we want to bind the address defined to a socket file descriptor, we
+do:
 
 @example
 mmux_libc_sockfd_t  server_sockfd;
@@ -16224,29 +16301,17 @@ mmux_libc_sockfd_t  server_sockfd;
   @}
 
   @{
-    mmux_usize_t  sockaddr_local_length;
+    mmux_libc_network_socket_address_local_t *  sockaddr;
+    mmux_usize_t  sockaddr_length;
 
-    mmux_libc_sockaddr_local_length(&sockaddr_local_length, sockaddr_local);
-    if (mmux_libc_bind(server_sockfd, sockaddr_local, sockaddr_local_length)) @{
+    gimme_a_sockaddr_local(&sockaddr);
+    mmux_libc_sockaddr_local_bind_length(&sockaddr_length, sockaddr);
+    if (mmux_libc_bind(server_sockfd, sockaddr, sockaddr_length)) @{
       /* error */
     @}
   @}
 @}
 @end example
-
-
-@deftypefun bool mmux_libc_sockaddr_local_length (mmux_usize_t * @var{sockaddr_local_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr_local})
-Store in the variable referenced by @var{sockaddr_local_length_result_p} the address size, measured
-in bytes, of the address data structure referenced by @var{sockaddr_local}.
-
-@itemize
-@item
-The resulting size does @strong{not} include the terminating nul of the included file pathname.
-
-@item
-The resulting size is the correct value to hand to functions requiring the address size, like
-@cfunc{mmux_libc_bind}.
-@end itemize
 @end deftypefun
 
 @c page
@@ -16396,7 +16461,7 @@ if (mmux_libc_sockaddr_ipfour_port_ref(&port, sockaddr_ipfour)) @{
 
 @c ------------------------------------------------------------------------
 
-@MmuxCWrapperStructOpaqueTypedef{network_socket_address_ipfour,sockaddr_in}
+@MmuxCWrapperStructWithParentOpaqueTypedef{network_socket_address_ipfour,sockaddr_in,mmux_libc_network_socket_address_t}
 @MmuxCWrapperStructArrayOneTypedef{sockaddr_ipfour,network_socket_address_ipfour}
 @MmuxCWrapperStructPointerTypedef{sockaddr_ipfour,network_socket_address_ipfour}
 
@@ -16407,8 +16472,8 @@ Setter and getter for the field @code{sin_family} of @objtype{mmux_libc_network_
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_sockaddr_ipfour_addr_set (mmux_libc_sockaddr_ipfour_t @var{sockaddr_ipfour}, mmux_libc_fs_ptn_arg_t @var{path})
-@deftypefunx bool mmux_libc_sockaddr_ipfour_addr_ref (mmux_libc_fs_ptn_t @var{path_result}, mmux_libc_fs_ptn_factory_arg_t @var{fs_ptn_factory}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr_ipfour})
+@deftypefun bool mmux_libc_sockaddr_ipfour_addr_set (mmux_libc_sockaddr_ipfour_t @var{sockaddr_ipfour}, mmux_libc_ipfour_addr_arg_t @var{ipaddr})
+@deftypefunx bool mmux_libc_sockaddr_ipfour_addr_ref (mmux_libc_ipfour_addr_t @var{ipaddr_result}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr_ipfour})
 Setter and getter for the field @code{sin_addr} of @objtype{mmux_libc_network_address_local_t}.
 @end deftypefun
 
@@ -16421,33 +16486,314 @@ Setter and getter for the field @code{sin_port} of @objtype{mmux_libc_network_ad
 
 @MmuxCWrapperStructDumper{sockaddr_ipfour,sockaddr_in}
 
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sockaddr_ipfour_alloc_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address memory size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+If we have a networking socket address and we want to allocate a block of memory wide enough to
+contain a clone of such an address: we have to use this function.  For example:
+
+@example
+mmux_libc_network_socket_address_ipfour_t  *sockaddr_src, *sockaddr_dst;
+
+gimme_a_sockaddr_ipfour(&sockaddr_src);
+@{
+  auto          item_num = mmux_usize_constant_one();
+  mmux_usize_t  item_siz;
+
+  mmux_libc_sockaddr_ipfour_alloc_length(&item_siz, sockaddr_src);
+  if (mmux_libc_calloc(&sockaddr_dst, item_num, item_siz)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipfour_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
+correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
+
+If we want to compute the address size needed as argument by some socket functions: we have to use
+this function.  For example, if we want to bind the address defined to a socket file descriptor, we
+do:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Initialise the server socket, binding it to a local address. */
+@{
+  if (mmux_libc_socket(server_sockfd, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_libc_network_socket_address_ipfour_t *  sockaddr;
+    mmux_usize_t  sockaddr_length;
+
+    gimme_a_sockaddr_ipfour(&sockaddr);
+    mmux_libc_sockaddr_ipfour_bind_length(&sockaddr_length, sockaddr);
+    if (mmux_libc_bind(server_sockfd, sockaddr, sockaddr_length)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+@end deftypefun
+
 @c page
 @node networking addresses sockets ipsix
 @subsubsection @emph{Internet Protocol} version six socket address
 
 
-To ease typing on keyboards, @value{PACKAGE} renames: the name of the data structure @code{struct
-sockaddr_in6} to @objtype{mmux_libc_sockaddr_insix_t}; the fields @code{sin6_} of @code{struct
-sockaddr_in6} to @code{sinsix_}.
+According to the standard: @emph{IPv6 networking--addresses} to be used with
+@emph{networking--sockets} are represented by the data structure type @MmuxCStruct{sockaddr_in6}.
+Under @value{PACKAGE}: such data type is represented by the object type
+@objtype{mmux_libc_network_socket_address_ipsix_t}; it is usually better to use the types
+@objtype{mmux_libc_sockaddr_ipsix_t} and @objtype{mmux_libc_sockaddr_ipsix_arg_t}.
+
+To instantiate an IPv6 networking--socket address, initialising it with raw field values, we do:
+
+@example
+mmux_libc_sockaddr_ipsix_t  sockaddr_ipsix;
+
+/* Initialise the address. */
+@{
+  mmux_libc_ipsix_addr_t  address_ipsix;
+
+  /* Build the IPv6 address. */
+  @{
+    mmux_asciizcp_t  presentation = "1:2:3:4:5:6:7:8";
+
+    if (mmux_libc_make_ipsix_addr_from_asciiz(address_ipsix, presentation)) @{
+      /* error */
+    @}
+  @}
+
+  /* Initialise the fields. */
+  @{
+    if (mmux_libc_sockaddr_ipsix_family_set(sockaddr_ipsix, MMUX_LIBC_AF_INET6)) @{
+      /* error */
+    @}
+    if (mmux_libc_sockaddr_ipsix_addr_set(sockaddr_ipsix, address_ipsix)) @{
+      /* error */
+    @}
+    @{
+      /* SMTP port number is 25 in host byteorder, 0x1900 in network byteorder. */
+      auto  port_num = mmux_libc_host_byteorder_uint16_literal(25);
+      auto  port     = mmux_libc_network_port_number_from_host_byteorder_value(port_num);
+
+      if (mmux_libc_sockaddr_ipsix_port_set(sockaddr_ipsix, port)) @{
+        /* error */
+      @}
+    @}
+    if (mmux_libc_sockaddr_ipsix_flowinfo_set(sockaddr_ipsix, mmux_uint32_constant_zero())) @{
+      /* error */
+    @}
+    if (mmux_libc_sockaddr_ipsix_scope_id_set(sockaddr_ipsix, mmux_uint32_constant_zero())) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+
+@noindent
+after this, we can perform the following operations:
+
+@itemize
+@item
+to dump the contents of the address object as @objtype{mmux_libc_network_socket_address_ipsix_t},
+we do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_ipsix_dump(er, sockaddr_ipsix, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr_in6 = 0x7ffd0042b860
+struct sockaddr_in6.sin6_family = "10" (AF_INET6)
+struct sockaddr_in6.sin6_addr = "1:2:3:4:5:6:7:8"
+struct sockaddr_in6.sin6_flowinfo = "0"
+struct sockaddr_in6.sin6_scope_id = "0"
+struct sockaddr_in6.sin_port = 0x1900 [network byteorder] (host byteorder: 25)
+@end example
+
+@item
+to dump the contents of the address object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_oufd_t  er;
+
+mmux_libc_stder(er);
+if (mmux_libc_sockaddr_dump(er, sockaddr_ipsix, NULL)) @{
+  /* error */
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct sockaddr = 0x7ffd0042b860
+struct sockaddr.sa_family = "10" (AF_INET6)
+struct sockaddr_in6 = 0x7ffd0042b860
+struct sockaddr_in6.sin6_family = "10" (AF_INET6)
+struct sockaddr_in6.sin6_addr = "1:2:3:4:5:6:7:8"
+struct sockaddr_in6.sin6_flowinfo = "0"
+struct sockaddr_in6.sin6_scope_id = "0"
+struct sockaddr_in6.sin_port = 0x1900 [network byteorder] (host byteorder: 25)
+@end example
+
+@item
+to retrieve the address--family field by viewing the object as
+@objtype{mmux_libc_network_socket_address_ipsix_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_ipsix_family_ref(&family, sockaddr_ipsix);
+@end example
+
+@item
+to retrieve the address--family field by viewing the object through the abstract type
+@objtype{mmux_libc_network_socket_address_t}, we do:
+
+@example
+mmux_libc_network_address_family_t  family;
+
+mmux_libc_sockaddr_family_ref(&family, sockaddr_ipsix);
+@end example
+
+@item
+to retrieve the IPv6 address field we do:
+
+@example
+mmux_libc_ipsix_addr_t   ipsix_address;
+
+if (mmux_libc_sockaddr_ipsix_addr_ref(ipsix_address, sockaddr_ipsix)) @{
+  /* error */
+@}
+@end example
+
+@item
+to retrieve the port number we do:
+
+@example
+mmux_libc_network_port_number_t  port;
+
+if (mmux_libc_sockaddr_ipsix_port_ref(&port, sockaddr_ipsix)) @{
+  /* error */
+@}
+@end example
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+@MmuxCWrapperStructWithParentOpaqueTypedef{network_socket_address_ipsix,sockaddr_in6,mmux_libc_network_socket_address_t}
+@MmuxCWrapperStructArrayOneTypedef{sockaddr_ipsix,network_socket_address_ipsix}
+@MmuxCWrapperStructPointerTypedef{sockaddr_ipsix,network_socket_address_ipsix}
 
 
-@deftp {Opaque Struct Typedef} mmux_libc_sockaddr_insix_t
-An opaque alias for @code{struct sockaddr_in6}.
-@end deftp
+@deftypefun bool mmux_libc_sockaddr_ipsix_family_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_network_address_family_t @var{family})
+@deftypefunx bool mmux_libc_sockaddr_ipsix_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
+Setter and getter for the field @code{sin6_family} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
 
 
-@MmuxCStructPointerOpaqueTypedef{sockaddr_insix}
-@MmuxSetterGetter{sockaddr_insix, sinsix_family,   mmux_sshort_t}
-@MmuxSetterGetter{sockaddr_insix, sipsix_addr,     mmux_libc_ipsix_addr_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_flowinfo, mmux_uint32_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_scope_id, mmux_uint32_t}
-@MmuxSetterGetter{sockaddr_insix, sinsix_port,     mmux_host_byteorder_uint16_t}
-@MmuxStructDumper{sockaddr_insix}
+@deftypefun bool mmux_libc_sockaddr_ipsix_addr_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_ipsix_addr_arg_t @var{ipaddr})
+@deftypefunx bool mmux_libc_sockaddr_ipsix_addr_ref (mmux_libc_ipsix_addr_t @var{ipaddr_result}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
+Setter and getter for the field @code{sin6_addr} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
 
 
-@deftypefun bool mmux_libc_sipsix_addr_p_ref (mmux_libc_ipsix_addr_t ** @var{sipfour_addr_pp}, mmux_libc_sockaddr_in_t * @var{sockaddr_p})
-Store in the location referenced by @var{sipsix_addr_pp} a pointer to the field @code{sipsix_addr}
-of the data structure referenced by @var{sockaddr_p}.
+@deftypefun bool mmux_libc_sockaddr_ipsix_flowinfo_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_uint32_t @var{flowinfo})
+@deftypefunx bool mmux_libc_sockaddr_ipsix_flowinfo_ref (mmux_uint32_t * @var{flowinfo_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
+Setter and getter for the field @code{sin6_flowinfo} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipsix_scope_id_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_uint32_t @var{scope_id})
+@deftypefunx bool mmux_libc_sockaddr_ipsix_scope_id_ref (mmux_uint32_t * @var{scope_id_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
+Setter and getter for the field @code{sin6_scope_id} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipsix_port_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_network_port_number_t @var{port})
+@deftypefunx bool mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port_number_t * @var{port_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
+Setter and getter for the field @code{sin6_port} of @objtype{mmux_libc_network_address_local_t}.
+@end deftypefun
+
+
+@MmuxCWrapperStructDumper{sockaddr_ipsix,sockaddr_in6}
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sockaddr_ipsix_alloc_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address memory size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+If we have a networking socket address and we want to allocate a block of memory wide enough to
+contain a clone of such an address: we have to use this function.  For example:
+
+@example
+mmux_libc_network_socket_address_ipsix_t  *sockaddr_src, *sockaddr_dst;
+
+gimme_a_sockaddr_ipsix(&sockaddr_src);
+@{
+  auto          item_num = mmux_usize_constant_one();
+  mmux_usize_t  item_siz;
+
+  mmux_libc_sockaddr_ipsix_alloc_length(&item_siz, sockaddr_src);
+  if (mmux_libc_calloc(&sockaddr_dst, item_num, item_siz)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_ipsix_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
+correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
+
+If we want to compute the address size needed as argument by some socket functions: we have to use
+this function.  For example, if we want to bind the address defined to a socket file descriptor, we
+do:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Initialise the server socket, binding it to a local address. */
+@{
+  if (mmux_libc_socket(server_sockfd, MMUX_LIBC_PF_INET6, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_libc_network_socket_address_ipsix_t *  sockaddr;
+    mmux_usize_t  sockaddr_length;
+
+    gimme_a_sockaddr_ipsix(&sockaddr);
+    mmux_libc_sockaddr_ipsix_bind_length(&sockaddr_length, sockaddr);
+    if (mmux_libc_bind(server_sockfd, sockaddr, sockaddr_length)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
 @end deftypefun
 
 @c page

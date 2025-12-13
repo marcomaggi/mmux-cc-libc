@@ -3093,6 +3093,14 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_family_ref (mmux_libc_network_address_
 						      mmux_libc_sockaddr_arg_t P)
   __attribute__((__nonnull__(1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_sockaddr_bind_length (mmux_usize_t * sockaddr_length_result_p,
+						       mmux_libc_sockaddr_arg_t sockaddr_p)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_alloc_length (mmux_usize_t * sockaddr_length_result_p,
+							mmux_libc_sockaddr_arg_t sockaddr_p)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd,
 						mmux_libc_sockaddr_arg_t sockaddr_p,
 						mmux_asciizcp_t struct_name)
@@ -3122,11 +3130,15 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_local_path_ref (mmux_libc_fs_ptn_t fs_
 							  mmux_libc_sockaddr_local_arg_t P)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_sockaddr_local_length (mmux_usize_t * sockaddr_local_length_result_p,
-							mmux_libc_sockaddr_local_arg_t P)
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_local_bind_length (mmux_usize_t * sockaddr_local_length_result_p,
+							     mmux_libc_sockaddr_local_arg_t P)
   __attribute__((__nonnull__(1,2)));
 
-/* ------------------------------------------------------------------ */
+mmux_cc_libc_decl bool mmux_libc_sockaddr_local_alloc_length (mmux_usize_t * sockaddr_local_length_result_p,
+							      mmux_libc_sockaddr_local_arg_t P)
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_sockaddr_local_dump (mmux_libc_fd_arg_t fd,
 						      mmux_libc_sockaddr_local_arg_t sockaddr_un_p,
@@ -3167,6 +3179,14 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_port_ref (mmux_libc_network_por
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_bind_length (mmux_usize_t * sockaddr_ipfour_length_result_p,
+							      mmux_libc_sockaddr_ipfour_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_alloc_length (mmux_usize_t * sockaddr_ipfour_length_result_p,
+							       mmux_libc_sockaddr_ipfour_arg_t P)
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t fd,
 						       mmux_libc_sockaddr_ipfour_arg_t sockaddr_in_p,
@@ -3227,6 +3247,14 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port
   __attribute__((__nonnull__(1,2)));
 
 /* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_bind_length (mmux_usize_t * sockaddr_ipsix_length_result_p,
+							     mmux_libc_sockaddr_ipsix_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_alloc_length (mmux_usize_t * sockaddr_ipsix_length_result_p,
+							      mmux_libc_sockaddr_ipsix_arg_t P)
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t fd,
 						      mmux_libc_sockaddr_ipsix_arg_t sockaddr_p,
