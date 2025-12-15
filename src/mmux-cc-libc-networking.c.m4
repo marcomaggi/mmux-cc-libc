@@ -175,7 +175,7 @@ sa_family_to_asciiz_name(mmux_asciizcp_t * name_p, mmux_libc_network_address_fam
 /* ------------------------------------------------------------------ */
 
 static void
-socket_communication_style_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_socket_communication_style_t style)
+socket_communication_style_to_asciiz_name(mmux_asciizcp_t* name_p, mmux_libc_network_socket_communication_style_t style)
 {
   switch (style.value) {
 #if (defined MMUX_HAVE_LIBC_SOCK_STREAM)
@@ -413,11 +413,53 @@ mmux_libc_network_port_number_from_host_byteorder_value (mmux_libc_host_byteorde
 }
 
 bool
-mmux_libc_network_port_number_equal (bool * are_equal,
+mmux_libc_network_port_number_equal (bool * are_equal_result_p,
 				     mmux_libc_network_port_number_t port1,
 				     mmux_libc_network_port_number_t port2)
 {
-  return mmux_uint16_equal_p(are_equal, &port1, &port2);
+  return mmux_uint16_equal_p(are_equal_result_p, &port1, &port2);
+}
+
+bool
+mmux_libc_network_socket_communication_style_equal (bool * are_equal_result_p,
+						    mmux_libc_network_socket_communication_style_t style1,
+						    mmux_libc_network_socket_communication_style_t style2)
+{
+  mmux_standard_sint_t	style_num_1 = style1.value;
+  mmux_standard_sint_t	style_num_2 = style2.value;
+
+  /* The style values  might contain property bits: remove them  before comparing the
+     values. */
+#ifdef MMUX_HAVE_LIBC_SOCK_CLOEXEC
+  style_num_1 &= ~ MMUX_LIBC_VALUEOF_SOCK_CLOEXEC;
+  style_num_2 &= ~ MMUX_LIBC_VALUEOF_SOCK_CLOEXEC;
+#endif
+
+#ifdef MMUX_HAVE_LIBC_SOCK_NONBLOCK
+  style_num_1 &= ~ MMUX_LIBC_VALUEOF_SOCK_NONBLOCK;
+  style_num_2 &= ~ MMUX_LIBC_VALUEOF_SOCK_NONBLOCK;
+#endif
+
+  *are_equal_result_p = (style_num_1 == style_num_2)? true : false;
+  return false;
+}
+
+bool
+mmux_libc_network_socket_communication_style_property_equal
+    (bool * are_equal_result_p,
+     mmux_libc_network_socket_communication_style_property_t style1,
+     mmux_libc_network_socket_communication_style_property_t style2)
+{
+  return mmux_sint_equal_p(are_equal_result_p, &style1, &style2);
+}
+
+mmux_libc_network_socket_communication_style_t
+  mmux_libc_network_socket_communication_style_add_property
+    (mmux_libc_network_socket_communication_style_t style,
+     mmux_libc_network_socket_communication_style_property_t property)
+{
+  style.value |= property.value;
+  return mmux_libc_network_socket_communication_style(style.value);
 }
 
 
@@ -1453,7 +1495,7 @@ mmux_libc_sockaddr_family_ref (mmux_libc_network_address_family_t * field_value_
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_bind_length (mmux_usize_t * sockaddr_length_result_p, mmux_libc_sockaddr_arg_t sockaddr_p)
+mmux_libc_sockaddr_bind_length (mmux_libc_socklen_t * sockaddr_length_result_p, mmux_libc_sockaddr_arg_t sockaddr_p)
 {
   mmux_libc_network_address_family_t	address_family;
 
@@ -1653,13 +1695,13 @@ mmux_libc_sockaddr_local_path_ref (mmux_libc_fs_ptn_t fs_ptn_result,
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_local_bind_length (mmux_usize_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
+mmux_libc_sockaddr_local_bind_length (mmux_libc_socklen_t * sockaddr_local_length_result_p, mmux_libc_sockaddr_local_arg_t P)
 {
   /* NOTE: "SUN_LEN()"  does not  include the  terminating nul  of "sun_path"  in its
      computation; at least this is what I observe.  Notice that the length we pass to
      functions like "bind()" must be the  one returned by "SUN_LEN()".  (Marco Maggi;
      Dec 23, 2024) */
-  *sockaddr_local_length_result_p = mmux_usize(SUN_LEN((struct sockaddr_un *)P));
+  *sockaddr_local_length_result_p = mmux_libc_socklen(SUN_LEN((struct sockaddr_un *)P));
   return false;
 }
 bool
@@ -1778,10 +1820,10 @@ mmux_libc_sockaddr_ipfour_port_ref (mmux_libc_network_port_number_t * field_valu
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_ipfour_bind_length (mmux_usize_t * sockaddr_ipfour_length_result_p,
+mmux_libc_sockaddr_ipfour_bind_length (mmux_libc_socklen_t * sockaddr_ipfour_length_result_p,
 				       mmux_libc_sockaddr_ipfour_arg_t P MMUX_CC_LIBC_UNUSED)
 {
-  *sockaddr_ipfour_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipfour_t));
+  *sockaddr_ipfour_length_result_p = mmux_libc_socklen(sizeof(mmux_libc_network_socket_address_ipfour_t));
   return false;
 }
 bool
@@ -2000,10 +2042,10 @@ mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port_number_t * field_value
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_sockaddr_ipsix_bind_length (mmux_usize_t * sockaddr_ipsix_length_result_p,
+mmux_libc_sockaddr_ipsix_bind_length (mmux_libc_socklen_t * sockaddr_ipsix_length_result_p,
 				      mmux_libc_sockaddr_ipsix_arg_t P MMUX_CC_LIBC_UNUSED)
 {
-  *sockaddr_ipsix_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_ipsix_t));
+  *sockaddr_ipsix_length_result_p = mmux_libc_socklen(sizeof(mmux_libc_network_socket_address_ipsix_t));
   return false;
 }
 bool
@@ -2197,42 +2239,126 @@ mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
   return false;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Struct addrinfo.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER(addrinfo, ai_flags,		sint)
-DEFINE_STRUCT_SETTER_GETTER(addrinfo, ai_family,	sint)
-DEFINE_STRUCT_SETTER_GETTER(addrinfo, ai_socktype,	sint)
-DEFINE_STRUCT_SETTER_GETTER(addrinfo, ai_protocol,	sint)
-DEFINE_STRUCT_SETTER_GETTER(addrinfo, ai_addrlen,	libc_socklen)
-
 bool
-mmux_libc_ai_addr_set (mmux_libc_addrinfo_ptr_t const P, mmux_libc_sockaddr_ptr_t value)
+mmux_libc_addrinfo_family_set (mmux_libc_addrinfo_t P, mmux_libc_network_address_family_t new_field_value)
 {
-  P->ai_addr = value;
+  /* NOTE Here we  do not check for value being  AF_INET, AF_INET6, AF_UNSPEC because
+     other values may be valid.  What do I know?  (Marco Maggi; Dec 14, 2025) */
+  P->ai_family = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_ai_addr_ref (mmux_libc_sockaddr_ptr_t * result_p, mmux_libc_addrinfo_t const * const P)
+mmux_libc_addrinfo_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+			       mmux_libc_addrinfo_arg_t P)
 {
-  *result_p = (mmux_libc_sockaddr_ptr_t)(P->ai_addr);
+  *field_value_result_p = mmux_libc_network_address_family(P->ai_family);
   return false;
 }
 
+/* ------------------------------------------------------------------ */
+
 bool
-mmux_libc_ai_next_set (mmux_libc_addrinfo_ptr_t const P, mmux_libc_addrinfo_ptr_t value)
+mmux_libc_addrinfo_socket_communication_style_set (mmux_libc_addrinfo_t P,
+						   mmux_libc_network_socket_communication_style_t new_field_value)
 {
-  P->ai_next = value;
+  P->ai_socktype = new_field_value.value;
   return false;
 }
 bool
-mmux_libc_ai_next_ref (mmux_libc_addrinfo_ptr_t * result_p, mmux_libc_addrinfo_t const * const P)
+mmux_libc_addrinfo_socket_communication_style_ref (mmux_libc_network_socket_communication_style_t * field_value_result_p,
+						   mmux_libc_addrinfo_arg_t P)
 {
-  *result_p = (mmux_libc_addrinfo_ptr_t)(P->ai_next);
+  *field_value_result_p = mmux_libc_network_socket_communication_style(P->ai_socktype);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_addrinfo_internet_protocol_set (mmux_libc_addrinfo_t P,
+					  mmux_libc_network_internet_protocol_t new_field_value)
+{
+  P->ai_protocol = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_addrinfo_internet_protocol_ref (mmux_libc_network_internet_protocol_t * field_value_result_p,
+					  mmux_libc_addrinfo_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_internet_protocol(P->ai_protocol);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_addrinfo_flags_set (mmux_libc_addrinfo_t P, mmux_libc_network_addrinfo_flags_t new_field_value)
+{
+  P->ai_flags = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_addrinfo_flags_ref (mmux_libc_network_addrinfo_flags_t * field_value_result_p,
+			      mmux_libc_addrinfo_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_addrinfo_flags(P->ai_flags);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_addrinfo_addrlen_set (mmux_libc_addrinfo_t P, mmux_libc_socklen_t new_field_value)
+{
+  P->ai_addrlen = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_addrinfo_addrlen_ref (mmux_libc_socklen_t * field_value_result_p,
+				mmux_libc_addrinfo_arg_t P)
+{
+  *field_value_result_p = mmux_libc_socklen(P->ai_addrlen);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_addrinfo_sockaddr_set (mmux_libc_addrinfo_t P, mmux_libc_sockaddr_arg_t value)
+{
+  P->ai_addr = (struct sockaddr *) value;
+  return false;
+}
+bool
+mmux_libc_addrinfo_sockaddr_ref (mmux_libc_sockaddr_t sockaddr_result, mmux_libc_addrinfo_arg_t P)
+{
+  memcpy(sockaddr_result, P->ai_addr, P->ai_addrlen);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_addrinfo_next_set (mmux_libc_addrinfo_t P, mmux_libc_addrinfo_arg_t value)
+{
+  P->ai_next = (struct addrinfo *) value;
+  return false;
+}
+bool
+mmux_libc_addrinfo_next_ref (bool * there_is_one_more_result_p,
+			     mmux_libc_addrinfo_t addrinfo_result, mmux_libc_addrinfo_arg_t P)
+{
+  if (P->ai_next) {
+    *addrinfo_result = *((mmux_libc_network_socket_address_info_t *)(P->ai_next));
+    *there_is_one_more_result_p = true;
+  } else {
+    *there_is_one_more_result_p = false;
+  }
   return false;
 }
 
@@ -2241,13 +2367,13 @@ mmux_libc_ai_next_ref (mmux_libc_addrinfo_ptr_t * result_p, mmux_libc_addrinfo_t
 /* We define these setter and getter separately because we want the argument to be of
    type "mmux_asciizcp_t" rather than of type "mmux_asciizp_t ".*/
 bool
-mmux_libc_ai_canonname_set (mmux_libc_addrinfo_t * const P, mmux_asciizcp_t value)
+mmux_libc_addrinfo_canonname_set (mmux_libc_addrinfo_t P, mmux_asciizcp_t value)
 {
   P->ai_canonname = (mmux_asciizp_t)value;
   return false;
 }
 bool
-mmux_libc_ai_canonname_ref (mmux_asciizcp_t * result_p, mmux_libc_addrinfo_t const * const P)
+mmux_libc_addrinfo_canonname_ref (mmux_asciizcp_t * result_p, mmux_libc_addrinfo_arg_t P)
 {
   *result_p = P->ai_canonname;
   return false;
@@ -2256,174 +2382,205 @@ mmux_libc_ai_canonname_ref (mmux_asciizcp_t * result_p, mmux_libc_addrinfo_t con
 /* ------------------------------------------------------------------ */
 
 bool
-mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc_addrinfo_t const * addrinfo_p, mmux_asciizcp_t struct_name)
+mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addrinfo_p, mmux_asciizcp_t struct_name)
 {
-  if (NULL == struct_name) {
-    struct_name = "struct addrinfo";
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
+
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
   }
-
-  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)addrinfo_p);
-
-  /* Inspect the field: ai_flags */
   {
-    bool	not_first_flags = false;
+    if (NULL == struct_name) {
+      struct_name = "struct addrinfo";
+    }
 
-    DPRINTF(fd, "%s.ai_flags = \"%d\"", struct_name, addrinfo_p->ai_flags);
+    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)addrinfo_p);
 
-    if (AI_ADDRCONFIG & addrinfo_p->ai_flags) {
+    /* Inspect the field: ai_flags */
+    {
+      bool	not_first_flags = false;
+
+      DPRINTF(mfd, "%s.ai_flags = \"", struct_name);
+      {
+	if (mmux_libc_socklen_dprintf_with_base(mfd->value,
+						mmux_libc_socklen(addrinfo_p->ai_flags),
+						mmux_uint_constant_two())) {
+	  return true;
+	}
+      }
+      DPRINTF(mfd, "\"");
+
+      if (AI_ADDRCONFIG & addrinfo_p->ai_flags) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_ADDRCONFIG");
+	} else {
+	  DPRINTF(mfd, " (AI_ADDRCONFIG");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_ALL & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_ALL");
+	} else {
+	  DPRINTF(mfd, " (AI_ALL");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_CANONIDN & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_CANONIDN");
+	} else {
+	  DPRINTF(mfd, " (AI_CANONIDN");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_CANONNAME & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_CANONNAME");
+	} else {
+	  DPRINTF(mfd, " (AI_CANONNAME");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_IDN & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_IDN");
+	} else {
+	  DPRINTF(mfd, " (AI_IDN");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_NUMERICSERV & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_NUMERICSERV");
+	} else {
+	  DPRINTF(mfd, " (AI_NUMERICSERV");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_PASSIVE & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_PASSIVE");
+	} else {
+	  DPRINTF(mfd, " (AI_PASSIVE");
+	  not_first_flags = true;
+	}
+      }
+
+      if (AI_V4MAPPED & addrinfo_p->ai_flags ) {
+	if (not_first_flags) {
+	  DPRINTF(mfd, " | AI_V4MAPPED");
+	} else {
+	  DPRINTF(mfd, " (AI_V4MAPPED");
+	  not_first_flags = true;
+	}
+      }
+
       if (not_first_flags) {
-	DPRINTF(fd, " | AI_ADDRCONFIG");
+	DPRINTF(mfd, ")\n");
       } else {
-	DPRINTF(fd, " (AI_ADDRCONFIG");
-	not_first_flags = true;
+	DPRINTF(mfd, "\n");
       }
     }
 
-    if (AI_ALL & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_ALL");
+    /* Inspect the field: ai_family */
+    {
+      auto		field_value = mmux_libc_network_address_family(addrinfo_p->ai_family);
+      mmux_asciizcp_t	ai_name = "unknown";
+
+      sa_family_to_asciiz_name(&ai_name, field_value);
+      DPRINTF(mfd, "%s.ai_family = \"%d\" (%s)\n", struct_name, (int)field_value.value, ai_name);
+    }
+
+    /* Inspect the field: ai_socktype */
+    {
+      auto		style   = mmux_libc_network_socket_communication_style(addrinfo_p->ai_socktype);
+      mmux_asciizcp_t	ai_name = "unknown";
+
+      socket_communication_style_to_asciiz_name(&ai_name, style);
+      DPRINTF(mfd, "%s.ai_socktype = \"%d\" (%s)\n", struct_name, style.value, ai_name);
+    }
+
+    /* Inspect the field: ai_protocol */
+    {
+      auto		protocol = mmux_libc_network_internet_protocol(addrinfo_p->ai_protocol);
+      mmux_asciizcp_t	ai_name  = "unknown";
+
+      socket_internet_protocol_to_asciiz_name(&ai_name, protocol);
+      DPRINTF(mfd, "%s.ai_protocol = \"%d\" (%s)\n", struct_name, protocol.value, ai_name);
+    }
+
+    /* Inspect the field: ai_addrlen */
+    {
+      mmux_asciizcp_t	known_struct_name = "unknown struct type";
+
+      switch (addrinfo_p->ai_addrlen) {
+      case sizeof(mmux_libc_sockaddr_ipfour_t):
+	known_struct_name ="struct sockaddr_in";
+	break;
+
+      case sizeof(mmux_libc_sockaddr_ipsix_t):
+	known_struct_name ="struct sockaddr_in6";
+	break;
+
+      case sizeof(mmux_libc_sockaddr_local_t):
+	known_struct_name ="struct sockaddr_un";
+	break;
+      }
+
+      DPRINTF(mfd, "%s.ai_addrlen = \"%d\" (%s)\n", struct_name, addrinfo_p->ai_addrlen, known_struct_name);
+    }
+
+    /* Inspect the field: ai_addr, it is a pointer to "struct sockaddr" */
+    {
+      mmux_standard_usize_t	provided_nbytes = 256, required_nbytes;
+      mmux_standard_char_t	bufptr[provided_nbytes];
+      auto	A = (mmux_libc_network_socket_address_t *) (addrinfo_p->ai_addr);
+
+      required_nbytes = snprintf(bufptr, provided_nbytes, "%s.ai_addr", struct_name);
+      if (required_nbytes >= provided_nbytes) {
+	return true;
+      }
+      mmux_libc_sockaddr_dump(mfd, A, bufptr);
+    }
+
+    /* Inspect the field: ai_canonname */
+    {
+      if (addrinfo_p->ai_canonname) {
+	DPRINTF(mfd, "%s.ai_canonname = \"%p\" (%s)\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname), addrinfo_p->ai_canonname);
       } else {
-	DPRINTF(fd, " (AI_ALL");
-	not_first_flags = true;
+	DPRINTF(mfd, "%s.ai_canonname = \"%p\"\n",      struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname));
       }
     }
 
-    if (AI_CANONIDN & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_CANONIDN");
-      } else {
-	DPRINTF(fd, " (AI_CANONIDN");
-	not_first_flags = true;
-      }
+    /* Inspect the field: ai_next */
+    {
+      DPRINTF(mfd, "%s.ai_next = \"%p\"\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_next));
     }
 
-    if (AI_CANONNAME & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_CANONNAME");
-      } else {
-	DPRINTF(fd, " (AI_CANONNAME");
-	not_first_flags = true;
-      }
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
     }
 
-    if (AI_IDN & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_IDN");
-      } else {
-	DPRINTF(fd, " (AI_IDN");
-	not_first_flags = true;
-      }
-    }
-
-    if (AI_NUMERICSERV & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_NUMERICSERV");
-      } else {
-	DPRINTF(fd, " (AI_NUMERICSERV");
-	not_first_flags = true;
-      }
-    }
-
-    if (AI_PASSIVE & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_PASSIVE");
-      } else {
-	DPRINTF(fd, " (AI_PASSIVE");
-	not_first_flags = true;
-      }
-    }
-
-    if (AI_V4MAPPED & addrinfo_p->ai_flags ) {
-      if (not_first_flags) {
-	DPRINTF(fd, " | AI_V4MAPPED");
-      } else {
-	DPRINTF(fd, " (AI_V4MAPPED");
-	not_first_flags = true;
-      }
-    }
-
-    if (not_first_flags) {
-      DPRINTF(fd, ")\n");
-    } else {
-      DPRINTF(fd, "\n");
-    }
+    rv = false;
   }
 
-  /* Inspect the field: ai_family */
-  {
-    auto		field_value = mmux_libc_network_address_family(addrinfo_p->ai_family);
-    mmux_asciizcp_t	ai_name = "unknown";
+ exit_function:
 
-    sa_family_to_asciiz_name(&ai_name, field_value);
-    DPRINTF(fd, "%s.ai_family = \"%d\" (%s)\n", struct_name, (int)field_value.value, ai_name);
+  if (mmux_libc_close(mfd)) {
+    return true;
   }
-
-  /* Inspect the field: ai_socktype */
-  {
-    auto		style   = mmux_libc_socket_communication_style(addrinfo_p->ai_socktype);
-    mmux_asciizcp_t	ai_name = "unknown";
-
-    socket_communication_style_to_asciiz_name(&ai_name, style);
-    DPRINTF(fd, "%s.ai_socktype = \"%d\" (%s)\n", struct_name, style.value, ai_name);
-  }
-
-  /* Inspect the field: ai_protocol */
-  {
-    auto		protocol = mmux_libc_network_internet_protocol(addrinfo_p->ai_protocol);
-    mmux_asciizcp_t	ai_name  = "unknown";
-
-    socket_internet_protocol_to_asciiz_name(&ai_name, protocol);
-    DPRINTF(fd, "%s.ai_protocol = \"%d\" (%s)\n", struct_name, protocol.value, ai_name);
-  }
-
-  /* Inspect the field: ai_addrlen */
-  {
-    mmux_asciizcp_t	known_struct_name = "unknown struct type";
-
-    switch (addrinfo_p->ai_addrlen) {
-    case sizeof(mmux_libc_sockaddr_ipfour_t):
-      known_struct_name ="struct sockaddr_in";
-      break;
-
-    case sizeof(mmux_libc_sockaddr_ipsix_t):
-      known_struct_name ="struct sockaddr_in6";
-      break;
-
-    case sizeof(mmux_libc_sockaddr_local_t):
-      known_struct_name ="struct sockaddr_un";
-      break;
-    }
-
-    DPRINTF(fd, "%s.ai_addrlen = \"%d\" (%s)\n", struct_name, addrinfo_p->ai_addrlen, known_struct_name);
-  }
-
-  /* Inspect the field: ai_addr, it is a pointer to "struct sockaddr" */
-  {
-    auto const	provided_nchars = mmux_usize_literal(512);
-    char	bufstr[provided_nchars.value];
-
-    mmux_libc_memzero(bufstr, provided_nchars);
-    inet_ntop(addrinfo_p->ai_family, &(addrinfo_p->ai_addr), bufstr, provided_nchars.value);
-
-    DPRINTF(fd, "%s.ai_addr = \"%p\" (%s)\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_addr), bufstr);
-  }
-
-  /* Inspect the field: ai_canonname */
-  {
-    if (addrinfo_p->ai_canonname) {
-      DPRINTF(fd, "%s.ai_canonname = \"%p\" (%s)\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname), addrinfo_p->ai_canonname);
-    } else {
-      DPRINTF(fd, "%s.ai_canonname = \"%p\"\n",      struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname));
-    }
-  }
-
-  /* Inspect the field: ai_next */
-  {
-    DPRINTF(fd, "%s.ai_next = \"%p\"\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_next));
-  }
-
-  return false;
+  return rv;
 }
+
+#if 0
 
 
 /** --------------------------------------------------------------------
@@ -2719,7 +2876,7 @@ mmux_libc_make_network_socket (mmux_libc_network_socket_t * result_p, mmux_stand
 bool
 mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
 		  mmux_libc_network_protocol_family_t namespace,
-		  mmux_libc_socket_communication_style_t style,
+		  mmux_libc_network_socket_communication_style_t style,
 		  mmux_libc_network_internet_protocol_t ipproto)
 {
   int	sock_num = socket(namespace.value, style.value, ipproto.value);
@@ -2741,7 +2898,7 @@ bool
 mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
 		      mmux_libc_network_socket_t * result_sock2_p,
 		      mmux_libc_network_protocol_family_t namespace,
-		      mmux_libc_socket_communication_style_t style,
+		      mmux_libc_network_socket_communication_style_t style,
 		      mmux_libc_network_internet_protocol_t ipproto)
 {
   int	socks[2];

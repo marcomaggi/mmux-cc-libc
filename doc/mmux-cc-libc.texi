@@ -379,15 +379,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{SO_SNDBUF}
 @MmuxDefineConstant{SO_STYLE}
 @MmuxDefineConstant{SO_TYPE}
-@MmuxDefineConstant{AI_ADDRCONFIG}
-@MmuxDefineConstant{AI_ADDRCONFIG}
-@MmuxDefineConstant{AI_ALL}
-@MmuxDefineConstant{AI_CANONIDN}
-@MmuxDefineConstant{AI_CANONNAME}
-@MmuxDefineConstant{AI_IDN}
-@MmuxDefineConstant{AI_NUMERICSERV}
-@MmuxDefineConstant{AI_PASSIVE}
-@MmuxDefineConstant{AI_V4MAPPED}
 @MmuxDefineConstant{NI_DGRAM}
 @MmuxDefineConstant{NI_IDN}
 @MmuxDefineConstant{NI_NAMEREQD}
@@ -427,16 +418,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{IPPORT_USERRESERVED}
 @MmuxDefineConstant{IPPORT_WHOIS}
 @MmuxDefineConstant{IPPORT_WHOSERVER}
-
-@MmuxDefineConstant{SOCK_CLOEXEC}
-@MmuxDefineConstant{SOCK_DCCP}
-@MmuxDefineConstant{SOCK_DGRAM}
-@MmuxDefineConstant{SOCK_NONBLOCK}
-@MmuxDefineConstant{SOCK_PACKET}
-@MmuxDefineConstant{SOCK_RAW}
-@MmuxDefineConstant{SOCK_RDM}
-@MmuxDefineConstant{SOCK_SEQPACKET}
-@MmuxDefineConstant{SOCK_STREAM}
 
 @MmuxDefineConstant{WAIT_ANY}
 @MmuxDefineConstant{WAIT_MYPGRP}
@@ -15965,6 +15946,7 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 
 
 @menu
+* networking addresses sockets style::        Networking sockets communication styles.
 * networking addresses sockets base::         Base networking socket address.
 * networking addresses sockets local::        Local networking socket address.
 * networking addresses sockets ipfour::       @emph{Internet Protocol} version four socket address.
@@ -15973,6 +15955,126 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 * networking addresses sockets getaddrinfo::  Getting address informations.
 * networking addresses sockets getnameinfo::  Getting address name informations.
 @end menu
+
+@c page
+@node networking addresses sockets style
+@subsubsection Networking sockets communication styles
+
+
+@cindex Networking sockets communication styles, property bits
+@cindex Property bits in networking sockets communication styles
+
+
+According to the standard: the constants @samp{SOCK_STREAM}, @samp{SOCK_DGRAM}, and others are
+identifiers for networking sockets communication styles.  Under @value{PACKAGE}: these values are
+instances of the type @objtype{mmux_libc_network_socket_communication_style_t}.
+
+In addition: the values @samp{SOCK_CLOEXEC} and @samp{SOCK_NONBLOCK} are Linux--specific constants
+that can be added to objects of type @objtype{mmux_libc_network_socket_communication_style_t}, using
+a bitwise OR operation; these values represent ``property bits''.
+
+
+@deftp {Struct Typedef} mmux_libc_network_socket_communication_style_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing networking sockets communication styles.  Such values are stored in
+host byteorder.
+@end deftp
+
+
+@deftypefun mmux_libc_network_socket_communication_style_t mmux_libc_network_socket_communication_style (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_socket_communication_style_t}.  This
+function is seldom useful because we should use the predefined constants @samp{MMUX_LIBC_SOCK_*}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_network_socket_communication_style_equal (bool * @var{are_equal_result_p}, mmux_libc_network_socket_communication_style_t @vari{style}, mmux_libc_network_socket_communication_style_t @varii{style})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} if the given styles are equal;
+otherwise store @cfalse{}.
+
+The style values might contain property bits, so those bits are removed from the values before
+comparing them.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants are predefined, if available on the underlying platform, to represent
+networking sockets communication styles.
+
+@macro MmuxDefineNetworkingSocketCommunicationStyleConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_socket_communication_style_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_socket_communication_style_t} representing the standard C language
+constant @code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_DCCP}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_DGRAM}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_PACKET}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_RAW}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_RDM}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_SEQPACKET}
+@MmuxDefineNetworkingSocketCommunicationStyleConstant{SOCK_STREAM}
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Networking socket communication style properties
+
+
+@deftp {Struct Typedef} mmux_libc_network_socket_communication_style_property_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing networking sockets communication style properties.  Such values are
+stored in host byteorder.
+@end deftp
+
+
+@deftypefun mmux_libc_network_socket_communication_style_property_t mmux_libc_network_socket_communication_style_property (mmux_standard_sint_t @var{value})
+Build and return a new instance of
+@objtype{mmux_libc_network_socket_communication_style_property_t}.  This function is seldom useful
+because we should use the predefined constants @samp{MMUX_LIBC_SOCK_*}.
+@end deftypefun
+
+
+@deftypefun mmux_libc_network_socket_communication_style_t mmux_libc_network_socket_communication_style_add_property (mmux_libc_network_socket_communication_style_t @var{style}, mmux_libc_network_socket_communication_style_property_t @var{property})
+Build and return a new instance of @objtype{mmux_libc_network_socket_communication_style_t}
+composing @var{style} with @var{property}.
+
+@example
+auto  style =
+  mmux_libc_network_socket_communication_style_add_property(MMUX_LIBC_SOCK_STREAM,
+                                                            MMUX_LIBC_SOCK_CLOEXEC);
+@end example
+@end deftypefun
+
+
+@macro MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_socket_communication_style_property_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_socket_communication_style_property_t} representing the standard C
+language constant @code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{SOCK_CLOEXEC}
+@MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{SOCK_NONBLOCK}
 
 @c page
 @node networking addresses sockets base
@@ -16044,7 +16146,7 @@ gimme_a_sockaddr(&sockaddr_src);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_sockaddr_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr})
+@deftypefun bool mmux_libc_sockaddr_bind_length (mmux_libc_socklen_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr})
 Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
 in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
 correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
@@ -16064,7 +16166,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
   @{
     mmux_libc_sockaddr_t  sockaddr;
-    mmux_usize_t          sockaddr_length;
+    mmux_libc_socklen_t   sockaddr_length;
 
     gimme_a_sockaddr(&sockaddr);
     mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr);
@@ -16286,7 +16388,7 @@ gimme_a_sockaddr_local(&sockaddr_src);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_sockaddr_local_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr})
+@deftypefun bool mmux_libc_sockaddr_local_bind_length (mmux_libc_socklen_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_local_arg_t @var{sockaddr})
 Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
 in bytes, of the address data structure referenced by @var{sockaddr}.
 
@@ -16314,7 +16416,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
   @{
     mmux_libc_network_socket_address_local_t *  sockaddr;
-    mmux_usize_t  sockaddr_length;
+    mmux_libc_socklen_t  sockaddr_length;
 
     gimme_a_sockaddr_local(&sockaddr);
     mmux_libc_sockaddr_local_bind_length(&sockaddr_length, sockaddr);
@@ -16528,7 +16630,7 @@ gimme_a_sockaddr_ipfour(&sockaddr_src);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_sockaddr_ipfour_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr})
+@deftypefun bool mmux_libc_sockaddr_ipfour_bind_length (mmux_libc_socklen_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipfour_arg_t @var{sockaddr})
 Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
 in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
 correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
@@ -16548,7 +16650,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
   @{
     mmux_libc_network_socket_address_ipfour_t *  sockaddr;
-    mmux_usize_t  sockaddr_length;
+    mmux_libc_socklen_t  sockaddr_length;
 
     gimme_a_sockaddr_ipfour(&sockaddr);
     mmux_libc_sockaddr_ipfour_bind_length(&sockaddr_length, sockaddr);
@@ -16621,7 +16723,7 @@ mmux_libc_sockaddr_ipsix_t  sockaddr_ipsix;
 @end example
 
 @noindent
-after this, we can perform the following operations:
+after this, we can perform various operations, among those:
 
 @itemize
 @item
@@ -16784,7 +16886,7 @@ gimme_a_sockaddr_ipsix(&sockaddr_src);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_sockaddr_ipsix_bind_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr})
+@deftypefun bool mmux_libc_sockaddr_ipsix_bind_length (mmux_libc_socklen_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr})
 Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
 in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
 correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_bind}.
@@ -16804,7 +16906,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
   @{
     mmux_libc_network_socket_address_ipsix_t *  sockaddr;
-    mmux_usize_t  sockaddr_length;
+    mmux_libc_socklen_t  sockaddr_length;
 
     gimme_a_sockaddr_ipsix(&sockaddr);
     mmux_libc_sockaddr_ipsix_bind_length(&sockaddr_length, sockaddr);
@@ -16827,17 +16929,311 @@ equal when compared field--by--field; otherwise store @cfalse{}.
 @subsubsection Address informations
 
 
-@MmuxCStructOpaqueTypedef{addrinfo}
-@MmuxCStructPointerOpaqueTypedef{addrinfo}
-@MmuxSetterGetter{addrinfo, ai_flags,           mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_family,          mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_socktype,        mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_protocol,        mmux_sint_t}
-@MmuxSetterGetter{addrinfo, ai_addrlen,         mmux_socklen_t}
-@MmuxSetterGetter{addrinfo, ai_addr,            mmux_libc_sockaddr_t *}
-@MmuxSetterGetter{addrinfo, ai_canonname,       mmux_asciizp_t}
-@MmuxSetterGetter{addrinfo, ai_next,            mmux_libc_addrinfo_t *}
+According to the standard: the data structure @MmuxCStruct{addrinfo} represents informations about
+networking--addresses associated to networking--sockets.  Under @value{PACKAGE}: such data structure
+is aliased by the object type @objtype{mmux_libc_network_socket_address_info_t}.
+
+To instantiate a networking--socket address information object, initialising it with raw field
+values, we do:
+
+@example
+mmux_libc_addrinfo_t  addrinfo;
+
+/* Initialise the fields of addrinfo. */
+@{
+  mmux_libc_sockaddr_ipfour_t  sockaddr;
+
+  /* Initialise the fields of sockaddr. */
+  @{
+    mmux_libc_ipfour_addr_t  ipaddr;
+
+    /* Build the IPv4 address. */
+    @{
+      mmux_asciizcp_t  presentation = "127.0.0.1";
+
+      if (mmux_libc_make_ipfour_addr_from_asciiz(ipaddr, presentation)) @{
+        /* error */
+      @}
+    @}
+
+    /* Initialise the fields of the IPv4 address. */
+    @{
+      mmux_libc_sockaddr_ipfour_family_set(sockaddr, MMUX_LIBC_AF_INET);
+      mmux_libc_sockaddr_ipfour_addr_set(sockaddr, ipaddr);
+      mmux_libc_sockaddr_ipfour_port_set(sockaddr,
+        mmux_libc_network_port_number_from_host_byteorder_literal(25));
+    @}
+  @}
+
+  /* Initialise the field ai_family. */
+  mmux_libc_addrinfo_family_set(addrinfo, MMUX_LIBC_AF_INET);
+
+  /* Initialise the field ai_socktype. */
+  mmux_libc_addrinfo_socket_communication_style_set(addrinfo, MMUX_LIBC_SOCK_STREAM);
+
+  /* Initialise the field ai_protocol. */
+  mmux_libc_addrinfo_internet_protocol_set(addrinfo, MMUX_LIBC_IPPROTO_TCP);
+
+  /* Initialise the field ai_flags. */
+  mmux_libc_addrinfo_flags_set(addrinfo,
+    mmux_libc_network_addrinfo_flags(MMUX_LIBC_AI_V4MAPPED |
+                                     MMUX_LIBC_AI_ADDRCONFIG |
+                                     MMUX_LIBC_AI_CANONNAME));
+
+  /* Initialise the field ai_addrlen. */
+  @{
+    mmux_libc_socklen_t     addrlen;
+
+    mmux_libc_sockaddr_bind_length(&addrlen, sockaddr);
+    mmux_libc_addrinfo_addrlen_set(addrinfo, addrlen);
+  @}
+
+  /* Initialise the field ai_addr. */
+  mmux_libc_addrinfo_sockaddr_set(addrinfo, sockaddr);
+
+  /* Initialise the field ai_canonname. */
+  mmux_libc_addrinfo_canonname_set(addrinfo, "localhost");
+
+  /* Initialise the field ai_next. */
+  mmux_libc_addrinfo_next_set(addrinfo, NULL);
+@}
+@end example
+
+@noindent
+after this, we can perform the following operations:
+
+@itemize
+@item
+to dump the contents of the address information object as
+@objtype{mmux_libc_network_socket_address_info_t}, we do:
+
+@example
+@{
+  mmux_libc_oufd_t  er;
+
+  mmux_libc_stder(er);
+  if (mmux_libc_addrinfo_dump(er, addrinfo, NULL)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+which prints something like:
+
+@example
+struct addrinfo = 0x7ffca733a090
+struct addrinfo.ai_flags = "+101010" (AI_ADDRCONFIG | AI_CANONNAME | AI_V4MAPPED)
+struct addrinfo.ai_family = "2" (AF_INET)
+struct addrinfo.ai_socktype = "1" (SOCK_STREAM)
+struct addrinfo.ai_protocol = "6" (IPPROTO_TCP)
+struct addrinfo.ai_addrlen = "16" (struct sockaddr_in)
+struct addrinfo.ai_addr = 0x7ffca733a080
+struct addrinfo.ai_addr.sa_family = "2" (AF_INET)
+struct addrinfo.ai_addr = 0x7ffca733a080
+struct addrinfo.ai_addr.sin_family = "2" (AF_INET)
+struct addrinfo.ai_addr.sin_addr = "127.0.0.1"
+struct addrinfo.ai_addr.sin_port = 0x1900 [network byteorder] (host byteorder: 25)
+struct addrinfo.ai_canonname = "0x40305a" (localhost)
+struct addrinfo.ai_next = "(nil)"
+@end example
+@end itemize
+
+@c ------------------------------------------------------------------------
+
+@MmuxCWrapperStructOpaqueTypedef{network_address_socket_info,addrinfo}
+@MmuxCWrapperStructArrayOneTypedef{addrinfo,network_address_socket_info}
+@MmuxCWrapperStructPointerTypedef{addrinfo,network_address_socket_info}
+
+
+@deftypefun bool mmux_libc_addrinfo_family_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_network_address_family_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_family_ref (mmux_libc_network_address_family_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_family} of @MmuxCStruct{addrinfo}.
+
+Valid values for this field should be mainly @samp{MMUX_LIBC_AF_INET}, @samp{MMUX_LIBC_AF_INET6},
+@samp{MMUX_LIBC_AF_UNSPEC}; other values might be possibly allowed, @MmuxCFuncpage{getaddrinfo}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_libc_network_address_family_t  ai_family;
+
+mmux_libc_addrinfo_family_ref(&ai_family, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_socket_communication_style_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_network_socket_communication_style_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_socket_communication_style_ref (mmux_libc_network_socket_communication_style_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_socktype} of @MmuxCStruct{addrinfo}.  @ref{networking
+addresses sockets style, Networking sockets communication styles}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_libc_network_socket_communication_style_t  ai_socktype;
+
+mmux_libc_addrinfo_socket_communication_style_ref(&ai_socktype, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_internet_protocol_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_network_internet_protocol_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_internet_protocol_ref (mmux_libc_network_internet_protocol_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_protocol} of @MmuxCStruct{addrinfo}.  @ref{networking
+addresses protocol family, Networking protocol families}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_libc_network_internet_protocol_t  ai_protocol;
+
+mmux_libc_addrinfo_internet_protocol_ref(&ai_protocol, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_flags_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_network_addrinfo_flags_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_flags_ref (mmux_libc_network_addrinfo_flags_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_flags} of @MmuxCStruct{addrinfo}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_libc_network_addrinfo_flags_t  ai_flags;
+
+mmux_libc_addrinfo_flags_ref(&ai_flags, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftp {Struct Typedef} mmux_libc_network_addrinfo_flags_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing a bitwise OR combination of flags for the field @code{ai_flags} of
+@MmuxCStruct{addrinfo}.
+@end deftp
+
+
+@deftypefun mmux_libc_network_addrinfo_flags_t mmux_libc_network_addrinfo_flags (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_network_addrinfo_flags_t}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_addrlen_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_socklen_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_addrlen_ref (mmux_libc_socklen_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_addrlen} of @MmuxCStruct{addrinfo}.
+
+This field represents the number of bytes required to contain the data of the @MmuxCStruct{sockaddr}
+representing the networking--socket address associated to this object; this is the same value
+computed by the functions @cfunc{mmux_libc_sockaddr*_bind_length}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_libc_socklen_t  ai_addrlen;
+
+mmux_libc_addrinfo_addrlen_ref(&ai_addrlen, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_sockaddr_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_sockaddr_arg_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_sockaddr_ref (mmux_libc_sockaddr_t @var{sockaddr_result}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_addr} of @MmuxCStruct{addrinfo}.
+
+@quotation
+@strong{OPINION} The field @code{ai_addr} should have been called @code{ai_sockaddr}.
+@end quotation
+
+To use the field setter: only the pointer @objtype{mmux_libc_sockaddr_t} is stored in the
+@var{addrinfo}, so we need to keep alive the networking--socket address while we keep alive the
+@var{addrinfo}.
+
+To use the field getter: we have to allocate a block of memory wide enough to contain the whole
+address; we can do it by accessing the @code{ai_addrlen} field.  Example:
+
+@example
+mmux_libc_addrinfo_t  addrinfo;
+mmux_libc_socklen_t   ai_addrlen;
+
+gimme_an_addrinfo(addrinfo);
+mmux_libc_addrinfo_addrlen_ref(&ai_addrlen, addrinfo);
+@{
+  mmux_standard_octet_t  bufptr[ai_addrlen.value];
+  auto  ai_addr = (mmux_libc_sockaddr_t) bufptr;
+
+  mmux_libc_addrinfo_sockaddr_ref(ai_addr, addrinfo);
+  /* Do something with "ai_addr". */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_canonname_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_asciizcp_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_canonname_ref (mmux_asciizcp_t * @var{field_value_result_p}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_canonname} of @MmuxCStruct{addrinfo}.
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+mmux_asciizcp_t  ai_canonname;
+
+mmux_libc_addrinfo_canonname_ref(&ai_canonname, addrinfo);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_addrinfo_next_set (mmux_libc_addrinfo_t @var{addrinfo}, mmux_libc_addrinfo_arg_t @var{new_field_value})
+@deftypefunx bool mmux_libc_addrinfo_next_ref (bool * @var{there_is_one_more_result_p}, mmux_libc_addrinfo_t @var{addrinfo_result}, mmux_libc_addrinfo_arg_t @var{addrinfo})
+Setter and getter for the field @code{ai_next} of @MmuxCStruct{addrinfo}.
+
+For the getter function:
+
+@itemize
+@item
+if the field @code{ai_next} is @cnull{}: the variable referenced by @var{there_is_one_more_result_p}
+is set to @cfalse{} and the value referenced by @var{addrinfo_result} is left untouched;
+
+@item
+if the field @code{ai_next} is not @cnull{}: the variable referenced by
+@var{there_is_one_more_result_p} is set to @ctrue{} and the value referenced by
+@var{addrinfo_result} is filled with the ``next'' data structure values.
+@end itemize
+
+After the object definition in the example above, we can use the field getter as follows:
+
+@example
+bool                      there_is_one_more;
+mmux_libc_addrinfo_t      ai_next;
+
+if (mmux_libc_addrinfo_next_ref(&there_is_one_more, ai_next, addrinfo)) @{
+  /* error */
+@}
+if (true == there_is_one_more) @{
+  /* Do something with "ai_next". */
+@}
+@end example
+@end deftypefun
+
+
 @MmuxStructDumper{addrinfo}
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Flags for the field @code{ai_flags}
+
+
+For the meaning of the following flags @MmuxCFuncpage{getaddrinfo}.
+
+
+@MmuxDefineConstant{AI_ADDRCONFIG}
+@MmuxDefineConstant{AI_ALL}
+@MmuxDefineConstant{AI_CANONIDN}
+@MmuxDefineConstant{AI_CANONNAME}
+@MmuxDefineConstant{AI_IDN}
+@MmuxDefineConstant{AI_NUMERICSERV}
+@MmuxDefineConstant{AI_PASSIVE}
+@MmuxDefineConstant{AI_V4MAPPED}
 
 @c page
 @node networking addresses sockets getaddrinfo

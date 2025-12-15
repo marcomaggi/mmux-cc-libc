@@ -897,7 +897,8 @@ check_PROGRAMS	+= \
 	tests/test-networking-struct-servent				\
 	tests/test-networking-struct-protoent				\
 	tests/test-networking-struct-netent				\
-	tests/test-networking-struct-sockaddr-all
+	tests/test-networking-struct-sockaddr-all			\
+	tests/test-networking-struct-addrinfo
 
 tests_test_networking_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -931,6 +932,9 @@ tests_test_networking_struct_netent_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_networking_struct_sockaddr_all_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_struct_sockaddr_all_LDADD		= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_struct_addrinfo_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_struct_addrinfo_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"
