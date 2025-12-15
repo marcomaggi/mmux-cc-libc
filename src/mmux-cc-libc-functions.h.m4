@@ -3384,13 +3384,16 @@ mmux_cc_libc_decl bool mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc
 						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_getaddrinfo (mmux_libc_addrinfo_t result_addrinfo_linked_list_pp,
-					      mmux_sint_t * result_error_code_p,
+mmux_cc_libc_decl bool mmux_libc_getaddrinfo (bool * there_is_one_more,
+					      mmux_libc_first_addrinfo_t first_addrinfo_result,
+					      mmux_libc_addrinfo_t ai_next_result,
+					      mmux_sint_t * error_code_result_p,
 					      mmux_asciizcp_t node, mmux_asciizcp_t service,
-					      mmux_libc_addrinfo_arg_t hints_pointer)
-  __attribute__((__nonnull__(1,2,3,4,5),__warn_unused_result__));
+					      mmux_libc_addrinfo_arg_t hints_addrinfo)
+  /* The arguments "node", "service", "hints_addrinfo" can be NULL. */
+  __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_freeaddrinfo (mmux_libc_addrinfo_t addrinfo_linked_list_p)
+mmux_cc_libc_decl bool mmux_libc_freeaddrinfo (mmux_libc_first_addrinfo_t addrinfo_linked_list_p)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)

@@ -2540,15 +2540,19 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
 
     /* Inspect the field: ai_addr, it is a pointer to "struct sockaddr" */
     {
-      mmux_standard_usize_t	provided_nbytes = 256, required_nbytes;
-      mmux_standard_char_t	bufptr[provided_nbytes];
-      auto	A = (mmux_libc_network_socket_address_t *) (addrinfo_p->ai_addr);
+      if (NULL != addrinfo_p->ai_addr) {
+	mmux_standard_usize_t	provided_nbytes = 256, required_nbytes;
+	mmux_standard_char_t	bufptr[provided_nbytes];
+	auto	A = (mmux_libc_network_socket_address_t *) (addrinfo_p->ai_addr);
 
-      required_nbytes = snprintf(bufptr, provided_nbytes, "%s.ai_addr", struct_name);
-      if (required_nbytes >= provided_nbytes) {
-	return true;
+	required_nbytes = snprintf(bufptr, provided_nbytes, "%s.ai_addr", struct_name);
+	if (required_nbytes >= provided_nbytes) {
+	  return true;
+	}
+	mmux_libc_sockaddr_dump(mfd, A, bufptr);
+      } else {
+	DPRINTF(mfd, "%s.ai_addr = %p\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_addr));
       }
-      mmux_libc_sockaddr_dump(mfd, A, bufptr);
     }
 
     /* Inspect the field: ai_canonname */
@@ -2580,14 +2584,10 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
   return rv;
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Address conversion to/from ASCII presentation.
  ** ----------------------------------------------------------------- */
-
-#endif
 
 bool
 mmux_libc_inet_aton (mmux_libc_ipfour_addr_t address_result, mmux_asciizcp_t input_presentation_p)
@@ -2787,32 +2787,40 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_NTOP]]],[[[
 ]]])
 }
 
-
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Address informations.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_getaddrinfo (mmux_libc_addrinfo_ptr_t * result_addrinfo_linked_list_pp,
-		       mmux_sint_t * result_error_code_p,
-		       mmux_asciizcp_t node, mmux_asciizcp_t service, mmux_libc_addrinfo_ptr_t hints_pointer)
+mmux_libc_getaddrinfo (bool * there_is_one_more,
+		       mmux_libc_first_addrinfo_t first_addrinfo_result,
+		       mmux_libc_addrinfo_t ai_next_result,
+		       mmux_sint_t * error_code_result_p,
+		       mmux_asciizcp_t node, mmux_asciizcp_t service, mmux_libc_addrinfo_arg_t hints_addrinfo)
 {
-  int	rv = getaddrinfo(node, service, hints_pointer, result_addrinfo_linked_list_pp);
+  struct addrinfo *	ptr;
+  int	rv = getaddrinfo(node, service, hints_addrinfo, &ptr);
 
   if (0 == rv) {
+    if (NULL != ptr) {
+      *there_is_one_more = true;
+      first_addrinfo_result->value = (mmux_libc_network_socket_address_info_t const *) ptr;
+      *((struct addrinfo *) ai_next_result) = *ptr;
+    } else {
+      *there_is_one_more = false;
+    }
     return false;
   } else {
-    *result_error_code_p = mmux_sint(rv);
+    *error_code_result_p = mmux_sint(rv);
+    first_addrinfo_result->value = NULL;
     return true;
   }
 }
 bool
-mmux_libc_freeaddrinfo (mmux_libc_addrinfo_ptr_t addrinfo_linked_list_p)
+mmux_libc_freeaddrinfo (mmux_libc_first_addrinfo_t first_addrinfo_in_linked_list)
 {
-  freeaddrinfo(addrinfo_linked_list_p);
+  freeaddrinfo((struct addrinfo *) (first_addrinfo_in_linked_list->value));
   return false;
 }
 bool
@@ -2824,11 +2832,11 @@ mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t er
 bool
 mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t provided_hostname_len,
 		       mmux_asciizcp_t result_servname_p, mmux_libc_socklen_t provided_servname_len,
-		       mmux_sint_t * result_error_code_p,
-		       mmux_libc_sockaddr_ptr_t input_sockaddr_p, mmux_libc_socklen_t input_sockaddr_size,
+		       mmux_sint_t * error_code_result_p,
+		       mmux_libc_sockaddr_arg_t input_sockaddr_p, mmux_libc_socklen_t input_sockaddr_size,
 		       mmux_sint_t flags)
 {
-  int	rv = getnameinfo(input_sockaddr_p, input_sockaddr_size.value,
+  int	rv = getnameinfo((const struct sockaddr *)input_sockaddr_p, input_sockaddr_size.value,
 			 (mmux_asciizp_t)result_hostname_p, provided_hostname_len.value,
 			 (mmux_asciizp_t)result_servname_p, provided_servname_len.value,
 			 flags.value);
@@ -2836,31 +2844,12 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
   if (0 == rv) {
     return false;
   } else {
-    *result_error_code_p = mmux_sint(rv);
+    *error_code_result_p = mmux_sint(rv);
     return true;
   }
 }
 
-bool
-mmux_libc_sethostent (bool stayopen)
-{
-  sethostent((mmux_standard_sint_t)stayopen);
-  return false;
-}
-bool
-mmux_libc_endhostent (void)
-{
-  endhostent();
-  return false;
-}
-bool
-mmux_libc_gethostent (mmux_libc_hostent_t const * * result_hostent_pp)
-{
-  mmux_libc_hostent_ptr_t	hostent_p = gethostent();
-
-  *result_hostent_pp = hostent_p;
-  return false;
-}
+#if 0
 
 
 /** --------------------------------------------------------------------
