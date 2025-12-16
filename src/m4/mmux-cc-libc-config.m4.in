@@ -448,6 +448,18 @@ m4_define([[[mmux_libc_VALUEOF_INADDR_BROADCAST]]],		[[[@MMUX_VALUEOF_INADDR_BRO
 m4_define([[[mmux_libc_VALUEOF_INADDR_LOOPBACK]]],		[[[@MMUX_VALUEOF_INADDR_LOOPBACK@]]])
 m4_define([[[mmux_libc_VALUEOF_INADDR_NONE]]],			[[[@MMUX_VALUEOF_INADDR_NONE@]]])
 
+m4_define([[[mmux_libc_VALUEOF_EAI_ADDRFAMILY]]],		[[[@MMUX_VALUEOF_@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_AGAIN]]],			[[[@MMUX_VALUEOF_EAI_AGAIN@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_BADFLAGS]]],			[[[@MMUX_VALUEOF_EAI_BADFLAGS@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_FAIL]]],			[[[@MMUX_VALUEOF_EAI_FAIL@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_FAMILY]]],			[[[@MMUX_VALUEOF_EAI_FAMILY@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_MEMORY]]],			[[[@MMUX_VALUEOF_EAI_MEMORY@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_NODATA]]],			[[[@MMUX_VALUEOF_EAI_NODATA@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_NONAME]]],			[[[@MMUX_VALUEOF_EAI_NONAME@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_OVERFLOW]]],			[[[@MMUX_VALUEOF_EAI_OVERFLOW@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_SERVICE]]],			[[[@MMUX_VALUEOF_EAI_SERVICE@]]])
+m4_define([[[mmux_libc_VALUEOF_EAI_SYSTEM]]],			[[[@MMUX_VALUEOF_EAI_SYSTEM@]]])
+
 m4_define([[[mmux_libc_VALUEOF_EXIT_SUCCESS]]],			[[[@MMUX_VALUEOF_EXIT_SUCCESS@]]])
 m4_define([[[mmux_libc_VALUEOF_EXIT_FAILURE]]],			[[[@MMUX_VALUEOF_EXIT_FAILURE@]]])
 

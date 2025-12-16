@@ -17381,6 +17381,7 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 @MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_MEMORY}
 @MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_NODATA}
 @MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_NONAME}
+@MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_OVERFLOW}
 @MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_SERVICE}
 @MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{EAI_SYSTEM}
 
