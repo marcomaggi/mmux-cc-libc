@@ -229,6 +229,30 @@ MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_NONE)
 
 
 /** --------------------------------------------------------------------
+ ** Sockets getaddrinfo error codes.
+ ** ----------------------------------------------------------------- */
+
+m4_divert(-1)
+m4_define([[[MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT]]],[[[m4_dnl
+m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
+[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
+[[[#define MMUX_HAVE_LIBC_$1	1
+#define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
+#define MMUX_LIBC_$1	((mmux_libc_gai_errno_t) { .value = MMUX_LIBC_VALUEOF_$1 }) ]]])]]])
+m4_divert(0)m4_dnl
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_ADDRFAMILY)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_AGAIN)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_BADFLAGS)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_FAIL)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_FAMILY)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_MEMORY)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_NODATA)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_NONAME)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_SERVICE)
+MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_SYSTEM)
+
+
+/** --------------------------------------------------------------------
  ** Errno codes.
  ** ----------------------------------------------------------------- */
 

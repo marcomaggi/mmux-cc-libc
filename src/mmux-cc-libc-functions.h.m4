@@ -2734,6 +2734,11 @@ mmux_libc_network_interface_index (mmux_standard_uint_t value)
 {
   return (mmux_libc_network_interface_index_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_gai_errno_t
+mmux_libc_gai_errno (mmux_standard_uint_t value)
+{
+  return (mmux_libc_gai_errno_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -3384,26 +3389,32 @@ mmux_cc_libc_decl bool mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t fd, mmux_libc
 						mmux_asciizcp_t struct_name)
   __attribute__((__nonnull__(1,2)));
 
-mmux_cc_libc_decl bool mmux_libc_getaddrinfo (bool * there_is_one_more,
-					      mmux_libc_first_addrinfo_t first_addrinfo_result,
-					      mmux_libc_addrinfo_t ai_next_result,
-					      mmux_sint_t * error_code_result_p,
-					      mmux_asciizcp_t node, mmux_asciizcp_t service,
-					      mmux_libc_addrinfo_arg_t hints_addrinfo)
+mmux_cc_libc_decl bool mmux_libc_getaddrinfo (bool *                      there_is_one_more_result_p,
+					      mmux_libc_first_addrinfo_t  first_addrinfo_result,
+					      mmux_libc_addrinfo_t        ai_next_result,
+					      mmux_libc_gai_errno_t *	  gai_errno_result_p,
+					      mmux_asciizcp_t             node,
+					      mmux_asciizcp_t             service,
+					      mmux_libc_addrinfo_arg_t    hints_addrinfo)
   /* The arguments "node", "service", "hints_addrinfo" can be NULL. */
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_freeaddrinfo (mmux_libc_first_addrinfo_t addrinfo_linked_list_p)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)
+mmux_cc_libc_decl bool mmux_libc_gai_errno_equal (bool * are_equal_result_p,
+						  mmux_libc_gai_errno_t errnum1,
+						  mmux_libc_gai_errno_t errnum2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_libc_gai_errno_t errnum)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_getnameinfo (mmux_asciizcp_t		result_hostname_p,
 					      mmux_libc_socklen_t	provided_hostname_len,
 					      mmux_asciizcp_t		result_servname_p,
 					      mmux_libc_socklen_t	provided_servname_len,
-					      mmux_sint_t *		result_error_code_p,
+					      mmux_libc_gai_errno_t *	gai_errno_result_p,
 					      mmux_libc_sockaddr_arg_t	input_sockaddr_p,
 					      mmux_libc_socklen_t	input_sockaddr_size,
 					      mmux_sint_t		flags)

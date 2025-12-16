@@ -2793,10 +2793,18 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_INET_NET_NTOP]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_getaddrinfo (bool * there_is_one_more,
+mmux_libc_gai_errno_equal (bool * are_equal_result_p,
+			   mmux_libc_gai_errno_t errnum1,
+			   mmux_libc_gai_errno_t errnum2)
+{
+  return mmux_sint_equal_p(are_equal_result_p, &errnum1, &errnum2);
+}
+
+bool
+mmux_libc_getaddrinfo (bool * there_is_one_more_result_p,
 		       mmux_libc_first_addrinfo_t first_addrinfo_result,
 		       mmux_libc_addrinfo_t ai_next_result,
-		       mmux_sint_t * error_code_result_p,
+		       mmux_libc_gai_errno_t * gai_errno_result_p,
 		       mmux_asciizcp_t node, mmux_asciizcp_t service, mmux_libc_addrinfo_arg_t hints_addrinfo)
 {
   struct addrinfo *	ptr;
@@ -2804,16 +2812,15 @@ mmux_libc_getaddrinfo (bool * there_is_one_more,
 
   if (0 == rv) {
     if (NULL != ptr) {
-      *there_is_one_more = true;
+      *there_is_one_more_result_p = true;
       first_addrinfo_result->value = (mmux_libc_network_socket_address_info_t const *) ptr;
       *((struct addrinfo *) ai_next_result) = *ptr;
     } else {
-      *there_is_one_more = false;
+      *there_is_one_more_result_p = false;
     }
     return false;
   } else {
-    *error_code_result_p = mmux_sint(rv);
-    first_addrinfo_result->value = NULL;
+    *gai_errno_result_p = mmux_libc_gai_errno(rv);
     return true;
   }
 }
@@ -2824,7 +2831,7 @@ mmux_libc_freeaddrinfo (mmux_libc_first_addrinfo_t first_addrinfo_in_linked_list
   return false;
 }
 bool
-mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t errnum)
+mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_libc_gai_errno_t errnum)
 {
   *result_error_message_p = gai_strerror(errnum.value);
   return false;
@@ -2832,7 +2839,7 @@ mmux_libc_gai_strerror (mmux_asciizcp_t * result_error_message_p, mmux_sint_t er
 bool
 mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t provided_hostname_len,
 		       mmux_asciizcp_t result_servname_p, mmux_libc_socklen_t provided_servname_len,
-		       mmux_sint_t * error_code_result_p,
+		       mmux_libc_gai_errno_t * gai_errno_result_p,
 		       mmux_libc_sockaddr_arg_t input_sockaddr_p, mmux_libc_socklen_t input_sockaddr_size,
 		       mmux_sint_t flags)
 {
@@ -2844,7 +2851,7 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
   if (0 == rv) {
     return false;
   } else {
-    *error_code_result_p = mmux_sint(rv);
+    *gai_errno_result_p = mmux_libc_gai_errno(rv);
     return true;
   }
 }
