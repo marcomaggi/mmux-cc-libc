@@ -161,6 +161,9 @@ test_getaddrinfo_with_localhost_hints (void)
       printf_error("getaddrinfo-ing: %s", error_message);
       handle_error();
     }
+
+    /* Which one is the more readable? */
+#if 0
     if (there_is_one_more) {
       do {
 	mmux_libc_oufd_t	er;
@@ -177,6 +180,21 @@ test_getaddrinfo_with_localhost_hints (void)
 	handle_error();
       }
     }
+#else
+    for (; there_is_one_more; mmux_libc_addrinfo_next_ref(&there_is_one_more, ai_next, ai_next)) {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_addrinfo_dump(er, ai_next, NULL)) {
+	handle_error();
+      }
+    }
+    printf_message("freeaddrinfo-ing");
+    if (mmux_libc_freeaddrinfo(first_addrinfo)) {
+      printf_error("freeaddrinfo-ing");
+      handle_error();
+    }
+#endif
 
   }
   printf_message("DONE: %s\n", __func__);
@@ -304,6 +322,35 @@ test_getaddrinfo_with_poste_it_hints (void)
 }
 
 
+static void
+test_getaddrinfo_with_non_existent_host (void)
+{
+  printf_message("testing: %s", __func__);
+  {
+    bool			there_is_one_more;
+    mmux_libc_first_addrinfo_t	first_addrinfo;
+    mmux_libc_addrinfo_t	ai_next;
+    mmux_libc_gai_errno_t	gai_errno;
+    mmux_asciizcp_t		node = "poppapoppa", service = "smtp";
+
+    printf_message("getaddrinfo-ing");
+    if (mmux_libc_getaddrinfo(&there_is_one_more, first_addrinfo, ai_next, &gai_errno,
+			      node, service, NULL)) {
+      mmux_asciizcp_t	error_message;
+
+      mmux_libc_gai_strerror(&error_message, gai_errno);
+      printf_message("getaddrinfo-ing: correctly found no matching address: %s", error_message);
+    }
+    /* Let's check that this does not cause a segmentation fault. */
+    if (mmux_libc_freeaddrinfo(first_addrinfo)) {
+      printf_error("freeaddrinfo-ing");
+      handle_error();
+    }
+  }
+  printf_message("DONE: %s\n", __func__);
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -320,6 +367,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true)  {	test_getaddrinfo_no_hints();			}
   if (true)  {	test_getaddrinfo_with_localhost_hints();	}
   if (false) {	test_getaddrinfo_with_poste_it_hints();		}
+  if (true)  {	test_getaddrinfo_with_non_existent_host();	}
 
   mmux_libc_exit_success();
 }

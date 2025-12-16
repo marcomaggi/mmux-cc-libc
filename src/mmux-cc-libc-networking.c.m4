@@ -2807,7 +2807,7 @@ mmux_libc_getaddrinfo (bool * there_is_one_more_result_p,
 		       mmux_libc_gai_errno_t * gai_errno_result_p,
 		       mmux_asciizcp_t node, mmux_asciizcp_t service, mmux_libc_addrinfo_arg_t hints_addrinfo)
 {
-  struct addrinfo *	ptr;
+  struct addrinfo *	ptr = NULL;
   int	rv = getaddrinfo(node, service, hints_addrinfo, &ptr);
 
   if (0 == rv) {
@@ -2816,18 +2816,23 @@ mmux_libc_getaddrinfo (bool * there_is_one_more_result_p,
       first_addrinfo_result->value = (mmux_libc_network_socket_address_info_t const *) ptr;
       *((struct addrinfo *) ai_next_result) = *ptr;
     } else {
-      *there_is_one_more_result_p = false;
+      *there_is_one_more_result_p  = false;
+      first_addrinfo_result->value = NULL;
+      /* Leave "ai_next_result" untouched. */
     }
     return false;
   } else {
     *gai_errno_result_p = mmux_libc_gai_errno(rv);
+    first_addrinfo_result->value = NULL;
     return true;
   }
 }
 bool
 mmux_libc_freeaddrinfo (mmux_libc_first_addrinfo_t first_addrinfo_in_linked_list)
 {
-  freeaddrinfo((struct addrinfo *) (first_addrinfo_in_linked_list->value));
+  if (NULL != first_addrinfo_in_linked_list->value) {
+    freeaddrinfo((struct addrinfo *) (first_addrinfo_in_linked_list->value));
+  }
   return false;
 }
 bool
