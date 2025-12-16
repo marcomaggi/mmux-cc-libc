@@ -17484,7 +17484,7 @@ Found host '127.0.0.1 and service '25'.
 @end example
 
 
-@deftypefun bool mmux_libc_getnameinfo (mmux_asciizcp_t @var{result_hostname_p}, mmux_socklen_t @var{provided_hostname_len}, mmux_asciizcp_t @var{result_servname_p}, mmux_socklen_t @var{provided_servname_len}, mmux_sint_t * @var{result_error_code_p}, mmux_libc_sockaddr_ptr_t @var{input_sockaddr_p}, mmux_socklen_t @var{input_sockaddr_size}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_getnameinfo (mmux_asciizcp_t @var{hostname_result}, mmux_libc_socklen_t @var{provided_hostname_len}, mmux_asciizcp_t @var{servname_result}, mmux_libc_socklen_t @var{provided_servname_len}, mmux_libc_gai_errno_t * @var{gai_errno_result_p}, mmux_libc_sockaddr_arg_t @var{sockaddr}, mmux_libc_socklen_t @var{sockaddr_length}, mmux_libc_getnameinfo_flags_t @var{flags})
 @MmuxCInterface{getnameinfo}.
 @end deftypefun
 
