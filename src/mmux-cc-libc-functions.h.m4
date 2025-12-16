@@ -2735,9 +2735,14 @@ mmux_libc_network_interface_index (mmux_standard_uint_t value)
   return (mmux_libc_network_interface_index_t) { .value = value };
 }
 mmux_cc_libc_inline_decl mmux_libc_gai_errno_t
-mmux_libc_gai_errno (mmux_standard_uint_t value)
+mmux_libc_gai_errno (mmux_standard_sint_t value)
 {
   return (mmux_libc_gai_errno_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_getnameinfo_flags_t
+mmux_libc_getnameinfo_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_getnameinfo_flags_t) { .value = value };
 }
 
 /* ------------------------------------------------------------------ */
@@ -3417,7 +3422,7 @@ mmux_cc_libc_decl bool mmux_libc_getnameinfo (mmux_asciizcp_t		result_hostname_p
 					      mmux_libc_gai_errno_t *	gai_errno_result_p,
 					      mmux_libc_sockaddr_arg_t	input_sockaddr_p,
 					      mmux_libc_socklen_t	input_sockaddr_size,
-					      mmux_sint_t		flags)
+					      mmux_libc_getnameinfo_flags_t flags)
   __attribute__((__nonnull__(1,3,5,6),__warn_unused_result__));
 
 

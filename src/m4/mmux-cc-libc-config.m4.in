@@ -407,6 +407,8 @@ m4_define([[[mmux_libc_VALUEOF_NI_NAMEREQD]]],			[[[@MMUX_VALUEOF_NI_NAMEREQD@]]
 m4_define([[[mmux_libc_VALUEOF_NI_NOFQDN]]],			[[[@MMUX_VALUEOF_NI_NOFQDN@]]])
 m4_define([[[mmux_libc_VALUEOF_NI_NUMERICHOST]]],		[[[@MMUX_VALUEOF_NI_NUMERICHOST@]]])
 m4_define([[[mmux_libc_VALUEOF_NI_NUMERICSERV]]],		[[[@MMUX_VALUEOF_NI_NUMERICSERV@]]])
+m4_define([[[mmux_libc_VALUEOF_NI_MAXHOST]]],			[[[@MMUX_VALUEOF_NI_MAXHOST@]]])
+m4_define([[[mmux_libc_VALUEOF_NI_MAXSERV]]],			[[[@MMUX_VALUEOF_NI_MAXSERV@]]])
 m4_define([[[mmux_libc_VALUEOF_IPPORT_BIFFUDP]]],		[[[@MMUX_VALUEOF_IPPORT_BIFFUDP@]]])
 m4_define([[[mmux_libc_VALUEOF_IPPORT_CMDSERVER]]],		[[[@MMUX_VALUEOF_IPPORT_CMDSERVER@]]])
 m4_define([[[mmux_libc_VALUEOF_IPPORT_DAYTIME]]],		[[[@MMUX_VALUEOF_IPPORT_DAYTIME@]]])

@@ -379,12 +379,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{SO_SNDBUF}
 @MmuxDefineConstant{SO_STYLE}
 @MmuxDefineConstant{SO_TYPE}
-@MmuxDefineConstant{NI_DGRAM}
-@MmuxDefineConstant{NI_IDN}
-@MmuxDefineConstant{NI_NAMEREQD}
-@MmuxDefineConstant{NI_NOFQDN}
-@MmuxDefineConstant{NI_NUMERICHOST}
-@MmuxDefineConstant{NI_NUMERICSERV}
 
 @MmuxDefineConstant{RWF_APPEND}
 @MmuxDefineConstant{RWF_DSYNC}
@@ -17430,34 +17424,105 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 Usage example:
 
 @example
-mmux_libc_sockaddr_in_t input_sockaddr;
-mmux_sint_t             error_code;
-mmux_sint_t             flags = 0;
+auto  hostlen = MMUX_LIBC_NI_MAXHOST;
+auto  servlen = MMUX_LIBC_NI_MAXSERV;
+char  hostname[hostlen.value];
+char  servname[servlen.value];
 
-#undef  IS_THIS_ENOUGH_QUESTION_MARK
-#define IS_THIS_ENOUGH_QUESTION_MARK	512
-char                    hostname[IS_THIS_ENOUGH_QUESTION_MARK];
-char                    servname[IS_THIS_ENOUGH_QUESTION_MARK];
+@{
+  mmux_libc_sockaddr_ipfour_t  sockaddr_ipfour;
+  mmux_libc_socklen_t          sockaddr_length;
+  mmux_libc_gai_errno_t        gai_errno;
+  auto  flags = mmux_libc_getnameinfo_flags(0);
 
-gimme_an_address(&input_sockaddr);
+  /* Initialise the socket address. */
+  @{
+    mmux_libc_ipfour_addr_t  address_ipfour;
 
-if (mmux_libc_getnameinfo (hostname, IS_THIS_ENOUGH_QUESTION_MARK,
-                           servname, IS_THIS_ENOUGH_QUESTION_MARK,
-                           &error_code,
-                           &input_sockaddr, sizeof(mmux_libc_sockaddr_in_t), flags)) @{
-  mmux_asciizcp_t      error_message;
+    if (mmux_libc_make_ipfour_addr_from_asciiz(address_ipfour, "127.0.0.1")) @{
+      /* error */
+    @}
+    mmux_libc_sockaddr_ipfour_family_set(sockaddr_ipfour, MMUX_LIBC_AF_INET);
+    mmux_libc_sockaddr_ipfour_addr_set(sockaddr_ipfour, address_ipfour);
+    mmux_libc_sockaddr_ipfour_port_set(sockaddr_ipfour,
+      mmux_libc_network_port_number_from_host_byteorder_literal(25));
+  @}
 
-  mmux_libc_gai_strerror(&error_message, error_code);
-  /* handle the error */
-@} else @{
-  /* do something with "hostname" and "servname" */
+  mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr_ipfour);
+  if (mmux_libc_getnameinfo(hostname, hostlen, servname, servlen,
+                            &gai_errno, sockaddr_ipfour, sockaddr_length, flags)) @{
+    mmux_asciizcp_t   gai_errmsg;
+
+    mmux_libc_gai_strerror(&gai_errmsg, gai_errno);
+    /* Handle the error. */
+  @}
 @}
+
+/* If successful: */
+mmux_libc_printfer("Found host '%s' and service '%s'.\n", hostname, servname);
+@end example
+
+@noindent
+on some systems, this example prints:
+
+@example
+Found host 'localhost' and service 'smtp'.
+@end example
+
+Notice that if we set the @var{flags} argument to:
+
+@example
+auto  flags = mmux_libc_getnameinfo_flags(MMUX_LIBC_NI_NUMERICHOST |
+                                          MMUX_LIBC_NI_NUMERICSERV);
+@end example
+
+@noindent
+on the same system, this example prints:
+
+@example
+Found host '127.0.0.1 and service '25'.
 @end example
 
 
 @deftypefun bool mmux_libc_getnameinfo (mmux_asciizcp_t @var{result_hostname_p}, mmux_socklen_t @var{provided_hostname_len}, mmux_asciizcp_t @var{result_servname_p}, mmux_socklen_t @var{provided_servname_len}, mmux_sint_t * @var{result_error_code_p}, mmux_libc_sockaddr_ptr_t @var{input_sockaddr_p}, mmux_socklen_t @var{input_sockaddr_size}, mmux_sint_t @var{flags})
 @MmuxCInterface{getnameinfo}.
 @end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Lengths constants for use with @cfunc{mmux_libc_getnameinfo}
+
+
+@macro MmuxDefineNetworkingGetnameinfoLengthConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_socklen_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_socklen_t} representing the standard C language constant @code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingGetnameinfoLengthConstant{NI_MAXHOST}
+@MmuxDefineNetworkingGetnameinfoLengthConstant{NI_MAXSERV}
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Flags for @cfunc{mmux_libc_getnameinfo}
+
+
+@MmuxDefineConstant{NI_DGRAM}
+@MmuxDefineConstant{NI_IDN}
+@MmuxDefineConstant{NI_NAMEREQD}
+@MmuxDefineConstant{NI_NOFQDN}
+@MmuxDefineConstant{NI_NUMERICHOST}
+@MmuxDefineConstant{NI_NUMERICSERV}
 
 @c page
 @node networking databases

@@ -2846,7 +2846,7 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
 		       mmux_asciizcp_t result_servname_p, mmux_libc_socklen_t provided_servname_len,
 		       mmux_libc_gai_errno_t * gai_errno_result_p,
 		       mmux_libc_sockaddr_arg_t input_sockaddr_p, mmux_libc_socklen_t input_sockaddr_size,
-		       mmux_sint_t flags)
+		       mmux_libc_getnameinfo_flags_t flags)
 {
   int	rv = getnameinfo((const struct sockaddr *)input_sockaddr_p, input_sockaddr_size.value,
 			 (mmux_asciizp_t)result_hostname_p, provided_hostname_len.value,

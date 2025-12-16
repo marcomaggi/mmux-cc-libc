@@ -361,7 +361,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-networking-struct-addrinfo";
+    PROGNAME = "test-networking-getaddrinfo";
   }
 
   if (true)  {	test_getaddrinfo_no_hints();			}
