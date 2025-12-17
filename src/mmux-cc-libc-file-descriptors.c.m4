@@ -263,7 +263,7 @@ mmux_libc_make_fd (mmux_libc_fd_t fd_result, mmux_standard_sint_t fd_num)
     fd_result->identity.is_directory		= false;
     fd_result->identity.is_networking_socket	= false;
     fd_result->identity.is_path_only		= false;
-    fd_result->identity.is_signal_fd		= false,
+    fd_result->identity.is_signal_fd		= false;
     fd_result->identity.is_closed_for_reading	= false;
     fd_result->identity.is_closed_for_writing	= false;
     return false;
@@ -280,7 +280,7 @@ mmux_libc_make_infd (mmux_libc_infd_t infd_result, mmux_standard_sint_t fd_num)
     infd_result->identity.is_for_ouput		= false;
     infd_result->identity.is_directory		= false;
     infd_result->identity.is_networking_socket	= false;
-    infd_result->identity.is_signal_fd		= false,
+    infd_result->identity.is_signal_fd		= false;
     infd_result->identity.is_closed_for_reading	= false;
     infd_result->identity.is_closed_for_writing	= true;
     return false;
@@ -297,7 +297,7 @@ mmux_libc_make_oufd (mmux_libc_oufd_t oufd_result, mmux_standard_sint_t fd_num)
     oufd_result->identity.is_for_ouput		= true;
     oufd_result->identity.is_directory		= false;
     oufd_result->identity.is_networking_socket	= false;
-    oufd_result->identity.is_signal_fd		= false,
+    oufd_result->identity.is_signal_fd		= false;
     oufd_result->identity.is_path_only		= false;
     oufd_result->identity.is_closed_for_reading	= true;
     oufd_result->identity.is_closed_for_writing	= false;
@@ -333,7 +333,7 @@ mmux_libc_make_sigfd (mmux_libc_sigfd_t sigfd_result, mmux_standard_sint_t fd_nu
     sigfd_result->identity.is_for_ouput			= false;
     sigfd_result->identity.is_directory			= false;
     sigfd_result->identity.is_networking_socket		= false;
-    sigfd_result->identity.is_signal_fd			= true,
+    sigfd_result->identity.is_signal_fd			= true;
     sigfd_result->identity.is_path_only			= false;
     sigfd_result->identity.is_closed_for_reading	= false;
     sigfd_result->identity.is_closed_for_writing	= true;

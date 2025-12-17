@@ -326,6 +326,9 @@ mmux_cc_libc_decl bool mmux_libc_memset (mmux_pointer_t ptr, mmux_octet_t octet,
 mmux_cc_libc_decl bool mmux_libc_memzero (mmux_pointer_t ptr, mmux_usize_t len)
   __attribute__((__nonnull__(1)));
 
+mmux_cc_libc_decl bool mmux_libc_memzero_socklen (mmux_pointer_t ptr, mmux_libc_socklen_t len)
+  __attribute__((__nonnull__(1)));
+
 mmux_cc_libc_decl bool mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointerc_t src_ptr, mmux_usize_t nbytes)
   __attribute__((__nonnull__(1,2)));
 
@@ -3527,8 +3530,10 @@ mmux_cc_libc_decl bool mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t *
  ** Networking sockets: operations.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_network_socket (mmux_libc_network_socket_t * result_p,
-						      mmux_standard_sint_t sock_num)
+mmux_cc_libc_decl bool mmux_libc_make_network_socket (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_sockfd (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
   __attribute__((__nonnull__(1)));
 
 mmux_cc_libc_decl bool mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
@@ -3537,11 +3542,11 @@ mmux_cc_libc_decl bool mmux_libc_socket (mmux_libc_network_socket_t * result_soc
 					 mmux_libc_network_internet_protocol_t   ipproto)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_shutdown (mmux_libc_network_socket_t * sockp, mmux_libc_socket_shutdown_mode_t how)
-  __attribute__((__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_shutdown (mmux_libc_sockfd_t sockfd, mmux_libc_network_socket_shutdown_mode_t how)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
-					     mmux_libc_network_socket_t * result_sock2_p,
+mmux_cc_libc_decl bool mmux_libc_socketpair (mmux_libc_sockfd_t sockfd1_result,
+					     mmux_libc_sockfd_t sockfd2_result,
 					     mmux_libc_network_protocol_family_t namespace,
 					     mmux_libc_network_socket_communication_style_t style,
 					     mmux_libc_network_internet_protocol_t ipproto)
@@ -3576,15 +3581,15 @@ mmux_cc_libc_decl bool mmux_libc_accept4 (mmux_libc_network_socket_t * result_co
 					  mmux_sint_t flags)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getpeername (mmux_libc_network_socket_t * sockp,
-					      mmux_libc_sockaddr_t sockaddr_all,
-					      mmux_libc_socklen_t * sockaddr_all_size_p)
-  __attribute__((__nonnull__(2,3),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getpeername (mmux_libc_sockfd_t sockfd,
+					      mmux_libc_sockaddr_t sockaddr_p,
+					      mmux_libc_socklen_t * sockaddr_length_p)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_getsockname (mmux_libc_network_socket_t * sockp,
-					      mmux_libc_sockaddr_t sockaddr_all,
-					      mmux_libc_socklen_t * sockaddr_all_size_p)
-  __attribute__((__nonnull__(2,3),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_getsockname (mmux_libc_sockfd_t sockfd,
+					      mmux_libc_sockaddr_t sockaddr_p,
+					      mmux_libc_socklen_t * sockaddr_length_p)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
 

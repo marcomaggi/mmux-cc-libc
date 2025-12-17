@@ -2861,21 +2861,37 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
   }
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Sockets: creation, pairs, shutdown.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_network_socket (mmux_libc_network_socket_t * result_p, mmux_standard_sint_t sock_num)
+mmux_libc_make_network_socket (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sockfd_num)
 {
-  result_p->value = sock_num;
+  if (0 <= sockfd_num) {
+    sockfd_result->value = sockfd_num;
+    sockfd_result->identity.is_for_input		= true;
+    sockfd_result->identity.is_for_ouput		= true;
+    sockfd_result->identity.is_directory		= false;
+    sockfd_result->identity.is_networking_socket	= true;
+    sockfd_result->identity.is_path_only		= false;
+    sockfd_result->identity.is_signal_fd		= false;
+    sockfd_result->identity.is_closed_for_reading	= false;
+    sockfd_result->identity.is_closed_for_writing	= false;
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_make_sockfd (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
+{
+  sockfd_result->value = sock_num;
   return false;
 }
 bool
-mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
+mmux_libc_socket (mmux_libc_network_socket_t * sockfd_result,
 		  mmux_libc_network_protocol_family_t namespace,
 		  mmux_libc_network_socket_communication_style_t style,
 		  mmux_libc_network_internet_protocol_t ipproto)
@@ -2883,21 +2899,39 @@ mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
   int	sock_num = socket(namespace.value, style.value, ipproto.value);
 
   if (-1 != sock_num) {
-    return mmux_libc_make_network_socket(result_sock_p, sock_num);
+    return mmux_libc_make_network_socket(sockfd_result, sock_num);
   } else {
     return true;
   }
 }
 bool
-mmux_libc_shutdown (mmux_libc_network_socket_t * sockp, mmux_libc_socket_shutdown_mode_t how)
+mmux_libc_shutdown (mmux_libc_sockfd_t sockfd, mmux_libc_network_socket_shutdown_mode_t how)
 {
-  int	rv = shutdown(sockp->value, how.value);
+  int	rv = shutdown(sockfd->value, how.value);
 
-  return ((0 == rv)? false : true);
+  if (0 == rv) {
+    switch (how.value) {
+    case MMUX_LIBC_VALUEOF_SHUT_RDWR:
+      sockfd->identity.is_closed_for_reading	= true;
+      sockfd->identity.is_closed_for_writing	= true;
+      break;
+
+    case MMUX_LIBC_VALUEOF_SHUT_RD:
+      sockfd->identity.is_closed_for_reading	= true;
+      break;
+
+    case MMUX_LIBC_VALUEOF_SHUT_WR:
+      sockfd->identity.is_closed_for_writing	= true;
+      break;
+    }
+    return false;
+  } else {
+    return true;
+  }
 }
 bool
-mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
-		      mmux_libc_network_socket_t * result_sock2_p,
+mmux_libc_socketpair (mmux_libc_sockfd_t sockfd1_result,
+		      mmux_libc_sockfd_t sockfd2_result,
 		      mmux_libc_network_protocol_family_t namespace,
 		      mmux_libc_network_socket_communication_style_t style,
 		      mmux_libc_network_internet_protocol_t ipproto)
@@ -2906,8 +2940,8 @@ mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
   int	rv = socketpair(namespace.value, style.value, ipproto.value, socks);
 
   if (0 == rv) {
-    mmux_libc_make_network_socket(result_sock1_p, socks[0]);
-    mmux_libc_make_network_socket(result_sock2_p, socks[1]);
+    mmux_libc_make_network_socket(sockfd1_result, socks[0]);
+    mmux_libc_make_network_socket(sockfd2_result, socks[1]);
     return false;
   } else {
     return true;
@@ -2916,20 +2950,58 @@ mmux_libc_socketpair (mmux_libc_network_socket_t * result_sock1_p,
 
 
 /** --------------------------------------------------------------------
+ ** Sockets file descriptors: inspection.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_getpeername (mmux_libc_sockfd_t sockfd,
+		       mmux_libc_sockaddr_t sockaddr_p,
+		       mmux_libc_socklen_t * sockaddr_length_p)
+{
+  mmux_standard_libc_socklen_t	len;
+  int				rv = getpeername(sockfd->value, (struct sockaddr *)sockaddr_p, &len);
+
+  if (0 == rv) {
+    *sockaddr_length_p = mmux_libc_socklen(len);
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_getsockname (mmux_libc_sockfd_t sockfd,
+		       mmux_libc_sockaddr_t sockaddr_p,
+		       mmux_libc_socklen_t * sockaddr_length_p)
+{
+  mmux_standard_libc_socklen_t	len;
+  int				rv = getsockname(sockfd->value, (struct sockaddr *)sockaddr_p, &len);
+
+  if (0 == rv) {
+    *sockaddr_length_p = mmux_libc_socklen(len);
+    return false;
+  } else {
+    return true;
+  }
+}
+
+#if 0
+
+
+/** --------------------------------------------------------------------
  ** Stream sockets.
  ** ----------------------------------------------------------------- */
 
 bool
 mmux_libc_connect (mmux_libc_network_socket_t * sockp,
-		   mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
+		   mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_size)
 {
-  int	rv = connect(sockp->value, sockaddr_pointer, sockaddr_size.value);
+  int	rv = connect(sockp->value, (struct sockaddr *)sockaddr_p, sockaddr_size.value);
 
   return ((0 == rv)? false : true);
 }
 bool
 mmux_libc_bind (mmux_libc_network_socket_t * sockp,
-		mmux_libc_sockaddr_ptr_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
+		mmux_libc_sockaddr_arg_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
 {
   int	rv = bind(sockp->value, sockaddr_pointer, sockaddr_size.value);
 
@@ -2944,7 +3016,7 @@ mmux_libc_listen (mmux_libc_network_socket_t * sockp, mmux_uint_t pending_connec
 }
 bool
 mmux_libc_accept (mmux_libc_network_socket_t * result_connected_sock_p,
-		  mmux_libc_sockaddr_ptr_t result_client_sockaddr_p,
+		  mmux_libc_sockaddr_t result_client_sockaddr_p,
 		  mmux_libc_socklen_t * result_client_sockaddr_size_p,
 		  mmux_libc_network_socket_t * server_sockp)
 /* Upon calling:  the location referenced by  "result_client_sockaddr_size_p" must be
@@ -2971,7 +3043,7 @@ mmux_libc_accept (mmux_libc_network_socket_t * result_connected_sock_p,
 }
 bool
 mmux_libc_accept4 (mmux_libc_network_socket_t * result_connected_sock_p,
-		   mmux_libc_sockaddr_ptr_t result_client_sockaddr_p,
+		   mmux_libc_sockaddr_t result_client_sockaddr_p,
 		   mmux_libc_socklen_t * result_client_sockaddr_size_p,
 		   mmux_libc_network_socket_t * server_sockp,
 		   mmux_sint_t flags)
@@ -2994,36 +3066,6 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_ACCEPT4]]],[[[
     return true;
   }
 ]]])
-}
-bool
-mmux_libc_getpeername (mmux_libc_network_socket_t * sockp,
-		       mmux_libc_sockaddr_ptr_t sockaddr_any,
-		       mmux_libc_socklen_t * sockaddr_any_size_p)
-{
-  mmux_standard_libc_socklen_t	len;
-  int				rv = getpeername(sockp->value, sockaddr_any, &len);
-
-  if (0 == rv) {
-    *sockaddr_any_size_p = mmux_libc_socklen(len);
-    return false;
-  } else {
-    return true;
-  }
-}
-bool
-mmux_libc_getsockname (mmux_libc_network_socket_t * sockp,
-		       mmux_libc_sockaddr_ptr_t sockaddr_any,
-		       mmux_libc_socklen_t * sockaddr_any_size_p)
-{
-  mmux_standard_libc_socklen_t	len;
-  int				rv = getsockname(sockp->value, sockaddr_any, &len);
-
-  if (0 == rv) {
-    *sockaddr_any_size_p = mmux_libc_socklen(len);
-    return false;
-  } else {
-    return true;
-  }
 }
 
 

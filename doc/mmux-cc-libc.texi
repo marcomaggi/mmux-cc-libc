@@ -355,9 +355,6 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{W_OK}
 @MmuxDefineConstant{X_OK}
 @MmuxDefineConstant{IFNAMSIZ}
-@MmuxDefineConstant{SHUT_RDWR}
-@MmuxDefineConstant{SHUT_RD}
-@MmuxDefineConstant{SHUT_WR}
 @MmuxDefineConstant{MSG_CONFIRM}
 @MmuxDefineConstant{MSG_DONTROUTE}
 @MmuxDefineConstant{MSG_DONTWAIT}
@@ -993,6 +990,7 @@ mmux_libc_memset(bufptr, value, buflen);
 
 
 @deftypefun bool mmux_libc_memzero (mmux_pointer_t @var{ptr}, mmux_usize_t @var{nbytes})
+@deftypefunx bool mmux_libc_memzero_socklen (mmux_pointer_t @var{ptr}, mmux_libc_socklen_t @var{len})
 @MmuxCInterface{memzero}.
 
 @example
@@ -6638,7 +6636,7 @@ a file descriptor referencing a file system pathname, without access to the file
 opened with the @samp{MMUX_LIBC_O_PATH} flag;
 
 @item
-a file descriptor referencing a networking socket;
+a file descriptor referencing a networking socket, @ref{networking sockets types} for details;
 
 @item
 a file descriptor referencing any of the special files supported by the underlying system, like a
@@ -14730,12 +14728,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 * networking byteorder::        Converting byte order storage in networking data structures.
 * networking addresses::        Networking addresses.
 * networking databases::        Networking information databases.
-* networking creating::         Sockets: creating, pairs, shutting down, inspecting.
-* networking stream::           Sending and receiving data through a stream socket.
-* networking server::           Stream socket servers.
-* networking client::           Stream socket clients.
-* networking dgram::            Sending and receiving data through a datagram socket.
-* networking options::          Socket options.
+* networking sockets::          Networking sockets.
 @end menu
 
 @c page
@@ -18007,95 +18000,311 @@ if (there_is_one) @{
 @end deftypefun
 
 @c page
-@node networking creating
-@section Sockets: creating, pairs, shutting down, inspecting
+@node networking sockets
+@section Networking sockets
 
 
-@deftp {Opaque Typedef} mmux_libc_network_socket_t
-An alias for @objtype{mmux_libc_file_descriptor_t} representing a networking socket.
+@menu
+* networking sockets types::       Networking-sockets file-descriptors.
+* networking sockets opening::     Opening networking-sockets file-descriptors.
+* networking sockets closing::     Closing networking-sockets file-descriptors.
+* networking sockets inspecting::  Inspecting networking-sockets file-descriptors.
+* networking sockets stream::      Sending and receiving data through a stream socket.
+* networking sockets server::      Stream socket servers.
+* networking sockets client::      Stream socket clients.
+* networking sockets dgram::       Sending and receiving data through a datagram socket.
+* networking sockets options::     Socket options.
+@end menu
+
+@c page
+@node networking sockets types
+@subsection Networking--sockets file--descriptors
+
+
+Networking--sockets file--descriptors are specialised file descriptors to be used to in
+communication through a network; @ref{fds fds fds} for details on file descriptors.
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_network_socket_t
+@deftpx {Parent Struct Type} mmux_libc_file_descriptor_t
+A file descriptor representing a networking socket.
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_network_socket (mmux_libc_network_socket_t * @var{result_p}, mmux_sint_t @var{sock_num})
-Initialise the value referenced by @var{result_p} with the given integer.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_socket (mmux_libc_network_socket_t * @var{result_sock_p}, mmux_sint_t @var{pf_namespace}, mmux_sint_t @var{sock_style}, mmux_sint_t @var{ipproto})
-@MmuxCInterface{socket}.
+@deftp {Struct Pointer Type} mmux_libc_sockfd_t
+Pointer type defined as:
 
 @example
-mmux_libc_network_socket_t      sock;
-
-if (mmux_libc_socket(&sock, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
-  /* error */
-@}
-
-mmux_libc_shutdown(sock, MMUX_LIBC_SHUT_RDWR);
+typedef mmux_libc_network_socket_t  mmux_libc_sockfd_t[1];
 @end example
-@end deftypefun
+
+@noindent
+it is meant to be used to define local variables and to declare a result argument for functions that
+open a new networking--socket file--descriptor or retrieve an already opened networking--socket
+file--descriptor, so the referenced @objtype{mmux_libc_network_socket_t} instance must be mutable.
+@end deftp
 
 
-@deftypefun bool mmux_libc_shutdown (mmux_libc_network_socket_t @var{sock}, mmux_sint_t @var{shut_how})
-@MmuxCInterface{shutdown}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_socketpair (mmux_libc_network_socket_t * @var{result_sock1_p}, mmux_libc_network_socket_t * @var{result_sock2_p}, mmux_sint_t @var{pf_namespace}, mmux_sint_t @var{sock_style}, mmux_sint_t @var{ipproto})
-@MmuxCInterface{socketpair}.
+@deftp {Struct Pointer Type} mmux_libc_sockfd_arg_t
+Pointer type defined as:
 
 @example
-mmux_libc_network_socket_t      sock1, sock2;
-
-if (mmux_libc_socketpair(&sock1, &sock2, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
-  /* error */
-@}
+typedef mmux_libc_network_socket_t const *  mmux_libc_sockfd_arg_t;
 @end example
-@end deftypefun
 
-@c ------------------------------------------------------------------------
+@noindent
+it is meant to be used to declare an argument for functions that use an already open
+networking--socket file--descriptor as input, so the referenced @objtype{mmux_libc_network_socket_t}
+instance is handled as immutable.
+@end deftp
 
-@deftypefun bool mmux_libc_getpeername (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t * @var{provided_sockaddr_size})
-@MmuxCInterface{getpeername}.
 
-@example
-mmux_libc_network_socket_t      sock;
-mmux_libc_sockaddr_t            sockaddr;
-mmux_socklen_t                  sockaddr_size = sizeof(mmux_libc_sockaddr_t);
-
-gimme_a_stream_sock(&sock);
-
-if (mmux_libc_getpeername(sock, &sockaddr, &sockaddr_size)) @{
-  /* error */
-@}
-
-/* do something with "sockaddr", whose real size is "sockaddr_size" */
-@end example
-@end deftypefun
-
-@c ------------------------------------------------------------------------
-
-@deftypefun bool mmux_libc_getsockname (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t * @var{provided_sockaddr_size})
-@MmuxCInterface{getsockname}.
+@deftypefun bool mmux_libc_make_network_socket (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num})
+@deftypefunx bool mmux_libc_make_sockfd (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num})
+Make a new socket file descriptor; the two functions are synonyms.  If @var{sockfdfd_num} is
+negative: @var{sockfd_result} is left untouched and the return value is @ctrue{}.
 
 @example
-mmux_libc_network_socket_t      sock;
-mmux_libc_sockaddr_t            sockaddr;
-mmux_socklen_t                  sockaddr_size = sizeof(mmux_libc_sockaddr_t);
+mmux_libc_sockfd_t  sockfd;
 
-gimme_a_stream_sock(&sock);
-
-if (mmux_libc_getsockname(sock, &sockaddr, &sockaddr_size)) @{
-  /* error */
-@}
-
-/* do something with "sockaddr", whose real size is "sockaddr_size" */
+mmux_libc_make_network_socket(sockfd, 4);
 @end example
 @end deftypefun
 
 @c page
-@node networking stream
-@section Sending and receiving data through a stream socket
+@node networking sockets opening
+@subsection Opening networking-sockets file-descriptors
+
+
+@deftypefun bool mmux_libc_socket (mmux_libc_sockfd_t @var{sockfd_result}, mmux_libc_network_protocol_family_t @var{pf_namespace}, mmux_libc_network_socket_communication_style_t @var{sock_style}, mmux_libc_network_internet_protocol_t @var{ipproto})
+@MmuxCInterface{socket}.
+
+@example
+mmux_libc_sockfd_t  sockfd;
+
+if (mmux_libc_socket(sockfd, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+  /* error */
+@}
+@{
+  /* Do something with "sockfd". */
+@}
+if (mmux_libc_shutdown(sockfd, MMUX_LIBC_SHUT_RDWR)) @{
+  /* error */
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_socketpair (mmux_libc_sockfd_t @vari{sockfd_result}, mmux_libc_sockfd_t @varii{sockfd_result}, mmux_libc_network_protocol_family_t @var{pf_namespace}, mmux_libc_network_socket_communication_style_t @var{sock_style}, mmux_libc_network_internet_protocol_t @var{ipproto})
+@MmuxCInterface{socketpair}.
+
+Notice that we can create a socket--pair only with protocol family set to @samp{PF_LOCAL}.
+
+@example
+mmux_libc_sockfd_t  sockfd1, sockfd2;
+
+if (mmux_libc_socketpair(sockfd1, sockfd2, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
+  /* error */
+@}
+@{
+  /* Do something with "sockfd1" and "sockfd2". */
+@}
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(sockfd1)) @{
+    /* error */
+  @}
+  if (mmux_libc_close(sockfd2)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+@c page
+@node networking sockets closing
+@subsection Closing networking-sockets file-descriptors
+
+
+To close a socket we can use the @cfunc{mmux_libc_close}, which will work even when the socket has
+been created but not connected to any address; for example, if we create a socket with
+@cfunc{mmux_libc_socket} we can immediately close it with @cfunc{mmux_libc_close}.
+
+Only if the socket is connected we can also use @cfunc{mmux_libc_shutdown}.
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_network_socket_shutdown_mode_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing the shutdown mode for networking--sockets to be used with the
+function @cfunc{mmux_libc_shutdown}.
+@end deftp
+
+
+@deftypefun mmux_libc_network_socket_shutdown_mode_t mmux_libc_network_socket_shutdown_mode (mmux_standard_sint_t @var{mode_num})
+Build and return a new instance of @objtype{mmux_libc_network_socket_shutdown_mode_t}.  This
+function is seldom useful because we should use the predefined constants @samp{MMUX_LIBC_SHUT_*}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_shutdown (mmux_libc_sockfd_arg_t @var{sockfd}, mmux_libc_network_socket_shutdown_mode_t @var{how})
+@MmuxCInterface{shutdown}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Shutting down modes
+
+@macro MmuxDefineNetworkingShutdownModeConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_socket_shutdown_mode_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_socket_shutdown_mode_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingShutdownModeConstant{SHUT_RDWR}
+@MmuxDefineNetworkingShutdownModeConstant{SHUT_RD}
+@MmuxDefineNetworkingShutdownModeConstant{SHUT_WR}
+
+@c page
+@node networking sockets inspecting
+@subsection Inspecting networking-sockets file-descriptors
+
+
+@deftypefun bool mmux_libc_getpeername (mmux_libc_sockfd_t @var{sockfd}, mmux_libc_sockaddr_t @var{sockaddr}, mmux_libc_socklen_t * @var{sockaddr_length_p})
+@MmuxCInterface{getpeername}.
+
+The following code:
+
+@example
+mmux_libc_sockfd_t  sockfd1, sockfd2;
+
+if (mmux_libc_socketpair(sockfd1, sockfd2,
+      MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
+  /* error */
+@}
+
+@{
+  auto                   buflen = mmux_libc_socklen_literal(512);
+  mmux_standard_octet_t  bufptr[buflen.value];
+  auto                   sockaddr = (mmux_libc_sockaddr_t) bufptr;
+  auto                   sockaddr_length = buflen;
+
+  mmux_libc_memzero_socklen(bufptr, buflen);
+  if (mmux_libc_getpeername(sockfd1, sockaddr, &sockaddr_length)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_libc_oufd_t      er;
+
+    mmux_libc_stder(er);
+    if (mmux_libc_sockaddr_dump(er, sockaddr, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Final cleanup */
+@{
+  printf_message("closing socket");
+  if (mmux_libc_close(sockfd1)) @{
+    printf_error("closing socket");
+    /* error */
+  @}
+  if (mmux_libc_close(sockfd2)) @{
+    printf_error("closing socket");
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+should print something like:
+
+@example
+struct sockaddr = 0x7ffc6f6e13b0
+struct sockaddr.sa_family = "1" (AF_LOCAL)
+struct sockaddr_un = 0x7ffc6f6e13b0
+struct sockaddr_un.sun_family = "1" (AF_LOCAL)
+struct sockaddr_un.sun_path = ""
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_getsockname (mmux_libc_sockfd_t @var{sockfd}, mmux_libc_sockaddr_t @var{sockaddr}, mmux_libc_socklen_t * @var{sockaddr_length_p})
+@MmuxCInterface{getsockname}.
+
+The following code:
+
+@example
+mmux_libc_sockfd_t  sockfd1, sockfd2;
+
+if (mmux_libc_socketpair(sockfd1, sockfd2,
+      MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
+  /* error */
+@}
+
+@{
+  auto                   buflen = mmux_libc_socklen_literal(512);
+  mmux_standard_octet_t  bufptr[buflen.value];
+  auto                   sockaddr = (mmux_libc_sockaddr_t) bufptr;
+  auto                   sockaddr_length = buflen;
+
+  mmux_libc_memzero_socklen(bufptr, buflen);
+  if (mmux_libc_getsockname(sockfd1, sockaddr, &sockaddr_length)) @{
+    /* error */
+  @}
+
+  @{
+    mmux_libc_oufd_t      er;
+
+    mmux_libc_stder(er);
+    if (mmux_libc_sockaddr_dump(er, sockaddr, NULL)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Final cleanup */
+@{
+  printf_message("closing socket");
+  if (mmux_libc_close(sockfd1)) @{
+    printf_error("closing socket");
+    /* error */
+  @}
+  if (mmux_libc_close(sockfd2)) @{
+    printf_error("closing socket");
+    /* error */
+  @}
+@}
+@end example
+
+@noindent
+should print something like:
+
+@example
+struct sockaddr = 0x7ffc6f6e13b0
+struct sockaddr.sa_family = "1" (AF_LOCAL)
+struct sockaddr_un = 0x7ffc6f6e13b0
+struct sockaddr_un.sun_family = "1" (AF_LOCAL)
+struct sockaddr_un.sun_path = ""
+@end example
+@end deftypefun
+
+@c page
+@node networking sockets stream
+@subsection Sending and receiving data through a stream socket
 
 
 @deftypefun bool mmux_libc_send (mmux_usize_t * @var{result_number_of_bytes_sent_p}, mmux_libc_network_socket_t @var{sock}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{flags})
@@ -18108,8 +18317,8 @@ if (mmux_libc_getsockname(sock, &sockaddr, &sockaddr_size)) @{
 @end deftypefun
 
 @c page
-@node networking server
-@section Stream socket servers
+@node networking sockets server
+@subsection Stream socket servers
 
 
 @deftypefun bool mmux_libc_bind (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
@@ -18152,8 +18361,8 @@ to the actual size of the client address.
 @end deftypefn
 
 @c page
-@node networking client
-@section Stream socket clients
+@node networking sockets client
+@subsection Stream socket clients
 
 
 @deftypefun bool mmux_libc_connect (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
@@ -18161,8 +18370,8 @@ to the actual size of the client address.
 @end deftypefun
 
 @c page
-@node networking dgram
-@section Sending and receiving data through a datagram socket
+@node networking sockets dgram
+@subsection Sending and receiving data through a datagram socket
 
 
 @deftypefun bool mmux_libc_sendto (mmux_usize_t * @var{result_number_of_bytes_sent_p}, mmux_libc_network_socket_t @var{sock}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{flags}, mmux_libc_sockaddr_ptr_t @var{destination_sockaddr_p}, mmux_socklen_t @var{destination_sockaddr_size})
@@ -18189,8 +18398,8 @@ sender address.
 @end deftypefun
 
 @c page
-@node networking options
-@section Socket options
+@node networking sockets options
+@subsection Socket options
 
 
 @MmuxCStructOpaqueTypedef{linger}

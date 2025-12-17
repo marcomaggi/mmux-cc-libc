@@ -195,7 +195,7 @@ m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 [[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
 [[[#define MMUX_HAVE_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
-#define MMUX_LIBC_$1	((mmux_libc_socket_shutdown_mode_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
+#define MMUX_LIBC_$1	((mmux_libc_network_socket_shutdown_mode_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_RDWR)
 MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_RD)

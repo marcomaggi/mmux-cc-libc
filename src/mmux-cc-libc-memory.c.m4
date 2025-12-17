@@ -119,6 +119,12 @@ mmux_libc_memzero (mmux_pointer_t ptr, mmux_usize_t len)
   return false;
 }
 bool
+mmux_libc_memzero_socklen (mmux_pointer_t ptr, mmux_libc_socklen_t len)
+{
+  memset(ptr, '\0', (mmux_standard_usize_t)len.value);
+  return false;
+}
+bool
 mmux_libc_memcpy (mmux_pointer_t dst_ptr, mmux_pointerc_t src_ptr, mmux_usize_t nbytes)
 {
   memcpy(dst_ptr, src_ptr, nbytes.value);
