@@ -372,6 +372,9 @@ typedef struct mmux_libc_network_internet_protocol_t  { mmux_sint_t;   } mmux_li
 typedef struct mmux_libc_gai_errno_t                  { mmux_sint_t;   } mmux_libc_gai_errno_t;
 typedef struct mmux_libc_getnameinfo_flags_t          { mmux_sint_t;   } mmux_libc_getnameinfo_flags_t;
 typedef struct mmux_libc_network_addrinfo_flags_t     { mmux_sint_t;   } mmux_libc_network_addrinfo_flags_t;
+typedef struct mmux_libc_send_flags_t                 { mmux_sint_t;   } mmux_libc_send_flags_t;
+typedef struct mmux_libc_recv_flags_t                 { mmux_sint_t;   } mmux_libc_recv_flags_t;
+typedef struct mmux_libc_accept4_flags_t              { mmux_sint_t;   } mmux_libc_accept4_flags_t;
 
 typedef struct mmux_libc_network_socket_communication_style_t {
   mmux_sint_t;

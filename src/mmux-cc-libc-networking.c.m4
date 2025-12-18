@@ -2984,86 +2984,97 @@ mmux_libc_getsockname (mmux_libc_sockfd_t sockfd,
   }
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Stream sockets.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_connect (mmux_libc_network_socket_t * sockp,
-		   mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_size)
+mmux_libc_connect (mmux_libc_sockfd_arg_t client_sockfd,
+		   mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_length)
 {
-  int	rv = connect(sockp->value, (struct sockaddr *)sockaddr_p, sockaddr_size.value);
+  int	rv = connect(client_sockfd->value, (struct sockaddr *)sockaddr_p, sockaddr_length.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_bind (mmux_libc_network_socket_t * sockp,
-		mmux_libc_sockaddr_arg_t sockaddr_pointer, mmux_libc_socklen_t sockaddr_size)
+mmux_libc_bind (mmux_libc_sockfd_arg_t server_sockfd,
+		mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_length)
 {
-  int	rv = bind(sockp->value, sockaddr_pointer, sockaddr_size.value);
+  int	rv = bind(server_sockfd->value, (struct sockaddr *)sockaddr_p, sockaddr_length.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_listen (mmux_libc_network_socket_t * sockp, mmux_uint_t pending_connections_queue_length)
+mmux_libc_listen (mmux_libc_sockfd_arg_t server_sockfd, mmux_uint_t pending_connections_queue_length)
 {
-  int	rv = listen(sockp->value, pending_connections_queue_length.value);
+  int	rv = listen(server_sockfd->value, pending_connections_queue_length.value);
 
   return ((0 == rv)? false : true);
 }
 bool
-mmux_libc_accept (mmux_libc_network_socket_t * result_connected_sock_p,
-		  mmux_libc_sockaddr_t result_client_sockaddr_p,
-		  mmux_libc_socklen_t * result_client_sockaddr_size_p,
-		  mmux_libc_network_socket_t * server_sockp)
-/* Upon calling:  the location referenced by  "result_client_sockaddr_size_p" must be
- * set  to   the  number   of  bytes   allocated  for   the  address   referenced  by
- * "result_client_sockaddr_p".
- *
- * Upon      successfully     returning:      the     location      referenced     by
- * "result_client_sockaddr_size_p" is reset to the actual size of the client address.
- */
+mmux_libc_accept (mmux_libc_sockfd_t     client_connection_sockfd_result,
+		  mmux_libc_sockaddr_t   client_connection_sockaddr_result,
+		  mmux_libc_socklen_t *  client_connection_sockaddr_length_result_p,
+		  mmux_libc_sockfd_arg_t server_sockfd)
+/* The arguments "client_connection_sockaddr_*result_p" can be  NULL if the caller is
+   not interested in retrieving the client's networking-socket address. */
 {
-  mmux_standard_libc_socklen_t	len;
-  mmux_standard_sint_t		connected_sock = accept(server_sockp->value, result_client_sockaddr_p, &len);
+  /* Reset the buffer used to store the client connection sockaddr. */
+  if (client_connection_sockaddr_result && client_connection_sockaddr_length_result_p) {
+    mmux_libc_memzero_socklen(client_connection_sockaddr_result,
+			      *client_connection_sockaddr_length_result_p);
+  }
+  {
+    mmux_standard_libc_socklen_t	client_connection_sockaddr_length;
+    mmux_standard_sint_t		client_connection_sockfd_num =
+      accept(server_sockfd->value,
+	     (struct sockaddr *)client_connection_sockaddr_result, &client_connection_sockaddr_length);
 
-  if (-1 != connected_sock) {
-    if (mmux_libc_make_network_socket(result_connected_sock_p, connected_sock)) {
-      return true;
+    if (-1 != client_connection_sockfd_num) {
+      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num)) {
+	return true;
+      } else {
+	*client_connection_sockaddr_length_result_p = mmux_libc_socklen(client_connection_sockaddr_length);
+	return false;
+      }
     } else {
-      *result_client_sockaddr_size_p = mmux_libc_socklen(len);
-      return false;
+      return true;
     }
-  } else {
-    return true;
   }
 }
 bool
-mmux_libc_accept4 (mmux_libc_network_socket_t * result_connected_sock_p,
-		   mmux_libc_sockaddr_t result_client_sockaddr_p,
-		   mmux_libc_socklen_t * result_client_sockaddr_size_p,
-		   mmux_libc_network_socket_t * server_sockp,
+mmux_libc_accept4 (mmux_libc_sockfd_t    client_connection_sockfd_result,
+		   mmux_libc_sockaddr_t  client_connection_sockaddr_result,
+		   mmux_libc_socklen_t * client_connection_sockaddr_length_result_p,
+		   mmux_libc_network_socket_t * server_sockfd,
 		   mmux_sint_t flags)
+/* The arguments "client_connection_sockaddr_*result_p" can be  NULL if the caller is
+   not interested in retrieving the client's networking-socket address. */
 {
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_ACCEPT4]]],[[[
-  mmux_standard_libc_socklen_t	len;
-  mmux_standard_sint_t		connected_sock = accept4(server_sockp->value,
-							 result_client_sockaddr_p,
-							 &len,
-							 flags.value);
+  /* Reset the buffer used to store the client connection sockaddr. */
+  if (client_connection_sockaddr_result && client_connection_sockaddr_length_result_p) {
+    mmux_libc_memzero_socklen(client_connection_sockaddr_result,
+			      *client_connection_sockaddr_length_result_p);
+  }
+  {
+    mmux_standard_libc_socklen_t	client_connection_sockaddr_length;
+    mmux_standard_sint_t		client_connection_sockfd_num =
+      accept4(server_sockfd->value,
+	      (struct sockaddr *)client_connection_sockaddr_result, &client_connection_sockaddr_length,
+	      flags.value);
 
-  if (-1 != connected_sock) {
-    if (mmux_libc_make_network_socket(result_connected_sock_p, connected_sock)) {
-      return true;
+    if (-1 != client_connection_sockfd_num) {
+      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num)) {
+	return true;
+      } else {
+	*client_connection_sockaddr_length_result_p = mmux_libc_socklen(client_connection_sockaddr_length);
+	return false;
+      }
     } else {
-      *result_client_sockaddr_size_p = mmux_libc_socklen(len);
-      return false;
+      return true;
     }
-  } else {
-    return true;
   }
 ]]])
 }
@@ -3074,30 +3085,31 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_ACCEPT4]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_send (mmux_usize_t * result_number_of_bytes_sent_p,
-		mmux_libc_network_socket_t * sockp,
-		mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags)
+mmux_libc_send (mmux_usize_t * number_of_bytes_sent_result_p,
+		mmux_libc_sockfd_t sockfd,
+		mmux_pointerc_t bufptr, mmux_usize_t buflen, mmux_libc_send_flags_t flags)
 {
-  mmux_standard_ssize_t	number_of_bytes_sent = send(sockp->value, bufptr, buflen.value, flags.value);
+  mmux_standard_ssize_t	number_of_bytes_sent = send(sockfd->value, bufptr, buflen.value, flags.value);
 
   if (-1 < number_of_bytes_sent) {
-    *result_number_of_bytes_sent_p = mmux_usize(number_of_bytes_sent);
+    *number_of_bytes_sent_result_p = mmux_usize(number_of_bytes_sent);
     return false;
   } else {
     return true;
   }
 }
 bool
-mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
-		  mmux_libc_network_socket_t * sockp,
-		  mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags,
-		  mmux_libc_sockaddr_ptr_t destination_sockaddr_p, mmux_libc_socklen_t destination_sockaddr_size)
+mmux_libc_sendto (mmux_usize_t * number_of_bytes_sent_result_p,
+		  mmux_libc_sockfd_t sockfd,
+		  mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_libc_send_flags_t flags,
+		  mmux_libc_sockaddr_arg_t destination_sockaddr_p, mmux_libc_socklen_t destination_sockaddr_size)
 {
-  mmux_standard_ssize_t	number_of_bytes_sent = sendto(sockp->value, bufptr, buflen.value, flags.value,
-						      destination_sockaddr_p, destination_sockaddr_size.value);
+  mmux_standard_ssize_t	number_of_bytes_sent = sendto(sockfd->value, bufptr, buflen.value, flags.value,
+						      (struct sockaddr *)destination_sockaddr_p,
+						      destination_sockaddr_size.value);
 
   if (-1 < number_of_bytes_sent) {
-    *result_number_of_bytes_sent_p = mmux_usize(number_of_bytes_sent);
+    *number_of_bytes_sent_result_p = mmux_usize(number_of_bytes_sent);
     return false;
   } else {
     return true;
@@ -3108,10 +3120,10 @@ mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
 
 bool
 mmux_libc_recv (mmux_usize_t * result_number_of_bytes_received_p,
-		mmux_libc_network_socket_t * sockp,
-		mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags)
+		mmux_libc_sockfd_t sockfd,
+		mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_libc_recv_flags_t flags)
 {
-  mmux_standard_ssize_t	number_of_bytes_received = recv(sockp->value, bufptr, buflen.value, flags.value);
+  mmux_standard_ssize_t	number_of_bytes_received = recv(sockfd->value, bufptr, buflen.value, flags.value);
 
   if (-1 < number_of_bytes_received) {
     *result_number_of_bytes_received_p = mmux_usize(number_of_bytes_received);
@@ -3122,17 +3134,17 @@ mmux_libc_recv (mmux_usize_t * result_number_of_bytes_received_p,
 }
 bool
 mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
-		    mmux_libc_sockaddr_ptr_t result_sender_sockaddr_p,
+		    mmux_libc_sockaddr_arg_t result_sender_sockaddr_p,
 		    mmux_libc_socklen_t * result_sender_sockaddr_size_p,
-		    mmux_libc_network_socket_t * sockp,
-		    mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_sint_t flags)
+		    mmux_libc_sockfd_t sockfd,
+		    mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_libc_recv_flags_t flags)
 {
   /* The arguments "result_sender_sockaddr_p" and "result_sender_sockaddr_size_p" can
      be NULL if we are not interested in retrieving the sender address. */
   mmux_standard_libc_socklen_t	len;
-  mmux_standard_ssize_t		number_of_bytes_received  = recvfrom(sockp->value,
+  mmux_standard_ssize_t		number_of_bytes_received  = recvfrom(sockfd->value,
 								     bufptr, buflen.value, flags.value,
-								     result_sender_sockaddr_p,
+								     (struct sockaddr *)result_sender_sockaddr_p,
 								     &len);
 
   if (-1 < number_of_bytes_received) {
@@ -3143,6 +3155,8 @@ mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
     return true;
   }
 }
+
+#if 0
 
 
 /** --------------------------------------------------------------------

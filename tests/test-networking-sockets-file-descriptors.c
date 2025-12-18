@@ -278,6 +278,88 @@ test_sockfd_function_getsockname (void)
 }
 
 
+static void
+test_sockfd_function_send_recv_socketpair (void)
+{
+  printf_message("testing: %s", __func__);
+  {
+    mmux_libc_sockfd_t	sockfd1, sockfd2;
+
+    /* Create the socket-pair. */
+    {
+      printf_message("socketpair-ing");
+      if (mmux_libc_socketpair(sockfd1, sockfd2, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) {
+	printf_error("socketpair-ing");
+	handle_error();
+      }
+    }
+
+    /* Write to a socket. */
+    {
+      mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+      mmux_usize_t	buflen, nbytes_done;
+      auto		flags = mmux_libc_send_flags(0);
+
+      mmux_libc_strlen(&buflen, bufptr);
+      if (mmux_libc_send(&nbytes_done, sockfd1, bufptr, buflen, flags)) {
+	printf_error("sending data to socket");
+	handle_error();
+      }
+
+      {
+	if (mmux_usize_equal(buflen, nbytes_done)) {
+	  printf_message("correctly sent all data");
+	} else {
+	  print_error("wrongly sent not all data");
+	  handle_error();
+	}
+      }
+    }
+
+    /* Read from the other socket. */
+    {
+      mmux_usize_t	nbytes_done;
+      auto		buflen = mmux_usize_literal(128);
+      char		bufptr[buflen.value];
+      auto		flags = mmux_libc_recv_flags(0);
+
+      printf_message("receiving data from socket");
+      if (mmux_libc_recv(&nbytes_done, sockfd2, bufptr, buflen, flags)) {
+	printf_error("receiving data from socket");
+	handle_error();
+      }
+      bufptr[nbytes_done.value] = '\0';
+      {
+	bool	are_equal;
+
+	if (mmux_libc_strequ(&are_equal, bufptr, "the colour of water and quicksilver")) {
+	  handle_error();
+	} else if (are_equal) {
+	  printf_message("correct string read from socket-pair: '%s'", bufptr);
+	} else {
+	  printf_error("wrong string read from socket-pair");
+	  handle_error();
+	}
+      }
+    }
+
+    /* Final cleanup */
+    {
+      printf_message("closing socket");
+      if (mmux_libc_close(sockfd1)) {
+	printf_error("closing socket");
+	handle_error();
+      }
+      if (mmux_libc_close(sockfd2)) {
+	printf_error("closing socket");
+	handle_error();
+      }
+    }
+  }
+  printf_message("DONE: %s\n", __func__);
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -296,6 +378,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true) {	test_sockfd_function_socketpair();		}
   if (true) {	test_sockfd_function_getpeername();		}
   if (true) {	test_sockfd_function_getsockname();		}
+  if (true) {	test_sockfd_function_send_recv_socketpair();	}
 
   mmux_libc_exit_success();
 }

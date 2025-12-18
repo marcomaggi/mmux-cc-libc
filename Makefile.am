@@ -901,7 +901,8 @@ check_PROGRAMS	+= \
 	tests/test-networking-struct-addrinfo				\
 	tests/test-networking-getaddrinfo				\
 	tests/test-networking-getnameinfo				\
-	tests/test-networking-sockets-file-descriptors
+	tests/test-networking-sockets-file-descriptors			\
+	tests/test-networking-sockets-stream
 
 tests_test_networking_interface_names_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_interface_names_LDADD		= $(mmux_cc_libc_tests_ldadd)
@@ -947,6 +948,9 @@ tests_test_networking_getnameinfo_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_networking_sockets_file_descriptors_CPPFLAGS	= $(mmux_cc_libc_tests_cppflags)
 tests_test_networking_sockets_file_descriptors_LDADD	= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_networking_sockets_stream_CPPFLAGS		= $(mmux_cc_libc_tests_cppflags)
+tests_test_networking_sockets_stream_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 
 #### interface to "make installcheck"

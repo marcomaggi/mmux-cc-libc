@@ -2747,6 +2747,21 @@ mmux_libc_getnameinfo_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_getnameinfo_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_send_flags_t
+mmux_libc_send_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_send_flags_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_recv_flags_t
+mmux_libc_recv_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_recv_flags_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_accept4_flags_t
+mmux_libc_accept4_flags (mmux_standard_sint_t value)
+{
+  return (mmux_libc_accept4_flags_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -3554,32 +3569,32 @@ mmux_cc_libc_decl bool mmux_libc_socketpair (mmux_libc_sockfd_t sockfd1_result,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_connect (mmux_libc_network_socket_t * sockp,
-					  mmux_libc_sockaddr_arg_t sockaddr_pointer,
-					  mmux_libc_socklen_t sockaddr_size)
+mmux_cc_libc_decl bool mmux_libc_connect (mmux_libc_sockfd_arg_t client_sockfd,
+					  mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_length)
+  __attribute__((__nonnull__(1,2),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_bind (mmux_libc_sockfd_arg_t server_sockfd,
+				       mmux_libc_sockaddr_arg_t sockaddr_p, mmux_libc_socklen_t sockaddr_length)
   __attribute__((__nonnull__(2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_bind (mmux_libc_network_socket_t * sockp,
-				       mmux_libc_sockaddr_arg_t sockaddr_pointer,
-				       mmux_libc_socklen_t sockaddr_size)
-  __attribute__((__nonnull__(2),__warn_unused_result__));
-
-mmux_cc_libc_decl bool mmux_libc_listen (mmux_libc_network_socket_t * sockp,
+mmux_cc_libc_decl bool mmux_libc_listen (mmux_libc_sockfd_arg_t server_sockfd,
 					 mmux_uint_t pending_connections_queue_length)
   __attribute__((__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_accept (mmux_libc_network_socket_t * result_connected_sock_p,
-					 mmux_libc_sockaddr_arg_t result_client_sockaddr_p,
-					 mmux_libc_socklen_t * result_client_sockaddr_size_p,
-					 mmux_libc_network_socket_t * server_sockp)
-  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+mmux_cc_libc_decl bool mmux_libc_accept (mmux_libc_sockfd_t     client_connection_sockfd_result,
+					 mmux_libc_sockaddr_t   client_connection_sockaddr_result_p,
+					 mmux_libc_socklen_t *  client_connection_sockaddr_length_result_p,
+					 mmux_libc_sockfd_arg_t server_sockfd)
+  /* The arguments "client_connection_sockaddr_*result_p" can be NULL. */
+  __attribute__((__nonnull__(1,4),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_accept4 (mmux_libc_network_socket_t * result_connected_sock_p,
-					  mmux_libc_sockaddr_t result_client_sockaddr_p,
-					  mmux_libc_socklen_t * result_client_sockaddr_size_p,
-					  mmux_libc_network_socket_t * server_sockp,
+mmux_cc_libc_decl bool mmux_libc_accept4 (mmux_libc_sockfd_t    client_connection_sockfd_result,
+					  mmux_libc_sockaddr_t  client_connection_sockaddr_result_p,
+					  mmux_libc_socklen_t * client_connection_sockaddr_length_result_p,
+					  mmux_libc_network_socket_t * server_sockfd,
 					  mmux_sint_t flags)
-  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+  /* The arguments "client_connection_sockaddr_*result_p" can be NULL. */
+  __attribute__((__nonnull__(1,4),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_getpeername (mmux_libc_sockfd_t sockfd,
 					      mmux_libc_sockaddr_t sockaddr_p,
@@ -3593,22 +3608,22 @@ mmux_cc_libc_decl bool mmux_libc_getsockname (mmux_libc_sockfd_t sockfd,
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_decl bool mmux_libc_send (mmux_usize_t * result_number_of_bytes_sent_p,
-				       mmux_libc_network_socket_t * sockp,
-				       mmux_pointer_t bufptr, mmux_usize_t buflen,
-				       mmux_sint_t flags)
+mmux_cc_libc_decl bool mmux_libc_send (mmux_usize_t * number_of_bytes_sent_result_p,
+				       mmux_libc_sockfd_t sockfd,
+				       mmux_pointerc_t bufptr, mmux_usize_t buflen,
+				       mmux_libc_send_flags_t flags)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_recv (mmux_usize_t * result_number_of_bytes_received_p,
-				       mmux_libc_network_socket_t * sockp,
+mmux_cc_libc_decl bool mmux_libc_recv (mmux_usize_t * number_of_bytes_received_result_p,
+				       mmux_libc_sockfd_t sockfd,
 				       mmux_pointer_t bufptr, mmux_usize_t buflen,
-				       mmux_sint_t flags)
+				       mmux_libc_recv_flags_t flags)
   __attribute__((__nonnull__(1,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
-					 mmux_libc_network_socket_t * sockp,
+					 mmux_libc_sockfd_t sockfd,
 					 mmux_pointer_t bufptr, mmux_usize_t buflen,
-					 mmux_sint_t flags,
+					 mmux_libc_send_flags_t flags,
 					 mmux_libc_sockaddr_arg_t destination_sockaddr_p,
 					 mmux_libc_socklen_t destination_sockaddr_size)
   __attribute__((__nonnull__(1,3,6),__warn_unused_result__));
@@ -3616,11 +3631,11 @@ mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_s
 /* The arguments  "result_sender_sockaddr_p" and  "result_sender_sockaddr_size_p" can
    be NULL if we are not interested in retrieving the sender address. */
 mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
-					   mmux_libc_sockaddr_t result_sender_sockaddr_p,
+					   mmux_libc_sockaddr_arg_t result_sender_sockaddr_p,
 					   mmux_libc_socklen_t * result_sender_sockaddr_size_p,
-					   mmux_libc_network_socket_t * sockp,
+					   mmux_libc_sockfd_t sockfd,
 					   mmux_pointer_t bufptr, mmux_usize_t buflen,
-					   mmux_sint_t flags)
+					   mmux_libc_recv_flags_t flags)
   __attribute__((__nonnull__(1,5),__warn_unused_result__));
 
 
