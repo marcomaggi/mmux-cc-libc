@@ -7,6 +7,10 @@
 
 	Test file for functions.
 
+	One of the reasons for putting all the streams tests in a single test file is
+	that:  we can  be sure  that we  create a  server for  localhost:8080 without
+	concurrencty between different files.
+
   Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
