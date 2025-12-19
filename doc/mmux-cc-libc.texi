@@ -17987,11 +17987,8 @@ if (there_is_one) @{
 * networking sockets opening::     Opening networking-sockets file-descriptors.
 * networking sockets closing::     Closing networking-sockets file-descriptors.
 * networking sockets inspecting::  Inspecting networking-sockets file-descriptors.
-* networking sockets stream::      Sending data with @cfunc{send} and receiving data with @cfunc{recv}.
-* networking sockets dgram::       Sending data with @cfunc{sendto} and receiving data with @cfunc{recvfrom}.
-* networking sockets server::      Stream socket servers.
-* networking sockets client::      Stream socket clients.
-* networking sockets dgram::       Sending and receiving data through a datagram socket.
+* networking sockets stream::      Networking communications using the stream style.
+* networking sockets dgram::       Networking communications using the datagram style.
 * networking sockets options::     Socket options.
 @end menu
 
@@ -18283,7 +18280,578 @@ struct sockaddr_un.sun_path = ""
 
 @c page
 @node networking sockets stream
-@subsection Sending data with @cfunc{send} and receiving data with @cfunc{recv}
+@subsection Networking communications using the stream style
+
+
+To create a networking server using the stream communication style, the required sequence of
+standard function calls is: @cfunc{socket}, @cfunc{bind}, @cfunc{listen}, @cfunc{accept} or
+@cfunc{accept4}.
+
+To create a networking client using the stream communication style, the required sequence of
+standard function calls is: @cfunc{socket}, @cfunc{connect}.
+
+
+@menu
+* networking sockets stream server ipfour::  Example of stream IPv4 networking server.
+* networking sockets stream server ipsix::   Example of stream IPv6 networking server.
+* networking sockets stream server local::   Example of stream local networking server.
+* networking sockets stream server api::     Stream networking servers programming interface.
+* networking sockets stream client ipfour::  Example of stream IPv4 networking client.
+* networking sockets stream client ipsix::   Example of stream IPv6 networking client.
+* networking sockets stream client local::   Example of stream local networking client.
+* networking sockets stream client api::     Stream networking clients programming interface.
+* networking sockets stream data::           Sending data with @cfunc{send} and receiving data with @cfunc{recv}.
+@end menu
+
+@c page
+@node networking sockets stream server ipfour
+@subsubsection Example of stream IPv4 networking server
+
+
+The core organisation of code implementing an IPv4 networking server looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_ipfour_t  server_sockaddr;
+  mmux_libc_socklen_t          server_sockaddr_length;
+
+  @{
+    mmux_libc_ipfour_addr_t  ipfour_addr;
+    mmux_asciizcp_t          presentation = "127.0.0.1";
+
+    if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
+      /* error */
+    @}
+    mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
+    mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
+    mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Listen for incoming client connections to the server socket. */
+@{
+  if (mmux_libc_listen(server_sockfd, mmux_uint_literal(5))) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection to the server. */
+@{
+  mmux_libc_sockfd_t  client_connection_sockfd;
+  @{
+    auto                   client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
+    mmux_standard_octet_t  client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
+    auto                   client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
+    auto                   client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+
+    if (mmux_libc_accept(client_connection_sockfd,
+                         client_connection_sockaddr, &client_connection_sockaddr_length,
+                         server_sockfd)) @{
+      /* error */
+    @}
+
+    /* Dump the client connection address. */
+    @{
+      mmux_libc_oufd_t  er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_connection_sockaddr")) @{
+        /* error */
+      @}
+    @}
+  @}
+
+  /* Use "client_connection_sockfd" to communicate with the client. */
+
+  /* Client connection cleanup. */
+  @{
+    if (mmux_libc_close(client_connection_sockfd)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Server cleanup. */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream server ipsix
+@subsubsection Example of stream IPv6 networking server
+
+
+The core organisation of code implementing an IPv6 networking server looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_INET6, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_ipsix_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  @{
+    mmux_libc_ipsix_addr_t  ipsix_addr;
+
+    if (mmux_libc_make_ipsix_addr_loopback(ipsix_addr)) @{
+      /* error */
+    @}
+
+    mmux_libc_sockaddr_ipsix_family_set(server_sockaddr, MMUX_LIBC_AF_INET6);
+    mmux_libc_sockaddr_ipsix_addr_set(server_sockaddr, ipsix_addr);
+    mmux_libc_sockaddr_ipsix_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Listen for incoming client connections to the server socket. */
+@{
+  if (mmux_libc_listen(server_sockfd, mmux_uint_literal(5))) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection to the server. */
+@{
+  mmux_libc_sockfd_t  client_connection_sockfd;
+  @{
+    auto                   client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
+    mmux_standard_octet_t  client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
+    auto                   client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
+    auto                   client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+
+    if (mmux_libc_accept(client_connection_sockfd,
+                         client_connection_sockaddr, &client_connection_sockaddr_length,
+                         server_sockfd)) @{
+      /* error */
+    @}
+
+    /* Dump the client connection address. */
+    @{
+      mmux_libc_oufd_t  er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_connection_sockaddr")) @{
+        /* error */
+      @}
+    @}
+  @}
+
+  /* Use "client_connection_sockfd" to communicate with the client. */
+
+  /* Client connection cleanup. */
+  @{
+    if (mmux_libc_close(client_connection_sockfd)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Server cleanup. */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream server local
+@subsubsection Example of stream local networking server
+
+
+The core organisation of code implementing a local networking server looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_local_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  /* Build the local networking address. */
+  @{
+    mmux_libc_fs_ptn_t  fs_ptn;
+
+    /* Build socket's file system pathname. */
+    @{
+      mmux_asciizcp_t             ptn_asciiz = "/path/to/local.sock";
+      mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+        /* error */
+      @}
+    @}
+
+    mmux_libc_sockaddr_local_family_set(server_sockaddr, MMUX_LIBC_AF_LOCAL);
+    mmux_libc_sockaddr_local_path_set(server_sockaddr, fs_ptn);
+
+    /* Local cleanup. */
+    @{
+      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+        /* error */
+      @}
+    @}
+  @}
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Listen for incoming client connections to the server socket. */
+@{
+  if (mmux_libc_listen(server_sockfd, mmux_uint_literal(5))) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection to the server. */
+@{
+  mmux_libc_sockfd_t  client_connection_sockfd;
+  @{
+    auto                   client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
+    mmux_standard_octet_t  client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
+    auto                   client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
+    auto                   client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+
+    if (mmux_libc_accept(client_connection_sockfd,
+                         client_connection_sockaddr, &client_connection_sockaddr_length,
+                         server_sockfd)) @{
+      /* error */
+    @}
+
+    /* Dump the client connection address. */
+    @{
+      mmux_libc_oufd_t  er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_connection_sockaddr")) @{
+        /* error */
+      @}
+    @}
+  @}
+
+  /* Use "client_connection_sockfd" to communicate with the client. */
+
+  /* Client connection cleanup. */
+  @{
+    if (mmux_libc_close(client_connection_sockfd)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Server cleanup. */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream server api
+@subsubsection Stream networking servers programming interface
+
+
+@deftypefun bool mmux_libc_bind (mmux_libc_sockfd_t @var{server_sockfd}, mmux_libc_sockaddr_arg_t @var{server_sockaddr}, mmux_libc_socklen_t @var{server_sockaddr_length})
+@MmuxCInterface{bind}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_listen (mmux_libc_sockfd_t @var{server_sockfd}, mmux_uint_t @var{pending_connections_queue_length})
+@MmuxCInterface{listen}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_accept (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock})
+@MmuxCInterface{accept}.
+
+@itemize
+@item
+Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
+set to the number of bytes allocated for the address referenced by
+@var{client_connection_sockaddr_result}.
+
+@item
+Upon successfully returning: the location referenced by
+@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
+@end itemize
+
+The arguments @var{client_connection_sockaddr_result} and
+@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
+retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
+by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
+that will fill it with the address informations.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefn {Linux Function} bool mmux_libc_accept4 (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock}, mmux_libc_accept4_flags_t @var{flags})
+@MmuxCInterface{accept4}.
+
+
+@itemize
+@item
+Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
+set to the number of bytes allocated for the address referenced by
+@var{client_connection_sockaddr_result}.
+
+@item
+Upon successfully returning: the location referenced by
+@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
+@end itemize
+
+The arguments @var{client_connection_sockaddr_result} and
+@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
+retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
+by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
+that will fill it with the address informations.
+@end deftypefn
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_accept4_flags_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing a bitwise OR combination of flags for a call to
+@cfunc{mmux_libc_accept4}.  Such flags are @code{MMUX_LIBC_SOCK_NONBLOCK},
+@code{MMUX_LIBC_SOCK_CLOEXEC} and maybe others; @MmuxCFuncpage{accept4}.
+@end deftp
+
+
+@deftypefun mmux_libc_accept4_flags_t mmux_libc_accept4_flags (mmux_standard_sint_t @var{flags})
+Build and return a new instance of @objtype{mmux_libc_accept4_flags_t}.
+@end deftypefun
+
+@c page
+@node networking sockets stream client ipfour
+@subsubsection Example of stream IPv4 networking client
+
+
+The core organisation of code implementing an IPv4 networking client looks as follows:
+
+@example
+mmux_libc_sockfd_t  client_sockfd;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+    /* error */
+  @}
+@}
+
+/* Connect the client socket to the server. */
+@{
+  mmux_libc_sockaddr_ipfour_t  server_sockaddr;
+  mmux_libc_socklen_t          server_sockaddr_length;
+
+  @{
+    mmux_libc_ipfour_addr_t  ipfour_addr;
+    mmux_asciizcp_t          presentation = "127.0.0.1";
+
+    if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
+      /* error */
+    @}
+    mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
+    mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
+    mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Use "client_sockfd" to communicate with the server. */
+
+/* Client cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream client ipsix
+@subsubsection Example of stream IPv6 networking client
+
+
+The core organisation of code implementing an IPv6 networking client looks as follows:
+
+@example
+mmux_libc_sockfd_t  client_sockfd;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_INET6, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+    /* error */
+  @}
+@}
+
+/* Connect the client socket to the server. */
+@{
+  mmux_libc_sockaddr_ipsix_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  @{
+    mmux_libc_ipsix_addr_t  ipsix_addr;
+
+    if (mmux_libc_make_ipsix_addr_loopback(ipsix_addr)) @{
+      /* error */
+    @}
+
+    mmux_libc_sockaddr_ipsix_family_set(server_sockaddr, MMUX_LIBC_AF_INET6);
+    mmux_libc_sockaddr_ipsix_addr_set(server_sockaddr, ipsix_addr);
+    mmux_libc_sockaddr_ipsix_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Use "client_sockfd" to communicate with the server. */
+
+/* Client cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream client local
+@subsubsection Example of stream local networking client
+
+
+The core organisation of code implementing a local networking client looks as follows:
+
+@example
+mmux_libc_sockfd_t  client_sockfd;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) @{
+    /* error */
+  @}
+@}
+
+/* Connect the client socket to the server. */
+@{
+  mmux_libc_sockaddr_local_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  /* Build the local networking address. */
+  @{
+    mmux_libc_fs_ptn_t  fs_ptn;
+
+    /* Build socket's file system pathname. */
+    @{
+      mmux_asciizcp_t             ptn_asciiz = "/path/to/local.sock";
+      mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+        /* error */
+      @}
+    @}
+
+    mmux_libc_sockaddr_local_family_set(server_sockaddr, MMUX_LIBC_AF_LOCAL);
+    mmux_libc_sockaddr_local_path_set(server_sockaddr, fs_ptn);
+
+    /* Local cleanup. */
+    @{
+      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+        /* error */
+      @}
+    @}
+  @}
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Use "client_sockfd" to communicate with the server. */
+
+/* Client cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node networking sockets stream client api
+@subsubsection Stream networking clients programming interface
+
+
+@deftypefun bool mmux_libc_connect (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
+@MmuxCInterface{connect}.
+@end deftypefun
+
+@c page
+@node networking sockets stream data
+@subsubsection Sending data with @cfunc{send} and receiving data with @cfunc{recv}
 
 
 To send data to and receive data from a networking socket, we do:
@@ -18381,7 +18949,7 @@ The only difference between @cfunc{mmux_libc_recv} and @cfunc{mmux_libc_read} is
 
 @c page
 @node networking sockets dgram
-@subsection Sending data with @cfunc{sendto} and receiving data with @cfunc{recvfrom}
+@subsection Networking communications using the datagram style
 
 
 @deftypefun bool mmux_libc_sendto (mmux_usize_t * @var{result_number_of_bytes_sent_p}, mmux_libc_network_socket_t @var{sock}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{flags}, mmux_libc_sockaddr_ptr_t @var{destination_sockaddr_p}, mmux_socklen_t @var{destination_sockaddr_size})
@@ -18402,232 +18970,6 @@ Upon successfully returning from the call: the location referenced by
 @var{result_sender_sockaddr_size_p} is reset to the actual number of bytes required to contain the
 sender address.
 @end itemize
-@end deftypefun
-
-@c page
-@node networking sockets server
-@subsection Stream socket servers
-
-
-To create a networking server using the stream communication style, the required sequence of
-standard function calls is: @cfunc{socket}, @cfunc{bind}, @cfunc{listen}, @cfunc{accept} or
-@cfunc{accept4}.
-
-The core organisation of code implementing an IPv4 networking server looks as follows:
-
-@example
-mmux_libc_sockfd_t  server_sockfd;
-
-/* Build the server socket. */
-@{
-  if (mmux_libc_socket(server_sockfd,
-        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
-    /* error */
-  @}
-@}
-
-/* Bind the server socket to the sockaddr. */
-@{
-  mmux_libc_sockaddr_ipfour_t   server_sockaddr;
-  mmux_libc_socklen_t           server_sockaddr_length;
-
-  @{
-    mmux_libc_ipfour_addr_t       ipfour_addr;
-    mmux_asciizcp_t               presentation = "127.0.0.1";
-
-    if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
-      /* error */
-    @}
-    mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
-    mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
-    mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
-      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
-  @}
-  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
-
-  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
-    /* error */
-  @}
-@}
-
-/* Listen for incoming client connections to the server socket. */
-@{
-  if (mmux_libc_listen(server_sockfd, mmux_uint_literal(5))) @{
-    /* error */
-  @}
-@}
-
-/* Accept a connection to the server. */
-@{
-  mmux_libc_sockfd_t  client_connection_sockfd;
-  @{
-    auto                   client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
-    mmux_standard_octet_t  client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
-    auto                   client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
-    auto                   client_connection_sockaddr_length = client_connection_sockaddr_buflen;
-
-    if (mmux_libc_accept(client_connection_sockfd,
-                         client_connection_sockaddr, &client_connection_sockaddr_length,
-                         server_sockfd)) @{
-      /* error */
-    @}
-
-    /* Dump the client connection address. */
-    @{
-      mmux_libc_oufd_t  er;
-
-      mmux_libc_stder(er);
-      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_connection_sockaddr")) @{
-        /* error */
-      @}
-    @}
-  @}
-
-  /* Use "client_connection_sockfd" to communicate with the client. */
-
-  /* Client connection cleanup. */
-  @{
-    if (mmux_libc_close(client_connection_sockfd)) @{
-      /* error */
-    @}
-  @}
-@}
-
-/* Server cleanup. */
-@{
-  if (mmux_libc_close(server_sockfd)) @{
-    /* error */
-  @}
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_bind (mmux_libc_sockfd_t @var{server_sockfd}, mmux_libc_sockaddr_arg_t @var{server_sockaddr}, mmux_libc_socklen_t @var{server_sockaddr_length})
-@MmuxCInterface{bind}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_listen (mmux_libc_sockfd_t @var{server_sockfd}, mmux_uint_t @var{pending_connections_queue_length})
-@MmuxCInterface{listen}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_accept (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock})
-@MmuxCInterface{accept}.
-
-@itemize
-@item
-Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
-set to the number of bytes allocated for the address referenced by
-@var{client_connection_sockaddr_result}.
-
-@item
-Upon successfully returning: the location referenced by
-@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
-@end itemize
-
-The arguments @var{client_connection_sockaddr_result} and
-@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
-retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
-by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
-that will fill it with the address informations.
-@end deftypefun
-
-@c ------------------------------------------------------------------------
-
-@deftypefn {Linux Function} bool mmux_libc_accept4 (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock}, mmux_libc_accept4_flags_t @var{flags})
-@MmuxCInterface{accept4}.
-
-
-@itemize
-@item
-Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
-set to the number of bytes allocated for the address referenced by
-@var{client_connection_sockaddr_result}.
-
-@item
-Upon successfully returning: the location referenced by
-@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
-@end itemize
-
-The arguments @var{client_connection_sockaddr_result} and
-@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
-retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
-by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
-that will fill it with the address informations.
-@end deftypefn
-
-
-@deftp {Opaque Struct Typedef} mmux_libc_accept4_flags_t
-@deftpx {Parent Struct Typedef} mmux_sint_t
-Data structure type representing a bitwise OR combination of flags for a call to
-@cfunc{mmux_libc_accept4}.  Such flags are @code{MMUX_LIBC_SOCK_NONBLOCK},
-@code{MMUX_LIBC_SOCK_CLOEXEC} and maybe others; @MmuxCFuncpage{accept4}.
-@end deftp
-
-
-@deftypefun mmux_libc_accept4_flags_t mmux_libc_accept4_flags (mmux_standard_sint_t @var{flags})
-Build and return a new instance of @objtype{mmux_libc_accept4_flags_t}.
-@end deftypefun
-
-@c page
-@node networking sockets client
-@subsection Stream socket clients
-
-
-To create a networking client using the stream communication style, the required sequence of
-standard function calls is: @cfunc{socket}, @cfunc{connect}.
-
-The core organisation of code implementing an IPv4 networking client looks as follows:
-
-@example
-mmux_libc_sockfd_t  client_sockfd;
-
-/* Build the client socket. */
-@{
-  if (mmux_libc_socket(client_sockfd,
-        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
-    /* error */
-  @}
-@}
-
-/* Connect the client socket to the server. */
-@{
-  mmux_libc_sockaddr_ipfour_t  server_sockaddr;
-  mmux_libc_socklen_t          server_sockaddr_length;
-
-  @{
-    mmux_libc_ipfour_addr_t  ipfour_addr;
-    mmux_asciizcp_t          presentation = "127.0.0.1";
-
-    if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
-      /* error */
-    @}
-    mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
-    mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
-    mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
-      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
-  @}
-  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
-
-  if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) @{
-    /* error */
-  @}
-@}
-
-/* Use "client_sockfd" to communicate with the server. */
-
-/* Client cleanup. */
-@{
-  if (mmux_libc_close(client_sockfd)) @{
-    /* error */
-  @}
-@}
-@end example
-
-
-@deftypefun bool mmux_libc_connect (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
-@MmuxCInterface{connect}.
 @end deftypefun
 
 @c page
