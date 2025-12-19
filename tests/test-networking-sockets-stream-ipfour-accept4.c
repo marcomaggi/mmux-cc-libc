@@ -144,12 +144,13 @@ server_doit (mmux_libc_pid_t child_pid,
     mmux_standard_octet_t	client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
     auto			client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
     auto			client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+    auto			flags = mmux_libc_accept4_flags(MMUX_LIBC_SOCK_NONBLOCK);
 
-    printf_message("parent: server: accepting connection from client");
-    if (mmux_libc_accept(client_connection_sockfd,
-			 client_connection_sockaddr, &client_connection_sockaddr_length,
-			 server_sockfd)) {
-      printf_error("parent: server: accepting connection from client");
+    printf_message("parent: server: accept4-ing connection from client");
+    if (mmux_libc_accept4(client_connection_sockfd,
+			  client_connection_sockaddr, &client_connection_sockaddr_length,
+			  server_sockfd, flags)) {
+      printf_error("parent: server: accept4-ing connection from client");
       goto error;
     }
 
@@ -298,7 +299,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-networking-sockets-stream";
+    PROGNAME = "test-networking-sockets-stream-ipfour-accept4";
   }
 
   /* Do it. */

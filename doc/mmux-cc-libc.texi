@@ -275,6 +275,22 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 
 @end macro
 
+@c ------------------------------------------------------------------------
+
+@macro MmuxDefineStandardIntConstant{NAME}
+@deftypevr {Constant} int @value{PackageApiPrefixUpper}\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant
+@code{\NAME\}; it can be defined or not depending on the features of the underlying platform.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{@value{PackageApiPrefixUpper}\NAME\} is available.
+@end deftypevr
+
+@end macro
+
+@c ------------------------------------------------------------------------
+
 @MmuxDefineConstant{AT_EMPTY_PATH}
 @MmuxDefineConstant{AT_FDCWD}
 @MmuxDefineConstant{AT_NOAUTOMOUNT}
@@ -15950,7 +15966,8 @@ instances of the type @objtype{mmux_libc_network_socket_communication_style_t}.
 
 In addition: the values @samp{SOCK_CLOEXEC} and @samp{SOCK_NONBLOCK} are Linux--specific constants
 that can be added to objects of type @objtype{mmux_libc_network_socket_communication_style_t}, using
-a bitwise OR operation; these values represent ``property bits''.
+a bitwise OR operation; these values represent ``property bits''.  Under @value{PACKAGE}: the
+property bits can be added to a communication style object by calling a specific function.
 
 
 @deftp {Struct Typedef} mmux_libc_network_socket_communication_style_t
@@ -16006,54 +16023,23 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if
 
 @c ------------------------------------------------------------------------
 
-@subsubheading Networking socket communication style properties
+@subsubheading Networking--socket communication--style properties
 
 
-@deftp {Struct Typedef} mmux_libc_network_socket_communication_style_property_t
-@deftpx {Parent Struct Typedef} mmux_sint_t
-Data structure type representing networking sockets communication style properties.  Such values are
-stored in host byteorder.
-@end deftp
-
-
-@deftypefun mmux_libc_network_socket_communication_style_property_t mmux_libc_network_socket_communication_style_property (mmux_standard_sint_t @var{value})
-Build and return a new instance of
-@objtype{mmux_libc_network_socket_communication_style_property_t}.  This function is seldom useful
-because we should use the predefined constants @samp{MMUX_LIBC_SOCK_*}.
-@end deftypefun
-
-
-@deftypefun mmux_libc_network_socket_communication_style_t mmux_libc_network_socket_communication_style_add_property (mmux_libc_network_socket_communication_style_t @var{style}, mmux_libc_network_socket_communication_style_property_t @var{property})
+@deftypefun mmux_libc_network_socket_communication_style_t mmux_libc_network_socket_communication_style_add_property (mmux_libc_network_socket_communication_style_t @var{style}, mmux_standard_sint_t @var{property})
 Build and return a new instance of @objtype{mmux_libc_network_socket_communication_style_t}
 composing @var{style} with @var{property}.
 
 @example
 auto  style =
   mmux_libc_network_socket_communication_style_add_property(MMUX_LIBC_SOCK_STREAM,
-                                                            MMUX_LIBC_SOCK_CLOEXEC);
+    MMUX_LIBC_SOCK_CLOEXEC | MMUX_LIBC_SOCK_NONBLOCK);
 @end example
 @end deftypefun
 
 
-@macro MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{NAME}
-@deftypevr {Struct Constant} mmux_libc_network_socket_communication_style_property_t MMUX_LIBC_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
-If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
-@objtype{mmux_libc_network_socket_communication_style_property_t} representing the standard C
-language constant @code{\NAME\}.
-
-If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
-@samp{\NAME\}.
-
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
-@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
-@end deftypevr
-
-@end macro
-
-@MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{SOCK_CLOEXEC}
-@MmuxDefineNetworkingSocketCommunicationStylePropertyConstant{SOCK_NONBLOCK}
+@MmuxDefineStandardIntConstant{SOCK_CLOEXEC}
+@MmuxDefineStandardIntConstant{SOCK_NONBLOCK}
 
 @c page
 @node networking addresses sockets base

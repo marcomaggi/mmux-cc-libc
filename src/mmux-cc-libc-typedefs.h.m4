@@ -380,10 +380,6 @@ typedef struct mmux_libc_network_socket_communication_style_t {
   mmux_sint_t;
 } mmux_libc_network_socket_communication_style_t;
 
-typedef struct mmux_libc_network_socket_communication_style_property_t {
-  mmux_sint_t;
-} mmux_libc_network_socket_communication_style_property_t;
-
 typedef struct mmux_libc_network_socket_shutdown_mode_t {
   mmux_sint_t;
 } mmux_libc_network_socket_shutdown_mode_t;

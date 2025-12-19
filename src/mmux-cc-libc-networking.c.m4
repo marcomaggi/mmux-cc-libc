@@ -443,22 +443,11 @@ mmux_libc_network_socket_communication_style_equal (bool * are_equal_result_p,
   *are_equal_result_p = (style_num_1 == style_num_2)? true : false;
   return false;
 }
-
-bool
-mmux_libc_network_socket_communication_style_property_equal
-    (bool * are_equal_result_p,
-     mmux_libc_network_socket_communication_style_property_t style1,
-     mmux_libc_network_socket_communication_style_property_t style2)
-{
-  return mmux_sint_equal_p(are_equal_result_p, &style1, &style2);
-}
-
 mmux_libc_network_socket_communication_style_t
   mmux_libc_network_socket_communication_style_add_property
-    (mmux_libc_network_socket_communication_style_t style,
-     mmux_libc_network_socket_communication_style_property_t property)
+    (mmux_libc_network_socket_communication_style_t style, mmux_standard_sint_t property)
 {
-  style.value |= property.value;
+  style.value |= property;
   return mmux_libc_network_socket_communication_style(style.value);
 }
 
@@ -3048,7 +3037,7 @@ mmux_libc_accept4 (mmux_libc_sockfd_t    client_connection_sockfd_result,
 		   mmux_libc_sockaddr_t  client_connection_sockaddr_result,
 		   mmux_libc_socklen_t * client_connection_sockaddr_length_result_p,
 		   mmux_libc_network_socket_t * server_sockfd,
-		   mmux_sint_t flags)
+		   mmux_libc_accept4_flags_t flags)
 /* The arguments "client_connection_sockaddr_*result_p" can be  NULL if the caller is
    not interested in retrieving the client's networking-socket address. */
 {

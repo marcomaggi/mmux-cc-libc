@@ -2722,11 +2722,6 @@ mmux_libc_network_socket_communication_style (mmux_standard_sint_t value)
 {
   return (mmux_libc_network_socket_communication_style_t) { .value = value };
 }
-mmux_cc_libc_inline_decl mmux_libc_network_socket_communication_style_property_t
-mmux_libc_network_socket_communication_style_property (mmux_standard_sint_t value)
-{
-  return (mmux_libc_network_socket_communication_style_property_t) { .value = value };
-}
 mmux_cc_libc_inline_decl mmux_libc_network_addrinfo_flags_t
 mmux_libc_network_addrinfo_flags (mmux_standard_sint_t value)
 {
@@ -2776,16 +2771,9 @@ mmux_cc_libc_decl bool mmux_libc_network_socket_communication_style_equal
      mmux_libc_network_socket_communication_style_t style2)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_network_socket_communication_style_property_equal
-    (bool * are_equal_result_p,
-     mmux_libc_network_socket_communication_style_property_t style_property_1,
-     mmux_libc_network_socket_communication_style_property_t style_property_2)
-  __attribute__((__nonnull__(1)));
-
 mmux_cc_libc_decl mmux_libc_network_socket_communication_style_t
   mmux_libc_network_socket_communication_style_add_property
-    (mmux_libc_network_socket_communication_style_t style,
-     mmux_libc_network_socket_communication_style_property_t property);
+    (mmux_libc_network_socket_communication_style_t style, mmux_standard_sint_t property);
 
 
 /** --------------------------------------------------------------------
@@ -3592,7 +3580,7 @@ mmux_cc_libc_decl bool mmux_libc_accept4 (mmux_libc_sockfd_t    client_connectio
 					  mmux_libc_sockaddr_t  client_connection_sockaddr_result_p,
 					  mmux_libc_socklen_t * client_connection_sockaddr_length_result_p,
 					  mmux_libc_network_socket_t * server_sockfd,
-					  mmux_sint_t flags)
+					  mmux_libc_accept4_flags_t flags)
   /* The arguments "client_connection_sockaddr_*result_p" can be NULL. */
   __attribute__((__nonnull__(1,4),__warn_unused_result__));
 
