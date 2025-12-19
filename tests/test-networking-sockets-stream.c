@@ -163,9 +163,9 @@ server_kill_child_process_wait_for_its_completion (mmux_libc_pid_t child_pid)
 
 
 static void
-server_doit (mmux_libc_pid_t child_pid, bool use_accept4,
-	     mmux_libc_network_protocol_family_t family, mmux_libc_network_internet_protocol_t ipproto,
-	     mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+stream_server_doit (mmux_libc_pid_t child_pid, bool use_accept4,
+		    mmux_libc_network_protocol_family_t family, mmux_libc_network_internet_protocol_t ipproto,
+		    mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
 {
   mmux_libc_sockfd_t	server_sockfd, client_connection_sockfd;
 
@@ -317,9 +317,9 @@ server_doit (mmux_libc_pid_t child_pid, bool use_accept4,
 
 
 static void
-client_doit (mmux_libc_network_protocol_family_t family,
-	     mmux_libc_network_internet_protocol_t ipproto,
-	     mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+stream_client_doit (mmux_libc_network_protocol_family_t family,
+		    mmux_libc_network_internet_protocol_t ipproto,
+		    mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
 {
   mmux_libc_sockfd_t	client_sockfd;
 
@@ -383,6 +383,132 @@ client_doit (mmux_libc_network_protocol_family_t family,
 }
 
 
+static void
+test_stream_server_local (void)
+{
+  print_newline();
+  printf_message("Do it for local addresses.");
+  mmux_libc_sockaddr_local_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_local(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for local addresses");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for local addresses");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      /* Final cleanup only in the parent process. */
+      if (true) {
+	cleanfiles_register(local_socket_ptn_asciiz);
+	cleanfiles();
+	mmux_libc_atexit(cleanfiles);
+      }
+      {
+	stream_server_doit(child_pid, false,
+			   MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP,
+			   sockaddr, sockaddr_length);
+      }
+      if (true) {
+	cleanfiles();
+      }
+    } else {
+      stream_client_doit(MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_stream_server_ipfour_accept (void)
+{
+  print_newline();
+  printf_message("Do it for IPv4 addresses with 'accept()'.");
+  mmux_libc_sockaddr_ipfour_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for IPv4 addresses");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for IPv4 addresses");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      stream_server_doit(child_pid, false,
+			 MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    } else {
+      stream_client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_stream_server_ipfour_accept4 (void)
+{
+  print_newline();
+  printf_message("Do it for IPv4 addresses with 'accept4()'.");
+  mmux_libc_sockaddr_ipfour_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for IPv4 addresses");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for IPv4 addresses");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      stream_server_doit(child_pid, true, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    } else {
+      stream_client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_stream_server_ipsix (void)
+{
+  print_newline();
+  printf_message("Do it for IPv6 addresses.");
+  mmux_libc_sockaddr_ipsix_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipsix(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for IPv6 addresses");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for IPv6 addresses");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      stream_server_doit(child_pid, false, MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    } else {
+      stream_client_doit(MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -396,119 +522,10 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-networking-sockets-stream";
   }
 
-  if (true) {
-    print_newline();
-    printf_message("Do it for local addresses.");
-    mmux_libc_sockaddr_local_t	sockaddr;
-    mmux_libc_socklen_t		sockaddr_length;
-
-    build_sockaddr_local(sockaddr, &sockaddr_length);
-
-    /* Fork a child process. */
-    {
-      bool		this_is_the_parent_process;
-      mmux_libc_pid_t	child_pid;
-
-      printf_message("forking for local addresses");
-      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
-	printf_error("forking for local addresses");
-	handle_error();
-      } else if (this_is_the_parent_process) {
-	/* Final cleanup only in the parent process. */
-	if (true) {
-	  cleanfiles_register(local_socket_ptn_asciiz);
-	  cleanfiles();
-	  mmux_libc_atexit(cleanfiles);
-	}
-	{
-	  server_doit(child_pid, false,
-		      MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP,
-		      sockaddr, sockaddr_length);
-	}
-	if (true) {
-	  cleanfiles();
-	}
-      } else {
-	client_doit(MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
-      }
-    }
-  }
-
-  if (true) {
-    print_newline();
-    printf_message("Do it for IPv4 addresses with 'accept()'.");
-    mmux_libc_sockaddr_ipfour_t	sockaddr;
-    mmux_libc_socklen_t		sockaddr_length;
-
-    build_sockaddr_ipfour(sockaddr, &sockaddr_length);
-
-    /* Fork a child process. */
-    {
-      bool		this_is_the_parent_process;
-      mmux_libc_pid_t	child_pid;
-
-      printf_message("forking for IPv4 addresses");
-      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
-	printf_error("forking for IPv4 addresses");
-	handle_error();
-      } else if (this_is_the_parent_process) {
-	server_doit(child_pid, false,
-		    MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      } else {
-	client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      }
-    }
-  }
-
-  if (true) {
-    print_newline();
-    printf_message("Do it for IPv4 addresses with 'accept4()'.");
-    mmux_libc_sockaddr_ipfour_t	sockaddr;
-    mmux_libc_socklen_t		sockaddr_length;
-
-    build_sockaddr_ipfour(sockaddr, &sockaddr_length);
-
-    /* Fork a child process. */
-    {
-      bool		this_is_the_parent_process;
-      mmux_libc_pid_t	child_pid;
-
-      printf_message("forking for IPv4 addresses");
-      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
-	printf_error("forking for IPv4 addresses");
-	handle_error();
-      } else if (this_is_the_parent_process) {
-	server_doit(child_pid, false, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      } else {
-	client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      }
-    }
-  }
-
-  if (true) {
-    print_newline();
-    printf_message("Do it for IPv6 addresses.");
-    mmux_libc_sockaddr_ipsix_t	sockaddr;
-    mmux_libc_socklen_t		sockaddr_length;
-
-    build_sockaddr_ipsix(sockaddr, &sockaddr_length);
-
-    /* Fork a child process. */
-    {
-      bool		this_is_the_parent_process;
-      mmux_libc_pid_t	child_pid;
-
-      printf_message("forking for IPv6 addresses");
-      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
-	printf_error("forking for IPv6 addresses");
-	handle_error();
-      } else if (this_is_the_parent_process) {
-	server_doit(child_pid, false, MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      } else {
-	client_doit(MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
-      }
-    }
-  }
+  if (true) {	test_stream_server_local();		}
+  if (true) {	test_stream_server_ipfour_accept();	}
+  if (true) {	test_stream_server_ipfour_accept4();	}
+  if (true) {	test_stream_server_ipsix();		}
 
   mmux_libc_exit_success();
 }
