@@ -31,7 +31,7 @@ build_sockaddr_ipsix (mmux_libc_sockaddr_ipsix_t sockaddr, mmux_libc_socklen_t *
   }
   mmux_libc_sockaddr_ipsix_family_set(sockaddr, MMUX_LIBC_AF_INET6);
   mmux_libc_sockaddr_ipsix_addr_set(sockaddr, ipsix_addr);
-  mmux_libc_sockaddr_ipsix_port_set(sockaddr, mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  mmux_libc_sockaddr_ipsix_port_set(sockaddr, mmux_libc_network_port_number_from_host_byteorder_literal(8081));
 
   mmux_libc_sockaddr_bind_length(sockaddr_length_p, sockaddr);
 }
