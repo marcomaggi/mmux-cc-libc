@@ -1,7 +1,7 @@
 /*
   Part of: MMUX CC Libc
   Contents: test for functions
-  Date: Dec 19, 2025
+  Date: Dec 18, 2025
 
   Abstract
 
@@ -22,6 +22,38 @@
 static mmux_asciizcp_t	local_socket_ptn_asciiz = "./test-networking-sockets-stream-local.sock";
 
 
+static void
+build_sockaddr_ipfour (mmux_libc_sockaddr_ipfour_t sockaddr, mmux_libc_socklen_t * sockaddr_length_p)
+/* Build the IPv4 sockaddr to be used by both the client and the server. */
+{
+  mmux_libc_ipfour_addr_t	ipfour_addr;
+  mmux_asciizcp_t		presentation = "127.0.0.1";
+
+  if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) {
+    handle_error();
+  }
+  mmux_libc_sockaddr_ipfour_family_set(sockaddr, MMUX_LIBC_AF_INET);
+  mmux_libc_sockaddr_ipfour_addr_set(sockaddr, ipfour_addr);
+  mmux_libc_sockaddr_ipfour_port_set(sockaddr, mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+
+  mmux_libc_sockaddr_bind_length(sockaddr_length_p, sockaddr);
+}
+static void
+build_sockaddr_ipsix (mmux_libc_sockaddr_ipsix_t sockaddr, mmux_libc_socklen_t * sockaddr_length_p)
+/* Build the IPv6 sockaddr to be used by both the client and the server. */
+{
+  mmux_libc_ipsix_addr_t	ipsix_addr;
+
+  if (mmux_libc_make_ipsix_addr_loopback(ipsix_addr)) {
+    handle_error();
+  }
+  mmux_libc_sockaddr_ipsix_family_set(sockaddr, MMUX_LIBC_AF_INET6);
+  mmux_libc_sockaddr_ipsix_addr_set(sockaddr, ipsix_addr);
+  mmux_libc_sockaddr_ipsix_port_set(sockaddr, mmux_libc_network_port_number_from_host_byteorder_literal(8081));
+
+  mmux_libc_sockaddr_bind_length(sockaddr_length_p, sockaddr);
+}
+
 static void
 build_sockaddr_local (mmux_libc_sockaddr_local_t sockaddr, mmux_libc_socklen_t * sockaddr_length_p)
 /* Build the local sockaddr to be used by both the client and the server. */
@@ -127,15 +159,26 @@ server_kill_child_process_wait_for_its_completion (mmux_libc_pid_t child_pid)
 
 
 static void
-server_doit (mmux_libc_pid_t child_pid,
-	     mmux_libc_sockaddr_local_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+server_doit (mmux_libc_pid_t child_pid, bool use_accept4,
+	     mmux_libc_network_protocol_family_t family, mmux_libc_network_internet_protocol_t ipproto,
+	     mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
 {
   mmux_libc_sockfd_t	server_sockfd, client_connection_sockfd;
+
+  /* Dump the server_sockaddr for debugging purposes. */
+  if (true) {
+    mmux_libc_oufd_t	er;
+
+    mmux_libc_stder(er);
+    if (mmux_libc_sockaddr_dump(er, server_sockaddr, "server_sockaddr")) {
+      goto error;
+    }
+  }
 
   /* Build the server socket. */
   {
     printf_message("parent: server: make server socket");
-    if (mmux_libc_socket(server_sockfd, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) {
+    if (mmux_libc_socket(server_sockfd, family, MMUX_LIBC_SOCK_STREAM, ipproto)) {
       printf_error("parent: server: make server socket");
       goto error;
     }
@@ -166,12 +209,24 @@ server_doit (mmux_libc_pid_t child_pid,
     auto			client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
     auto			client_connection_sockaddr_length = client_connection_sockaddr_buflen;
 
-    printf_message("parent: server: accepting connection from client");
-    if (mmux_libc_accept(client_connection_sockfd,
-			 client_connection_sockaddr, &client_connection_sockaddr_length,
-			 server_sockfd)) {
-      printf_error("parent: server: accepting connection from client");
-      goto error;
+    if (false == use_accept4) {
+      printf_message("parent: server: accepting connection from client");
+      if (mmux_libc_accept(client_connection_sockfd,
+			   client_connection_sockaddr, &client_connection_sockaddr_length,
+			   server_sockfd)) {
+	printf_error("parent: server: accepting connection from client");
+	goto error;
+      }
+    } else {
+      auto	flags = mmux_libc_accept4_flags(MMUX_LIBC_SOCK_NONBLOCK);
+
+      printf_message("parent: server: accept4-ing connection from client");
+      if (mmux_libc_accept4(client_connection_sockfd,
+			    client_connection_sockaddr, &client_connection_sockaddr_length,
+			    server_sockfd, flags)) {
+	printf_error("parent: server: accept4-ing connection from client");
+	goto error;
+      }
     }
 
     /* Dump the client connection address. */
@@ -234,10 +289,23 @@ server_doit (mmux_libc_pid_t child_pid,
   }
 
   server_wait_for_child_process_successful_completion(child_pid);
-  printf_message("parent: server: exiting process successfully");
-  mmux_libc_exit_success();
+  printf_message("parent: server: returning to main successfully");
+  return;
 
  error:
+  {
+    mmux_libc_errno_t	errnum;
+    mmux_asciizcp_t	errmsg;
+
+    mmux_libc_errno_consume(&errnum);
+    if (errnum.value) {
+      if (mmux_libc_strerror(&errmsg, errnum)) {
+	mmux_libc_exit_failure();
+      } else {
+	print_error(errmsg);
+      }
+    }
+  }
   server_kill_child_process_wait_for_its_completion(child_pid);
   printf_message("parent: server: exiting process after error");
   mmux_libc_exit_failure();
@@ -245,7 +313,9 @@ server_doit (mmux_libc_pid_t child_pid,
 
 
 static void
-client_doit (mmux_libc_sockaddr_local_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+client_doit (mmux_libc_network_protocol_family_t family,
+	     mmux_libc_network_internet_protocol_t ipproto,
+	     mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
 {
   mmux_libc_sockfd_t	client_sockfd;
 
@@ -257,7 +327,7 @@ client_doit (mmux_libc_sockaddr_local_t server_sockaddr, mmux_libc_socklen_t ser
   /* Build the client socket. */
   {
     printf_message("child: client: creating the socket");
-    if (mmux_libc_socket(client_sockfd, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) {
+    if (mmux_libc_socket(client_sockfd, family, MMUX_LIBC_SOCK_STREAM, ipproto)) {
       printf_error("child: client: creating the socket");
       handle_error();
     }
@@ -319,13 +389,14 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   /* Initialisation. */
   {
     mmux_cc_libc_init();
-    PROGNAME = "test-networking-sockets-stream-local-accept";
+    PROGNAME = "test-networking-sockets-stream";
   }
 
-  /* Do it. */
-  {
-    mmux_libc_sockaddr_local_t		sockaddr;
-    mmux_libc_socklen_t			sockaddr_length;
+  if (true) {
+    print_newline();
+    printf_message("Do it for local addresses.");
+    mmux_libc_sockaddr_local_t	sockaddr;
+    mmux_libc_socklen_t		sockaddr_length;
 
     build_sockaddr_local(sockaddr, &sockaddr_length);
 
@@ -334,39 +405,108 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       bool		this_is_the_parent_process;
       mmux_libc_pid_t	child_pid;
 
-      printf_message("forking");
+      printf_message("forking for local addresses");
       if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
-	print_error("forking");
-	goto error;
+	printf_error("forking for local addresses");
+	handle_error();
       } else if (this_is_the_parent_process) {
 	/* Final cleanup only in the parent process. */
-	{
+	if (true) {
 	  cleanfiles_register(local_socket_ptn_asciiz);
 	  cleanfiles();
 	  mmux_libc_atexit(cleanfiles);
 	}
-	server_doit(child_pid, sockaddr, sockaddr_length);
+	{
+	  server_doit(child_pid, false,
+		      MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP,
+		      sockaddr, sockaddr_length);
+	}
+	if (true) {
+	  cleanfiles();
+	}
       } else {
-	client_doit(sockaddr, sockaddr_length);
+	client_doit(MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
       }
-    }
-
-    mmux_libc_exit_success();
-
-  error:
-    {
-      mmux_libc_errno_t	errnum;
-      mmux_asciizcp_t	errmsg;
-
-      mmux_libc_errno_consume(&errnum);
-      if (mmux_libc_strerror(&errmsg, errnum)) {
-	mmux_libc_exit_failure();
-      } else {
-	print_error(errmsg);
-      }
-      mmux_libc_exit_failure();
     }
   }
+
+  if (true) {
+    print_newline();
+    printf_message("Do it for IPv4 addresses with 'accept()'.");
+    mmux_libc_sockaddr_ipfour_t	sockaddr;
+    mmux_libc_socklen_t		sockaddr_length;
+
+    build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+    /* Fork a child process. */
+    {
+      bool		this_is_the_parent_process;
+      mmux_libc_pid_t	child_pid;
+
+      printf_message("forking for IPv4 addresses");
+      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+	printf_error("forking for IPv4 addresses");
+	handle_error();
+      } else if (this_is_the_parent_process) {
+	server_doit(child_pid, false,
+		    MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      } else {
+	client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      }
+    }
+  }
+
+  if (true) {
+    print_newline();
+    printf_message("Do it for IPv4 addresses with 'accept4()'.");
+    mmux_libc_sockaddr_ipfour_t	sockaddr;
+    mmux_libc_socklen_t		sockaddr_length;
+
+    build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+    /* Fork a child process. */
+    {
+      bool		this_is_the_parent_process;
+      mmux_libc_pid_t	child_pid;
+
+      printf_message("forking for IPv4 addresses");
+      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+	printf_error("forking for IPv4 addresses");
+	handle_error();
+      } else if (this_is_the_parent_process) {
+	server_doit(child_pid, false, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      } else {
+	client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      }
+    }
+  }
+
+  if (true) {
+    print_newline();
+    printf_message("Do it for IPv6 addresses.");
+    mmux_libc_sockaddr_ipsix_t	sockaddr;
+    mmux_libc_socklen_t		sockaddr_length;
+
+    build_sockaddr_ipsix(sockaddr, &sockaddr_length);
+
+    /* Fork a child process. */
+    {
+      bool		this_is_the_parent_process;
+      mmux_libc_pid_t	child_pid;
+
+      printf_message("forking for IPv6 addresses");
+      if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+	printf_error("forking for IPv6 addresses");
+	handle_error();
+      } else if (this_is_the_parent_process) {
+	server_doit(child_pid, false, MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      } else {
+	client_doit(MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+      }
+    }
+  }
+
+  mmux_libc_exit_success();
 }
 
 /* end of file */

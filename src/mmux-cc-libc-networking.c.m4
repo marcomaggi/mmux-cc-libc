@@ -3145,12 +3145,12 @@ mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
   }
 }
 
-#if 0
-
 
 /** --------------------------------------------------------------------
  ** Options.
  ** ----------------------------------------------------------------- */
+
+#if 0
 
 DEFINE_STRUCT_SETTER_GETTER(linger, l_onoff,		sint)
 DEFINE_STRUCT_SETTER_GETTER(linger, l_linger,		sint)
