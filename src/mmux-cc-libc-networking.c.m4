@@ -1840,7 +1840,9 @@ mmux_libc_sockaddr_ipfour_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipfo
       struct_name = "struct sockaddr_in";
     }
 
-    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p)) {
+      goto exit_function;
+    }
 
     /* Dump the field "sin_family". */
     {
@@ -2062,7 +2064,9 @@ mmux_libc_sockaddr_ipsix_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_ipsix
       struct_name = "struct sockaddr_in6";
     }
 
-    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p)) {
+      goto exit_function;
+    }
 
     /* Dump the field "sin6_family". */
     {
@@ -2384,13 +2388,18 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
       struct_name = "struct addrinfo";
     }
 
-    DPRINTF(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)addrinfo_p);
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)addrinfo_p)) {
+      goto exit_function;
+    }
 
     /* Inspect the field: ai_flags */
     {
       bool	not_first_flags = false;
 
-      DPRINTF(mfd, "%s.ai_flags = \"", struct_name);
+      if (mmux_libc_dprintf(mfd, "%s.ai_flags = \"", struct_name)) {
+	goto exit_function;
+      }
+
       {
 	if (mmux_libc_socklen_dprintf_with_base(mfd->value,
 						mmux_libc_socklen(addrinfo_p->ai_flags),
@@ -2398,84 +2407,123 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
 	  return true;
 	}
       }
-      DPRINTF(mfd, "\"");
+
+      if (mmux_libc_dprintf(mfd, "\"")) {
+	goto exit_function;
+      }
 
       if (AI_ADDRCONFIG & addrinfo_p->ai_flags) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_ADDRCONFIG");
+	  if (mmux_libc_dprintf(mfd, " | AI_ADDRCONFIG")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_ADDRCONFIG");
+	  if (mmux_libc_dprintf(mfd, " (AI_ADDRCONFIG")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_ALL & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_ALL");
+	  if (mmux_libc_dprintf(mfd, " | AI_ALL")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_ALL");
+	  if (mmux_libc_dprintf(mfd, " (AI_ALL")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_CANONIDN & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_CANONIDN");
+	  if (mmux_libc_dprintf(mfd, " | AI_CANONIDN")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_CANONIDN");
+	  if (mmux_libc_dprintf(mfd, " (AI_CANONIDN")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_CANONNAME & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_CANONNAME");
+	  if (mmux_libc_dprintf(mfd, " | AI_CANONNAME")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_CANONNAME");
+	  if (mmux_libc_dprintf(mfd, " (AI_CANONNAME")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_IDN & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_IDN");
+	  if (mmux_libc_dprintf(mfd, " | AI_IDN")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_IDN");
+	  if (mmux_libc_dprintf(mfd, " (AI_IDN")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_NUMERICSERV & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_NUMERICSERV");
+	  if (mmux_libc_dprintf(mfd, " | AI_NUMERICSERV")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_NUMERICSERV");
+	  if (mmux_libc_dprintf(mfd, " (AI_NUMERICSERV")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_PASSIVE & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_PASSIVE");
+	  if (mmux_libc_dprintf(mfd, " | AI_PASSIVE")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_PASSIVE");
+	  if (mmux_libc_dprintf(mfd, " (AI_PASSIVE")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (AI_V4MAPPED & addrinfo_p->ai_flags ) {
 	if (not_first_flags) {
-	  DPRINTF(mfd, " | AI_V4MAPPED");
+	  if (mmux_libc_dprintf(mfd, " | AI_V4MAPPED")) {
+	    goto exit_function;
+	  }
 	} else {
-	  DPRINTF(mfd, " (AI_V4MAPPED");
+	  if (mmux_libc_dprintf(mfd, " (AI_V4MAPPED")) {
+	    goto exit_function;
+	  }
 	  not_first_flags = true;
 	}
       }
 
       if (not_first_flags) {
-	DPRINTF(mfd, ")\n");
+	if (mmux_libc_dprintf(mfd, ")\n")) {
+	  goto exit_function;
+	}
       } else {
-	DPRINTF(mfd, "\n");
+	if (mmux_libc_dprintf(mfd, "\n")) {
+	  goto exit_function;
+	}
       }
     }
 
@@ -2485,7 +2533,9 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
       mmux_asciizcp_t	ai_name = "unknown";
 
       sa_family_to_asciiz_name(&ai_name, field_value);
-      DPRINTF(mfd, "%s.ai_family = \"%d\" (%s)\n", struct_name, (int)field_value.value, ai_name);
+      if (mmux_libc_dprintf(mfd, "%s.ai_family = \"%d\" (%s)\n", struct_name, (int)field_value.value, ai_name)) {
+	goto exit_function;
+      }
     }
 
     /* Inspect the field: ai_socktype */
@@ -2494,7 +2544,9 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
       mmux_asciizcp_t	ai_name = "unknown";
 
       socket_communication_style_to_asciiz_name(&ai_name, style);
-      DPRINTF(mfd, "%s.ai_socktype = \"%d\" (%s)\n", struct_name, style.value, ai_name);
+      if (mmux_libc_dprintf(mfd, "%s.ai_socktype = \"%d\" (%s)\n", struct_name, style.value, ai_name)) {
+	goto exit_function;
+      }
     }
 
     /* Inspect the field: ai_protocol */
@@ -2503,7 +2555,9 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
       mmux_asciizcp_t	ai_name  = "unknown";
 
       socket_internet_protocol_to_asciiz_name(&ai_name, protocol);
-      DPRINTF(mfd, "%s.ai_protocol = \"%d\" (%s)\n", struct_name, protocol.value, ai_name);
+      if (mmux_libc_dprintf(mfd, "%s.ai_protocol = \"%d\" (%s)\n", struct_name, protocol.value, ai_name)) {
+	goto exit_function;
+      }
     }
 
     /* Inspect the field: ai_addrlen */
@@ -2524,7 +2578,10 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
 	break;
       }
 
-      DPRINTF(mfd, "%s.ai_addrlen = \"%d\" (%s)\n", struct_name, addrinfo_p->ai_addrlen, known_struct_name);
+      if (mmux_libc_dprintf(mfd, "%s.ai_addrlen = \"%d\" (%s)\n",
+			    struct_name, addrinfo_p->ai_addrlen, known_struct_name)) {
+	goto exit_function;
+      }
     }
 
     /* Inspect the field: ai_addr, it is a pointer to "struct sockaddr" */
@@ -2540,22 +2597,32 @@ mmux_libc_addrinfo_dump (mmux_libc_fd_arg_t oufd, mmux_libc_addrinfo_arg_t addri
 	}
 	mmux_libc_sockaddr_dump(mfd, A, bufptr);
       } else {
-	DPRINTF(mfd, "%s.ai_addr = %p\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_addr));
+	if (mmux_libc_dprintf(mfd, "%s.ai_addr = %p\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_addr))) {
+	  goto exit_function;
+	}
       }
     }
 
     /* Inspect the field: ai_canonname */
     {
       if (addrinfo_p->ai_canonname) {
-	DPRINTF(mfd, "%s.ai_canonname = \"%p\" (%s)\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname), addrinfo_p->ai_canonname);
+	if (mmux_libc_dprintf(mfd, "%s.ai_canonname = \"%p\" (%s)\n",
+			      struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname), addrinfo_p->ai_canonname)) {
+	  goto exit_function;
+	}
       } else {
-	DPRINTF(mfd, "%s.ai_canonname = \"%p\"\n",      struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname));
+	if (mmux_libc_dprintf(mfd, "%s.ai_canonname = \"%p\"\n",
+			      struct_name, (mmux_pointer_t)(addrinfo_p->ai_canonname))) {
+	  goto exit_function;
+	}
       }
     }
 
     /* Inspect the field: ai_next */
     {
-      DPRINTF(mfd, "%s.ai_next = \"%p\"\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_next));
+      if (mmux_libc_dprintf(mfd, "%s.ai_next = \"%p\"\n", struct_name, (mmux_pointer_t)(addrinfo_p->ai_next))) {
+	goto exit_function;
+      }
     }
 
     if (mmux_libc_memfd_copy(oufd, mfd)) {
@@ -3150,22 +3217,75 @@ mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
  ** Options.
  ** ----------------------------------------------------------------- */
 
-#if 0
-
-DEFINE_STRUCT_SETTER_GETTER(linger, l_onoff,		sint)
-DEFINE_STRUCT_SETTER_GETTER(linger, l_linger,		sint)
-
 bool
-mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_t const * linger_p, mmux_asciizcp_t struct_name)
+mmux_libc_network_socket_option_linger_on_set (mmux_libc_linger_t P, bool turn_it_on)
 {
-  if (NULL == struct_name) {
-    struct_name = "struct linger";
-  }
-  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)linger_p);
-  DPRINTF(fd, "%s.l_onoff  = \"%d\"\n", struct_name, linger_p->l_onoff);
-  DPRINTF(fd, "%s.l_linger = \"%d\"\n", struct_name, linger_p->l_linger);
+  P->l_onoff = (turn_it_on)? 1 : 0;
   return false;
 }
+bool
+mmux_libc_network_socket_option_linger_on_ref (bool * it_is_turned_on, mmux_libc_linger_arg_t P)
+{
+  *it_is_turned_on = (P->l_onoff)? true : false;
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_network_socket_option_linger_seconds_set (mmux_libc_linger_t P, mmux_uint_t number_of_seconds)
+{
+  P->l_linger = number_of_seconds.value;
+  return false;
+}
+bool
+mmux_libc_network_socket_option_linger_seconds_ref (mmux_uint_t * number_of_seconds_p, mmux_libc_linger_arg_t P)
+{
+  *number_of_seconds_p = mmux_uint(P->l_linger);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_linger_dump (mmux_libc_fd_arg_t oufd, mmux_libc_linger_arg_t linger_p, mmux_asciizcp_t struct_name)
+{
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
+
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
+  }
+  {
+    if (NULL == struct_name) {
+      struct_name = "struct linger";
+    }
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)linger_p)) {
+      goto exit_function;
+    }
+    if (mmux_libc_dprintf(mfd, "%s.l_onoff  = \"%d\"\n", struct_name, linger_p->l_onoff)) {
+      goto exit_function;
+    }
+    if (mmux_libc_dprintf(mfd, "%s.l_linger = \"%d\"\n", struct_name, linger_p->l_linger)) {
+      goto exit_function;
+    }
+
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
+    }
+
+    rv = false;
+  }
+
+ exit_function:
+  if (mmux_libc_close(mfd)) {
+    return true;
+  }
+  return rv;
+}
+
+/* ------------------------------------------------------------------ */
+
 bool
 mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
 		      mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname)
@@ -3189,7 +3309,5 @@ mmux_libc_setsockopt (mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmu
 
   return ((0 == rv)? false : true);
 }
-
-#endif
 
 /* end of file */

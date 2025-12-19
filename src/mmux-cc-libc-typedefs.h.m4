@@ -419,8 +419,8 @@ typedef struct mmux_libc_first_addrinfo_t {
   mmux_libc_network_socket_address_info_t const *	value;
 } mmux_libc_first_addrinfo_t[1];
 
-typedef mmux_libc_network_socket_address_linger_option_t		mmux_libc_linger_t[1];
-typedef mmux_libc_network_socket_address_linger_option_t const *	mmux_libc_linger_arg_t;
+typedef mmux_libc_network_socket_option_linger_t		mmux_libc_linger_t[1];
+typedef mmux_libc_network_socket_option_linger_t const *	mmux_libc_linger_arg_t;
 
 /* ------------------------------------------------------------------ */
 

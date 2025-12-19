@@ -3631,8 +3631,21 @@ mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes
  ** Networking-sockets: socket options.
  ** ----------------------------------------------------------------- */
 
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(linger, l_onoff,		mmux_sint_t)
-DEFINE_STRUCT_SETTER_GETTER_PROTOS(linger, l_linger,		mmux_sint_t)
+mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_on_set (mmux_libc_linger_t P,
+								      bool turn_it_on)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_on_ref (bool * it_is_turned_on,
+								      mmux_libc_linger_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_seconds_set (mmux_libc_linger_t P,
+									   mmux_uint_t number_of_seconds)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_seconds_ref (mmux_uint_t * number_of_seconds_p,
+									   mmux_libc_linger_arg_t P)
+  __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_arg_t linger_p,
 					      mmux_asciizcp_t struct_name)
