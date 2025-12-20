@@ -423,16 +423,16 @@ datagram_server_doit (mmux_libc_pid_t child_pid,
     char		packet_bufptr[packet_buflen.value];
     mmux_usize_t	packet_nbytes_received;
 
-    auto			client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
-    mmux_standard_octet_t	client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
-    auto			client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
-    auto			client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+    auto			client_sockaddr_buflen = mmux_libc_socklen_literal(512);
+    mmux_standard_octet_t	client_sockaddr_bufptr[client_sockaddr_buflen.value];
+    auto			client_sockaddr = (mmux_libc_sockaddr_t)client_sockaddr_bufptr;
+    auto			client_sockaddr_length = client_sockaddr_buflen;
 
     auto	flags = mmux_libc_recv_flags(0);
 
     printf_message("parent: server: receiving packet from client");
     if (mmux_libc_recvfrom(&packet_nbytes_received,
-			   client_connection_sockaddr, &client_connection_sockaddr_length,
+			   client_sockaddr, &client_sockaddr_length,
 			   server_sockfd, packet_bufptr, packet_buflen, flags)) {
       printf_error("parent: server: receiving packet from client");
       goto error;
@@ -446,8 +446,8 @@ datagram_server_doit (mmux_libc_pid_t child_pid,
 
       mmux_libc_stder(er);
       printf_message("parent: server: client sockaddr length %lu",
-		     (mmux_standard_ulong_t) client_connection_sockaddr_length.value);
-      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_sockaddr")) {
+		     (mmux_standard_ulong_t) client_sockaddr_length.value);
+      if (mmux_libc_sockaddr_dump(er, client_sockaddr, "client_sockaddr")) {
 	printf_error("parent: server: dumping the client connection sockaddr");
       }
     }

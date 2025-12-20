@@ -19117,17 +19117,243 @@ then @cfunc{send} or @cfunc{write}).
 @node networking sockets datagram server ipfour
 @subsubsection Example of datagram IPv4 networking server
 
+
+The core organisation of code implementing an IPv4 networking server, using the datagram
+communication style, looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_ipfour_t  server_sockaddr;
+  mmux_libc_socklen_t          server_sockaddr_length;
+
+  @{
+    mmux_libc_ipfour_addr_t  ipfour_addr;
+    mmux_asciizcp_t          presentation = "127.0.0.1";
+
+    if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
+      /* error */
+    @}
+    mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
+    mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
+    mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection from the server. */
+@{
+  auto          packet_buflen = mmux_usize_literal(1024);
+  char          packet_bufptr[packet_buflen.value];
+  mmux_usize_t  packet_nbytes_received;
+
+  auto                   client_sockaddr_buflen = mmux_libc_socklen_literal(512);
+  mmux_standard_octet_t  client_sockaddr_bufptr[client_sockaddr_buflen.value];
+  auto                   client_sockaddr = (mmux_libc_sockaddr_t)client_sockaddr_bufptr;
+  auto                   client_sockaddr_length = client_sockaddr_buflen;
+
+  auto  flags = mmux_libc_recv_flags(0);
+
+  if (mmux_libc_recvfrom(&packet_nbytes_received,
+                         client_sockaddr, &client_sockaddr_length,
+                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+    /* error */
+  @}
+
+  /* Do something with the received packet. */
+@}
+
+/* Final cleanup */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
 @c page
 @node networking sockets datagram server ipsix
 @subsubsection Example of datagram IPv6 networking server
+
+
+The core organisation of code implementing an IPv6 networking server, using the datagram
+communication style, looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_INET6, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_ipsix_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  @{
+    mmux_libc_ipsix_addr_t  ipsix_addr;
+    mmux_asciizcp_t         presentation = "1:2:3:4:5:6:7:8";
+
+    if (mmux_libc_make_ipsix_addr_from_asciiz(ipsix_addr, presentation)) @{
+      /* error */
+    @}
+    mmux_libc_sockaddr_ipsix_family_set(server_sockaddr, MMUX_LIBC_AF_INET6);
+    mmux_libc_sockaddr_ipsix_addr_set(server_sockaddr, ipsix_addr);
+    mmux_libc_sockaddr_ipsix_port_set(server_sockaddr,
+      mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection from the server. */
+@{
+  auto          packet_buflen = mmux_usize_literal(1024);
+  char          packet_bufptr[packet_buflen.value];
+  mmux_usize_t  packet_nbytes_received;
+
+  auto                   client_sockaddr_buflen = mmux_libc_socklen_literal(512);
+  mmux_standard_octet_t  client_sockaddr_bufptr[client_sockaddr_buflen.value];
+  auto                   client_sockaddr = (mmux_libc_sockaddr_t)client_sockaddr_bufptr;
+  auto                   client_sockaddr_length = client_sockaddr_buflen;
+
+  auto  flags = mmux_libc_recv_flags(0);
+
+  if (mmux_libc_recvfrom(&packet_nbytes_received,
+                         client_sockaddr, &client_sockaddr_length,
+                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+    /* error */
+  @}
+
+  /* Do something with the received packet. */
+@}
+
+/* Final cleanup */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
 
 @c page
 @node networking sockets datagram server local
 @subsubsection Example of datagram local networking server
 
+
+The core organisation of code implementing a local networking server, using the datagram
+communication style, looks as follows:
+
+@example
+mmux_libc_sockfd_t  server_sockfd;
+
+/* Build the server socket. */
+@{
+  if (mmux_libc_socket(server_sockfd,
+        MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Bind the server socket to the sockaddr. */
+@{
+  mmux_libc_sockaddr_local_t  server_sockaddr;
+  mmux_libc_socklen_t         server_sockaddr_length;
+
+  @{
+    mmux_libc_fs_ptn_t  fs_ptn;
+
+    /* Build socket's file system pathname. */
+    @{
+      mmux_asciizcp_t             ptn_asciiz = "/path/to/socket.sock";
+      mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+      mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+      if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+        /* error */
+      @}
+    @}
+
+    mmux_libc_sockaddr_local_family_set (server_sockaddr, MMUX_LIBC_AF_LOCAL);
+    mmux_libc_sockaddr_local_path_set   (server_sockaddr, fs_ptn);
+
+    /* Local cleanup. */
+    @{
+      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+        /* error */
+      @}
+    @}
+  @}
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+
+  if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Accept a connection from the server. */
+@{
+  auto          packet_buflen = mmux_usize_literal(1024);
+  char          packet_bufptr[packet_buflen.value];
+  mmux_usize_t  packet_nbytes_received;
+
+  auto                   client_sockaddr_buflen = mmux_libc_socklen_literal(512);
+  mmux_standard_octet_t  client_sockaddr_bufptr[client_sockaddr_buflen.value];
+  auto                   client_sockaddr = (mmux_libc_sockaddr_t)client_sockaddr_bufptr;
+  auto                   client_sockaddr_length = client_sockaddr_buflen;
+
+  auto  flags = mmux_libc_recv_flags(0);
+
+  if (mmux_libc_recvfrom(&packet_nbytes_received,
+                         client_sockaddr, &client_sockaddr_length,
+                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+    /* error */
+  @}
+
+  /* Do something with the received packet. */
+@}
+
+/* Final cleanup */
+@{
+  if (mmux_libc_close(server_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
 @c page
 @node networking sockets datagram client ipfour
 @subsubsection Example of datagram IPv4 networking client
+
+
+The core organisation of code implementing a IPv4 networking client, using the datagram
+communication style, looks as follows:
+
+@example
+@end example
 
 @c page
 @node networking sockets datagram client ipsix
