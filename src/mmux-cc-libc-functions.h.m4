@@ -3633,31 +3633,31 @@ mmux_cc_libc_decl bool mmux_libc_send (mmux_usize_t * number_of_bytes_sent_resul
 				       mmux_libc_sockfd_t sockfd,
 				       mmux_pointerc_t bufptr, mmux_usize_t buflen,
 				       mmux_libc_send_flags_t flags)
-  __attribute__((__nonnull__(1,3),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_recv (mmux_usize_t * number_of_bytes_received_result_p,
 				       mmux_libc_sockfd_t sockfd,
 				       mmux_pointer_t bufptr, mmux_usize_t buflen,
 				       mmux_libc_recv_flags_t flags)
-  __attribute__((__nonnull__(1,3),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
-					 mmux_libc_sockfd_t sockfd,
-					 mmux_pointerc_t bufptr, mmux_usize_t buflen,
+mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * number_of_bytes_sent_result_p,
+					 mmux_libc_sockfd_t client_sockfd,
+					 mmux_pointerc_t packet_bufptr, mmux_usize_t packet_buflen,
 					 mmux_libc_send_flags_t flags,
 					 mmux_libc_sockaddr_arg_t destination_sockaddr_p,
 					 mmux_libc_socklen_t destination_sockaddr_size)
-  __attribute__((__nonnull__(1,3,6),__warn_unused_result__));
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-/* The arguments  "result_sender_sockaddr_p" and  "result_sender_sockaddr_size_p" can
+/* The arguments  "sender_sockaddr_result" and  "sender_sockaddr_length_result_p" can
    be NULL if we are not interested in retrieving the sender address. */
-mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
-					   mmux_libc_sockaddr_arg_t result_sender_sockaddr_p,
-					   mmux_libc_socklen_t * result_sender_sockaddr_size_p,
-					   mmux_libc_sockfd_t sockfd,
-					   mmux_pointer_t bufptr, mmux_usize_t buflen,
+mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * number_of_bytes_received_result_p,
+					   mmux_libc_sockaddr_arg_t sender_sockaddr_result,
+					   mmux_libc_socklen_t * sender_sockaddr_length_result_p,
+					   mmux_libc_sockfd_t server_sockfd,
+					   mmux_pointer_t packet_bufptr, mmux_usize_t packet_buflen,
 					   mmux_libc_recv_flags_t flags)
-  __attribute__((__nonnull__(1,5),__warn_unused_result__));
+  __attribute__((__nonnull__(1,4,5),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

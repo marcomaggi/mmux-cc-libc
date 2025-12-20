@@ -18106,6 +18106,7 @@ if (there_is_one) @{
 * networking sockets opening::     Opening networking-sockets file-descriptors.
 * networking sockets closing::     Closing networking-sockets file-descriptors.
 * networking sockets inspecting::  Inspecting networking-sockets file-descriptors.
+* networking sockets serving::     Networking servers programming interface.
 * networking sockets connecting::  Connecting networking-sockets file-descriptors to server addresses.
 * networking sockets stream::      Networking communications using the stream style.
 * networking sockets datagram::    Networking communications using the datagram style.
@@ -18399,6 +18400,79 @@ struct sockaddr_un.sun_path = ""
 @end deftypefun
 
 @c page
+@node networking sockets serving
+@subsection Networking servers programming interface
+
+
+@deftypefun bool mmux_libc_bind (mmux_libc_sockfd_t @var{server_sockfd}, mmux_libc_sockaddr_arg_t @var{server_sockaddr}, mmux_libc_socklen_t @var{server_sockaddr_length})
+@MmuxCInterface{bind}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_listen (mmux_libc_sockfd_t @var{server_sockfd}, mmux_uint_t @var{pending_connections_queue_length})
+@MmuxCInterface{listen}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_accept (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock})
+@MmuxCInterface{accept}.
+
+@itemize
+@item
+Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
+set to the number of bytes allocated for the address referenced by
+@var{client_connection_sockaddr_result}.
+
+@item
+Upon successfully returning: the location referenced by
+@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
+@end itemize
+
+The arguments @var{client_connection_sockaddr_result} and
+@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
+retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
+by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
+that will fill it with the address informations.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefn {Linux Function} bool mmux_libc_accept4 (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock}, mmux_libc_accept4_flags_t @var{flags})
+@MmuxCInterface{accept4}.
+
+
+@itemize
+@item
+Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
+set to the number of bytes allocated for the address referenced by
+@var{client_connection_sockaddr_result}.
+
+@item
+Upon successfully returning: the location referenced by
+@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
+@end itemize
+
+The arguments @var{client_connection_sockaddr_result} and
+@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
+retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
+by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
+that will fill it with the address informations.
+@end deftypefn
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_accept4_flags_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type representing a bitwise OR combination of flags for a call to
+@cfunc{mmux_libc_accept4}.  Such flags are @code{MMUX_LIBC_SOCK_NONBLOCK},
+@code{MMUX_LIBC_SOCK_CLOEXEC} and maybe others; @MmuxCFuncpage{accept4}.
+@end deftp
+
+
+@deftypefun mmux_libc_accept4_flags_t mmux_libc_accept4_flags (mmux_standard_sint_t @var{flags})
+Build and return a new instance of @objtype{mmux_libc_accept4_flags_t}.
+@end deftypefun
+
+@c page
 @node networking sockets connecting
 @subsection Connecting networking-sockets file-descriptors to server addresses
 
@@ -18448,7 +18522,6 @@ standard function calls is: @cfunc{socket}, @cfunc{connect}.
 * networking sockets stream server ipfour::  Example of stream IPv4 networking server.
 * networking sockets stream server ipsix::   Example of stream IPv6 networking server.
 * networking sockets stream server local::   Example of stream local networking server.
-* networking sockets stream server api::     Stream networking servers programming interface.
 * networking sockets stream client ipfour::  Example of stream IPv4 networking client.
 * networking sockets stream client ipsix::   Example of stream IPv6 networking client.
 * networking sockets stream client local::   Example of stream local networking client.
@@ -18749,79 +18822,6 @@ mmux_libc_sockfd_t  server_sockfd;
 @end example
 
 @c page
-@node networking sockets stream server api
-@subsubsection Stream networking servers programming interface
-
-
-@deftypefun bool mmux_libc_bind (mmux_libc_sockfd_t @var{server_sockfd}, mmux_libc_sockaddr_arg_t @var{server_sockaddr}, mmux_libc_socklen_t @var{server_sockaddr_length})
-@MmuxCInterface{bind}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_listen (mmux_libc_sockfd_t @var{server_sockfd}, mmux_uint_t @var{pending_connections_queue_length})
-@MmuxCInterface{listen}.
-@end deftypefun
-
-
-@deftypefun bool mmux_libc_accept (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock})
-@MmuxCInterface{accept}.
-
-@itemize
-@item
-Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
-set to the number of bytes allocated for the address referenced by
-@var{client_connection_sockaddr_result}.
-
-@item
-Upon successfully returning: the location referenced by
-@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
-@end itemize
-
-The arguments @var{client_connection_sockaddr_result} and
-@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
-retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
-by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
-that will fill it with the address informations.
-@end deftypefun
-
-@c ------------------------------------------------------------------------
-
-@deftypefn {Linux Function} bool mmux_libc_accept4 (mmux_libc_sockfd_t @var{client_connection_sockfd_result}, mmux_libc_sockaddr_t @var{client_connection_sockaddr_result}, mmux_socklen_t * @var{client_connection_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sock}, mmux_libc_accept4_flags_t @var{flags})
-@MmuxCInterface{accept4}.
-
-
-@itemize
-@item
-Upon calling: the variable referenced by @var{client_connection_sockaddr_length_result_p} must be
-set to the number of bytes allocated for the address referenced by
-@var{client_connection_sockaddr_result}.
-
-@item
-Upon successfully returning: the location referenced by
-@var{client_connection_sockaddr_length_result_p} is set to the actual size of the client address.
-@end itemize
-
-The arguments @var{client_connection_sockaddr_result} and
-@var{client_connection_sockaddr_length_result_p} can be @cnull{} if the caller is not interested in
-retrieving the client's networking--socket address; if they are not @cnull{}: the buffer referenced
-by @var{client_connection_sockaddr_result} is reset to zero bytes before the call to @cfunc{accept}
-that will fill it with the address informations.
-@end deftypefn
-
-
-@deftp {Opaque Struct Typedef} mmux_libc_accept4_flags_t
-@deftpx {Parent Struct Typedef} mmux_sint_t
-Data structure type representing a bitwise OR combination of flags for a call to
-@cfunc{mmux_libc_accept4}.  Such flags are @code{MMUX_LIBC_SOCK_NONBLOCK},
-@code{MMUX_LIBC_SOCK_CLOEXEC} and maybe others; @MmuxCFuncpage{accept4}.
-@end deftp
-
-
-@deftypefun mmux_libc_accept4_flags_t mmux_libc_accept4_flags (mmux_standard_sint_t @var{flags})
-Build and return a new instance of @objtype{mmux_libc_accept4_flags_t}.
-@end deftypefun
-
-@c page
 @node networking sockets stream client ipfour
 @subsubsection Example of stream IPv4 networking client
 
@@ -19095,22 +19095,70 @@ The only difference between @cfunc{mmux_libc_recv} and @cfunc{mmux_libc_read} is
 @subsection Networking communications using the datagram style
 
 
-@deftypefun bool mmux_libc_sendto (mmux_usize_t * @var{result_number_of_bytes_sent_p}, mmux_libc_network_socket_t @var{sock}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{flags}, mmux_libc_sockaddr_ptr_t @var{destination_sockaddr_p}, mmux_socklen_t @var{destination_sockaddr_size})
+To create a networking server using the datagram communication style, the required sequence of
+standard function calls is: @cfunc{socket}, @cfunc{bind}, @cfunc{recvfrom} (usually, but we can also
+do @cfunc{recv} or @cfunc{read}).
+
+To create a networking client using the stream datagram style, the required sequence of standard
+function calls is: @cfunc{socket}, @cfunc{sendto} (usually, but we can also do @cfunc{connect} and
+then @cfunc{send} or @cfunc{write}).
+
+@menu
+* networking sockets datagram server ipfour::  Example of datagram IPv4 networking server.
+* networking sockets datagram server ipsix::   Example of datagram IPv6 networking server.
+* networking sockets datagram server local::   Example of datagram local networking server.
+* networking sockets datagram client ipfour::  Example of datagram IPv4 networking client.
+* networking sockets datagram client ipsix::   Example of datagram IPv6 networking client.
+* networking sockets datagram client local::   Example of datagram local networking client.
+* networking sockets datagram data::           Sending data with @cfunc{sendto} and receiving data with @cfunc{recvfrom}.
+@end menu
+
+@c page
+@node networking sockets datagram server ipfour
+@subsubsection Example of datagram IPv4 networking server
+
+@c page
+@node networking sockets datagram server ipsix
+@subsubsection Example of datagram IPv6 networking server
+
+@c page
+@node networking sockets datagram server local
+@subsubsection Example of datagram local networking server
+
+@c page
+@node networking sockets datagram client ipfour
+@subsubsection Example of datagram IPv4 networking client
+
+@c page
+@node networking sockets datagram client ipsix
+@subsubsection Example of datagram IPv6 networking client
+
+@c page
+@node networking sockets datagram client local
+@subsubsection Example of datagram local networking client
+
+
+@c page
+@node networking sockets datagram data
+@subsubsection Sending data with @cfunc{sendto} and receiving data with @cfunc{recvfrom}
+
+
+@deftypefun bool mmux_libc_sendto (mmux_usize_t * @var{number_of_bytes_sent_result_p}, mmux_libc_sockfd_t @var{client_sockfd}, mmux_pointerc_t @var{packet_bufptr}, mmux_usize_t @var{packet_buflen}, mmux_libc_send_flags_t @var{flags}, mmux_libc_sockaddr_arg_t @var{destination_sockaddr_p}, mmux_libc_socklen_t @var{destination_sockaddr_length})
 @MmuxCInterface{sendto}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_recvfrom (mmux_usize_t * @var{result_number_of_bytes_received_p}, mmux_libc_sockaddr_ptr_t @var{result_sender_sockaddr_p}, mmux_socklen_t * @var{result_sender_sockaddr_size_p}, mmux_libc_network_socket_t @var{sock}, mmux_pointer_t @var{bufptr}, mmux_usize_t @var{buflen}, mmux_sint_t @var{flags})
+@deftypefun bool mmux_libc_recvfrom (mmux_usize_t * @var{number_of_bytes_received_result_p}, mmux_libc_sockaddr_arg_t @var{sender_sockaddr_result}, mmux_libc_socklen_t * @var{sender_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sockfd}, mmux_pointer_t @var{packet_bufptr}, mmux_usize_t @var{packet_buflen}, mmux_libc_recv_flags_t @var{flags})
 @MmuxCInterface{recvfrom}.
 
 @itemize
 @item
-Upon entering the call: the location referenced by @var{result_sender_sockaddr_size_p} must be set
+Upon entering the call: the variable referenced by @var{sender_sockaddr_length_result_p} must be set
 to the number of bytes allocated to contain the sender address.
 
 @item
-Upon successfully returning from the call: the location referenced by
-@var{result_sender_sockaddr_size_p} is reset to the actual number of bytes required to contain the
+Upon successfully returning from the call: the variable referenced by
+@var{sender_sockaddr_length_result_p} is reset to the actual number of bytes required to contain the
 sender address.
 @end itemize
 @end deftypefun
