@@ -338,9 +338,9 @@ stream_client_doit (mmux_libc_network_protocol_family_t family,
 
   /* Connect the client socket to the server_sockaddr. */
   {
-    printf_message("child: client: connecting to the server");
+    printf_message("child: client: connecting the stream socket to the server sockaddr");
     if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) {
-      printf_error("child: client: connecting to the server");
+      printf_error("child: client: connecting the stream socket to the server sockaddr");
       handle_error();
     }
   }
@@ -539,6 +539,75 @@ datagram_client_doit (mmux_libc_network_protocol_family_t family,
     /* Check that all the data has been sent. */
     {
       if (mmux_usize_equal(packet_buflen, nbytes_done)) {
+	printf_message("child: client: correctly sent all data");
+      } else {
+	print_error("child: client: wrongly sent not all data");
+	handle_error();
+      }
+    }
+  }
+
+  /* Final cleanup. */
+  {
+    printf_message("child: client: closing the client socket");
+    if (mmux_libc_close(client_sockfd)) {
+      printf_error("child: client: closing the client socket");
+    }
+  }
+
+  printf_message("child: client: exiting process successfully");
+  mmux_libc_exit_success();
+}
+
+
+static void
+datagram_client_doit_connect (mmux_libc_network_protocol_family_t family,
+			      mmux_libc_network_internet_protocol_t ipproto,
+			      mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+/* Datagram  client  in   which  we  use  "connect()"  and   "write()",  rather  than
+   "sendto()". */
+{
+  mmux_libc_sockfd_t	client_sockfd;
+
+  {
+    printf_message("child: client: wait for the server to set itself up");
+    wait_for_some_time();
+  }
+
+  /* Build the client socket. */
+  {
+    printf_message("child: client: creating the socket");
+    if (mmux_libc_socket(client_sockfd, family, MMUX_LIBC_SOCK_DGRAM, ipproto)) {
+      printf_error("child: client: creating the socket");
+      handle_error();
+    }
+  }
+
+  /* Connect the client socket to the server_sockaddr. */
+  {
+    printf_message("child: client: connecting the datagram socket to the server sockaddr");
+    if (mmux_libc_connect(client_sockfd, server_sockaddr, server_sockaddr_length)) {
+      printf_error("child: client: connecting the datagram socket to the server sockaddr");
+      handle_error();
+    }
+  }
+
+  /* Write a message to the server. */
+  {
+    mmux_asciizcp_t	bufptr = "the colour of water and quicksilver";
+    mmux_usize_t	buflen, nbytes_done;
+    auto		flags = mmux_libc_send_flags(0);
+
+    mmux_libc_strlen(&buflen, bufptr);
+    printf_message("child: client: sending data to socket");
+    if (mmux_libc_send(&nbytes_done, client_sockfd, bufptr, buflen, flags)) {
+      printf_error("child: client: sending data to socket");
+      handle_error();
+    }
+
+    /* Check that all the data has been sent. */
+    {
+      if (mmux_usize_equal(buflen, nbytes_done)) {
 	printf_message("child: client: correctly sent all data");
       } else {
 	print_error("child: client: wrongly sent not all data");
@@ -790,6 +859,35 @@ test_datagram_server_ipsix (void)
 }
 
 
+static void
+test_datagram_server_ipfour_connect (void)
+{
+  print_newline();
+  printf_message("Do it for datagram IPv4 addresses, with connect().");
+  mmux_libc_sockaddr_ipfour_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for datagram IPv4 address");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for datagram IPv4 address");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      datagram_server_doit(child_pid, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
+    } else {
+      cleanfiles_reset();
+      datagram_client_doit_connect(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -812,6 +910,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true) {	test_datagram_server_local();		}
   if (true) {	test_datagram_server_ipfour();		}
   if (true) {	test_datagram_server_ipsix();		}
+
+  if (true) {	test_datagram_server_ipfour_connect();	}
 
   mmux_libc_exit_success();
 }

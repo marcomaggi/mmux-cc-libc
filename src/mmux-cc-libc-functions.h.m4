@@ -3333,6 +3333,39 @@ mmux_cc_libc_decl bool mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p
 
 
 /** --------------------------------------------------------------------
+ ** Networking-socket addresses: unspec address.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_family_set (mmux_libc_sockaddr_unspec_t P,
+							     mmux_libc_network_address_family_t new_field_value)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+							     mmux_libc_sockaddr_unspec_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_bind_length (mmux_libc_socklen_t * sockaddr_unspec_length_result_p,
+							      mmux_libc_sockaddr_unspec_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_alloc_length (mmux_usize_t * sockaddr_unspec_length_result_p,
+							       mmux_libc_sockaddr_unspec_arg_t P)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_dump (mmux_libc_fd_arg_t fd,
+						       mmux_libc_sockaddr_unspec_arg_t sockaddr_unspec_p,
+						       mmux_asciizcp_t struct_name)
+  __attribute__((__nonnull__(1,2)));
+
+mmux_cc_libc_decl bool mmux_libc_sockaddr_unspec_equal (bool * are_equal_result_p,
+							mmux_libc_sockaddr_unspec_arg_t sockaddr_unspec_1,
+							mmux_libc_sockaddr_unspec_arg_t sockaddr_unspec_2)
+  __attribute__((__nonnull__(1,2,3)));
+
+
+/** --------------------------------------------------------------------
  ** Networking-socket addresses: address informations.
  ** ----------------------------------------------------------------- */
 

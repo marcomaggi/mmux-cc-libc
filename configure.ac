@@ -158,6 +158,7 @@ MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_DIRENT],       [sizeof(struct dirent)])
 
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN_ADDR],      [sizeof(struct in_addr)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_IN6_ADDR],     [sizeof(struct in6_addr)])
+MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SOCKADDR],     [sizeof(struct sockaddr)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SOCKADDR_UN],  [sizeof(struct sockaddr_un)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SOCKADDR_IN],  [sizeof(struct sockaddr_in)])
 MMUX_CC_DETERMINE_VALUEOF([SIZEOF_STRUCT_SOCKADDR_IN6], [sizeof(struct sockaddr_in6)])

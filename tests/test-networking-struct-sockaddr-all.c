@@ -1084,6 +1084,189 @@ test_sockaddr_ipsix (void)
 }
 
 
+static void
+test_sockaddr_unspec (void)
+{
+  printf_message("testing: %s", __func__);
+  {
+    mmux_libc_sockaddr_unspec_t  sockaddr_unspec;
+
+    /* Initialise the address. */
+    {
+      if (mmux_libc_sockaddr_unspec_family_set(sockaddr_unspec, MMUX_LIBC_AF_UNSPEC)) {
+	handle_error();
+      }
+    }
+
+    /* Dump the data structure as a sockaddr_unspec. */
+    printf_message("dump data structure as sockaddr_unspec");
+    {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_unspec_dump(er, sockaddr_unspec, NULL)) {
+	handle_error();
+      }
+    }
+
+    /* Dump the data structure as a sockaddr. */
+    printf_message("dump data structure as sockaddr");
+    {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      if (mmux_libc_sockaddr_dump(er, sockaddr_unspec, NULL)) {
+	handle_error();
+      }
+    }
+
+    /* Extract and check the address family as sockaddr_unspec. */
+    {
+      mmux_libc_network_address_family_t	family;
+
+      mmux_libc_sockaddr_unspec_family_ref(&family, sockaddr_unspec);
+      if (MMUX_LIBC_VALUEOF_AF_UNSPEC == family.value) {
+	printf_message("correct family as sockaddr_unspec");
+      } else {
+	printf_error("wrong family");
+	handle_error();
+      }
+    }
+
+    /* Extract and check the address family as sockaddr. */
+    {
+      mmux_libc_network_address_family_t	family;
+
+      mmux_libc_sockaddr_family_ref(&family, sockaddr_unspec);
+      if (MMUX_LIBC_VALUEOF_AF_UNSPEC == family.value) {
+	printf_message("correct family as sockaddr object");
+      } else {
+	printf_error("wrong family");
+	handle_error();
+      }
+    }
+  }
+
+  /* Compare objects of type sockaddr_unspec. */
+  {
+    /* Compare equal sockaddr_unspec objects. */
+    {
+      mmux_libc_sockaddr_unspec_t	sockaddr1, sockaddr2;
+
+      /* Initialise the objects. */
+      {
+	if (mmux_libc_sockaddr_unspec_family_set(sockaddr1, MMUX_LIBC_AF_UNSPEC)) {
+	  handle_error();
+	}
+	if (mmux_libc_sockaddr_unspec_family_set(sockaddr2, MMUX_LIBC_AF_UNSPEC)) {
+	  handle_error();
+	}
+      }
+
+      /* Compare the objects as sockaddr_unspec. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_unspec_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal unspec socket addresses as sockaddr_unspec");
+	} else {
+	  printf_error("wrongly different unspec socket addresses as sockaddr_unspec");
+	  handle_error();
+	}
+      }
+
+      /* Compare the objects as sockaddr. */
+      {
+	bool	are_equal;
+
+	if (mmux_libc_sockaddr_equal(&are_equal, sockaddr1, sockaddr2)) {
+	  handle_error();
+	}
+	if (are_equal) {
+	  printf_message("correctly equal unspec socket addresses as sockaddr");
+	} else {
+	  printf_error("wrongly different unspec socket addresses as sockaddr");
+	  handle_error();
+	}
+      }
+    }
+  }
+
+  /* Configure a  datagram socket  by selecting  a default  address; then  cancel the
+     default address. */
+  {
+    mmux_libc_sockaddr_ipfour_t  sockaddr_ipfour;
+    mmux_libc_sockaddr_unspec_t  sockaddr_unspec;
+
+    /* Initialise the IPv4 address. */
+    {
+      mmux_libc_ipfour_addr_t	address_ipfour;
+      mmux_asciizcp_t		presentation = "127.0.0.1";
+
+      mmux_libc_make_ipfour_addr_from_asciiz (address_ipfour, presentation);
+      mmux_libc_sockaddr_ipfour_family_set   (sockaddr_ipfour, MMUX_LIBC_AF_INET);
+      mmux_libc_sockaddr_ipfour_addr_set     (sockaddr_ipfour, address_ipfour);
+      mmux_libc_sockaddr_ipfour_port_set     (sockaddr_ipfour,
+					      mmux_libc_network_port_number_from_host_byteorder_literal(25));
+    }
+
+    /* Initialise the unspec address. */
+    {
+      mmux_libc_sockaddr_unspec_family_set(sockaddr_unspec, MMUX_LIBC_AF_UNSPEC);
+    }
+
+    /* Build and configure the socket. */
+    {
+      mmux_libc_sockfd_t	sockfd;
+
+      /* Build the socket. */
+      {
+	if (mmux_libc_socket(sockfd, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) {
+	  handle_error();
+	}
+      }
+
+      /* Connect the client socket to the sockaddr_ipfour as default destination. */
+      {
+	mmux_libc_socklen_t	sockaddr_length;
+
+	mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr_ipfour);
+	printf_message("connecting the datagram socket, giving it a default destination");
+	if (mmux_libc_connect(sockfd, sockaddr_ipfour, sockaddr_length)) {
+	  printf_error("connecting the datagram socket, giving it a default destination");
+	  handle_error();
+	}
+      }
+
+      /* Connect the  client socket  to the  sockaddr_unspec, cancelling  the default
+	 destination. */
+      {
+	mmux_libc_socklen_t	sockaddr_length;
+
+	mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr_unspec);
+	printf_message("connecting the datagram socket, cancelling the default destination");
+	if (mmux_libc_connect(sockfd, sockaddr_unspec, sockaddr_length)) {
+	  printf_error("connecting the datagram socket, cancelling the default destination");
+	  handle_error();
+	}
+      }
+
+      /* Final cleanup. */
+      {
+	if (mmux_libc_close(sockfd)) {
+	  handle_error();
+	}
+      }
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
+}
+
+
 /** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
@@ -1100,6 +1283,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (true) {	test_sockaddr_local();		}
   if (true) {	test_sockaddr_ipfour();		}
   if (true) {	test_sockaddr_ipsix();		}
+  if (true) {	test_sockaddr_unspec();		}
 
   mmux_libc_exit_success();
 }

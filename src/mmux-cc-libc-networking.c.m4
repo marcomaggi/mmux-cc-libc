@@ -1585,6 +1585,9 @@ mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_arg_t sockadd
     case MMUX_LIBC_VALUEOF_AF_LOCAL:
       return mmux_libc_sockaddr_local_dump(fd, (mmux_libc_network_socket_address_local_t  const *) sockaddr_p,
 					   ((given_struct_name)? struct_name : given_struct_name));
+    case MMUX_LIBC_VALUEOF_AF_UNSPEC:
+      return mmux_libc_sockaddr_unspec_dump(fd, (mmux_libc_network_socket_address_unspec_t  const *) sockaddr_p,
+					    ((given_struct_name)? struct_name : given_struct_name));
     default:
       return true;
     }
@@ -1628,6 +1631,14 @@ mmux_libc_sockaddr_equal (bool * are_equal_result_p,
 	auto	sockaddr_local_2 = (mmux_libc_network_socket_address_local_t *) sockaddr_2;
 
 	return mmux_libc_sockaddr_local_equal(are_equal_result_p, sockaddr_local_1, sockaddr_local_2);
+      }
+
+    case MMUX_LIBC_VALUEOF_AF_UNSPEC:
+      {
+	auto	sockaddr_unspec_1 = (mmux_libc_network_socket_address_unspec_t *) sockaddr_1;
+	auto	sockaddr_unspec_2 = (mmux_libc_network_socket_address_unspec_t *) sockaddr_2;
+
+	return mmux_libc_sockaddr_unspec_equal(are_equal_result_p, sockaddr_unspec_1, sockaddr_unspec_2);
       }
 
     default:
@@ -2229,6 +2240,99 @@ mmux_libc_sockaddr_ipsix_equal (bool * are_equal_result_p,
   *are_equal_result_p = true;
 
  return_from_function:
+  return false;
+}
+
+
+/** --------------------------------------------------------------------
+ ** Networking-socket addresses: unspec address.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_sockaddr_unspec_family_set (mmux_libc_sockaddr_unspec_t P,
+				      mmux_libc_network_address_family_t new_field_value)
+{
+  P->sa_family = new_field_value.value;
+  return false;
+}
+bool
+mmux_libc_sockaddr_unspec_family_ref (mmux_libc_network_address_family_t * field_value_result_p,
+				      mmux_libc_sockaddr_unspec_arg_t P)
+{
+  *field_value_result_p = mmux_libc_network_address_family(P->sa_family);
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sockaddr_unspec_bind_length (mmux_libc_socklen_t * sockaddr_unspec_length_result_p,
+				       mmux_libc_sockaddr_unspec_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_unspec_length_result_p = mmux_libc_socklen(sizeof(mmux_libc_network_socket_address_unspec_t));
+  return false;
+}
+bool
+mmux_libc_sockaddr_unspec_alloc_length (mmux_usize_t * sockaddr_unspec_length_result_p,
+					mmux_libc_sockaddr_unspec_arg_t P MMUX_CC_LIBC_UNUSED)
+{
+  *sockaddr_unspec_length_result_p = mmux_usize(sizeof(mmux_libc_network_socket_address_unspec_t));
+  return false;
+}
+bool
+mmux_libc_sockaddr_unspec_dump (mmux_libc_fd_arg_t oufd,
+				mmux_libc_sockaddr_unspec_arg_t sockaddr_p,
+				mmux_asciizcp_t struct_name)
+{
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
+
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
+  }
+  {
+    if (NULL == struct_name) {
+      struct_name = "struct sockaddr_unspec";
+    }
+
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p)) {
+      goto exit_function;
+    }
+
+    /* Dump the field "sin6_family". */
+    {
+      mmux_libc_network_address_family_t	address_family;
+      mmux_asciizcp_t				family_name = "unknown";
+
+      mmux_libc_sockaddr_unspec_family_ref(&address_family, sockaddr_p);
+      sa_family_to_asciiz_name(&family_name, address_family);
+      if (mmux_libc_dprintf(mfd, "%s.sa_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name)) {
+	goto exit_function;
+      }
+    }
+
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
+    }
+
+    rv = false;
+  }
+ exit_function:
+  if (mmux_libc_close(mfd)) {
+    return true;
+  }
+  return rv;
+}
+bool
+mmux_libc_sockaddr_unspec_equal (bool * are_equal_result_p,
+				 mmux_libc_sockaddr_unspec_arg_t sockaddr_unspec_1,
+				 mmux_libc_sockaddr_unspec_arg_t sockaddr_unspec_2)
+{
+  mmux_libc_network_address_family_t	family1, family2;
+
+  mmux_libc_sockaddr_unspec_family_ref(&family1, sockaddr_unspec_1);
+  mmux_libc_sockaddr_unspec_family_ref(&family2, sockaddr_unspec_2);
+  *are_equal_result_p = (family1.value == family2.value)? true : false;
   return false;
 }
 

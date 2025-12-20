@@ -15946,6 +15946,7 @@ mmux_libc_host_byteorder_uint32_t   local_network_address_number, network_addres
 * networking addresses sockets local::        Local networking socket address.
 * networking addresses sockets ipfour::       @emph{Internet Protocol} version four socket address.
 * networking addresses sockets ipsix::        @emph{Internet Protocol} version six socket address.
+* networking addresses sockets unspec::       Unspecified socket address.
 * networking addresses sockets addrinfo::     Address informations.
 * networking addresses sockets getaddrinfo::  Getting address informations.
 * networking addresses sockets getnameinfo::  Getting address name informations.
@@ -16795,31 +16796,31 @@ if (mmux_libc_sockaddr_ipsix_port_ref(&port, sockaddr_ipsix)) @{
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_family_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_network_address_family_t @var{family})
 @deftypefunx bool mmux_libc_sockaddr_ipsix_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
-Setter and getter for the field @code{sin6_family} of @objtype{mmux_libc_network_address_local_t}.
+Setter and getter for the field @code{sin6_family} of @objtype{mmux_libc_network_address_ipsix_t}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_addr_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_ipsix_addr_arg_t @var{ipaddr})
 @deftypefunx bool mmux_libc_sockaddr_ipsix_addr_ref (mmux_libc_ipsix_addr_t @var{ipaddr_result}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
-Setter and getter for the field @code{sin6_addr} of @objtype{mmux_libc_network_address_local_t}.
+Setter and getter for the field @code{sin6_addr} of @objtype{mmux_libc_network_address_ipsix_t}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_flowinfo_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_uint32_t @var{flowinfo})
 @deftypefunx bool mmux_libc_sockaddr_ipsix_flowinfo_ref (mmux_uint32_t * @var{flowinfo_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
-Setter and getter for the field @code{sin6_flowinfo} of @objtype{mmux_libc_network_address_local_t}.
+Setter and getter for the field @code{sin6_flowinfo} of @objtype{mmux_libc_network_address_ipsix_t}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_scope_id_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_uint32_t @var{scope_id})
 @deftypefunx bool mmux_libc_sockaddr_ipsix_scope_id_ref (mmux_uint32_t * @var{scope_id_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
-Setter and getter for the field @code{sin6_scope_id} of @objtype{mmux_libc_network_address_local_t}.
+Setter and getter for the field @code{sin6_scope_id} of @objtype{mmux_libc_network_address_ipsix_t}.
 @end deftypefun
 
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_port_set (mmux_libc_sockaddr_ipsix_t @var{sockaddr_ipsix}, mmux_libc_network_port_number_t @var{port})
 @deftypefunx bool mmux_libc_sockaddr_ipsix_port_ref (mmux_libc_network_port_number_t * @var{port_result_p}, mmux_libc_sockaddr_ipsix_arg_t @var{sockaddr_ipsix})
-Setter and getter for the field @code{sin6_port} of @objtype{mmux_libc_network_address_local_t}.
+Setter and getter for the field @code{sin6_port} of @objtype{mmux_libc_network_address_ipsix_t}.
 @end deftypefun
 
 
@@ -16885,6 +16886,124 @@ mmux_libc_sockfd_t  server_sockfd;
 
 
 @deftypefun bool mmux_libc_sockaddr_ipsix_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_ipsix_arg_t @vari{sockaddr}, mmux_libc_sockaddr_ipsix_arg_t @varii{sockaddr})
+Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
+equal when compared field--by--field; otherwise store @cfalse{}.
+@end deftypefun
+
+@c page
+@node networking addresses sockets unspec
+@subsubsection Unspecified socket address
+
+
+According to the standard: we can use @cfunc{connect} to configure a default--destination address
+for a networking--socket using the datagram communication style; we can cancel such
+default--destination address by applying again @cfunc{connect} to the same socket, while specifying
+an address with family @samp{AF_UNSPEC}.  Under @value{PACKAGE}: we can use the networking--socket
+address type @objtype{mmux_libc_network_socket_address_unspec_t} to perform this operation; it is
+usually better to use the type @objtype{mmux_libc_sockaddr_unspec_t}.
+
+In the following code we build a new datagram socket, connect it to an address as default
+destination, cancel the default destination address.
+
+@example
+mmux_libc_sockaddr_ipfour_t  sockaddr_ipfour;
+mmux_libc_sockaddr_unspec_t  sockaddr_unspec;
+
+/* Initialise the IPv4 address. */
+@{
+  mmux_libc_ipfour_addr_t   address_ipfour;
+  mmux_asciizcp_t           presentation = "127.0.0.1";
+
+  mmux_libc_make_ipfour_addr_from_asciiz (address_ipfour, presentation);
+  mmux_libc_sockaddr_ipfour_family_set   (sockaddr_ipfour, MMUX_LIBC_AF_INET);
+  mmux_libc_sockaddr_ipfour_addr_set     (sockaddr_ipfour, address_ipfour);
+  mmux_libc_sockaddr_ipfour_port_set     (sockaddr_ipfour,
+    mmux_libc_network_port_number_from_host_byteorder_literal(25));
+@}
+
+/* Initialise the unspec address. */
+@{
+  mmux_libc_sockaddr_unspec_family_set(sockaddr_unspec, MMUX_LIBC_AF_UNSPEC);
+@}
+
+/* Build and configure the socket. */
+@{
+  mmux_libc_sockfd_t        sockfd;
+
+  /* Build the socket. */
+  @{
+    if (mmux_libc_socket(sockfd, MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+      /* error */
+    @}
+  @}
+
+  /* Connect the client socket to the sockaddr_ipfour as default destination. */
+  @{
+    mmux_libc_socklen_t     sockaddr_length;
+
+    mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr_ipfour);
+    if (mmux_libc_connect(sockfd, sockaddr_ipfour, sockaddr_length)) @{
+      /* error */
+    @}
+  @}
+
+  /* Connect the  client socket  to the  sockaddr_unspec, cancelling  the default
+     destination. */
+  @{
+    mmux_libc_socklen_t     sockaddr_length;
+
+    mmux_libc_sockaddr_bind_length(&sockaddr_length, sockaddr_unspec);
+    if (mmux_libc_connect(sockfd, sockaddr_unspec, sockaddr_length)) @{
+      /* error */
+    @}
+  @}
+
+  /* Final cleanup. */
+  @{
+    if (mmux_libc_close(sockfd)) @{
+      /* error */
+    @}
+  @}
+@}
+@end example
+
+@c ------------------------------------------------------------------------
+
+@MmuxCWrapperStructWithParentOpaqueTypedef{network_socket_address_unspec,sockaddr,mmux_libc_network_socket_address_t}
+@MmuxCWrapperStructArrayOneTypedef{sockaddr_unspec,network_socket_address_unspec}
+@MmuxCWrapperStructPointerTypedef{sockaddr_unspec,network_socket_address_unspec}
+
+
+@deftypefun bool mmux_libc_sockaddr_unspec_family_set (mmux_libc_sockaddr_unspec_t @var{sockaddr_unspec}, mmux_libc_network_address_family_t @var{family})
+@deftypefunx bool mmux_libc_sockaddr_unspec_family_ref (mmux_libc_network_address_family_t * @var{family_result_p}, mmux_libc_sockaddr_unspec_arg_t @var{sockaddr_unspec})
+Setter and getter for the field @code{sa_family} of @objtype{mmux_libc_network_address_unspec_t}.
+@end deftypefun
+
+
+@MmuxCWrapperStructDumper{sockaddr_unspec,sockaddr}
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sockaddr_unspec_alloc_length (mmux_usize_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_unspec_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address memory size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.
+
+If we have a networking socket address and we want to allocate a block of memory wide enough to
+contain a clone of such an address: we have to use this function.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_unspec_bind_length (mmux_libc_socklen_t * @var{sockaddr_length_result_p}, mmux_libc_sockaddr_unspec_arg_t @var{sockaddr})
+Store in the variable referenced by @var{sockaddr_length_result_p} the address data size, measured
+in bytes, of the address data structure referenced by @var{sockaddr}.  The resulting size is the
+correct value to hand to functions requiring the address data size, like @cfunc{mmux_libc_connect}.
+
+If we want to compute the address size needed as argument by some socket functions: we have to use
+this function.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_sockaddr_unspec_equal (bool * @var{are_equal_result_p}, mmux_libc_sockaddr_unspec_arg_t @vari{sockaddr}, mmux_libc_sockaddr_unspec_arg_t @varii{sockaddr})
 Store @ctrue{} in the variable referenced by @var{are_equal_result_p} is the given addresses are
 equal when compared field--by--field; otherwise store @cfalse{}.
 @end deftypefun
@@ -17987,6 +18106,7 @@ if (there_is_one) @{
 * networking sockets opening::     Opening networking-sockets file-descriptors.
 * networking sockets closing::     Closing networking-sockets file-descriptors.
 * networking sockets inspecting::  Inspecting networking-sockets file-descriptors.
+* networking sockets connecting::  Connecting networking-sockets file-descriptors to server addresses.
 * networking sockets stream::      Networking communications using the stream style.
 * networking sockets datagram::    Networking communications using the datagram style.
 * networking sockets options::     Socket options.
@@ -18279,6 +18399,39 @@ struct sockaddr_un.sun_path = ""
 @end deftypefun
 
 @c page
+@node networking sockets connecting
+@subsection Connecting networking-sockets file-descriptors to server addresses
+
+
+@deftypefun bool mmux_libc_connect (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
+@MmuxCInterface{connect}.
+
+For stream sockets, created by @cfunc{mmux_libc_socket} using the @samp{MMUX_LIBC_SOCK_STREAM}
+communication style: this function actually connects to the (remote) server initiating a session,
+@ref{networking sockets stream, Networking communications using the stream style}.
+
+For datagram sockets, created by @cfunc{mmux_libc_socket} using the @samp{MMUX_LIBC_SOCK_DGRAM}
+communication style: this function only registers the given networking--socket address as default
+destination for future operation of packet--sending, @ref{networking sockets datagram, Networking
+communications using the datagram style}.  Regarding datagram sockets:
+
+@itemize
+@item
+if a default destination @strong{is not} set up: we must use @cfunc{mmux_libc_sendto} to send
+packets;
+
+@item
+if a default destination @strong{is} set up: we can use @cfunc{mmux_libc_send} or
+@cfunc{mmux_libc_write} to send packets;
+
+@item
+we can cancel a previously configured default destination address by applying
+@cfunc{mmux_libc_connect} to the socket using a networking--socket address having family
+@samp{MMUX_LIBC_AF_UNSPEC}.
+@end itemize
+@end deftypefun
+
+@c page
 @node networking sockets stream
 @subsection Networking communications using the stream style
 
@@ -18299,7 +18452,6 @@ standard function calls is: @cfunc{socket}, @cfunc{connect}.
 * networking sockets stream client ipfour::  Example of stream IPv4 networking client.
 * networking sockets stream client ipsix::   Example of stream IPv6 networking client.
 * networking sockets stream client local::   Example of stream local networking client.
-* networking sockets stream client api::     Stream networking clients programming interface.
 * networking sockets stream data::           Sending data with @cfunc{send} and receiving data with @cfunc{recv}.
 @end menu
 
@@ -18839,15 +18991,6 @@ mmux_libc_sockfd_t  client_sockfd;
   @}
 @}
 @end example
-
-@c page
-@node networking sockets stream client api
-@subsubsection Stream networking clients programming interface
-
-
-@deftypefun bool mmux_libc_connect (mmux_libc_network_socket_t @var{sock}, mmux_libc_sockaddr_ptr_t @var{sockaddr_p}, mmux_socklen_t @var{sockaddr_size})
-@MmuxCInterface{connect}.
-@end deftypefun
 
 @c page
 @node networking sockets stream data

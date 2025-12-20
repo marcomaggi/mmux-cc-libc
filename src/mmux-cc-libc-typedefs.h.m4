@@ -412,6 +412,9 @@ typedef mmux_libc_network_socket_address_ipfour_t const *	mmux_libc_sockaddr_ipf
 typedef mmux_libc_network_socket_address_ipsix_t		mmux_libc_sockaddr_ipsix_t[1];
 typedef mmux_libc_network_socket_address_ipsix_t const *	mmux_libc_sockaddr_ipsix_arg_t;
 
+typedef mmux_libc_network_socket_address_unspec_t		mmux_libc_sockaddr_unspec_t[1];
+typedef mmux_libc_network_socket_address_unspec_t const *	mmux_libc_sockaddr_unspec_arg_t;
+
 typedef mmux_libc_network_socket_address_info_t			mmux_libc_addrinfo_t[1];
 typedef mmux_libc_network_socket_address_info_t const *		mmux_libc_addrinfo_arg_t;
 

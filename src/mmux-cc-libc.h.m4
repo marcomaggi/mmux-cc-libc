@@ -212,6 +212,11 @@ typedef struct mmux_libc_network_socket_address_ipsix_t {
   mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR_IN6];
 } mmux_libc_network_socket_address_ipsix_t;
 
+typedef struct mmux_libc_network_socket_address_unspec_t {
+  mmux_libc_network_socket_address_t;
+  mmux_uint8_t value[MMUX_LIBC_SIZEOF_SOCKADDR];
+} mmux_libc_network_socket_address_unspec_t;
+
 /* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_network_socket_address_info_t {

@@ -413,6 +413,11 @@ typedef struct mmux_libc_network_socket_address_ipsix_t {
   struct sockaddr_in6;
 } mmux_libc_network_socket_address_ipsix_t;
 
+typedef struct mmux_libc_network_socket_address_unspec_t {
+  mmux_libc_network_socket_address_t;
+  struct sockaddr;
+} mmux_libc_network_socket_address_unspec_t;
+
 /* ------------------------------------------------------------------ */
 
 typedef struct mmux_libc_network_socket_address_info_t {
