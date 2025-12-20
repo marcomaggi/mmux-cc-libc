@@ -17988,7 +17988,7 @@ if (there_is_one) @{
 * networking sockets closing::     Closing networking-sockets file-descriptors.
 * networking sockets inspecting::  Inspecting networking-sockets file-descriptors.
 * networking sockets stream::      Networking communications using the stream style.
-* networking sockets dgram::       Networking communications using the datagram style.
+* networking sockets datagram::    Networking communications using the datagram style.
 * networking sockets options::     Socket options.
 @end menu
 
@@ -18948,7 +18948,7 @@ The only difference between @cfunc{mmux_libc_recv} and @cfunc{mmux_libc_read} is
 @MmuxDefineConstant{MSG_PEEK}
 
 @c page
-@node networking sockets dgram
+@node networking sockets datagram
 @subsection Networking communications using the datagram style
 
 

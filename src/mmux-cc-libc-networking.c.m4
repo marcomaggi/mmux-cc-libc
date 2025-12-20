@@ -3155,14 +3155,18 @@ mmux_libc_send (mmux_usize_t * number_of_bytes_sent_result_p,
   }
 }
 bool
-mmux_libc_sendto (mmux_usize_t * number_of_bytes_sent_result_p,
-		  mmux_libc_sockfd_t sockfd,
-		  mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_libc_send_flags_t flags,
-		  mmux_libc_sockaddr_arg_t destination_sockaddr_p, mmux_libc_socklen_t destination_sockaddr_size)
+mmux_libc_sendto (mmux_usize_t *		number_of_bytes_sent_result_p,
+		  mmux_libc_sockfd_t		client_sockfd,
+		  mmux_pointerc_t		packet_bufptr,
+		  mmux_usize_t			packet_buflen,
+		  mmux_libc_send_flags_t	flags,
+		  mmux_libc_sockaddr_arg_t	server_sockaddr_p,
+		  mmux_libc_socklen_t		server_sockaddr_length)
 {
-  mmux_standard_ssize_t	number_of_bytes_sent = sendto(sockfd->value, bufptr, buflen.value, flags.value,
-						      (struct sockaddr *)destination_sockaddr_p,
-						      destination_sockaddr_size.value);
+  mmux_standard_ssize_t		number_of_bytes_sent =
+    sendto(client_sockfd->value, packet_bufptr, packet_buflen.value, flags.value,
+	   (struct sockaddr *)server_sockaddr_p,
+	   server_sockaddr_length.value);
 
   if (-1 < number_of_bytes_sent) {
     *number_of_bytes_sent_result_p = mmux_usize(number_of_bytes_sent);
@@ -3189,23 +3193,28 @@ mmux_libc_recv (mmux_usize_t * result_number_of_bytes_received_p,
   }
 }
 bool
-mmux_libc_recvfrom (mmux_usize_t * result_number_of_bytes_received_p,
-		    mmux_libc_sockaddr_arg_t result_sender_sockaddr_p,
-		    mmux_libc_socklen_t * result_sender_sockaddr_size_p,
-		    mmux_libc_sockfd_t sockfd,
-		    mmux_pointer_t bufptr, mmux_usize_t buflen, mmux_libc_recv_flags_t flags)
+mmux_libc_recvfrom (mmux_usize_t *		number_of_bytes_received_result_p,
+		    mmux_libc_sockaddr_arg_t	client_sockaddr_result,
+		    mmux_libc_socklen_t *	client_sockaddr_length_result_p,
+		    mmux_libc_sockfd_t		server_sockfd,
+		    mmux_pointer_t		packet_bufptr,
+		    mmux_usize_t		packet_max_buflen,
+		    mmux_libc_recv_flags_t	flags)
 {
-  /* The arguments "result_sender_sockaddr_p" and "result_sender_sockaddr_size_p" can
+  /* The arguments "client_sockaddr_result" and "client_sockaddr_length_result_p" can
      be NULL if we are not interested in retrieving the sender address. */
-  mmux_standard_libc_socklen_t	len;
-  mmux_standard_ssize_t		number_of_bytes_received  = recvfrom(sockfd->value,
-								     bufptr, buflen.value, flags.value,
-								     (struct sockaddr *)result_sender_sockaddr_p,
-								     &len);
+  mmux_standard_libc_socklen_t	client_sockaddr_length_num;
+  mmux_standard_ssize_t		number_of_bytes_received =
+    recvfrom(server_sockfd->value,
+	     packet_bufptr, packet_max_buflen.value, flags.value,
+	     (struct sockaddr *)client_sockaddr_result,
+	     &client_sockaddr_length_num);
 
   if (-1 < number_of_bytes_received) {
-    *result_number_of_bytes_received_p = mmux_usize(number_of_bytes_received);
-    *result_sender_sockaddr_size_p     = mmux_libc_socklen(len);
+    *number_of_bytes_received_result_p = mmux_usize(number_of_bytes_received);
+    if (client_sockaddr_length_result_p) {
+      *client_sockaddr_length_result_p = mmux_libc_socklen(client_sockaddr_length_num);
+    }
     return false;
   } else {
     return true;

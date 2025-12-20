@@ -23,7 +23,8 @@
 
 #include <test-common.h>
 
-static mmux_asciizcp_t	local_socket_ptn_asciiz = "./test-networking-sockets-stream-local.sock";
+static bool		local_socket_ptn_asciiz_registered = false;
+static mmux_asciizcp_t	local_socket_ptn_asciiz = "./test-networking-sockets-client-server.sock";
 
 
 static void
@@ -238,10 +239,8 @@ stream_server_doit (mmux_libc_pid_t child_pid, bool use_accept4,
       mmux_libc_oufd_t	er;
 
       mmux_libc_stder(er);
-      if (mmux_libc_dprintf(er, "parent: server: client sockaddr length %lu\n",
-			    (mmux_standard_ulong_t) client_connection_sockaddr_length.value)) {
-	handle_error();
-      }
+      printf_message("parent: server: client sockaddr length %lu",
+		     (mmux_standard_ulong_t) client_connection_sockaddr_length.value);
       if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_connection_sockaddr")) {
 	printf_error("parent: server: dumping the client connection sockaddr");
       }
@@ -384,10 +383,188 @@ stream_client_doit (mmux_libc_network_protocol_family_t family,
 
 
 static void
+datagram_server_doit (mmux_libc_pid_t child_pid,
+		      mmux_libc_network_protocol_family_t family, mmux_libc_network_internet_protocol_t ipproto,
+		      mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+{
+  mmux_libc_sockfd_t	server_sockfd;
+
+  /* Dump the server_sockaddr for debugging purposes. */
+  if (true) {
+    mmux_libc_oufd_t	er;
+
+    mmux_libc_stder(er);
+    if (mmux_libc_sockaddr_dump(er, server_sockaddr, "server_sockaddr")) {
+      goto error;
+    }
+  }
+
+  /* Build the server socket. */
+  {
+    printf_message("parent: server: make server socket");
+    if (mmux_libc_socket(server_sockfd, family, MMUX_LIBC_SOCK_DGRAM, ipproto)) {
+      printf_error("parent: server: make server socket");
+      goto error;
+    }
+  }
+
+  /* Bind the server socket to the server_sockaddr. */
+  {
+    printf_message("parent: server: bind server socket to server_sockaddr");
+    if (mmux_libc_bind(server_sockfd, server_sockaddr, server_sockaddr_length)) {
+      printf_error("parent: server: bind server socket to server_sockaddr");
+      goto error;
+    }
+  }
+
+  /* Accept a connection from the server. */
+  {
+    auto		packet_buflen = mmux_usize_literal(1024);
+    char		packet_bufptr[packet_buflen.value];
+    mmux_usize_t	packet_nbytes_received;
+
+    auto			client_connection_sockaddr_buflen = mmux_libc_socklen_literal(512);
+    mmux_standard_octet_t	client_connection_sockaddr_bufptr[client_connection_sockaddr_buflen.value];
+    auto			client_connection_sockaddr = (mmux_libc_sockaddr_t)client_connection_sockaddr_bufptr;
+    auto			client_connection_sockaddr_length = client_connection_sockaddr_buflen;
+
+    auto	flags = mmux_libc_recv_flags(0);
+
+    printf_message("parent: server: receiving packet from client");
+    if (mmux_libc_recvfrom(&packet_nbytes_received,
+			   client_connection_sockaddr, &client_connection_sockaddr_length,
+			   server_sockfd, packet_bufptr, packet_buflen, flags)) {
+      printf_error("parent: server: receiving packet from client");
+      goto error;
+    }
+
+    packet_bufptr[packet_nbytes_received.value] = '\0';
+
+    /* Dump the client connection address. */
+    if (true) {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      printf_message("parent: server: client sockaddr length %lu",
+		     (mmux_standard_ulong_t) client_connection_sockaddr_length.value);
+      if (mmux_libc_sockaddr_dump(er, client_connection_sockaddr, "client_sockaddr")) {
+	printf_error("parent: server: dumping the client connection sockaddr");
+      }
+    }
+
+    /* Check the received data. */
+    {
+      bool	are_equal;
+
+      if (mmux_libc_strequ(&are_equal, packet_bufptr, "the colour of water and quicksilver")) {
+	handle_error();
+      } else if (are_equal) {
+	printf_message("parent: server: correct string received to server socket: '%s'", packet_bufptr);
+      } else {
+	printf_error("parent: server: wrong string received to server socket");
+	handle_error();
+      }
+    }
+  }
+
+  /* Final cleanup */
+  {
+    printf_message("parent: server: closing sockets");
+
+    if (mmux_libc_close(server_sockfd)) {
+      printf_error("parent: server: closing server socket");
+      handle_error();
+    }
+  }
+
+  server_wait_for_child_process_successful_completion(child_pid);
+  printf_message("parent: server: returning to main successfully");
+  return;
+
+ error:
+  {
+    mmux_libc_errno_t	errnum;
+    mmux_asciizcp_t	errmsg;
+
+    mmux_libc_errno_consume(&errnum);
+    if (errnum.value) {
+      if (mmux_libc_strerror(&errmsg, errnum)) {
+	mmux_libc_exit_failure();
+      } else {
+	print_error(errmsg);
+      }
+    }
+  }
+  server_kill_child_process_wait_for_its_completion(child_pid);
+  printf_message("parent: server: exiting process after error");
+  mmux_libc_exit_failure();
+}
+
+
+static void
+datagram_client_doit (mmux_libc_network_protocol_family_t family,
+		      mmux_libc_network_internet_protocol_t ipproto,
+		      mmux_libc_sockaddr_arg_t server_sockaddr, mmux_libc_socklen_t server_sockaddr_length)
+{
+  mmux_libc_sockfd_t	client_sockfd;
+
+  {
+    printf_message("child: client: wait for the server to set itself up");
+    wait_for_some_time();
+  }
+
+  /* Build the client socket. */
+  {
+    printf_message("child: client: creating the socket");
+    if (mmux_libc_socket(client_sockfd, family, MMUX_LIBC_SOCK_DGRAM, ipproto)) {
+      printf_error("child: client: creating the socket");
+      handle_error();
+    }
+  }
+
+  /* Write a message to the server. */
+  {
+    mmux_asciizcp_t	packet_bufptr = "the colour of water and quicksilver";
+    mmux_usize_t	packet_buflen, nbytes_done;
+    auto		flags = mmux_libc_send_flags(0);
+
+    mmux_libc_strlen(&packet_buflen, packet_bufptr);
+    printf_message("child: client: sending packet to server");
+    if (mmux_libc_sendto(&nbytes_done, client_sockfd, packet_bufptr, packet_buflen, flags,
+			 server_sockaddr, server_sockaddr_length)) {
+      printf_error("child: client: sending packet to server");
+      handle_error();
+    }
+
+    /* Check that all the data has been sent. */
+    {
+      if (mmux_usize_equal(packet_buflen, nbytes_done)) {
+	printf_message("child: client: correctly sent all data");
+      } else {
+	print_error("child: client: wrongly sent not all data");
+	handle_error();
+      }
+    }
+  }
+
+  /* Final cleanup. */
+  {
+    printf_message("child: client: closing the client socket");
+    if (mmux_libc_close(client_sockfd)) {
+      printf_error("child: client: closing the client socket");
+    }
+  }
+
+  printf_message("child: client: exiting process successfully");
+  mmux_libc_exit_success();
+}
+
+
+static void
 test_stream_server_local (void)
 {
   print_newline();
-  printf_message("Do it for local addresses.");
+  printf_message("Do it for stream local addresses.");
   mmux_libc_sockaddr_local_t	sockaddr;
   mmux_libc_socklen_t		sockaddr_length;
 
@@ -405,9 +582,11 @@ test_stream_server_local (void)
     } else if (this_is_the_parent_process) {
       /* Final cleanup only in the parent process. */
       if (true) {
-	cleanfiles_register(local_socket_ptn_asciiz);
+	if (false == local_socket_ptn_asciiz_registered) {
+	  cleanfiles_register(local_socket_ptn_asciiz);
+	  local_socket_ptn_asciiz_registered = true;
+	}
 	cleanfiles();
-	mmux_libc_atexit(cleanfiles);
       }
       {
 	stream_server_doit(child_pid, false,
@@ -418,6 +597,7 @@ test_stream_server_local (void)
 	cleanfiles();
       }
     } else {
+      cleanfiles_reset();
       stream_client_doit(MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
     }
   }
@@ -428,7 +608,7 @@ static void
 test_stream_server_ipfour_accept (void)
 {
   print_newline();
-  printf_message("Do it for IPv4 addresses with 'accept()'.");
+  printf_message("Do it for stream IPv4 addresses with 'accept()'.");
   mmux_libc_sockaddr_ipfour_t	sockaddr;
   mmux_libc_socklen_t		sockaddr_length;
 
@@ -447,6 +627,7 @@ test_stream_server_ipfour_accept (void)
       stream_server_doit(child_pid, false,
 			 MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
     } else {
+      cleanfiles_reset();
       stream_client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
     }
   }
@@ -457,7 +638,7 @@ static void
 test_stream_server_ipfour_accept4 (void)
 {
   print_newline();
-  printf_message("Do it for IPv4 addresses with 'accept4()'.");
+  printf_message("Do it for stream IPv4 addresses with 'accept4()'.");
   mmux_libc_sockaddr_ipfour_t	sockaddr;
   mmux_libc_socklen_t		sockaddr_length;
 
@@ -475,6 +656,7 @@ test_stream_server_ipfour_accept4 (void)
     } else if (this_is_the_parent_process) {
       stream_server_doit(child_pid, true, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
     } else {
+      cleanfiles_reset();
       stream_client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
     }
   }
@@ -485,7 +667,7 @@ static void
 test_stream_server_ipsix (void)
 {
   print_newline();
-  printf_message("Do it for IPv6 addresses.");
+  printf_message("Do it for stream IPv6 addresses.");
   mmux_libc_sockaddr_ipsix_t	sockaddr;
   mmux_libc_socklen_t		sockaddr_length;
 
@@ -503,7 +685,106 @@ test_stream_server_ipsix (void)
     } else if (this_is_the_parent_process) {
       stream_server_doit(child_pid, false, MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
     } else {
+      cleanfiles_reset();
       stream_client_doit(MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_TCP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_datagram_server_local (void)
+{
+  print_newline();
+  printf_message("Do it for datagram local addresses.");
+  mmux_libc_sockaddr_local_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_local(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for datagram local address");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for datagram local address");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      /* Final cleanup only in the parent process. */
+      if (true) {
+	if (false == local_socket_ptn_asciiz_registered) {
+	  cleanfiles_register(local_socket_ptn_asciiz);
+	  local_socket_ptn_asciiz_registered = true;
+	}
+	cleanfiles();
+      }
+      datagram_server_doit(child_pid, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
+      if (true) {
+	cleanfiles();
+      }
+    } else {
+      cleanfiles_reset();
+      datagram_client_doit(MMUX_LIBC_PF_LOCAL, MMUX_LIBC_IPPROTO_IP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_datagram_server_ipfour (void)
+{
+  print_newline();
+  printf_message("Do it for datagram IPv4 addresses.");
+  mmux_libc_sockaddr_ipfour_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipfour(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for datagram IPv4 address");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for datagram IPv4 address");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      datagram_server_doit(child_pid, MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
+    } else {
+      cleanfiles_reset();
+      datagram_client_doit(MMUX_LIBC_PF_INET, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
+    }
+  }
+}
+
+
+static void
+test_datagram_server_ipsix (void)
+{
+  print_newline();
+  printf_message("Do it for datagram IPv6 addresses.");
+  mmux_libc_sockaddr_ipsix_t	sockaddr;
+  mmux_libc_socklen_t		sockaddr_length;
+
+  build_sockaddr_ipsix(sockaddr, &sockaddr_length);
+
+  /* Fork a child process. */
+  {
+    bool		this_is_the_parent_process;
+    mmux_libc_pid_t	child_pid;
+
+    printf_message("forking for datagram IPv6 address");
+    if (mmux_libc_fork(&this_is_the_parent_process, &child_pid)) {
+      printf_error("forking for datagram IPv6 address");
+      handle_error();
+    } else if (this_is_the_parent_process) {
+      datagram_server_doit(child_pid, MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
+    } else {
+      cleanfiles_reset();
+      datagram_client_doit(MMUX_LIBC_PF_INET6, MMUX_LIBC_IPPROTO_UDP, sockaddr, sockaddr_length);
     }
   }
 }
@@ -520,12 +801,17 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   {
     mmux_cc_libc_init();
     PROGNAME = "test-networking-sockets-stream";
+    mmux_libc_atexit(cleanfiles);
   }
 
   if (true) {	test_stream_server_local();		}
   if (true) {	test_stream_server_ipfour_accept();	}
   if (true) {	test_stream_server_ipfour_accept4();	}
   if (true) {	test_stream_server_ipsix();		}
+
+  if (true) {	test_datagram_server_local();		}
+  if (true) {	test_datagram_server_ipfour();		}
+  if (true) {	test_datagram_server_ipsix();		}
 
   mmux_libc_exit_success();
 }

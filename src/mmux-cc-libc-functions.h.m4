@@ -3610,7 +3610,7 @@ mmux_cc_libc_decl bool mmux_libc_recv (mmux_usize_t * number_of_bytes_received_r
 
 mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * result_number_of_bytes_sent_p,
 					 mmux_libc_sockfd_t sockfd,
-					 mmux_pointer_t bufptr, mmux_usize_t buflen,
+					 mmux_pointerc_t bufptr, mmux_usize_t buflen,
 					 mmux_libc_send_flags_t flags,
 					 mmux_libc_sockaddr_arg_t destination_sockaddr_p,
 					 mmux_libc_socklen_t destination_sockaddr_size)

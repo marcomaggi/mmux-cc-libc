@@ -48,6 +48,7 @@ void wait_for_some_time (void);
 
 void cleanfiles (void);
 void cleanfiles_register (mmux_asciizcp_t pathname_asciiz);
+void cleanfiles_reset (void);
 bool test_create_data_file (mmux_asciizcp_t pathname_ascii);
 bool test_create_directory (mmux_asciizcp_t pathname_ascii);
 
@@ -213,6 +214,11 @@ cleanfiles_register (mmux_asciizcp_t pathname_asciiz)
   CLEANFILES_PATHNAMES_ASCIIZ[CLEANFILES_PATHNAMES_COUNT] = pathname_asciiz;
   printf_message("common: registered cleanfile[%lu]: \"%s\"", CLEANFILES_PATHNAMES_COUNT, pathname_asciiz);
   ++CLEANFILES_PATHNAMES_COUNT;
+}
+void
+cleanfiles_reset (void)
+{
+  CLEANFILES_PATHNAMES_COUNT = 0;
 }
 void
 cleanfiles (void)
