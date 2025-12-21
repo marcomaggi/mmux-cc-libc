@@ -3027,7 +3027,11 @@ mmux_libc_getnameinfo (mmux_asciizcp_t result_hostname_p, mmux_libc_socklen_t pr
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_network_socket (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sockfd_num)
+mmux_libc_make_network_socket (mmux_libc_sockfd_t				sockfd_result,
+			       mmux_standard_sint_t				sockfd_num,
+			       mmux_libc_network_protocol_family_t		protocol_family,
+			       mmux_libc_network_socket_communication_style_t	socket_communication_style,
+			       mmux_libc_network_internet_protocol_t		internet_protocol)
 {
   if (0 <= sockfd_num) {
     sockfd_result->value = sockfd_num;
@@ -3039,16 +3043,13 @@ mmux_libc_make_network_socket (mmux_libc_sockfd_t sockfd_result, mmux_standard_s
     sockfd_result->identity.is_signal_fd		= false;
     sockfd_result->identity.is_closed_for_reading	= false;
     sockfd_result->identity.is_closed_for_writing	= false;
+    sockfd_result->protocol_family			= protocol_family;
+    sockfd_result->socket_communication_style		= socket_communication_style;
+    sockfd_result->internet_protocol			= internet_protocol;
     return false;
   } else {
     return true;
   }
-}
-bool
-mmux_libc_make_sockfd (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
-{
-  sockfd_result->value = sock_num;
-  return false;
 }
 bool
 mmux_libc_socket (mmux_libc_network_socket_t * sockfd_result,
@@ -3059,7 +3060,7 @@ mmux_libc_socket (mmux_libc_network_socket_t * sockfd_result,
   int	sock_num = socket(namespace.value, style.value, ipproto.value);
 
   if (-1 != sock_num) {
-    return mmux_libc_make_network_socket(sockfd_result, sock_num);
+    return mmux_libc_make_network_socket(sockfd_result, sock_num, namespace, style, ipproto);
   } else {
     return true;
   }
@@ -3100,8 +3101,10 @@ mmux_libc_socketpair (mmux_libc_sockfd_t sockfd1_result,
   int	rv = socketpair(namespace.value, style.value, ipproto.value, socks);
 
   if (0 == rv) {
-    mmux_libc_make_network_socket(sockfd1_result, socks[0]);
-    mmux_libc_make_network_socket(sockfd2_result, socks[1]);
+    mmux_libc_make_network_socket(sockfd1_result, socks[0],
+				  MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP);
+    mmux_libc_make_network_socket(sockfd2_result, socks[1],
+				  MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP);
     return false;
   } else {
     return true;
@@ -3192,7 +3195,10 @@ mmux_libc_accept (mmux_libc_sockfd_t     client_connection_sockfd_result,
 	     (struct sockaddr *)client_connection_sockaddr_result, &client_connection_sockaddr_length);
 
     if (-1 != client_connection_sockfd_num) {
-      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num)) {
+      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num,
+					server_sockfd->protocol_family,
+					server_sockfd->socket_communication_style,
+					server_sockfd->internet_protocol)) {
 	return true;
       } else {
 	*client_connection_sockaddr_length_result_p = mmux_libc_socklen(client_connection_sockaddr_length);
@@ -3226,7 +3232,10 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_ACCEPT4]]],[[[
 	      flags.value);
 
     if (-1 != client_connection_sockfd_num) {
-      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num)) {
+      if (mmux_libc_make_network_socket(client_connection_sockfd_result, client_connection_sockfd_num,
+					server_sockfd->protocol_family,
+					server_sockfd->socket_communication_style,
+					server_sockfd->internet_protocol)) {
 	return true;
       } else {
 	*client_connection_sockaddr_length_result_p = mmux_libc_socklen(client_connection_sockaddr_length);
@@ -3298,12 +3307,12 @@ mmux_libc_recv (mmux_usize_t * result_number_of_bytes_received_p,
 }
 bool
 mmux_libc_recvfrom (mmux_usize_t *		number_of_bytes_received_result_p,
-		    mmux_libc_sockaddr_arg_t	client_sockaddr_result,
-		    mmux_libc_socklen_t *	client_sockaddr_length_result_p,
 		    mmux_libc_sockfd_t		server_sockfd,
 		    mmux_pointer_t		packet_bufptr,
 		    mmux_usize_t		packet_max_buflen,
-		    mmux_libc_recv_flags_t	flags)
+		    mmux_libc_recv_flags_t	flags,
+		    mmux_libc_sockaddr_arg_t	client_sockaddr_result,
+		    mmux_libc_socklen_t *	client_sockaddr_length_result_p)
 {
   /* The arguments "client_sockaddr_result" and "client_sockaddr_length_result_p" can
      be NULL if we are not interested in retrieving the sender address. */

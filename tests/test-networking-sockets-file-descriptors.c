@@ -28,7 +28,7 @@ test_sockfd_raw_initialisation (void)
     mmux_libc_sockfd_t	sockfd;
 
     printf_message("raw initialisation of sockfd");
-    if (mmux_libc_make_network_socket(sockfd, 123)) {
+    if (mmux_libc_make_network_socket(sockfd, 123, MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_IP)) {
       printf_error("raw initialisation of sockfd");
       handle_error();
     }

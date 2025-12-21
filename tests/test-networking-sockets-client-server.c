@@ -432,8 +432,8 @@ datagram_server_doit (mmux_libc_pid_t child_pid,
 
     printf_message("parent: server: receiving packet from client");
     if (mmux_libc_recvfrom(&packet_nbytes_received,
-			   client_sockaddr, &client_sockaddr_length,
-			   server_sockfd, packet_bufptr, packet_buflen, flags)) {
+			   server_sockfd, packet_bufptr, packet_buflen, flags,
+			   client_sockaddr, &client_sockaddr_length)) {
       printf_error("parent: server: receiving packet from client");
       goto error;
     }
@@ -552,6 +552,7 @@ datagram_client_doit (mmux_libc_network_protocol_family_t family,
     printf_message("child: client: closing the client socket");
     if (mmux_libc_close(client_sockfd)) {
       printf_error("child: client: closing the client socket");
+      handle_error();
     }
   }
 

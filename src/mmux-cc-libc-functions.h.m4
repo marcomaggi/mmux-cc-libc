@@ -3566,11 +3566,24 @@ mmux_cc_libc_decl bool mmux_libc_inet_netof (mmux_libc_host_byteorder_uint32_t *
  ** Networking sockets: operations.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_make_network_socket (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
+mmux_cc_libc_decl bool mmux_libc_make_network_socket
+    (mmux_libc_sockfd_t					sockfd_result,
+     mmux_standard_sint_t				sock_num,
+     mmux_libc_network_protocol_family_t		protocol_family,
+     mmux_libc_network_socket_communication_style_t	socket_communication_style,
+     mmux_libc_network_internet_protocol_t		internet_protocol)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_sockfd (mmux_libc_sockfd_t sockfd_result, mmux_standard_sint_t sock_num)
-  __attribute__((__nonnull__(1)));
+__attribute__((__nonnull__(1))) mmux_cc_libc_inline_decl bool
+mmux_libc_make_sockfd (mmux_libc_sockfd_t				sockfd_result,
+		       mmux_standard_sint_t				sockfd_num,
+		       mmux_libc_network_protocol_family_t		protocol_family,
+		       mmux_libc_network_socket_communication_style_t	socket_communication_style,
+		       mmux_libc_network_internet_protocol_t		internet_protocol)
+{
+  return mmux_libc_make_network_socket(sockfd_result, sockfd_num,
+				       protocol_family, socket_communication_style, internet_protocol);
+}
 
 mmux_cc_libc_decl bool mmux_libc_socket (mmux_libc_network_socket_t * result_sock_p,
 					 mmux_libc_network_protocol_family_t     namespace,
@@ -3652,12 +3665,12 @@ mmux_cc_libc_decl bool mmux_libc_sendto (mmux_usize_t * number_of_bytes_sent_res
 /* The arguments  "sender_sockaddr_result" and  "sender_sockaddr_length_result_p" can
    be NULL if we are not interested in retrieving the sender address. */
 mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * number_of_bytes_received_result_p,
-					   mmux_libc_sockaddr_arg_t sender_sockaddr_result,
-					   mmux_libc_socklen_t * sender_sockaddr_length_result_p,
 					   mmux_libc_sockfd_t server_sockfd,
 					   mmux_pointer_t packet_bufptr, mmux_usize_t packet_buflen,
-					   mmux_libc_recv_flags_t flags)
-  __attribute__((__nonnull__(1,4,5),__warn_unused_result__));
+					   mmux_libc_recv_flags_t flags,
+					   mmux_libc_sockaddr_arg_t sender_sockaddr_result,
+					   mmux_libc_socklen_t * sender_sockaddr_length_result_p)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

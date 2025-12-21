@@ -18156,16 +18156,20 @@ instance is handled as immutable.
 @end deftp
 
 
-@deftypefun bool mmux_libc_make_network_socket (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num})
-@deftypefunx bool mmux_libc_make_sockfd (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num})
-Make a new socket file descriptor; the two functions are synonyms.  If @var{sockfdfd_num} is
-negative: @var{sockfd_result} is left untouched and the return value is @ctrue{}.
+@deftypefun bool mmux_libc_make_network_socket (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num}, mmux_libc_network_protocol_family_t @var{family}, mmux_libc_network_socket_communication_style_t @var{style}, mmux_libc_network_internet_protocol_t @var{ipproto})
+@deftypefunx bool mmux_libc_make_sockfd (mmux_libc_sockfd_t @var{sockfd_result}, mmux_standard_sint_t @var{sock_num}, mmux_libc_network_protocol_family_t @var{family}, mmux_libc_network_socket_communication_style_t @var{style}, mmux_libc_network_internet_protocol_t @var{ipproto})
+Make a new socket file descriptor; the two functions are synonyms.  If @var{sockfd_num} is negative:
+@var{sockfd_result} is left untouched and the return value is @ctrue{}.
 
 @example
 mmux_libc_sockfd_t  sockfd;
 
-mmux_libc_make_network_socket(sockfd, 4);
+mmux_libc_make_network_socket(sockfd, 4,
+  MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP);
 @end example
+
+These functions are seldom useful because we should create new networking sockets only by calling
+@cfunc{mmux_libc_socket} or @cfunc{mmux_libc_accept} and similar.
 @end deftypefun
 
 @c page
@@ -18512,11 +18516,14 @@ we can cancel a previously configured default destination address by applying
 
 To create a networking server using the stream communication style, the required sequence of
 standard function calls is: @cfunc{socket}, @cfunc{bind}, @cfunc{listen}, @cfunc{accept} or
-@cfunc{accept4}.
+@cfunc{accept4}.  We can write code for the abstract networking--socket address
+@objtype{mmux_libc_network_socket_address_t}, then use such code with any kind of address supporting
+the stream communication style.
 
 To create a networking client using the stream communication style, the required sequence of
-standard function calls is: @cfunc{socket}, @cfunc{connect}.
-
+standard function calls is: @cfunc{socket}, @cfunc{connect}.  We can write code for the abstract
+networking--socket address @objtype{mmux_libc_network_socket_address_t}, then use such code with any
+kind of address supporting the stream communication style.
 
 @menu
 * networking sockets stream server ipfour::  Example of stream IPv4 networking server.
@@ -19097,11 +19104,15 @@ The only difference between @cfunc{mmux_libc_recv} and @cfunc{mmux_libc_read} is
 
 To create a networking server using the datagram communication style, the required sequence of
 standard function calls is: @cfunc{socket}, @cfunc{bind}, @cfunc{recvfrom} (usually, but we can also
-do @cfunc{recv} or @cfunc{read}).
+do @cfunc{recv} or @cfunc{read}).  We can write code for the abstract networking--socket address
+@objtype{mmux_libc_network_socket_address_t}, then use such code with any kind of address supporting
+the datagram communication style.
 
 To create a networking client using the stream datagram style, the required sequence of standard
 function calls is: @cfunc{socket}, @cfunc{sendto} (usually, but we can also do @cfunc{connect} and
-then @cfunc{send} or @cfunc{write}).
+then @cfunc{send} or @cfunc{write}).  We can write code for the abstract networking--socket address
+@objtype{mmux_libc_network_socket_address_t}, then use such code with any kind of address supporting
+the datagram communication style.
 
 @menu
 * networking sockets datagram server ipfour::  Example of datagram IPv4 networking server.
@@ -19170,8 +19181,8 @@ mmux_libc_sockfd_t  server_sockfd;
   auto  flags = mmux_libc_recv_flags(0);
 
   if (mmux_libc_recvfrom(&packet_nbytes_received,
-                         client_sockaddr, &client_sockaddr_length,
-                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+                         server_sockfd, packet_bufptr, packet_buflen, flags,
+                         client_sockaddr, &client_sockaddr_length)) @{
     /* error */
   @}
 
@@ -19243,8 +19254,8 @@ mmux_libc_sockfd_t  server_sockfd;
   auto  flags = mmux_libc_recv_flags(0);
 
   if (mmux_libc_recvfrom(&packet_nbytes_received,
-                         client_sockaddr, &client_sockaddr_length,
-                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+                         server_sockfd, packet_bufptr, packet_buflen, flags,
+                         client_sockaddr, &client_sockaddr_length)) @{
     /* error */
   @}
 
@@ -19328,8 +19339,8 @@ mmux_libc_sockfd_t  server_sockfd;
   auto  flags = mmux_libc_recv_flags(0);
 
   if (mmux_libc_recvfrom(&packet_nbytes_received,
-                         client_sockaddr, &client_sockaddr_length,
-                         server_sockfd, packet_bufptr, packet_buflen, flags)) @{
+                         server_sockfd, packet_bufptr, packet_buflen, flags,
+                         client_sockaddr, &client_sockaddr_length)) @{
     /* error */
   @}
 
@@ -19353,16 +19364,182 @@ The core organisation of code implementing a IPv4 networking client, using the d
 communication style, looks as follows:
 
 @example
+mmux_libc_sockfd_t           client_sockfd;
+mmux_libc_sockaddr_ipfour_t  server_sockaddr;
+mmux_libc_socklen_t          server_sockaddr_length;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Build the server address. */
+@{
+  mmux_libc_ipfour_addr_t  ipfour_addr;
+  mmux_asciizcp_t          presentation = "127.0.0.1";
+
+  if (mmux_libc_make_ipfour_addr_from_asciiz(ipfour_addr, presentation)) @{
+    /* error */
+  @}
+  mmux_libc_sockaddr_ipfour_family_set(server_sockaddr, MMUX_LIBC_AF_INET);
+  mmux_libc_sockaddr_ipfour_addr_set(server_sockaddr, ipfour_addr);
+  mmux_libc_sockaddr_ipfour_port_set(server_sockaddr,
+    mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+@}
+
+/* Write a message to the server. */
+@{
+  mmux_asciizcp_t  packet_bufptr = "the colour of water and quicksilver";
+  mmux_usize_t     packet_buflen, nbytes_done;
+  auto             flags = mmux_libc_send_flags(0);
+
+  mmux_libc_strlen(&packet_buflen, packet_bufptr);
+  if (mmux_libc_sendto(&nbytes_done, client_sockfd, packet_bufptr, packet_buflen, flags,
+                       server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
 @end example
 
 @c page
 @node networking sockets datagram client ipsix
 @subsubsection Example of datagram IPv6 networking client
 
+
+The core organisation of code implementing a IPv6 networking client, using the datagram
+communication style, looks as follows:
+
+@example
+mmux_libc_sockfd_t          client_sockfd;
+mmux_libc_sockaddr_ipsix_t  server_sockaddr;
+mmux_libc_socklen_t         server_sockaddr_length;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_INET6, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Build the server address. */
+@{
+  mmux_libc_ipsix_addr_t  ipsix_addr;
+  mmux_asciizcp_t         presentation = "1:2:3:4:5:6:7:8";
+
+  if (mmux_libc_make_ipsix_addr_from_asciiz(ipsix_addr, presentation)) @{
+    /* error */
+  @}
+  mmux_libc_sockaddr_ipsix_family_set(server_sockaddr, MMUX_LIBC_AF_INET6);
+  mmux_libc_sockaddr_ipsix_addr_set(server_sockaddr, ipsix_addr);
+  mmux_libc_sockaddr_ipsix_port_set(server_sockaddr,
+    mmux_libc_network_port_number_from_host_byteorder_literal(8080));
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+@}
+
+/* Write a message to the server. */
+@{
+  mmux_asciizcp_t  packet_bufptr = "the colour of water and quicksilver";
+  mmux_usize_t     packet_buflen, nbytes_done;
+  auto             flags = mmux_libc_send_flags(0);
+
+  mmux_libc_strlen(&packet_buflen, packet_bufptr);
+  if (mmux_libc_sendto(&nbytes_done, client_sockfd, packet_bufptr, packet_buflen, flags,
+                       server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
 @c page
 @node networking sockets datagram client local
 @subsubsection Example of datagram local networking client
 
+
+The core organisation of code implementing a local networking client, using the datagram
+communication style, looks as follows:
+
+@example
+mmux_libc_sockfd_t          client_sockfd;
+mmux_libc_sockaddr_local_t  server_sockaddr;
+mmux_libc_socklen_t         server_sockaddr_length;
+
+/* Build the client socket. */
+@{
+  if (mmux_libc_socket(client_sockfd,
+        MMUX_LIBC_PF_LOCAL, MMUX_LIBC_SOCK_DGRAM, MMUX_LIBC_IPPROTO_UDP)) @{
+    /* error */
+  @}
+@}
+
+/* Build the server address. */
+@{
+  mmux_libc_fs_ptn_t  fs_ptn;
+
+  /* Build socket's file system pathname. */
+  @{
+    mmux_asciizcp_t             ptn_asciiz = "/path/to/socket.sock";
+    mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
+
+    mmux_libc_file_system_pathname_factory_static(fs_ptn_factory);
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, ptn_asciiz)) @{
+      /* error */
+    @}
+  @}
+
+  mmux_libc_sockaddr_local_family_set (server_sockaddr, MMUX_LIBC_AF_LOCAL);
+  mmux_libc_sockaddr_local_path_set   (server_sockaddr, fs_ptn);
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      /* error */
+    @}
+  @}
+
+  mmux_libc_sockaddr_bind_length(&server_sockaddr_length, server_sockaddr);
+@}
+
+/* Write a message to the server. */
+@{
+  mmux_asciizcp_t  packet_bufptr = "the colour of water and quicksilver";
+  mmux_usize_t     packet_buflen, nbytes_done;
+  auto             flags = mmux_libc_send_flags(0);
+
+  mmux_libc_strlen(&packet_buflen, packet_bufptr);
+  if (mmux_libc_sendto(&nbytes_done, client_sockfd, packet_bufptr, packet_buflen, flags,
+                       server_sockaddr, server_sockaddr_length)) @{
+    /* error */
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(client_sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
 
 @c page
 @node networking sockets datagram data
@@ -19371,19 +19548,28 @@ communication style, looks as follows:
 
 @deftypefun bool mmux_libc_sendto (mmux_usize_t * @var{number_of_bytes_sent_result_p}, mmux_libc_sockfd_t @var{client_sockfd}, mmux_pointerc_t @var{packet_bufptr}, mmux_usize_t @var{packet_buflen}, mmux_libc_send_flags_t @var{flags}, mmux_libc_sockaddr_arg_t @var{destination_sockaddr_p}, mmux_libc_socklen_t @var{destination_sockaddr_length})
 @MmuxCInterface{sendto}.
+
+The arguments of this function are the same as those of @cfunc{mmux_libc_send}, with the addition of
+the destination socket address as last arguments.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_recvfrom (mmux_usize_t * @var{number_of_bytes_received_result_p}, mmux_libc_sockaddr_arg_t @var{sender_sockaddr_result}, mmux_libc_socklen_t * @var{sender_sockaddr_length_result_p}, mmux_libc_sockfd_t @var{server_sockfd}, mmux_pointer_t @var{packet_bufptr}, mmux_usize_t @var{packet_buflen}, mmux_libc_recv_flags_t @var{flags})
+@deftypefun bool mmux_libc_recvfrom (mmux_usize_t * @var{number_of_bytes_received_result_p}, mmux_libc_sockfd_t @var{server_sockfd}, mmux_pointer_t @var{packet_bufptr}, mmux_usize_t @var{packet_buflen}, mmux_libc_recv_flags_t @var{flags}, mmux_libc_sockaddr_arg_t @var{sender_sockaddr_result}, mmux_libc_socklen_t * @var{sender_sockaddr_length_result_p})
 @MmuxCInterface{recvfrom}.
+
+The arguments of this function are the same as those of @cfunc{mmux_libc_recv}, with the addition of
+the sender socket address as last arguments.
+
+The arguments @var{sender_sockaddr_result} and @var{sender_sockaddr_length_result_p} can be @cnull{}
+if we are not interested in retrieving the sender address.  If they are not @cnull{}, then:
 
 @itemize
 @item
-Upon entering the call: the variable referenced by @var{sender_sockaddr_length_result_p} must be set
-to the number of bytes allocated to contain the sender address.
+upon entering the call: the variable referenced by @var{sender_sockaddr_length_result_p} must be set
+to the number of bytes allocated to contain the sender address;
 
 @item
-Upon successfully returning from the call: the variable referenced by
+upon successfully returning from the call: the variable referenced by
 @var{sender_sockaddr_length_result_p} is reset to the actual number of bytes required to contain the
 sender address.
 @end itemize
