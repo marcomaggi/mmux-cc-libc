@@ -2757,6 +2757,16 @@ mmux_libc_accept4_flags (mmux_standard_sint_t value)
 {
   return (mmux_libc_accept4_flags_t) { .value = value };
 }
+mmux_cc_libc_inline_decl mmux_libc_networking_socket_option_level_t
+mmux_libc_networking_socket_option_level (mmux_standard_sint_t value)
+{
+  return (mmux_libc_networking_socket_option_level_t) { .value = value };
+}
+mmux_cc_libc_inline_decl mmux_libc_networking_socket_option_name_t
+mmux_libc_networking_socket_option_name (mmux_standard_sint_t value)
+{
+  return (mmux_libc_networking_socket_option_name_t) { .value = value };
+}
 
 /* ------------------------------------------------------------------ */
 
@@ -3698,10 +3708,14 @@ mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_l
   __attribute__((__nonnull__(1,2)));
 
 mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
-					     mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname)
+					     mmux_libc_sockfd_arg_t sockfd,
+					     mmux_libc_networking_socket_option_level_t level,
+					     mmux_libc_networking_socket_option_name_t optname)
   __attribute__((__nonnull__(1,2),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_setsockopt (mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname,
+mmux_cc_libc_decl bool mmux_libc_setsockopt (mmux_libc_sockfd_arg_t sockfd,
+					     mmux_libc_networking_socket_option_level_t level,
+					     mmux_libc_networking_socket_option_name_t optname,
 					     mmux_pointer_t optval_p, mmux_libc_socklen_t optlen)
   __attribute__((__nonnull__(4),__warn_unused_result__));
 

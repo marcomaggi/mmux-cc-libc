@@ -371,52 +371,12 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{W_OK}
 @MmuxDefineConstant{X_OK}
 @MmuxDefineConstant{IFNAMSIZ}
-@MmuxDefineConstant{SOL_SOCKET}
-@MmuxDefineConstant{SO_BROADCAST}
-@MmuxDefineConstant{SO_DEBUG}
-@MmuxDefineConstant{SO_DONTROUTE}
-@MmuxDefineConstant{SO_ERROR}
-@MmuxDefineConstant{SO_KEEPALIVE}
-@MmuxDefineConstant{SO_LINGER}
-@MmuxDefineConstant{SO_OOBINLINE}
-@MmuxDefineConstant{SO_RCVBUF}
-@MmuxDefineConstant{SO_REUSEADDR}
-@MmuxDefineConstant{SO_SNDBUF}
-@MmuxDefineConstant{SO_STYLE}
-@MmuxDefineConstant{SO_TYPE}
 
 @MmuxDefineConstant{RWF_APPEND}
 @MmuxDefineConstant{RWF_DSYNC}
 @MmuxDefineConstant{RWF_HIPRI}
 @MmuxDefineConstant{RWF_NOWAIT}
 @MmuxDefineConstant{RWF_SYNC}
-
-@MmuxDefineConstant{IPPORT_BIFFUDP}
-@MmuxDefineConstant{IPPORT_CMDSERVER}
-@MmuxDefineConstant{IPPORT_DAYTIME}
-@MmuxDefineConstant{IPPORT_DISCARD}
-@MmuxDefineConstant{IPPORT_ECHO}
-@MmuxDefineConstant{IPPORT_EFSSERVER}
-@MmuxDefineConstant{IPPORT_EXECSERVER}
-@MmuxDefineConstant{IPPORT_FINGER}
-@MmuxDefineConstant{IPPORT_FTP}
-@MmuxDefineConstant{IPPORT_LOGINSERVER}
-@MmuxDefineConstant{IPPORT_MTP}
-@MmuxDefineConstant{IPPORT_NAMESERVER}
-@MmuxDefineConstant{IPPORT_NETSTAT}
-@MmuxDefineConstant{IPPORT_RESERVED}
-@MmuxDefineConstant{IPPORT_RJE}
-@MmuxDefineConstant{IPPORT_ROUTESERVER}
-@MmuxDefineConstant{IPPORT_SMTP}
-@MmuxDefineConstant{IPPORT_SUPDUP}
-@MmuxDefineConstant{IPPORT_SYSTAT}
-@MmuxDefineConstant{IPPORT_TELNET}
-@MmuxDefineConstant{IPPORT_TFTP}
-@MmuxDefineConstant{IPPORT_TIMESERVER}
-@MmuxDefineConstant{IPPORT_TTYLINK}
-@MmuxDefineConstant{IPPORT_USERRESERVED}
-@MmuxDefineConstant{IPPORT_WHOIS}
-@MmuxDefineConstant{IPPORT_WHOSERVER}
 
 @MmuxDefineConstant{WAIT_ANY}
 @MmuxDefineConstant{WAIT_MYPGRP}
@@ -15297,6 +15257,38 @@ Store @ctrue{} in the variable referenced by @var{are_equal_result_p} if the por
 otherwise store @cfalse{}.
 @end deftypefun
 
+@c ------------------------------------------------------------------------
+
+The following constants define @emph{Internet Protocol} port numbers in host byteorder.
+
+
+@MmuxDefineConstant{IPPORT_BIFFUDP}
+@MmuxDefineConstant{IPPORT_CMDSERVER}
+@MmuxDefineConstant{IPPORT_DAYTIME}
+@MmuxDefineConstant{IPPORT_DISCARD}
+@MmuxDefineConstant{IPPORT_ECHO}
+@MmuxDefineConstant{IPPORT_EFSSERVER}
+@MmuxDefineConstant{IPPORT_EXECSERVER}
+@MmuxDefineConstant{IPPORT_FINGER}
+@MmuxDefineConstant{IPPORT_FTP}
+@MmuxDefineConstant{IPPORT_LOGINSERVER}
+@MmuxDefineConstant{IPPORT_MTP}
+@MmuxDefineConstant{IPPORT_NAMESERVER}
+@MmuxDefineConstant{IPPORT_NETSTAT}
+@MmuxDefineConstant{IPPORT_RESERVED}
+@MmuxDefineConstant{IPPORT_RJE}
+@MmuxDefineConstant{IPPORT_ROUTESERVER}
+@MmuxDefineConstant{IPPORT_SMTP}
+@MmuxDefineConstant{IPPORT_SUPDUP}
+@MmuxDefineConstant{IPPORT_SYSTAT}
+@MmuxDefineConstant{IPPORT_TELNET}
+@MmuxDefineConstant{IPPORT_TFTP}
+@MmuxDefineConstant{IPPORT_TIMESERVER}
+@MmuxDefineConstant{IPPORT_TTYLINK}
+@MmuxDefineConstant{IPPORT_USERRESERVED}
+@MmuxDefineConstant{IPPORT_WHOIS}
+@MmuxDefineConstant{IPPORT_WHOSERVER}
+
 @c page
 @node networking addresses ip base
 @subsubsection Base @emph{Internet Protocol} address type
@@ -19578,6 +19570,108 @@ sender address.
 @c page
 @node networking sockets options
 @subsection Socket options
+
+
+@menu
+* networking sockets options levels::  Networking-sockets option levels.
+* networking sockets options names::   Networking-sockets option names.
+* networking sockets options api::     Setting and getting networking-sockets options.
+@end menu
+
+@c page
+@node networking sockets options levels
+@subsubsection Networking--sockets option levels
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_networking_socket_option_level_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type used to represent networking--sockets option levels.
+@end deftp
+
+
+@deftypefun mmux_libc_networking_socket_option_level_t mmux_libc_networking_socket_option_level (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_networking_socket_option_level_t}.  This
+function is seldom useful because we should use the predefined constant @samp{MMUX_LIBC_SOL_SOCKET}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants represent the predefined networking--sockets option levels.
+
+
+@macro MmuxDefineNetworkingSocketOptionLevelConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_socket_option_level_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_socket_option_level_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingSocketOptionLevelConstant{SOL_SOCKET}
+
+@c page
+@node networking sockets options names
+@subsubsection Networking--sockets option names
+
+
+@deftp {Opaque Struct Typedef} mmux_libc_networking_socket_option_name_t
+@deftpx {Parent Struct Typedef} mmux_sint_t
+Data structure type used to represent networking--sockets option names.
+@end deftp
+
+
+@deftypefun mmux_libc_networking_socket_option_name_t mmux_libc_networking_socket_option_name (mmux_standard_sint_t @var{value})
+Build and return a new instance of @objtype{mmux_libc_networking_socket_option_name_t}.  This
+function is seldom useful because we should use the predefined constant @samp{MMUX_LIBC_SOL_SOCKET}.
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+The following constants represent the predefined networking--sockets option names.
+
+
+@macro MmuxDefineNetworkingSocketOptionNameConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_network_socket_option_name_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
+@objtype{mmux_libc_network_socket_option_name_t} representing the standard C language constant
+@code{\NAME\}.
+
+If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
+@samp{\NAME\}.
+
+The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+@samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_BROADCAST}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_DEBUG}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_DONTROUTE}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_ERROR}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_KEEPALIVE}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_LINGER}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_OOBINLINE}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_RCVBUF}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_REUSEADDR}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_SNDBUF}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_STYLE}
+@MmuxDefineNetworkingSocketOptionNameConstant{SO_TYPE}
+
+@c page
+@node networking sockets options api
+@subsubsection Setting and getting networking-sockets options
 
 
 @MmuxCStructOpaqueTypedef{linger}

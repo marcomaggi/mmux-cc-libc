@@ -384,6 +384,14 @@ typedef struct mmux_libc_network_socket_shutdown_mode_t {
   mmux_sint_t;
 } mmux_libc_network_socket_shutdown_mode_t;
 
+typedef struct mmux_libc_networking_socket_option_level_t {
+  mmux_sint_t;
+} mmux_libc_networking_socket_option_level_t;
+
+typedef struct mmux_libc_networking_socket_option_name_t {
+  mmux_sint_t;
+} mmux_libc_networking_socket_option_name_t;
+
 /* ------------------------------------------------------------------ */
 
 typedef mmux_libc_network_interface_name_index_t		mmux_libc_if_nameindex_t[1];

@@ -3410,10 +3410,12 @@ mmux_libc_linger_dump (mmux_libc_fd_arg_t oufd, mmux_libc_linger_arg_t linger_p,
 
 bool
 mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
-		      mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname)
+		      mmux_libc_sockfd_arg_t sockfd,
+		      mmux_libc_networking_socket_option_level_t level,
+		      mmux_libc_networking_socket_option_name_t optname)
 {
   mmux_standard_libc_socklen_t	len;
-  mmux_standard_sint_t		rv = getsockopt(sockp->value, level.value, optname.value,
+  mmux_standard_sint_t		rv = getsockopt(sockfd->value, level.value, optname.value,
 						result_optval_p, &len);
 
   if (0 == rv) {
@@ -3424,10 +3426,12 @@ mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * resu
   }
 }
 bool
-mmux_libc_setsockopt (mmux_libc_network_socket_t * sockp, mmux_sint_t level, mmux_sint_t optname,
+mmux_libc_setsockopt (mmux_libc_sockfd_arg_t sockfd,
+		      mmux_libc_networking_socket_option_level_t level,
+		      mmux_libc_networking_socket_option_name_t optname,
 		      mmux_pointer_t optval_p, mmux_libc_socklen_t optlen)
 {
-  int	rv = setsockopt(sockp->value, level.value, optname.value, optval_p, optlen.value);
+  int	rv = setsockopt(sockfd->value, level.value, optname.value, optval_p, optlen.value);
 
   return ((0 == rv)? false : true);
 }
