@@ -42,7 +42,7 @@ dump_open_flags (mmux_libc_fd_arg_t fd, mmux_uint64_t value)
   bool		not_first_flags = false;
 
 m4_define([[[DUMP_OPEN_FLAGS_FLAG]]],[[[{
-#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+#if ((defined HAVE_MMUX_$1) && (1 == HAVE_MMUX_$1))
   if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
@@ -97,7 +97,7 @@ dump_open_mode (mmux_libc_fd_arg_t fd, mmux_uint64_t value)
   bool		not_first_flags = false;
 
 m4_define([[[DUMP_OPEN_MODE_FLAG]]],[[[{
-#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+#if ((defined HAVE_MMUX_$1) && (1 == HAVE_MMUX_$1))
   if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
@@ -137,7 +137,7 @@ dump_open_resolve (mmux_libc_fd_arg_t fd, mmux_uint64_t value)
   bool		not_first_flags = false;
 
 m4_define([[[DUMP_OPEN_RESOLVE_FLAG]]],[[[{
-#if ((defined MMUX_HAVE_$1) && (1 == MMUX_HAVE_$1))
+#if ((defined HAVE_MMUX_$1) && (1 == HAVE_MMUX_$1))
   if (MMUX_LIBC_$1 & value.value) {
     if (not_first_flags) {
       DPRINTF(fd, " | $1");
@@ -1228,12 +1228,12 @@ mmux_libc_flag_to_symbol_seek_whence (mmux_asciizcp_t * const str_p, mmux_libc_s
   case MMUX_VALUEOF_SEEK_CUR:
     *str_p = "SEEK_CUR";
     return false;
-#ifdef MMUX_HAVE_LIBC_SEEK_DATA
+#ifdef HAVE_MMUX_LIBC_SEEK_DATA
   case MMUX_VALUEOF_SEEK_DATA:
     *str_p = "SEEK_DATA";
     return false;
 #endif
-#ifdef MMUX_HAVE_LIBC_SEEK_HOLE
+#ifdef HAVE_MMUX_LIBC_SEEK_HOLE
   case MMUX_VALUEOF_SEEK_HOLE:
     *str_p = "SEEK_HOLE";
     return false;
@@ -1357,7 +1357,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 {
   switch (command.value) {
 
-#ifdef MMUX_HAVE_LIBC_F_DUPFD
+#ifdef HAVE_MMUX_LIBC_F_DUPFD
   case MMUX_LIBC_VALUEOF_F_DUPFD: {
     mmux_libc_file_descriptor_t *	new_fd_p = parameter_p;
     mmux_standard_sint_t		rv = fcntl(fd->value, command.value, new_fd_p->value);
@@ -1368,7 +1368,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 
     /* ------------------------------------------------------------------ */
 
-#ifdef MMUX_HAVE_LIBC_F_GETFD
+#ifdef HAVE_MMUX_LIBC_F_GETFD
   case MMUX_LIBC_VALUEOF_F_GETFD: {
     /* Acquire the flags associated to the file descriptor. */
     mmux_standard_sint_t	rv = fcntl(fd->value, command.value);
@@ -1384,7 +1384,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_SETFD
+#ifdef HAVE_MMUX_LIBC_F_SETFD
   case MMUX_LIBC_VALUEOF_F_SETFD: {
     mmux_sint_t *	flags_p = parameter_p;
     int			rv = fcntl(fd->value, command.value, flags_p->value);
@@ -1395,7 +1395,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 
     /* ------------------------------------------------------------------ */
 
-#ifdef MMUX_HAVE_LIBC_F_GETFL
+#ifdef HAVE_MMUX_LIBC_F_GETFL
   case MMUX_LIBC_VALUEOF_F_GETFL: {
     /* Acquire the flags associated to the open file. */
     mmux_standard_sint_t	rv = fcntl(fd->value, command.value);
@@ -1411,7 +1411,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_SETFL
+#ifdef HAVE_MMUX_LIBC_F_SETFL
   case MMUX_LIBC_VALUEOF_F_SETFL: {
     mmux_sint_t *	flags_p = parameter_p;
     int			rv = fcntl(fd->value, command.value, flags_p->value);
@@ -1422,7 +1422,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 
     /* ------------------------------------------------------------------ */
 
-#ifdef MMUX_HAVE_LIBC_F_GETLK
+#ifdef HAVE_MMUX_LIBC_F_GETLK
   case MMUX_LIBC_VALUEOF_F_GETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1431,7 +1431,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_SETLK
+#ifdef HAVE_MMUX_LIBC_F_SETLK
   case MMUX_LIBC_VALUEOF_F_SETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1440,7 +1440,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_SETLKW
+#ifdef HAVE_MMUX_LIBC_F_SETLKW
   case MMUX_LIBC_VALUEOF_F_SETLKW: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1451,7 +1451,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 
     /* ------------------------------------------------------------------ */
 
-#ifdef MMUX_HAVE_LIBC_F_OFD_GETLK
+#ifdef HAVE_MMUX_LIBC_F_OFD_GETLK
   case MMUX_LIBC_VALUEOF_F_OFD_GETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1460,7 +1460,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_OFD_SETLK
+#ifdef HAVE_MMUX_LIBC_F_OFD_SETLK
   case MMUX_LIBC_VALUEOF_F_OFD_SETLK: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1469,7 +1469,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_OFD_SETLKW
+#ifdef HAVE_MMUX_LIBC_F_OFD_SETLKW
   case MMUX_LIBC_VALUEOF_F_OFD_SETLKW: {
     mmux_libc_flock_t *		flock_pointer = parameter_p;
     int				rv = fcntl(fd->value, command.value, flock_pointer);
@@ -1480,7 +1480,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
 
     /* ------------------------------------------------------------------ */
 
-#ifdef MMUX_HAVE_LIBC_F_GETOWN
+#ifdef HAVE_MMUX_LIBC_F_GETOWN
   case MMUX_LIBC_VALUEOF_F_GETOWN: {
     mmux_standard_libc_pid_t	rv = fcntl(fd->value, command.value);
 
@@ -1494,7 +1494,7 @@ mmux_libc_fcntl (mmux_libc_fd_arg_t fd, mmux_libc_fcntl_command_t command, mmux_
   }
 #endif
 
-#ifdef MMUX_HAVE_LIBC_F_SETOWN
+#ifdef HAVE_MMUX_LIBC_F_SETOWN
   case MMUX_LIBC_VALUEOF_F_SETOWN: {
     mmux_libc_pid_t *	pid_p = parameter_p;
     int			rv = fcntl(fd->value, command.value, pid_p->value);
@@ -1562,7 +1562,7 @@ mmux_libc_ioctl (mmux_libc_fd_arg_t fd, mmux_libc_ioctl_command_t command, mmux_
 {
   switch (command.value) {
 
-#ifdef MMUX_HAVE_LIBC_SIOCATMARK
+#ifdef HAVE_MMUX_LIBC_SIOCATMARK
   case MMUX_LIBC_VALUEOF_SIOCATMARK: { /* synopsis: mmux_libc_ioctl FD SIOCATMARK ATMARK_POINTER */
     mmux_sint_t *	atmark_p = parameter_p;
     int			rv = ioctl(fd->value, command.value, atmark_p->value);

@@ -39,7 +39,7 @@ mmux_libc_interprocess_signal_dump (mmux_libc_fd_arg_t fd, mmux_libc_interproces
   mmux_asciizcp_t	signame;
 
 m4_define([[[DEFINE_SIGNAL_CASE]]],[[[m4_dnl
-#ifdef MMUX_HAVE_LIBC_$1
+#ifdef HAVE_MMUX_LIBC_$1
   case MMUX_LIBC_VALUEOF_$1:
     signame = "$1";
     break;
@@ -99,7 +99,7 @@ mmux_libc_interprocess_signal_parse (mmux_libc_interprocess_signal_t * ipxsig_p,
   } else {
 
 m4_define([[[DEFINE_SIGNAL_CASE]]],[[[m4_dnl
-#ifdef MMUX_HAVE_LIBC_SIG$1
+#ifdef HAVE_MMUX_LIBC_SIG$1
   if (0 == strcmp("$1", (input_string + 3))) {
     *ipxsig_p = MMUX_LIBC_SIG$1;
     return false;

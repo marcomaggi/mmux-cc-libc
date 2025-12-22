@@ -264,12 +264,12 @@ the @value{PACKAGE} constant is the original name prefixed with
 
 @macro MmuxDefineConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
 either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
 features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -279,11 +279,11 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 
 @macro MmuxDefineStandardIntConstant{NAME}
 @deftypevr {Constant} int @value{PackageApiPrefixUpper}\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant
 @code{\NAME\}; it can be defined or not depending on the features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end deftypevr
 
@@ -390,13 +390,13 @@ The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} 
 @MmuxDefineConstant{EXIT_FAILURE}
 
 @defvr Constant @value{PackageApiPrefixUpper}MSG_ZERO
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_MSG_ZERO
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_MSG_ZERO
 The symbol @code{@value{PackageApiPrefixUpper}MSG_ZERO} evaluates to zero; it is meant to be used as
 @var{flags} argument for @cfunc{mmux_libc_send}, and similar functions, when no other
 @code{@value{PackageApiPrefixUpper}MSG_*} flag is needed; it gives the reader of the code a
 remainder of which flags are available for the operation.
 
-The symbol @code{MMUX_HAVE_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
+The symbol @code{HAVE_MMUX_LIBC_MSG_ZERO} is always defined and it evaluates to @samp{1}.
 @end defvr
 
 @c page
@@ -616,7 +616,7 @@ Store in the variable referenced by @var{result_p} a pointer to the @gnu{} C Lib
 @macro MmuxLibcDefineErrnoConstant{NAME}
 @deftypevr {Constant} mmux_libc_errno_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 Error code @code{\NAME\}.
 @end deftypevr
 
@@ -3325,12 +3325,12 @@ if (mmux_libc_sysconf(&result, MMUX_LIBC__SC_PAGESIZE)) @{
 
 @macro MmuxDefineSystemParameterConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_sysconf_parameter_t}; it can be defined or not depending on the features of the
 underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -3583,12 +3583,12 @@ if (mmux_libc_confstr_size(&required_nbytes, parameter)) @{
 
 @macro MmuxDefineSystemStringParameterConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_sysconf_string_parameter_t}; it can be defined or not depending on the features
 of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -3692,12 +3692,12 @@ mmux_libc_fd_t  fd;
 
 @macro MmuxDefineFileSystemParameterConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_sysconf_string_parameter_t}; it can be defined or not depending on the features
 of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -3859,12 +3859,12 @@ The argument @var{new_rlimit_p} is the last because it is an argument of the fun
 
 @macro MmuxDefineResourceLimitParameterConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_sysconf_resource_limit_t}; it can be defined or not depending on the features of
 the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -4815,12 +4815,12 @@ auto  waiting_options =
 
 @macro MmuxDefineProcessCompletionWaitingOptionConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
 either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
 features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -5143,7 +5143,7 @@ if (mmux_libc_interprocess_signal_parse(&ipxsig, input_string, __func__)) @{
 
 @deftypevr {Struct Constant} mmux_libc_interprocess_signal_t MMUX_LIBC_SIG_ZERO
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_SIG_ZERO
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_SIG_ZERO
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_SIG_ZERO
 The symbol @samp{MMUX_LIBC_SIG_ZERO} evaluates to an instance of
 @objtype{mmux_libc_interprocess_signal_t} representing the signal number zero; this is not a real
 signal number: it is used in calls to @cfunc{mmux_libc_kill} to test for the existence of a process
@@ -5152,7 +5152,7 @@ and for permissions to signal it.
 The symbol @samp{MMUX_LIBC_VALUEOF_SIG_ZERO} expands into the signal's raw numeric value, which is
 zero.
 
-The symbol @samp{MMUX_HAVE_LIBC_SIG_ZERO} is defined, and defined to @samp{1}, if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_SIG_ZERO} is defined, and defined to @samp{1}, if the symbol
 @samp{MMUX_LIBC_SIG_ZERO} is available.
 @end deftypevr
 
@@ -5160,13 +5160,13 @@ The symbol @samp{MMUX_HAVE_LIBC_SIG_ZERO} is defined, and defined to @samp{1}, i
 @macro MmuxDefineInterprocessSignalConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_interprocess_signal_t @value{PackageApiPrefixUpper}\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to an instance of
 @objtype{mmux_libc_interprocess_signal_t} representing the signal number @samp{\NAME\}.
 
 The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} expands into the signal's raw numeric value.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined, and defined to @samp{1}, if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined, and defined to @samp{1}, if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end deftypevr
 
@@ -5990,11 +5990,11 @@ We can use the following constants as flags for the field @code{sa_flags} of
 
 @macro MmuxDefineSigactionFlagConstant{NAME}
 @defvr {Constant} @value{PackageApiPrefixUpper}\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{@value{PackageApiPrefixUpper}\NAME\} evaluates to the C language constant
 @code{\NAME\}; it can be defined or not depending on the features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -6222,14 +6222,14 @@ We can use the following constants as values for the field @code{si_code} of
 @macro MmuxDefineSigvalSiCodeConstant{NAME}
 @deftypevr {Constant} mmux_libc_si_code_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 We can use @samp{MMUX_LIBC_\NAME\} as actual value for the field @code{si_code} of
 @objtype{mmux_libc_interprocess_signal_info_t}.
 
 The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} evaluates to the C language constant @code{\NAME\}; it
 can be defined or not depending on the features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end deftypevr
 
@@ -6517,10 +6517,10 @@ We can use the following constants as values for the field @var{flags} argument 
 
 @macro MmuxDefineSignalfdFlagConstant{NAME}
 @defvr {Constant} MMUX_LIBC_\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 Value of the standard constant @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{@value{PackageApiPrefixUpper}\NAME\} is available.
 @end defvr
 
@@ -7657,14 +7657,14 @@ if (mmux_libc_lseek(fd, &offset, whence)) @{
 @macro MmuxDefineSeekWhenceConstant{NAME}
 @defvr {Constant Struct} MMUX_LIBC_\NAME\
 @defvrx {Preprocessor Symbol} MMUX_LIBC_VALUEOF_\NAME\
-@defvrx {Preprocessor Symbol} MMUX_HAVE_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{MMUX_LIBC_\NAME\} evaluates to a C language constant of type
 @objtype{mmux_libc_seek_whence_t} representing the standard value @code{\NAME\}.
 
 The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} evaluates to the standard @code{\NAME\} value as exact
 integer.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end defvr
 
@@ -8663,13 +8663,13 @@ Build and return a new instance of @objtype{mmux_libc_file_lock_type_t}.
 @macro MmuxStructFlockLTypeDefineConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_file_lock_type_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 Value for the field @code{l_type} in objects of type @objtype{mmux_libc_file_descriptor_lock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_\NAME\} is defined to the standard exact integer
 corresponding to @code{\NAME\}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_\NAME\} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_\NAME\} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_\NAME\} is available.
 @end deftypevr
 
@@ -8767,14 +8767,14 @@ representation of the @var{command}.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_DUPFD
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_DUPFD
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_DUPFD
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_DUPFD
 Duplicate a file descriptor; @var{parameter_p} must reference a variable of type
 @objtype{mmux_libc_file_descriptor_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_DUPFD} is defined to the standard exact integer
 corresponding to @code{F_DUPFD}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_DUPFD} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_DUPFD} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_DUPFD} is available.
 @end deftypevr
 
@@ -8782,14 +8782,14 @@ symbol @code{MMUX_LIBC_F_DUPFD} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETFD
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETFD
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETFD
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_GETFD
 Get file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a
 variable of type @objtype{mmux_sint_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETFD} is defined to the standard exact integer
 corresponding to @code{F_GETFD}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETFD} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_GETFD} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_GETFD} is available.
 @end deftypevr
 
@@ -8797,14 +8797,14 @@ symbol @code{MMUX_LIBC_F_GETFD} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETFD
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETFD
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETFD
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_SETFD
 Set file descriptor flags, like @samp{MMUX_LIBC_FD_CLOEXEC}; @var{parameter_p} must reference a
 variable of type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETFD} is defined to the standard exact integer
 corresponding to @code{F_SETFD}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETFD} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_SETFD} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_SETFD} is available.
 @end deftypevr
 
@@ -8812,7 +8812,7 @@ symbol @code{MMUX_LIBC_F_SETFD} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETFL
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETFL
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETFL
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_GETFL
 Get open file descriptor flags, like @samp{MMUX_LIBC_O_RDWR}; @var{parameter_p} must reference a
 variable of type @objtype{mmux_sint_t}.
 
@@ -8839,7 +8839,7 @@ if (mmux_libc_fcntl(in, MMUX_LIBC_F_SETFL, &parameter)) @{
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETFL} is defined to the standard exact integer
 corresponding to @code{F_GETFL}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETFL} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_GETFL} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_GETFL} is available.
 @end deftypevr
 
@@ -8847,14 +8847,14 @@ symbol @code{MMUX_LIBC_F_GETFL} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETFL
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETFL
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETFL
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_SETFL
 Set open file descriptor flags, like @samp{O_APPEND}; @var{parameter_p} must reference a variable of
 type @objtype{mmux_sint_t} holding a bitwise OR combination of flags.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETFL} is defined to the standard exact integer
 corresponding to @code{F_SETFL}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETFL} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_SETFL} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_SETFL} is available.
 @end deftypevr
 
@@ -8862,14 +8862,14 @@ symbol @code{MMUX_LIBC_F_SETFL} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETLK
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETLK
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETLK
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_GETLK
 Get a @MmuxCStruct{flock} describing a lock that blocks a requested lock; @var{parameter_p} must
 reference a value of type @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETLK} is defined to the standard exact integer
 corresponding to @code{F_GETLK}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETLK} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_GETLK} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_GETLK} is available.
 @end deftypevr
 
@@ -8877,14 +8877,14 @@ symbol @code{MMUX_LIBC_F_GETLK} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETLK
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETLK
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETLK
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_SETLK
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETLK} is defined to the standard exact integer
 corresponding to @code{F_SETLK}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETLK} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_SETLK} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_SETLK} is available.
 @end deftypevr
 
@@ -8892,14 +8892,14 @@ symbol @code{MMUX_LIBC_F_SETLK} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETLKW
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETLKW
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETLKW
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_SETLKW
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETLKW} is defined to the standard exact integer
 corresponding to @code{F_SETLKW}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETLKW} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_SETLKW} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_SETLKW} is available.
 @end deftypevr
 
@@ -8907,14 +8907,14 @@ symbol @code{MMUX_LIBC_F_SETLKW} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_GETLK
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_GETLK
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_GETLK
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_OFD_GETLK
 Get a @MmuxCStruct{flock} describing a lock that blocks a requested lock; @var{parameter_p} must
 reference a value of type @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_GETLK} is defined to the standard exact integer
 corresponding to @code{F_OFD_GETLK}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_GETLK} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_OFD_GETLK} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_OFD_GETLK} is available.
 @end deftypevr
 
@@ -8922,14 +8922,14 @@ symbol @code{MMUX_LIBC_F_OFD_GETLK} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_SETLK
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_SETLK
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_SETLK
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_OFD_SETLK
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_SETLK} is defined to the standard exact integer
 corresponding to @code{F_OFD_SETLK}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_SETLK} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_OFD_SETLK} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_OFD_SETLK} is available.
 @end deftypevr
 
@@ -8937,14 +8937,14 @@ symbol @code{MMUX_LIBC_F_OFD_SETLK} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_OFD_SETLKW
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_OFD_SETLKW
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_OFD_SETLKW
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_OFD_SETLKW
 Set or clear file lock; @var{parameter_p} must reference a value of type
 @objtype{mmux_libc_flock_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_OFD_SETLKW} is defined to the standard exact
 integer corresponding to @code{F_OFD_SETLKW}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_OFD_SETLKW} is defined, and defined to @samp{1}, if
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_OFD_SETLKW} is defined, and defined to @samp{1}, if
 the symbol @code{MMUX_LIBC_F_OFD_SETLKW} is available.
 @end deftypevr
 
@@ -8952,14 +8952,14 @@ the symbol @code{MMUX_LIBC_F_OFD_SETLKW} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_GETOWN
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_GETOWN
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_GETOWN
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_GETOWN
 Get the process or group id that receives the signal @samp{SIGIO}; @var{parameter_p} must reference
 a variable of type @objtype{mmux_libc_pid_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_GETOWN} is defined to the standard exact integer
 corresponding to @code{F_GETOWN}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_GETOWN} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_GETOWN} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_GETOWN} is available.
 @end deftypevr
 
@@ -8967,14 +8967,14 @@ symbol @code{MMUX_LIBC_F_GETOWN} is available.
 
 @deftypevr {Struct Constant} mmux_libc_fcntl_command_t MMUX_LIBC_F_SETOWN
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_F_SETOWN
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_F_SETOWN
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_F_SETOWN
 Set the process or group id that receives the signal @samp{SIGIO}; @var{parameter_p} must reference
 a variable of type @objtype{mmux_libc_pid_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_F_SETOWN} is defined to the standard exact integer
 corresponding to @code{F_SETOWN}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_F_SETOWN} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_F_SETOWN} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_F_SETOWN} is available.
 @end deftypevr
 
@@ -9014,14 +9014,14 @@ Pointer to a variable representing a parameter that can be input or output depen
 
 @deftypevr {Struct Constant} mmux_libc_ioctl_command_t MMUX_LIBC_SIOCATMARK
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_SIOCATMARK
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_SIOCATMARK
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_SIOCATMARK
 Detect if the data received through a socket has reached the mark; @var{parameter_p} must reference
 a variable of type @objtype{mmux_sint_t}.
 
 The preprocessor symbol @code{MMUX_LIBC_VALUEOF_SIOCATMARK} is defined to the standard exact integer
 corresponding to @code{SIOCATMARK}.
 
-The preprocessor symbol @code{MMUX_HAVE_LIBC_SIOCATMARK} is defined, and defined to @samp{1}, if the
+The preprocessor symbol @code{HAVE_MMUX_LIBC_SIOCATMARK} is defined, and defined to @samp{1}, if the
 symbol @code{MMUX_LIBC_SIOCATMARK} is available.
 @end deftypevr
 
@@ -15000,7 +15000,7 @@ networking address families.
 @macro MmuxDefineNetworkingAddressFamilyConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_address_family_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_address_family_t} representing the standard C language constant
 @code{\NAME\}.
@@ -15008,7 +15008,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -15070,7 +15070,7 @@ networking protocol families.
 @macro MmuxDefineNetworkingAddressProtocolConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_protocol_family_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_protocol_family_t} representing the standard C language constant
 @code{\NAME\}.
@@ -15078,7 +15078,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -15137,7 +15137,7 @@ networking @emph{Internet Protocols}.
 @macro MmuxDefineNetworkingAddressProtocolNumberConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_internet_protocol_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_internet_protocol_t} representing the standard C language constant
 @code{\NAME\}.
@@ -15145,7 +15145,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -15457,12 +15457,12 @@ equal; otherwise store @cfalse{}.
 @macro MmuxDefineInaddrConstant{NAME}
 @deftypevr {Constant} mmux_libc_host_byteorder_uint32_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} mmux_standard_uint32_t MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 The symbol @samp{MMUX_LIBC_\NAME\} evaluates to the C language constant @code{\NAME\}; it can be
 either a preprocessor symbol or an enumerated symbol; it can be defined or not depending on the
 features of the underlying platform.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
 @samp{MMUX_LIBC_\NAME\} is available.
 @end deftypevr
 
@@ -15992,7 +15992,7 @@ networking sockets communication styles.
 @macro MmuxDefineNetworkingSocketCommunicationStyleConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_socket_communication_style_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_socket_communication_style_t} representing the standard C language
 constant @code{\NAME\}.
@@ -16000,7 +16000,7 @@ constant @code{\NAME\}.
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -17473,14 +17473,14 @@ equal; otherwise store @cfalse{}.
 @macro MmuxDefineNetworkingGetaddrinfoErrorCodeConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_gai_errno_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_gai_errno_t} representing the standard C language constant @code{\NAME\}.
 
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -17578,14 +17578,14 @@ Found host '127.0.0.1 and service '25'.
 @macro MmuxDefineNetworkingGetnameinfoLengthConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_socklen_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_socklen_t} representing the standard C language constant @code{\NAME\}.
 
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -18250,7 +18250,7 @@ function is seldom useful because we should use the predefined constants @samp{M
 @macro MmuxDefineNetworkingShutdownModeConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_socket_shutdown_mode_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_socket_shutdown_mode_t} representing the standard C language constant
 @code{\NAME\}.
@@ -18258,7 +18258,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -19602,7 +19602,7 @@ The following constants represent the predefined networking--sockets option leve
 @macro MmuxDefineNetworkingSocketOptionLevelConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_socket_option_level_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_socket_option_level_t} representing the standard C language constant
 @code{\NAME\}.
@@ -19610,7 +19610,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 
@@ -19642,7 +19642,7 @@ The following constants represent the predefined networking--sockets option name
 @macro MmuxDefineNetworkingSocketOptionNameConstant{NAME}
 @deftypevr {Struct Constant} mmux_libc_network_socket_option_name_t MMUX_LIBC_\NAME\
 @deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
-@deftypevrx {Preprocessor Symbol} int MMUX_HAVE_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
 If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 @objtype{mmux_libc_network_socket_option_name_t} representing the standard C language constant
 @code{\NAME\}.
@@ -19650,7 +19650,7 @@ If the symbol @samp{MMUX_LIBC_\NAME\} is defined: it evaluates to an instance of
 If the symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} is defined: it expands to the C language constant
 @samp{\NAME\}.
 
-The symbol @samp{MMUX_HAVE_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if the symbols
 @samp{MMUX_LIBC_\NAME\} and @samp{MMUX_LIBC_VALUEOF_\NAME\} are available.
 @end deftypevr
 

@@ -30,23 +30,23 @@
  ** Some constants.
  ** ----------------------------------------------------------------- */
 
-#define MMUX_HAVE_LIBC_EXIT_SUCCESS	1
+#define HAVE_MMUX_LIBC_EXIT_SUCCESS	1
 #define MMUX_LIBC_EXIT_SUCCESS		((mmux_libc_process_exit_status_t){ .value = mmux_libc_VALUEOF_EXIT_SUCCESS })
 
-#define MMUX_HAVE_LIBC_EXIT_FAILURE	1
+#define HAVE_MMUX_LIBC_EXIT_FAILURE	1
 #define MMUX_LIBC_EXIT_FAILURE		((mmux_libc_process_exit_status_t){ .value = mmux_libc_VALUEOF_EXIT_FAILURE })
 
 /* ------------------------------------------------------------------ */
 
-#define MMUX_HAVE_LIBC_WAIT_ANY	1
+#define HAVE_MMUX_LIBC_WAIT_ANY	1
 #define MMUX_LIBC_WAIT_ANY		((mmux_libc_pid_t){ .value = mmux_libc_VALUEOF_WAIT_ANY })
 
-#define MMUX_HAVE_LIBC_WAIT_MYPGRP	1
+#define HAVE_MMUX_LIBC_WAIT_MYPGRP	1
 #define MMUX_LIBC_WAIT_MYPGRP		((mmux_libc_pid_t){ .value = mmux_libc_VALUEOF_WAIT_MYPGRP })
 
 /* ------------------------------------------------------------------ */
 
-#define MMUX_HAVE_LIBC_FD_SETSIZE	1
+#define HAVE_MMUX_LIBC_FD_SETSIZE	1
 #define MMUX_LIBC_VALUEOF_FD_SETSIZE	mmux_libc_VALUEOF_FD_SETSIZE
 #define MMUX_LIBC_FD_SETSIZE		((mmux_uint_t){ .value = mmux_libc_VALUEOF_FD_SETSIZE })
 
@@ -58,8 +58,8 @@
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_network_address_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
@@ -97,8 +97,8 @@ MMUX_LIBC_DEFINE_SOCKETS_ADDRESS_FAMILY_CONSTANT(AF_XDP)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_network_protocol_family_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
@@ -117,8 +117,8 @@ MMUX_LIBC_DEFINE_SOCKETS_PROTOCOL_FAMILY_CONSTANT(PF_UNSPEC)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_network_internet_protocol_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
@@ -158,8 +158,8 @@ MMUX_LIBC_DEFINE_SOCKETS_INTERNET_PROTOCOL_CONSTANT(IPPROTO_UDPLITE)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_NETWORK_SOCKET_COMMUNICATION_STYLE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_network_socket_communication_style_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
@@ -176,8 +176,8 @@ MMUX_LIBC_DEFINE_NETWORK_SOCKET_COMMUNICATION_STYLE_CONSTANT(SOCK_STREAM)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_NETWORK_SOCKET_COMMUNICATION_STYLE_PROPERTY_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_standard_sint_t) (mmux_libc_VALUEOF_$1)) ]]])]]])
 m4_divert(0)m4_dnl
@@ -192,8 +192,8 @@ MMUX_LIBC_DEFINE_NETWORK_SOCKET_COMMUNICATION_STYLE_PROPERTY_CONSTANT(SOCK_NONBL
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_network_socket_shutdown_mode_t){ .value = mmux_libc_VALUEOF_$1 })]]])]]])
 m4_divert(0)m4_dnl
@@ -217,8 +217,8 @@ MMUX_LIBC_DEFINE_SOCKET_SHUTDOWN_MODE_CONSTANT(SHUT_WR)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_standard_uint32_literal(mmux_libc_VALUEOF_$1)
 #define MMUX_LIBC_$1	((mmux_libc_host_byteorder_uint32_t) { .value = MMUX_LIBC_VALUEOF_$1 }) ]]])]]])
 m4_divert(0)m4_dnl
@@ -235,8 +235,8 @@ MMUX_LIBC_DEFINE_SOCKETS_IPFOUR_KNOWN_ADDRESS_CONSTANT(INADDR_NONE)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	((mmux_libc_gai_errno_t) { .value = MMUX_LIBC_VALUEOF_$1 }) ]]])]]])
 m4_divert(0)m4_dnl
@@ -260,8 +260,8 @@ MMUX_LIBC_DEFINE_GETADDRINFO_ERROR_CODE_CONSTANT(EAI_SYSTEM)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_GETNAMEINFO_SIZE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_socklen_literal(MMUX_LIBC_VALUEOF_$1)) ]]])]]])
 m4_divert(0)m4_dnl
@@ -276,8 +276,8 @@ MMUX_LIBC_DEFINE_GETNAMEINFO_SIZE_CONSTANT(NI_MAXSERV)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_NAME_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_networking_socket_option_name(MMUX_LIBC_VALUEOF_$1)) ]]])]]])
 m4_divert(0)m4_dnl
@@ -292,7 +292,7 @@ MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_NAME_CONSTANT(SO_RCVBUF)
 MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_NAME_CONSTANT(SO_REUSEADDR)
 MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_NAME_CONSTANT(SO_SNDBUF)
 
-#define MMUX_HAVE_LIBC_SO_STYLE		MMUX_HAVE_LIBC_SO_TYPE
+#define HAVE_MMUX_LIBC_SO_STYLE		HAVE_MMUX_LIBC_SO_TYPE
 #define MMUX_LIBC_SO_STYLE		MMUX_LIBC_SO_TYPE
 
 /* ------------------------------------------------------------------ */
@@ -300,8 +300,8 @@ MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_NAME_CONSTANT(SO_SNDBUF)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_LEVEL_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_networking_socket_option_level(MMUX_LIBC_VALUEOF_$1)) ]]])]]])
 m4_divert(0)m4_dnl
@@ -314,8 +314,8 @@ MMUX_LIBC_DEFINE_NETWORKING_SOCKET_OPTION_LEVEL_CONSTANT(SOL_SOCKET)
 
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_ERRNO_CONSTANT]]],[[[m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1		(mmux_libc_errno(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -461,8 +461,8 @@ MMUX_LIBC_DEFINE_ERRNO_CONSTANT(ENOTRECOVERABLE)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SYSTEM_CONFIGURATION_PARAMETER_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_sysconf_parameter(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -676,8 +676,8 @@ MMUX_LIBC_DEFINE_SYSTEM_CONFIGURATION_PARAMETER_CONSTANT(_SC_XOPEN_XPG4)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SYSTEM_STRING_CONFIGURATION_PARAMETER_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_sysconf_string_parameter(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -696,8 +696,8 @@ MMUX_LIBC_DEFINE_SYSTEM_STRING_CONFIGURATION_PARAMETER_CONSTANT(_CS_PATH)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SYSTEM_PATHNAME_CONFIGURATION_PARAMETER_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_sysconf_pathname_parameter(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -724,8 +724,8 @@ MMUX_LIBC_DEFINE_SYSTEM_PATHNAME_CONFIGURATION_PARAMETER_CONSTANT(_PC_VDISABLE)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SYSTEM_CONFIGURATION_LIMIT_RESOURCE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_sysconf_resource_limit(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -747,8 +747,8 @@ MMUX_LIBC_DEFINE_SYSTEM_CONFIGURATION_LIMIT_RESOURCE_CONSTANT(RLIMIT_SIGPENDING)
 MMUX_LIBC_DEFINE_SYSTEM_CONFIGURATION_LIMIT_RESOURCE_CONSTANT(RLIMIT_STACK)
 
 m4_ifelse(mmux_libc_VALUEOF_RLIM_INFINITY,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_RLIM_INFINITY */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_RLIM_INFINITY	1
+[[[/* #undef HAVE_MMUX_LIBC_RLIM_INFINITY */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_RLIM_INFINITY	1
 #define MMUX_LIBC_RLIM_INFINITY		(mmux_libc_rlim_literal(mmux_libc_VALUEOF_RLIM_INFINITY))
 ]]])
 
@@ -760,8 +760,8 @@ m4_ifelse(mmux_libc_VALUEOF_RLIM_INFINITY,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_file_lock_type(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -777,8 +777,8 @@ MMUX_LIBC_DEFINE_FILE_LOCK_TYPE_CONSTANT(F_WRLCK)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_seek_whence(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -796,8 +796,8 @@ MMUX_LIBC_DEFINE_SEEK_WHENCE_CONSTANT(SEEK_SET)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_fcntl_command(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -823,8 +823,8 @@ MMUX_LIBC_DEFINE_FCNTL_COMMAND_CONSTANT(F_SETOWN)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_IOCTL_COMMAND_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_ioctl_command(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -835,15 +835,15 @@ MMUX_LIBC_DEFINE_IOCTL_COMMAND_CONSTANT(SIOCATMARK)
  ** Interprocess signals.
  ** ----------------------------------------------------------------- */
 
-#define MMUX_HAVE_LIBC_SIG_ZERO		1
+#define HAVE_MMUX_LIBC_SIG_ZERO		1
 #define MMUX_LIBC_VALUEOF_SIG_ZERO	0
 #define MMUX_LIBC_SIG_ZERO		(mmux_libc_interprocess_signal(mmux_libc_VALUEOF_SIG_ZERO))
 
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_INTERPROCESS_SIGNAL_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_interprocess_signal(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -887,8 +887,8 @@ MMUX_LIBC_DEFINE_INTERPROCESS_SIGNAL_CONSTANT(SIGINFO)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_SIGACTION_FLAG_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_$1		mmux_libc_VALUEOF_$1]]])]]])
 m4_divert(0)m4_dnl
 MMUX_LIBC_DEFINE_SIGACTION_FLAG_CONSTANT(SA_NOCLDSTOP)
@@ -907,8 +907,8 @@ MMUX_LIBC_DEFINE_SIGACTION_FLAG_CONSTANT(SA_EXPOSE_TAGBITS)
 m4_divert(-1)
 m4_define([[[MMUX_LIBC_DEFINE_INTERPROCESS_SIGNAL_SI_CODE_CONSTANT]]],[[[m4_dnl
 m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_VALUEOF_$1	mmux_libc_VALUEOF_$1
 #define MMUX_LIBC_$1	(mmux_libc_si_code(mmux_libc_VALUEOF_$1))]]])]]])
 m4_divert(0)m4_dnl
@@ -980,13 +980,13 @@ MMUX_LIBC_DEFINE_INTERPROCESS_SIGNAL_SI_CODE_CONSTANT(SYS_SECCOMP)
 m4_divert(-1)
 
 m4_define([[[MMUX_LIBC_DEFINE_ENUM_CONSTANT]]],[[[m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
   MMUX_LIBC_$1 = mmux_libc_VALUEOF_$1,]]])]]])
 
 m4_define([[[MMUX_LIBC_DEFINE_ULONG_CPP_CONSTANT]]],[[[m4_ifelse(mmux_libc_VALUEOF_$1,[[[MMUX_META_VALUE_UNDEFINED]]],m4_dnl
-[[[/* #undef MMUX_HAVE_LIBC_$1 */]]],m4_dnl
-[[[#define MMUX_HAVE_LIBC_$1	1
+[[[/* #undef HAVE_MMUX_LIBC_$1 */]]],m4_dnl
+[[[#define HAVE_MMUX_LIBC_$1	1
 #define MMUX_LIBC_$1		mmux_libc_VALUEOF_$1[[[]]]UL]]])]]])
 m4_divert(0)m4_dnl
 
@@ -1077,7 +1077,7 @@ MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_NOWAIT)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(RWF_SYNC)
 
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(IFNAMSIZ)
-#define MMUX_HAVE_LIBC_MSG_ZERO		1
+#define HAVE_MMUX_LIBC_MSG_ZERO		1
   MMUX_LIBC_MSG_ZERO = 0,
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MSG_CONFIRM)
 MMUX_LIBC_DEFINE_ENUM_CONSTANT(MSG_DONTROUTE)

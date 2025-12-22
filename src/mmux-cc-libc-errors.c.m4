@@ -141,7 +141,7 @@ mmux_libc_errno_to_name (mmux_libc_errno_t N)
 /* This is a duplicate of "mmux_libc_strerrorname_np()". */
 {
 m4_define([[[MMUX_LIBC_DEFINE_ERRNO_CONSTANT]]],[[[
-#ifdef MMUX_HAVE_LIBC_$1
+#ifdef HAVE_MMUX_LIBC_$1
   case MMUX_LIBC_VALUEOF_$1:
    return "$1";
 #endif

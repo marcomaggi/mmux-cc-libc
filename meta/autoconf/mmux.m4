@@ -948,7 +948,7 @@ AC_INCLUDES_DEFAULT([
 #     is the value of the constant itself.  If the symbol "EINVAL" does not exist: the shell value
 #     is the string "MMUX_META_VALUE_UNDEFINED".
 #
-# MMUX_HAVE_EINVAL
+# HAVE_MMUX_EINVAL
 #
 #     A C language  preprocessor symbol.  If the symbol "EINVAL"  exists: the preprocessor symbols
 #     is defined to  be "1".  If the symbol  "EINVAL" does not exist: the  preprocessor symbols is
@@ -970,9 +970,9 @@ AC_DEFUN([MMUX_CC_DETERMINE_VALUEOF],
         [m4_ifblank([$3],[MMUX_CC_COMMON_INCLUDES_FOR_TESTS],[$3])],
         [AS_VAR_SET([mmux_cv_valueof_$1],[MMUX_META_VALUE_UNDEFINED])])])
     AS_IF([test "x$mmux_cv_valueof_$1" = xMMUX_META_VALUE_UNDEFINED],
-          [AS_VAR_SET([MMUX_HAVE_$1],[0])],
-          [AS_VAR_SET([MMUX_HAVE_$1],[1])])
-    AC_DEFINE_UNQUOTED([MMUX_HAVE_$1],   [$MMUX_HAVE_$1],[The constant value $1 is defined.])
+          [AS_VAR_SET([HAVE_MMUX_$1],[0])],
+          [AS_VAR_SET([HAVE_MMUX_$1],[1])])
+    AC_DEFINE_UNQUOTED([HAVE_MMUX_$1],   [$HAVE_MMUX_$1],[The constant value $1 is defined.])
     AC_DEFINE_UNQUOTED([MMUX_VALUEOF_$1],[$mmux_cv_valueof_$1],[The constant value $1.])
     AC_SUBST([MMUX_VALUEOF_$1],[$mmux_cv_valueof_$1])])
 
@@ -1739,11 +1739,11 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128X],
 #
 #     Results:
 #
-#     MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES
+#     HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES
 #               C language preprocessor symbol; always defined; by default set to 0; set to 1 if the
 #               facilities are available.
 #
-#     MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES
+#     HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES
 #               GNU Autoconf substitution symbol; by default defined to expand to 0; expands to 1 if
 #               the facilities are available.
 #
@@ -1761,7 +1761,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_FLOAT128X],
 AC_DEFUN([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES],
   [AS_VAR_SET([MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_LIBS])
    AS_VAR_SET([MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_CFLAGS])
-   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES],
+   MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES],
      [Always defined, set to 1 if MMUX support for '_DecimalN' floating-point numbers is available.],
      [MMUX_AUTOCONF_ENABLE_OPTION([CC_DECIMAL_FLOATING_POINT_FACILITIES], [cc-decimal-floating-point], [yes],
         [whether to enable MMUX support for the C language decimal floating-point library],
@@ -1769,15 +1769,15 @@ AC_DEFUN([MMUX_CC_CHECK_DECIMAL_FLOATING_POINT_FACILITIES],
       AS_IF([mmux_test_variable_is_yes([mmux_enable_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
         [PKG_CHECK_MODULES([LIBDFP],[libdfp],,[AC_MSG_WARN([package libdfp not found])])
          AS_IF([mmux_test_variable_is_not_empty([pkg_cv_LIBDFP_LIBS])],
-               [AS_VAR_SET([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES],[1])],
+               [AS_VAR_SET([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES],[1])],
                [])])
       AC_MSG_CHECKING([for MMUX supporting decimal floating-point library])
-      AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+      AS_IF([mmux_test_variable_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
             [AS_VAR_SET([MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_LIBS],   [$LIBDFP_LIBS])
              AS_VAR_SET([MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_CFLAGS], [$LIBDFP_CFLAGS])
              AC_MSG_RESULT([yes])],
             [AC_MSG_RESULT([no])])])
-   AM_CONDITIONAL([WANT_LIBDFP],[mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])])])
+   AM_CONDITIONAL([WANT_LIBDFP],[mmux_test_variable_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])])])
 
 
 # Synopsis:
@@ -1801,7 +1801,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL32],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL32],
      [Always defined, set to 1 if MMUX support for type '_Decimal32' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal32],
-        [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([test mmux_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([CFLAGS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_CFLAGS"],
                   [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([LIBS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_LIBS"],
                      [AC_CHECK_TYPE([_Decimal32])
@@ -1841,7 +1841,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL64],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL64],
      [Always defined, set to 1 if MMUX support for type '_Decimal64' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal64],
-        [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([test mmux_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([CFLAGS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_CFLAGS"],
                   [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([LIBS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_LIBS"],
                      [AC_CHECK_TYPE([_Decimal64])
@@ -1881,7 +1881,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_DECIMAL128],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_DECIMAL128],
      [Always defined, set to 1 if MMUX support for type '_Decimal128' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([decimal128],
-        [AS_IF([test mmux_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([test mmux_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([CFLAGS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_CFLAGS"],
                   [MMUX_AUTOCONF_SAVE_SHELL_VARIABLE_WHILE_APPENDING([LIBS],[" $MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES_LIBS"],
                      [AC_CHECK_TYPE([_Decimal128])
@@ -2304,7 +2304,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD32],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD32],
      [Always defined, set to 1 if MMUX support for type 'complexd32' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd32],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([mmux_test_variable_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD32], [$MMUX_CC_TYPES_HAS_DECIMAL32])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd32],[complexd32])])])])
 
@@ -2330,7 +2330,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD64],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD64],
      [Always defined, set to 1 if MMUX support for type 'complexd64' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd64],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([mmux_test_variable_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD64], [$MMUX_CC_TYPES_HAS_DECIMAL64])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd64],[complexd64])])])])
 
@@ -2356,7 +2356,7 @@ AC_DEFUN([MMUX_CC_CHECK_TYPE_COMPLEXD128],
    MMUX_DEFINE_OMNIBUS_CONFIG_VARIABLE([MMUX_CC_TYPES_HAS_COMPLEXD128],
      [Always defined, set to 1 if MMUX support for type 'complexd128' is enabled.],
      [MMUX_AUTOCONF_DEFINE_CC_TYPE_ENABLE_OPTION_WITH_BODY([complexd128],
-        [AS_IF([mmux_test_variable_is_one([MMUX_HAVE_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
+        [AS_IF([mmux_test_variable_is_one([HAVE_MMUX_CC_DECIMAL_FLOATING_POINT_FACILITIES])],
                [AS_VAR_SET([MMUX_CC_TYPES_HAS_COMPLEXD128], [$MMUX_CC_TYPES_HAS_DECIMAL128])])
          MMUX_CC_TYPE_SUPPORT_MSG_CHECKING([complexd128],[complexd128])])])])
 
