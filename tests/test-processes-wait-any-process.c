@@ -47,7 +47,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
       bool					process_completion_status_available;
       mmux_libc_process_completion_status_t	process_completion_status;
       mmux_libc_pid_t				completed_process_pid;
-      auto	waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
+      auto	waiting_options = mmux_libc_process_completion_waiting_options(0);
 
       if (mmux_libc_wait_any_process(&process_completion_status_available,
 				     &process_completion_status,

@@ -195,7 +195,7 @@ paren_wait_for_child_process_completion (mmux_libc_pid_t child_pid)
   bool					process_completion_status_is_available;
   mmux_libc_process_completion_status_t	process_completion_status;
   mmux_libc_pid_t			process_completion_pid;
-  auto	waiting_options = mmux_libc_process_completion_waiting_options(MMUX_LIBC_WNOHANG);
+  auto	waiting_options = mmux_libc_process_completion_waiting_options(0);
 
   printf_message("paren: wait child process completion");
 
