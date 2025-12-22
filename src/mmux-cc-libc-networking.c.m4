@@ -1552,46 +1552,96 @@ mmux_libc_sockaddr_alloc_length (mmux_usize_t * sockaddr_length_result_p, mmux_l
 }
 
 bool
-mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t fd, mmux_libc_sockaddr_arg_t sockaddr_p,
+mmux_libc_sockaddr_dump (mmux_libc_fd_arg_t oufd, mmux_libc_sockaddr_arg_t sockaddr_p,
 			 mmux_asciizcp_t given_struct_name)
 {
-  mmux_asciizcp_t			struct_name = given_struct_name;
-  mmux_libc_network_address_family_t	address_family;
+  mmux_libc_memfd_t	mfd;
+  bool			rv = true;
 
-  if (NULL == struct_name) {
-    struct_name = "struct sockaddr";
+  if (mmux_libc_make_memfd(mfd)) {
+    return false;
   }
-
-  DPRINTF(fd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p);
-
-  /* Dump the field "sa_family". */
   {
-    mmux_asciizcp_t	family_name = "unknown";
+    mmux_asciizcp_t			struct_name = given_struct_name;
+    mmux_libc_network_address_family_t	address_family;
 
-    mmux_libc_sockaddr_family_ref(&address_family, sockaddr_p);
-    sa_family_to_asciiz_name(&family_name, address_family);
-    DPRINTF(fd, "%s.sa_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name);
-  }
-
-  /* Dump the specific data structure. */
-  {
-    switch (address_family.value) {
-    case MMUX_LIBC_VALUEOF_AF_INET:
-      return mmux_libc_sockaddr_ipfour_dump(fd, (mmux_libc_network_socket_address_ipfour_t  const *) sockaddr_p,
-					    ((given_struct_name)? struct_name : given_struct_name));
-    case MMUX_LIBC_VALUEOF_AF_INET6:
-      return mmux_libc_sockaddr_ipsix_dump(fd, (mmux_libc_network_socket_address_ipsix_t const *) sockaddr_p,
-					   ((given_struct_name)? struct_name : given_struct_name));
-    case MMUX_LIBC_VALUEOF_AF_LOCAL:
-      return mmux_libc_sockaddr_local_dump(fd, (mmux_libc_network_socket_address_local_t  const *) sockaddr_p,
-					   ((given_struct_name)? struct_name : given_struct_name));
-    case MMUX_LIBC_VALUEOF_AF_UNSPEC:
-      return mmux_libc_sockaddr_unspec_dump(fd, (mmux_libc_network_socket_address_unspec_t  const *) sockaddr_p,
-					    ((given_struct_name)? struct_name : given_struct_name));
-    default:
-      return true;
+    if (NULL == struct_name) {
+      struct_name = "struct sockaddr";
     }
+
+    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)sockaddr_p)) {
+      goto exit_function;
+    }
+
+    /* Dump the field "sa_family". */
+    {
+      mmux_asciizcp_t	family_name = "unknown";
+
+      mmux_libc_sockaddr_family_ref(&address_family, sockaddr_p);
+      sa_family_to_asciiz_name(&family_name, address_family);
+      if (mmux_libc_dprintf(mfd, "%s.sa_family = \"%d\" (%s)\n", struct_name, address_family.value, family_name)) {
+	goto exit_function;
+      }
+    }
+
+    /* Dump the specific data structure. */
+    {
+      auto	sub_struct_name = ((given_struct_name)? struct_name : given_struct_name);
+
+      switch (address_family.value) {
+      case MMUX_LIBC_VALUEOF_AF_INET:
+	{
+	  auto	P = (mmux_libc_network_socket_address_ipfour_t  const *) sockaddr_p;
+
+	  if (mmux_libc_sockaddr_ipfour_dump(mfd, P, sub_struct_name)) {
+	    goto exit_function;
+	  }
+	}
+	break;
+      case MMUX_LIBC_VALUEOF_AF_INET6:
+	{
+	  auto	P = (mmux_libc_network_socket_address_ipsix_t const *) sockaddr_p;
+
+	  if (mmux_libc_sockaddr_ipsix_dump(mfd, P, sub_struct_name)) {
+	    goto exit_function;
+	  }
+	}
+	break;
+      case MMUX_LIBC_VALUEOF_AF_LOCAL:
+	{
+	  auto	P = (mmux_libc_network_socket_address_local_t  const *) sockaddr_p;
+
+	  if (mmux_libc_sockaddr_local_dump(mfd, P, sub_struct_name)) {
+	    goto exit_function;
+	  }
+	}
+	break;
+      case MMUX_LIBC_VALUEOF_AF_UNSPEC:
+	{
+	  auto	P = (mmux_libc_network_socket_address_unspec_t  const *) sockaddr_p;
+
+	  if (mmux_libc_sockaddr_unspec_dump(mfd, P, sub_struct_name)) {
+	    goto exit_function;
+	  }
+	}
+	break;
+      default:
+	goto exit_function;
+      }
+    }
+
+    if (mmux_libc_memfd_copy(oufd, mfd)) {
+      goto exit_function;
+    }
+
+    rv = false;
   }
+
+ exit_function:
+  if (mmux_libc_close(mfd)) {
+    return true;
+  }
+  return rv;
 }
 
 bool
