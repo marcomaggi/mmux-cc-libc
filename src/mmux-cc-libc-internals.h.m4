@@ -424,10 +424,6 @@ typedef struct mmux_libc_network_socket_address_info_t {
   struct addrinfo;
 } mmux_libc_network_socket_address_info_t;
 
-typedef struct mmux_libc_network_socket_option_linger_t {
-  struct linger;
-} mmux_libc_network_socket_option_linger_t;
-
 
 /** --------------------------------------------------------------------
  ** Subordinate includes.

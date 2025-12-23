@@ -3687,27 +3687,7 @@ mmux_cc_libc_decl bool mmux_libc_recvfrom (mmux_usize_t * number_of_bytes_receiv
  ** Networking-sockets: socket options.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_on_set (mmux_libc_linger_t P,
-								      bool turn_it_on)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_on_ref (bool * it_is_turned_on,
-								      mmux_libc_linger_arg_t P)
-  __attribute__((__nonnull__(1,2)));
-
-mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_seconds_set (mmux_libc_linger_t P,
-									   mmux_uint_t number_of_seconds)
-  __attribute__((__nonnull__(1)));
-
-mmux_cc_libc_decl bool mmux_libc_network_socket_option_linger_seconds_ref (mmux_uint_t * number_of_seconds_p,
-									   mmux_libc_linger_arg_t P)
-  __attribute__((__nonnull__(1,2)));
-
-mmux_cc_libc_decl bool mmux_libc_linger_dump (mmux_libc_fd_arg_t fd, mmux_libc_linger_arg_t linger_p,
-					      mmux_asciizcp_t struct_name)
-  __attribute__((__nonnull__(1,2)));
-
-mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
+mmux_cc_libc_decl bool mmux_libc_getsockopt (mmux_pointer_t optval_result_p, mmux_libc_socklen_t * optlen_p,
 					     mmux_libc_sockfd_arg_t sockfd,
 					     mmux_libc_networking_socket_option_level_t level,
 					     mmux_libc_networking_socket_option_name_t optname)
@@ -3718,6 +3698,15 @@ mmux_cc_libc_decl bool mmux_libc_setsockopt (mmux_libc_sockfd_arg_t sockfd,
 					     mmux_libc_networking_socket_option_name_t optname,
 					     mmux_pointer_t optval_p, mmux_libc_socklen_t optlen)
   __attribute__((__nonnull__(4),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_getsockopt_linger_when_closing (bool * it_is_on_result_p,
+								  mmux_uint_t * timeout_seconds_result_p,
+								  mmux_libc_sockfd_arg_t sockfd)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+
+mmux_cc_libc_decl  bool mmux_libc_setsockopt_linger_when_closing (mmux_libc_sockfd_arg_t sockfd,
+								  bool it_is_on, mmux_uint_t timeout_seconds)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
 
 
 /** --------------------------------------------------------------------

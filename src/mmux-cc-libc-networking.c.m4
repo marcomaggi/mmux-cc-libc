@@ -3386,90 +3386,21 @@ mmux_libc_recvfrom (mmux_usize_t *		number_of_bytes_received_result_p,
 
 
 /** --------------------------------------------------------------------
- ** Options.
+ ** Networking sockets: options.
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_network_socket_option_linger_on_set (mmux_libc_linger_t P, bool turn_it_on)
-{
-  P->l_onoff = (turn_it_on)? 1 : 0;
-  return false;
-}
-bool
-mmux_libc_network_socket_option_linger_on_ref (bool * it_is_turned_on, mmux_libc_linger_arg_t P)
-{
-  *it_is_turned_on = (P->l_onoff)? true : false;
-  return false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_network_socket_option_linger_seconds_set (mmux_libc_linger_t P, mmux_uint_t number_of_seconds)
-{
-  P->l_linger = number_of_seconds.value;
-  return false;
-}
-bool
-mmux_libc_network_socket_option_linger_seconds_ref (mmux_uint_t * number_of_seconds_p, mmux_libc_linger_arg_t P)
-{
-  *number_of_seconds_p = mmux_uint(P->l_linger);
-  return false;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_linger_dump (mmux_libc_fd_arg_t oufd, mmux_libc_linger_arg_t linger_p, mmux_asciizcp_t struct_name)
-{
-  mmux_libc_memfd_t	mfd;
-  bool			rv = true;
-
-  if (mmux_libc_make_memfd(mfd)) {
-    return false;
-  }
-  {
-    if (NULL == struct_name) {
-      struct_name = "struct linger";
-    }
-    if (mmux_libc_dprintf(mfd, "%s = %p\n", struct_name, (mmux_pointer_t)linger_p)) {
-      goto exit_function;
-    }
-    if (mmux_libc_dprintf(mfd, "%s.l_onoff  = \"%d\"\n", struct_name, linger_p->l_onoff)) {
-      goto exit_function;
-    }
-    if (mmux_libc_dprintf(mfd, "%s.l_linger = \"%d\"\n", struct_name, linger_p->l_linger)) {
-      goto exit_function;
-    }
-
-    if (mmux_libc_memfd_copy(oufd, mfd)) {
-      goto exit_function;
-    }
-
-    rv = false;
-  }
-
- exit_function:
-  if (mmux_libc_close(mfd)) {
-    return true;
-  }
-  return rv;
-}
-
-/* ------------------------------------------------------------------ */
-
-bool
-mmux_libc_getsockopt (mmux_pointer_t result_optval_p, mmux_libc_socklen_t * result_optlen_p,
+mmux_libc_getsockopt (mmux_pointer_t optval_result_p, mmux_libc_socklen_t * optlen_p,
 		      mmux_libc_sockfd_arg_t sockfd,
 		      mmux_libc_networking_socket_option_level_t level,
 		      mmux_libc_networking_socket_option_name_t optname)
 {
-  mmux_standard_libc_socklen_t	len;
+  mmux_standard_libc_socklen_t	optlen = optlen_p->value;
   mmux_standard_sint_t		rv = getsockopt(sockfd->value, level.value, optname.value,
-						result_optval_p, &len);
+						optval_result_p, &optlen);
 
   if (0 == rv) {
-    *result_optlen_p = mmux_libc_socklen(len);
+    *optlen_p = mmux_libc_socklen(optlen);
     return false;
   } else {
     return true;
@@ -3485,5 +3416,44 @@ mmux_libc_setsockopt (mmux_libc_sockfd_arg_t sockfd,
 
   return ((0 == rv)? false : true);
 }
+
+bool
+mmux_libc_getsockopt_linger_when_closing (bool * it_is_on_result_p,
+					   mmux_uint_t * timeout_seconds_result_p,
+					   mmux_libc_sockfd_arg_t sockfd)
+{
+  struct linger			optval = {
+    .l_onoff	= 0,
+    .l_linger	= 0,
+  };
+  mmux_standard_libc_socklen_t	optlen = sizeof(struct linger);
+  mmux_standard_sint_t		rv = getsockopt(sockfd->value,
+						MMUX_LIBC_VALUEOF_SOL_SOCKET, MMUX_LIBC_VALUEOF_SO_LINGER,
+						&optval, &optlen);
+
+  if (0 == rv) {
+    *it_is_on_result_p		= (optval.l_onoff)? true : false;
+    *timeout_seconds_result_p	= mmux_uint(optval.l_linger);
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_setsockopt_linger_when_closing (mmux_libc_sockfd_arg_t sockfd,
+					  bool it_is_on, mmux_uint_t timeout_seconds)
+{
+  struct linger			optval = {
+    .l_onoff	= (it_is_on)? 1 : 0,
+    .l_linger	= timeout_seconds.value,
+  };
+  mmux_standard_libc_socklen_t	optlen = sizeof(struct linger);
+  mmux_standard_sint_t		rv     = setsockopt(sockfd->value,
+						    MMUX_LIBC_VALUEOF_SOL_SOCKET, MMUX_LIBC_VALUEOF_SO_LINGER,
+						    &optval, optlen);
+
+  return ((0 == rv)? false : true);
+}
+
 
 /* end of file */

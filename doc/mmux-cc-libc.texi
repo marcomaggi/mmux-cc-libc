@@ -19576,11 +19576,23 @@ sender address.
 * networking sockets options levels::  Networking-sockets option levels.
 * networking sockets options names::   Networking-sockets option names.
 * networking sockets options api::     Setting and getting networking-sockets options.
+* networking sockets options linger::  Handling of not transmitted data upon closure.
 @end menu
 
 @c page
 @node networking sockets options levels
 @subsubsection Networking--sockets option levels
+
+
+According to the standard: we can configure networking--socket behaviour by setting ``options'';
+each of the many layers of the networking transmission protocols might present configurable options;
+for convenience in designing the options--handling @api{}: the whole set of options has been
+partitioned into ``levels'', identified by exact integers, and at each level a further exact integer
+identifies a specific option.
+
+To configure an option at the ``Socket--Level Option'', shortly indicated with @samp{SOL}, we must
+use the level identifier @samp{SOL_SOCKET}.  To configure the many, many options available at other
+levels: we should read the manual pages @samp{ip(7)}, @samp{tcp(7)}, and others.
 
 
 @deftp {Opaque Struct Typedef} mmux_libc_networking_socket_option_level_t
@@ -19590,8 +19602,7 @@ Data structure type used to represent networking--sockets option levels.
 
 
 @deftypefun mmux_libc_networking_socket_option_level_t mmux_libc_networking_socket_option_level (mmux_standard_sint_t @var{value})
-Build and return a new instance of @objtype{mmux_libc_networking_socket_option_level_t}.  This
-function is seldom useful because we should use the predefined constant @samp{MMUX_LIBC_SOL_SOCKET}.
+Build and return a new instance of @objtype{mmux_libc_networking_socket_option_level_t}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------
@@ -19674,19 +19685,112 @@ The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it expands to @samp{1} if
 @subsubsection Setting and getting networking-sockets options
 
 
-@MmuxCStructOpaqueTypedef{linger}
-@MmuxCStructPointerOpaqueTypedef{linger}
-@MmuxSetterGetter{linger, l_onoff,		mmux_sint_t}
-@MmuxSetterGetter{linger, l_linger,		mmux_sint_t}
-@MmuxStructDumper{linger}
+From the point of view of the C language @api{}: setting and getting the networking options is very
+dirty, because we have to cross the operating--system kernel's boundaries.
+
+As example, to set the option @samp{SO_KEEPALIVE} at level @samp{SOL_SOCKET}, we do:
+
+@example
+mmux_libc_sockfd_t  sockfd;
+
+if (mmux_libc_socket(sockfd,
+      MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+  /* error */
+@}
+
+/* Setting the option. */
+@{
+  auto  optval = mmux_standard_sint_literal(1);
+  auto  optlen = mmux_libc_socklen(sizeof(optval));
+
+  if (mmux_libc_setsockopt(sockfd, MMUX_LIBC_SOL_SOCKET, MMUX_LIBC_SO_KEEPALIVE,
+                           &optval, optlen)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "sockfd". */
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
 
 
-@deftypefun bool mmux_libc_getsockopt (mmux_pointer_t @var{result_optval_p}, mmux_socklen_t * @var{result_optlen_p}, mmux_libc_network_socket_t @var{sock}, mmux_sint_t @var{level}, mmux_sint_t @var{optname})
+@deftypefun bool mmux_libc_getsockopt (mmux_pointer_t @var{optval_result_p}, mmux_libc_socklen_t * @var{optlen_p}, mmux_libc_sockfd_arg_t @var{sockfd}, mmux_libc_networking_socket_option_level_t @var{level}, mmux_libc_networking_socket_option_name_t @var{optname})
+@MmuxCInterface{getsockopt}.
+
+@strong{NOTE} Upon calling this function: we @strong{must} set the variable referenced by
+@var{optlen_p} to the number of bytes available in the buffer referenced by @var{optval_result_p}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_setsockopt (mmux_libc_sockfd_arg_t @var{sockfd}, mmux_libc_networking_socket_option_level_t @var{level}, mmux_libc_networking_socket_option_name_t @var{optname}, mmux_pointer_t @var{optval_p}, mmux_libc_socklen_t @var{optlen})
+@MmuxCInterface{setsockopt}.
+@end deftypefun
+
+@c page
+@node networking sockets options linger
+@subsubsection Handling of not transmitted data upon closure
+
+
+According to the standard: the networking--socket option @samp{SO_LINGER}, at level
+@samp{SOL_SOCKET}, manages what happens when a socket having not--yet--transmitted data is closed;
+the behaviour is configured with data structures of type @MmuxCStruct{linger}.  Under
+@value{PACKAGE}: such behaviour is configured and inspected with the functions
+@cfunc{mmux_libc_setsockopt_linger_when_closing} and
+@cfunc{mmux_libc_getsockopt_linger_when_closing}.
+
+To configure a socket such that it will linger for @math{123} second, after closing it, while
+attempting to deliver the enqueued data, we do:
+
+@example
+mmux_libc_sockfd_t  sockfd;
+
+if (mmux_libc_socket(sockfd,
+      MMUX_LIBC_PF_INET, MMUX_LIBC_SOCK_STREAM, MMUX_LIBC_IPPROTO_TCP)) @{
+  /* error */
+@}
+
+/* Setting the option. */
+@{
+  auto  timeout_seconds = mmux_uint_literal(123);
+
+  if (mmux_libc_setsockopt_linger_when_closing(sockfd, true, timeout_seconds)) @{
+    /* error */
+  @}
+@}
+
+/* Getting the option. */
+@{
+  bool         it_is_on;
+  mmux_uint_t  timeout_seconds;
+
+  if (mmux_libc_getsockopt_linger_when_closing(&it_is_on, &timeout_seconds, sockfd)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "sockfd". */
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_close(sockfd)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_getsockopt_linger_when_closing (bool * @var{it_is_on_result_p}, mmux_uint_t * @var{timeout_seconds_result_p}, mmux_libc_sockfd_arg_t @var{sockfd})
 @MmuxCInterface{getsockopt}.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_setsockopt (mmux_libc_network_socket_t @var{sock}, mmux_sint_t @var{level}, mmux_sint_t @var{optname}, mmux_pointer_t @var{optval_p}, mmux_socklen_t @var{optlen})
+@deftypefun bool mmux_libc_setsockopt_linger_when_closing (mmux_libc_sockfd_arg_t @var{sockfd}, bool @var{it_is_on}, mmux_uint_t @var{timeout_seconds_result_p})
 @MmuxCInterface{setsockopt}.
 @end deftypefun
 

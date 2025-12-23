@@ -52,7 +52,7 @@ test_socket_option_keepalive (void)
     /* Getting the option. */
     {
       mmux_standard_sint_t	optval;
-      mmux_libc_socklen_t	optlen;
+      auto			optlen = mmux_libc_socklen(sizeof(optval));
 
       printf_message("getting option SO_KEEPALIVE");
       if (mmux_libc_getsockopt(&optval, &optlen,
@@ -65,6 +65,67 @@ test_socket_option_keepalive (void)
 	printf_message("correct value for SO_KEEPALIVE option");
       } else {
 	printf_error("wrong value for SO_KEEPALIVE option");
+	handle_error();
+      }
+    }
+
+    printf_message("closing socket");
+    if (mmux_libc_close(sockfd)) {
+      printf_error("closing socket");
+      handle_error();
+    }
+  }
+  printf_message("DONE: %s\n", __func__);
+}
+
+
+static void
+test_socket_option_linger_after_close (void)
+{
+  printf_message("testing: %s", __func__);
+  {
+    mmux_libc_sockfd_t	sockfd;
+    auto	namespace = MMUX_LIBC_PF_INET;
+    auto	style     = MMUX_LIBC_SOCK_STREAM;
+    auto	ipproto   = MMUX_LIBC_IPPROTO_TCP;
+
+    printf_message("socket-ing");
+    if (mmux_libc_socket(sockfd, namespace, style, ipproto)) {
+      printf_error("socket-ing");
+      handle_error();
+    }
+
+    /* Setting the option. */
+    {
+      printf_message("setting option SO_LINGER");
+      if (mmux_libc_setsockopt_linger_when_closing(sockfd, true, mmux_uint_literal(123))) {
+	printf_error("setting option SO_LINGER");
+	handle_error();
+      }
+    }
+
+    /* Getting the option. */
+    {
+      bool		it_is_on;
+      mmux_uint_t	timeout_seconds;
+
+      printf_message("getting option SO_LINGER");
+      if (mmux_libc_getsockopt_linger_when_closing(&it_is_on, &timeout_seconds, sockfd)) {
+	printf_error("getting option SO_LINGER");
+	handle_error();
+      }
+
+      if (it_is_on) {
+	printf_message("correct value for SO_LINGER on/off option");
+      } else {
+	printf_error("wrong value for SO_LINGER on/off option");
+	handle_error();
+      }
+
+      if (123 == timeout_seconds.value) {
+	printf_message("correct value for SO_LINGER timeout seconds");
+      } else {
+	printf_error("wrong value for SO_LINGER timeout seconds: %u", timeout_seconds.value);
 	handle_error();
       }
     }
@@ -92,7 +153,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-networking-sockets-file-descriptors";
   }
 
-  if (true) {	test_socket_option_keepalive();		}
+  if (true) {	test_socket_option_keepalive();			}
+  if (true) {	test_socket_option_linger_after_close();	}
 
   mmux_libc_exit_success();
 }
