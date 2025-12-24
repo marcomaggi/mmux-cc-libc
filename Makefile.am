@@ -108,7 +108,7 @@ EXTRA_DIST	+= \
 	src/mmux-cc-libc-memory.c.m4			\
 	src/mmux-cc-libc-persona.c.m4			\
 	src/mmux-cc-libc-processes.c.m4			\
-	src/mmux-cc-libc-networking.c.m4			\
+	src/mmux-cc-libc-networking.c.m4		\
 	src/mmux-cc-libc-strings.c.m4			\
 	src/mmux-cc-libc-system-configuration.c.m4	\
 	src/mmux-cc-libc-time.c.m4
@@ -148,7 +148,10 @@ include_HEADERS				= \
 	src/mmux-cc-libc.h			\
 	src/mmux-cc-libc-config.h		\
 	src/mmux-cc-libc-constants.h		\
-	src/mmux-cc-libc-functions.h
+	src/mmux-cc-libc-functions.h		\
+	src/mmux-cc-libc-generics.h		\
+	src/mmux-cc-libc-internals.h		\
+	src/mmux-cc-libc-typedefs.h
 
 lib_LTLIBRARIES			= libmmux-cc-libc.la
 libmmux_cc_libc_la_CPPFLAGS	= $(AM_CPPFLAGS) -I$(builddir)/src
