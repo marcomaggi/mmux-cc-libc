@@ -65,7 +65,7 @@ with @gnu{} C Compiler extensions, which implements a uniform @api{} to the @pos
 functions and some Linux extensions.  A possible use of the library is in foreign functions
 interfaces for higher--level languages.
 
-The package targets @posix{} platforms.
+The package targets @posix{} platforms on which the @gnu{} C Library is available.
 
 This package is distributed under the terms of the @gnu{} General Public License (@gpl{}).
 
@@ -198,6 +198,7 @@ mmux_cc_libc_init();
 * overview stems::              Specifying C language types with their stem.
 * overview errors::             Error handling.
 * overview results::            Results handling.
+* overview hierarchy::          Data types hierarchy.
 * overview linking::            Linking code with the shared library.
 @end menu
 
@@ -223,19 +224,19 @@ if (mmux_libc_do_something()) @{
 @}
 @end example
 
-If a function implemented by the @gnu{} C Library is interfaced by @value{PACKAGE} but it is not
-available under a specific platform: the corresponding @value{PACKAGE} function is always
-implemented; its return value is a @objtype{bool} and it is always @ctrue{}; it sets @code{errno} to
-@samp{MMUX_LIBC_ENOSYS}.
+If a function implemented by the @gnu{} C Library, or the Linux kernel, is interfaced by
+@value{PACKAGE} but it is not available under a specific platform: the corresponding @value{PACKAGE}
+function is always implemented; its return value is a @objtype{bool} and it is always @ctrue{}; it
+sets @code{errno} to @samp{MMUX_LIBC_ENOSYS}.
 
 @c page
 @node overview results
 @section Results handling
 
 
-Unless otherwise specified, if the first argument of a function is a pointer named @var{result_p},
-@var{output_p}, @var{ouput_p}, or similar: the function will store in the referenced location the
-result of the call.
+Unless otherwise specified, if the first arguments of a function are pointers named
+@var{*_result_p}, @var{*_output_p}, or similar: the function will store in the referenced location
+the results produced by the function call.
 
 For example, we can write:
 
@@ -247,6 +248,52 @@ if (mmux_libc_sysconf(&result, MMUX_LIBC__SC_PAGESIZE)) @{
 @}
 /* the result is in "result" */
 @end example
+
+@c page
+@node overview hierarchy
+@section Data types hierarchy
+
+
+A number of data structure type definitions are documented as having a ``parent type''; this is
+because @value{PACKAGE} uses the @option{-fplan9-extensions} option of the @gnu{} C Compiler,
+@gccref{Unnamed Fields, Unnamed Structure and Union Fields}.
+
+With this extension, if we write the code:
+
+@example
+typedef struct alpha_t @{
+  double  X;
+@} alpha_t;
+
+typedef struct beta_t @{
+  alpha_t;
+  double  Y;
+@} beta_t;
+@end example
+
+@noindent
+in which the definition of @objtype{beta_t} has an unnamed first field of type @objtype{alpha_t},
+the @command{gcc} compiler will accept pointers to @objtype{beta_t} as pointers to
+@objtype{alpha_t}:
+
+@example
+beta_t  self = @{
+  .X = 1.2,
+  .Y = 3.4,
+@};
+
+void
+doit (alpha_t * selfp)
+@{
+  ...
+@}
+
+/* This is accepted by "gcc". */
+doit(&self);
+@end example
+
+@noindent
+in some sense: it is as if @objtype{alpha_t} is the ``parent'' type of @objtype{beta_t}.
 
 @c page
 

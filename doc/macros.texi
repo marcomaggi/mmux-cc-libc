@@ -528,6 +528,10 @@ Revised^6 Report on the algorithmic language Scheme
 @ref{\NODE\,\TITLE\,\TITLE\,libc}
 @end macro
 
+@macro gccref{NODE, TITLE}
+@ref{\NODE\,\TITLE\,\TITLE\,gcc}
+@end macro
+
 @c @macro rsixref{NODE, TITLE}
 @c @ref{\NODE\,\TITLE\,\TITLE\,r6rs}
 @c @end macro

@@ -24,7 +24,8 @@ which implements a  uniform API to the POSIX library  functions and some
 Linux extensions.  A possible use of the library is in foreign functions
 interfaces for higher--level languages.
 
-  The package targets POSIX systems.
+  The  package targets  POSIX  systems on  which the  GNU  C Library  is
+available.
 
   The  package uses  the GNU  Autotools and  it is  tested on  GNU+Linux
 systems;  only to  build from  a  repository checkout:  it requires  the
