@@ -667,6 +667,9 @@ mmux_cc_libc_decl bool mmux_libc_dprintfou (mmux_asciizcp_t template, ...)
 mmux_cc_libc_decl bool mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   __attribute__((__nonnull__(1),__format__(__printf__,1,2),__warn_unused_result__));
 
+mmux_cc_libc_decl bool mmux_libc_dprintfer_no_error (mmux_asciizcp_t template, ...)
+  __attribute__((__nonnull__(1),__format__(__printf__,1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 

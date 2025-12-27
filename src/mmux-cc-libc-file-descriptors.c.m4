@@ -389,6 +389,18 @@ mmux_libc_dprintfer (mmux_asciizcp_t template, ...)
   va_end(ap);
   return ((0 <= rv)? false : true);
 }
+bool
+mmux_libc_dprintfer_no_error (mmux_asciizcp_t template, ...)
+{
+  va_list	ap;
+
+  va_start(ap, template);
+  {
+    vdprintf(stder_fd.value, template, ap);
+  }
+  va_end(ap);
+  return false;
+}
 
 bool
 mmux_libc_dprintf_strerror (mmux_libc_fd_arg_t fd, mmux_libc_errno_t errnum)

@@ -7078,6 +7078,12 @@ if (mmux_libc_dprintfer("the number is %d\n", 456)) @{
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_dprintfer_no_error (mmux_asciizcp_t template, ...)
+@MmuxCInterface{dprintf}.  Like @cfunc{mmux_libc_dprintfer}, but ignore errors and always return
+@cfalse{}.
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_vdprintf (mmux_libc_fs_arg_t @var{fd}, mmux_asciizcp_t @var{template}, va_list @var{ap})
 @deftypefunx bool mmux_libc_vdprintfou (mmux_asciizcp_t @var{template}, va_list @var{ap})
 @deftypefunx bool mmux_libc_vdprintfer (mmux_asciizcp_t @var{template}, va_list @var{ap})
