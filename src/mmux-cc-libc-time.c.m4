@@ -7,7 +7,7 @@
 
 	This module implements the time and dates API.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -94,7 +94,9 @@ mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_arg_t timeval_p
     } else {
       char	str[required_nbytes.value];
 
-      mmux_time_sprint(str, required_nbytes, field_value);
+      if (mmux_time_sprint(str, required_nbytes, field_value)) {
+	return true;
+      }
       rv = dprintf(fd->value, "%s->tv_sec = %s [seconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
@@ -110,7 +112,9 @@ mmux_libc_timeval_dump (mmux_libc_fd_arg_t fd, mmux_libc_timeval_arg_t timeval_p
     } else {
       char	str[required_nbytes.value];
 
-      mmux_slong_sprint(str, required_nbytes, field_value);
+      if (mmux_slong_sprint(str, required_nbytes, field_value)) {
+	return true;
+      };
       rv = dprintf(fd->value, "%s->tv_usec = %s [microseconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
@@ -185,7 +189,9 @@ mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_arg_t timespe
     } else {
       char	str[required_nbytes.value];
 
-      mmux_time_sprint(str, required_nbytes, field_value);
+      if (mmux_time_sprint(str, required_nbytes, field_value)) {
+	return true;
+      }
       rv = dprintf(fd->value, "%s->ts_sec = %s [seconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
@@ -201,7 +207,9 @@ mmux_libc_timespec_dump (mmux_libc_fd_arg_t fd, mmux_libc_timespec_arg_t timespe
     } else {
       char	str[required_nbytes.value];
 
-      mmux_slong_sprint(str, required_nbytes, field_value);
+      if (mmux_slong_sprint(str, required_nbytes, field_value)) {
+	return true;
+      };
       rv = dprintf(fd->value, "%s->ts_nsec = %s [nanoseconds]\n", struct_name, str);
       if (0 > rv) { return true; }
     }
@@ -280,7 +288,9 @@ m4_define([[[DEFINE_TM_FIELD_DUMPER]]],[[[
     } else {
       char	str[required_nbytes.value];
 
-      mmux_$2_sprint(str, required_nbytes, field_value);
+      if (mmux_$2_sprint(str, required_nbytes, field_value)) {
+	return true;
+      }
       rv = dprintf(fd->value, "%s->$1 = %s\n", struct_name, str);
       if (0 > rv) { return true; }
     }
