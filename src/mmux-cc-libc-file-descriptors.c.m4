@@ -7,7 +7,7 @@
 
 	This module implements file descriptor functions.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -2060,6 +2060,11 @@ bool
 mmux_libc_dprintf_fs_ptn (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_arg_t pathname)
 {
   return mmux_libc_dprintf(fd, "%s", pathname->value);
+}
+bool
+mmux_libc_dprintf_str (mmux_libc_fd_arg_t fd, mmux_libc_str_arg_t str)
+{
+  return mmux_libc_dprintf(fd, "%s", str->value);
 }
 bool
 mmux_libc_dprintf_process_completion_status (mmux_libc_fd_arg_t fd, mmux_libc_process_completion_status_t value)

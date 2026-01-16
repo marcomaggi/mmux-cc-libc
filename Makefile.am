@@ -252,10 +252,14 @@ tests_test_memory_allocator_LDADD			= $(mmux_cc_libc_tests_ldadd)
 ## strings
 
 check_PROGRAMS	+= \
-	tests/test-strings-core
+	tests/test-strings-core				\
+	tests/test-strings-custom
 
 tests_test_strings_core_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_strings_core_LDADD				= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_strings_custom_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_strings_custom_LDADD				= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## characters

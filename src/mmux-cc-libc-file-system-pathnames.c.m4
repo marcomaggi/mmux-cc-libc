@@ -7,7 +7,7 @@
 
 	This module implements the file system pathnames API.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -505,10 +505,6 @@ mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len
 
    The  new file  system  pathname  references an  ASCIIZ  string  allocated by  this
    constructor using the factory's memory allocator.
-
-   We expect  "ap" to  hold two  additional arguments  of type  "mmux_asciizcp_t" and
-   "mmux_usize_t"  representing   a  pointer  to   an  ASCII  string   (possibly  not
-   nil-terminated) and the number of characters in the string.
 */
 {
   auto	dst_ptn_len_with_nul = mmux_ctype_incr(src_ptn_len_no_nul);

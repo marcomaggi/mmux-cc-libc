@@ -8,7 +8,7 @@
 	This header file is for type definitions that are common between the internal
 	and  external API.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -118,6 +118,76 @@ typedef mmux_libc_time_specification_t const *	mmux_libc_timespec_arg_t;
 
 typedef mmux_libc_broken_down_time_t		mmux_libc_tm_t[1];
 typedef mmux_libc_broken_down_time_t const *	mmux_libc_tm_arg_t;
+
+
+/** --------------------------------------------------------------------
+ ** Strings.
+ ** ----------------------------------------------------------------- */
+
+/* Forward type declarations. */
+typedef struct mmux_libc_string_class_t		mmux_libc_string_class_t;
+typedef struct mmux_libc_string_t		mmux_libc_string_t;
+
+typedef bool mmux_libc_string_unmake_fun_t (mmux_libc_string_t * str);
+
+struct mmux_libc_string_class_t {
+  mmux_libc_interface_specification_t	const	* const	interface_specification;
+  mmux_libc_string_unmake_fun_t			* const	unmake;
+  mmux_libc_memory_allocator_t		const	* const memory_allocator;
+};
+
+/* NOTE Whatever changes we  make in the future: this data structure  must be at most
+   two machine words, because we will always want  to be able to pass it by value, if
+   there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
+struct mmux_libc_string_t {
+  mmux_asciizcp_t			value;
+  mmux_libc_string_class_t const *	class;
+};
+
+typedef mmux_libc_string_t		mmux_libc_str_t[1];
+typedef mmux_libc_string_t const *	mmux_libc_str_arg_t;
+
+/* ------------------------------------------------------------------ */
+
+/* Forward type declarations. */
+typedef struct mmux_libc_string_factory_class_t		mmux_libc_string_factory_class_t;
+typedef struct mmux_libc_string_factory_t		mmux_libc_string_factory_t;
+typedef struct mmux_libc_string_factory_copying_t	mmux_libc_string_factory_copying_t;
+
+typedef bool mmux_libc_string_factory_make_from_asciiz_fun_t
+   (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
+    mmux_asciizcp_t src_str_asciiz);
+
+typedef bool mmux_libc_string_factory_make_from_ascii_len_fun_t
+   (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
+    mmux_asciicp_t src_str_ascii, mmux_usize_t src_str_len);
+
+typedef bool mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t
+   (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
+    mmux_libc_str_arg_t str_prefix, mmux_libc_str_arg_t str_suffix);
+
+struct mmux_libc_string_factory_class_t {
+  mmux_libc_string_factory_make_from_asciiz_fun_t *		make_from_asciiz;
+  mmux_libc_string_factory_make_from_ascii_len_fun_t *		make_from_ascii_len;
+  mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t *	make_from_prefix_and_suffix;
+};
+
+/* NOTE Whatever changes we  make in the future: this data structure  must be at most
+   two machine words, because we will always want  to be able to pass it by value, if
+   there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
+struct mmux_libc_string_factory_t {
+  mmux_libc_string_factory_class_t const *	class;
+};
+
+struct mmux_libc_string_factory_copying_t {
+  mmux_libc_string_factory_t;
+};
+
+typedef mmux_libc_string_factory_t			mmux_libc_str_factory_t[1];
+typedef mmux_libc_string_factory_t const *		mmux_libc_str_factory_arg_t;
+
+typedef mmux_libc_string_factory_copying_t		mmux_libc_str_factory_copying_t[1];
+typedef mmux_libc_string_factory_copying_t const *	mmux_libc_str_factory_copying_arg_t;
 
 
 /** --------------------------------------------------------------------

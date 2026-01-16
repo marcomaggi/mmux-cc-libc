@@ -7,7 +7,7 @@
 
 	This header file declares function prototypes.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -987,6 +987,94 @@ mmux_cc_libc_decl bool mmux_libc_memfd_read_buffer (mmux_libc_memfd_arg_t mfd, m
 
 
 /** --------------------------------------------------------------------
+ ** Custom strings.
+ ** ----------------------------------------------------------------- */
+
+mmux_cc_libc_decl bool mmux_libc_string_factory_static (mmux_libc_str_factory_t str_factory)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_factory_dynamic (mmux_libc_str_factory_copying_t str_factory)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_factory_swallow (mmux_libc_str_factory_t str_factory)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_make_string (mmux_libc_str_t str_result,
+					      mmux_libc_str_factory_arg_t str_factory,
+					      mmux_asciizcp_t src_str_asciiz)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_make_string2 (mmux_libc_str_t str_result,
+					       mmux_libc_str_factory_copying_arg_t str_factory,
+					       mmux_asciicp_t src_str_ascii,
+					       mmux_usize_t   src_str_len_excluding_nul)
+  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_make_string_concat (mmux_libc_str_t				str_result,
+						     mmux_libc_str_factory_copying_arg_t	str_factory,
+						     mmux_libc_str_arg_t			str_prefix,
+						     mmux_libc_str_arg_t			str_suffix)
+  __attribute__((__nonnull__(1,2,3,4)));
+
+mmux_cc_libc_decl bool mmux_libc_unmake_string (mmux_libc_str_t str)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_unmake_string_variable (mmux_libc_str_t * str_p)
+  __attribute__((__nonnull__(1)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_string_ptr_ref (mmux_asciizcp_t * result_p,
+						 mmux_libc_str_arg_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_len_ref (mmux_usize_t * result_p,
+						 mmux_libc_str_arg_t ptn)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_len_including_nul_ref
+(mmux_usize_t * str_len_including_nul_result_p, mmux_libc_str_arg_t str)
+  __attribute__((__nonnull__(1,2)));
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_decl bool mmux_libc_string_compare (mmux_ternary_comparison_result_t * result_p,
+						 mmux_libc_str_arg_t ptn1,
+						 mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_equal (bool * result_p,
+					       mmux_libc_str_arg_t ptn1,
+					       mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_not_equal (bool * result_p,
+						   mmux_libc_str_arg_t ptn1,
+						   mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_less (bool * result_p,
+					      mmux_libc_str_arg_t ptn1,
+					      mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_greater (bool * result_p,
+						 mmux_libc_str_arg_t ptn1,
+						 mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_less_equal (bool * result_p,
+						    mmux_libc_str_arg_t ptn1,
+						    mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_string_greater_equal (bool * result_p,
+						       mmux_libc_str_arg_t ptn1,
+						       mmux_libc_str_arg_t ptn2)
+  __attribute__((__nonnull__(1)));
+
+
+/** --------------------------------------------------------------------
  ** Printing types.
  ** ----------------------------------------------------------------- */
 
@@ -1086,6 +1174,9 @@ mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_extension (mmux_libc_fd_arg_t fd
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t fd, mmux_libc_fs_ptn_segment_arg_t E)
+  __attribute__((__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_dprintf_str (mmux_libc_fd_arg_t fd, mmux_libc_str_arg_t value)
   __attribute__((__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_dprintf_process_completion_status (mmux_libc_fd_arg_t fd,

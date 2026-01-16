@@ -7,7 +7,7 @@
 
 	This module implements the file system API.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -1051,7 +1051,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_libc_mode_sprint(str, required_nbytes, val);
+      if (mmux_libc_mode_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_mode = %s", struct_name, str);
       {
 	mmux_asciizcp_t	type;
@@ -1094,7 +1096,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_ino = %s\n", struct_name, str);
     }
   }
@@ -1109,7 +1113,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_dev = %s\n", struct_name, str);
     }
   }
@@ -1124,7 +1130,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_nlink = %s\n", struct_name, str);
     }
   }
@@ -1139,7 +1147,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_uid = %s\n", struct_name, str);
     }
   }
@@ -1154,7 +1164,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_gid = %s\n", struct_name, str);
     }
   }
@@ -1169,7 +1181,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_size = %s\n", struct_name, str);
     }
   }
@@ -1184,7 +1198,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_atim.tv_sec = %s\n", struct_name, str);
     }
   }
@@ -1199,7 +1215,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_atim.tv_nsec = %s\n", struct_name, str);
     }
   }
@@ -1214,7 +1232,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_mtim.tv_sec = %s\n", struct_name, str);
     }
   }
@@ -1229,7 +1249,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_mtim.tv_nsec = %s\n", struct_name, str);
     }
   }
@@ -1244,7 +1266,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_ctim.tv_sec = %s\n", struct_name, str);
     }
   }
@@ -1259,7 +1283,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_ctim.tv_nsec = %s\n", struct_name, str);
     }
   }
@@ -1274,7 +1300,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_blocks = %s\n", struct_name, str);
     }
   }
@@ -1289,7 +1317,9 @@ mmux_libc_stat_dump (mmux_libc_fd_arg_t fd, mmux_libc_stat_arg_t stat_p, char co
     } else {
       char	str[required_nbytes.value];
 
-      mmux_ctype_sprint(str, required_nbytes, val);
+      if (mmux_ctype_sprint(str, required_nbytes, val)) {
+	return true;
+      }
       DPRINTF(fd, "%s->st_blksize = %s\n", struct_name, str);
     }
   }

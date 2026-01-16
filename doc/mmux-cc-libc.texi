@@ -35,7 +35,7 @@
 
 @c To be used as @value{COPYRIGHT_YEARS} whenever we need to include the
 @c list of copyright years.
-@set COPYRIGHT_YEARS            2024, 2025
+@set COPYRIGHT_YEARS            2024, 2025, 2026
 
 @c ------------------------------------------------------------
 
@@ -1759,6 +1759,7 @@ spiffy_memory_allocator_ref (mmux_libc_mall_t * result_p)
 * strings collation::           Collation builtins for @MmuxAsciiZ{} strings.
 * strings searching::           Searching in @MmuxAsciiZ{} strings.
 * strings tokens::              Finding tokens in @MmuxAsciiZ{} strings.
+* strings objects::             Custom string objects.
 @end menu
 
 @c page
@@ -2527,6 +2528,710 @@ assert(false == mmux_libc_dirname(&dirname, pathname));
 @}
 @end example
 @end deftypefn
+
+@c page
+@node strings objects
+@section Custom string objects
+
+
+@value{PACKAGE}'s custom string objects have the purpose of handling @MmuxAsciiZ{} strings whose
+memory is managed by custom allocators.  Custom string objects are meant to be immutable.
+
+To use a custom string object that embeds a statically--allocated @MmuxAsciiZ{} string, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t          str_asciiz = "The colour of water and quicksilver.";
+  mmux_libc_str_factory_t  str_factory;
+
+  mmux_libc_string_factory_static(str_factory);
+  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+
+@menu
+* strings objects types::               Custom string type definitions.
+* strings objects factories::           Custom string factories.
+* strings objects constructors::        Custom string constructors.
+* strings objects inspection::          Inspecting custom strings.
+* strings objects comparison::          Comparing custom strings.
+@end menu
+
+@c page
+@node strings objects types
+@subsection Custom string type definitions
+
+
+Most of the times, when we need to define a custom--string local--variable we do:
+
+@example
+mmux_libc_str_t  the_string;
+@end example
+
+@noindent
+when declaring an argument to function being an already built custom string, we do:
+
+@example
+void
+the_function (mmux_libc_str_arg_t the_string)
+@{
+  ...
+@}
+@end example
+
+@noindent
+when declaring an argument to function being a reference to a custom string variable that will be
+built by the function itself, we do:
+
+@example
+void
+the_function (mmux_libc_str_t the_string_result)
+@{
+  ...
+@}
+@end example
+
+@noindent
+to define a function that builds a custom string as local variable, then returns it as result, we
+do:
+
+@example
+void
+the_function (mmux_libc_str_t the_string_result)
+@{
+  mmux_libc_str_t  the_local_string;
+
+  build_the_local_string(the_local_string);
+  the_string_result[0] = the_local_string[0];
+@}
+@end example
+
+
+@deftp {Struct Typedef} mmux_libc_string_t
+@deftpx {Struct Pointer Type} mmux_libc_str_t
+@deftpx {Struct Pointer Type} mmux_libc_str_arg_t
+Structure data type representing a string object as a non--@cnull{} pointer to a, possibly empty,
+@MmuxAsciiZ{} string.  The pointer types are defined as follows:
+
+@example
+typedef struct mmux_libc_string_t          mmux_libc_str_t[1];
+typedef struct mmux_libc_string_t const *  mmux_libc_str_arg_t;
+@end example
+@end deftp
+
+
+@deftypecv {Public Field} mmux_libc_string_t mmux_asciizcp_t value
+Pointer to the @MmuxAsciiZ{} string itself.
+@end deftypecv
+
+@c page
+@node strings objects factories
+@subsection Custom string factories
+
+
+Custom string factories are data structures representing a selection of properties for custom
+strings.
+
+@menu
+* strings objects factories types::     Custom string factory types.
+* strings objects factories static::    Static string construction factory.
+* strings objects factories dynamic::   Dynamic string construction factory.
+* strings objects factories swallow::   Swallow string construction factory.
+@end menu
+
+@c page
+@node strings objects factories types
+@subsubsection Custom string factory types
+
+
+@deftp {Struct Typedef} mmux_libc_string_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_str_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_str_factory_arg_t
+Structure data type representing a factory for strings.  It allows the selection of a memory
+allocation strategy to contain strings data.
+
+The pointer types are defined as follows:
+
+@example
+typedef struct mmux_libc_string_factory_t          mmux_libc_str_factory_t[1];
+typedef struct mmux_libc_string_factory_t const *  mmux_libc_str_factory_arg_t;
+@end example
+@end deftp
+
+@c ------------------------------------------------------------------------
+
+@deftp {Struct Typedef} mmux_libc_string_factory_copying_t
+@deftpx {Parent Struct Typedef} mmux_libc_string_factory_t
+@deftpx {Struct Pointer Type} mmux_libc_str_factory_copying_t
+@deftpx {Struct Pointer Type} mmux_libc_str_factory_copying_arg_t
+Structure data type representing a factory for strings.  It is like its parent type, but
+@strong{always} allocates new memory to contain the @MmuxAsciiZ{} string.
+
+The pointer types are defined as follows:
+
+@example
+typedef struct mmux_libc_string_factory_copying_t          mmux_libc_str_factory_copying_t[1];
+typedef struct mmux_libc_string_factory_copying_t const *  mmux_libc_str_factory_copying_arg_t;
+@end example
+@end deftp
+
+@c page
+@node strings objects factories static
+@subsubsection Static string construction factory
+
+
+To use the @emph{static factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t          str_asciiz = "The colour of water and quicksilver.";
+  mmux_libc_str_factory_t  str_factory;
+
+  mmux_libc_string_factory_static(str_factory);
+  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_string_factory_static (mmux_libc_str_factory_t @var{str_factory})
+Store in the variable referenced by @var{str_factory} a reference to the prebuilt ``static'' strings
+factory.
+
+When building strings with this factory: the memory containing the @MmuxAsciiZ{} string must have
+been already allocated and initialised, and the new custom string object will reference it; this
+factory uses the ``fake'' memory allocator, @ref{memory allocators fake, Fake memory allocator}.  We
+can use this factory to reference a hard--coded string.
+
+We can use this factory only with the constructor @cfunc{mmux_libc_make_string}; if we use it with
+the other constructors: the constructor call will fail and @code{errno} will be set to
+@code{ENOTSUP}.
+@end deftypefun
+
+@c page
+@node strings objects factories dynamic
+@subsubsection Dynamic string construction factory
+
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t  str_asciiz = "The colour of water and quicksilver.";
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string2}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t                  str_asciiz = "The colour of water and quicksilver.";
+  mmux_usize_t                     str_length_excluding_nul;
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
+  if (mmux_libc_make_string2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string_concat}, we do:
+
+@example
+mmux_libc_str_t  str_prefix;
+
+/* Build custom strings. */
+@{
+  mmux_libc_str_t                  str_prefix, str_suffix;
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  if (mmux_libc_make_string(str_prefix, str_factory, "The colour of water")) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string(str_suffix, str_factory, " and quicksilver.")) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string_concat(str_result, str_factory, str_prefix, str_suffix)) @{
+    /* error */
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_string(str_prefix)) @{
+      /* error */
+    @}
+    if (mmux_libc_unmake_string(str_suffix)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Do something with "str_result". */
+
+/* Final clenaup. */
+@{
+  if (mmux_libc_unmake_string(str_result)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_string_factory_dynamic (mmux_libc_str_factory_copying_t @var{str_factory})
+Store in the variable referenced by @var{str_factory} a reference to the prebuilt ``dynamic''
+strings factory.
+
+When building strings with this factory: the memory containing the @MmuxAsciiZ{} string is newly
+allocated using the default memory allocator, @ref{memory allocators default, Default memory
+allocator}.  We can use this factory when we need to build a custom string by creating a copy of an
+existing string.
+
+We can use this factory with the constructors @cfunc{mmux_libc_make_string},
+@cfunc{mmux_libc_make_string2}, @cfunc{mmux_libc_make_string_concat}.
+@end deftypefun
+
+@c page
+@node strings objects factories swallow
+@subsubsection Swallow string construction factory
+
+
+To use the @emph{swallow factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the custom string. */
+@{
+  mmux_asciizp_t  bufptr;
+
+  /* Allocate a string using the standard memory allocation functions. */
+  @{
+    mmux_asciizcp_t  str_asciiz = "The colour of water and quicksilver.";
+    mmux_usize_t     buflen_with_nil;
+
+    if (mmux_libc_strlen_plus_nil(&buflen_with_nil, str_asciiz)) @{
+      /* error */
+    @}
+    if (mmux_libc_malloc_and_copy(&bufptr, str_asciiz, buflen_with_nil)) @{
+      /* error */
+    @}
+  @}
+
+  /* Actually construct the string object. */
+  @{
+    mmux_libc_str_factory_t  str_factory;
+
+    mmux_libc_string_factory_swallow(str_factory);
+    if (mmux_libc_make_string(str, str_factory, bufptr)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_unmake_string(str)) @{
+    /* error */
+  @}
+@}
+@end example
+
+
+@deftypefun bool mmux_libc_string_factory_swallow (mmux_libc_str_factory_t @var{str_factory})
+Store in the variable referenced by @var{str_factory} a reference to the prebuilt ``swallow''
+file system factory.
+
+When building custom strings with this factory: the memory containing the @MmuxAsciiZ{} string must
+have been already allocated using the default memory allocator, and the new custom string object
+will reference it; this factory uses the default memory allocator, @ref{memory allocators default,
+Default memory allocator}.
+
+The string objects that result from using this factory take full ownership of the dynamically
+allocated memory.
+
+We can use this factory only with the constructor @cfunc{mmux_libc_make_string}; if we use it with
+the other constructors: the constructor call will fail and @code{errno} will be set to
+@code{ENOTSUP}.
+@end deftypefun
+
+@c page
+@node strings objects constructors
+@subsection Custom string constructors.
+
+
+@cindex Appending custom strings
+@cindex Concatenating custom strings
+@cindex Prefix custom strings
+@cindex Suffix custom strings
+@cindex custom strings, concatenation
+@cindex custom strings, appending
+@cindex custom strings, prefix
+@cindex custom strings, suffix
+
+
+@deftypefun bool mmux_libc_make_string (mmux_libc_str_t @var{str_result}, @
+  mmux_libc_str_factory_arg_t @var{str_factory}, @
+  mmux_asciizcp_t @var{str_asciiz})
+Make a new custom string object, using the given @var{str_factory} and the @MmuxAsciiZ{} string
+referenced by @var{str_asciiz}.  The pointer @var{str_asciiz} must not be @cnull{}, but it can
+reference an empty string (that is: a string for which @code{'\0' == @var{str_asciiz}[0]}).
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t  str_asciiz = "The colour of water and quicksilver.";
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_string2 (mmux_libc_str_t @var{str_result}, @
+  mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
+  mmux_asciicp_t @var{str_ascii}, @
+  mmux_usize_t @var{str_length_excluding_nul})
+Make a new custom string object using the given @var{str_factory} and the @MmuxAscii{} string
+referenced by @var{str_ascii}, which must have length @var{str_length_excluding_nul} which itself
+cannot be zero.
+
+This constructor always allocates new memory and makes a copy of the given @var{str_ascii} string,
+so the given @var{str_factory} must support this operation, otherwise @ctrue{} is returned and
+@cerrno{} set to @code{MMUX_LIBC_ENOTSUP}.
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string2}, we do:
+
+@example
+mmux_libc_str_t  str;
+
+/* Build the object. */
+@{
+  mmux_asciizcp_t                  str_asciiz = "The colour of water and quicksilver.";
+  mmux_usize_t                     str_length_excluding_nul;
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
+  if (mmux_libc_make_string2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with "str". */
+
+/* Final cleanup. */
+@{
+  mmux_libc_unmake_string(str);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_make_string_concat (mmux_libc_str_t @var{str_result}, @
+  mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
+  mmux_libc_str_arg_t @var{prefix}, @
+  mmux_libc_str_arg_t @var{suffix})
+Make a new custom string by concatenating the @var{prefix} with the @var{suffix}.
+
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string_concat}, we do:
+
+@example
+mmux_libc_str_t  str_prefix;
+
+/* Build custom strings. */
+@{
+  mmux_libc_str_t                  str_prefix, str_suffix;
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  if (mmux_libc_make_string(str_prefix, str_factory, "The colour of water")) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string(str_suffix, str_factory, " and quicksilver.")) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string_concat(str_result, str_factory, str_prefix, str_suffix)) @{
+    /* error */
+  @}
+
+  /* Local cleanup. */
+  @{
+    if (mmux_libc_unmake_string(str_prefix)) @{
+      /* error */
+    @}
+    if (mmux_libc_unmake_string(str_suffix)) @{
+      /* error */
+    @}
+  @}
+@}
+
+/* Do something with "str_result". */
+
+/* Final clenaup. */
+@{
+  if (mmux_libc_unmake_string(str_result)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_unmake_string (mmux_libc_str_t @var{str})
+Finalise the custom string object referenced by @var{str}, appropriately releasing all the
+referenced asynchronous resources.
+@end deftypefun
+
+@c page
+@node strings objects inspection
+@subsection Inspecting custom strings
+
+
+@deftypefun bool mmux_libc_string_ptr_ref (mmux_asciizcp_t * @var{result_p}, mmux_libc_str_arg_t @var{str})
+Store in the variable referenced by @var{result_p} a pointer to the first character in the array
+representing the string.
+
+@example
+mmux_libc_str_t  str;
+mmux_asciizcp_t  ptr;
+
+initialise_str_in_some_way(str);
+mmux_libc_string_ptr_ref(&ptr, str);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_len_ref (mmux_usize_t * @var{str_length_excluding_nul_result_p}, @
+  mmux_libc_str_arg_t @var{str})
+Store in the variable referenced by @var{str_length_excluding_nul_result_p} the number of octets in
+the string @var{str} @strong{excluding} the terminating nul.  A call to this function should never
+fail, so we can avoid checking its return value.
+
+@example
+mmux_libc_str_t  str;
+mmux_usize_t     len_excluding_nul;
+
+initialise_str_in_some_way(str);
+mmux_libc_string_len_ref(&len_excluding_nul, str);
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_len_including_nul_ref (mmux_usize_t * @var{str_length_including_nul_result_p}, @
+  mmux_libc_str_arg_t @var{str})
+Store in the variable referenced by @var{str_length_including_nul_result_p} the number of octets in
+the string @var{str} @strong{including} the terminating nul.  A call to this function should never
+fail, so we can avoid checking its return value.
+
+@example
+mmux_libc_str_t  str;
+mmux_usize_t     len_including_nul;
+
+initialise_str_in_some_way(str);
+mmux_libc_string_len_including_nul_ref(&len_including_nul, str);
+@end example
+@end deftypefun
+
+@c page
+@node strings objects comparison
+@subsection Comparing string objects
+
+
+@deftypefun bool mmux_libc_string_compare (mmux_ternary_comparison_result_t * @var{cmpnum_result_p}, @
+  mmux_libc_str_arg_t @vari{str}, @
+  mmux_libc_str_arg_t @varii{str})
+Compare the @MmuxAsciiZ{} strings of two custom string objects using @cfunc{mmux_libc_strcmp}, store
+the result in the variable referenced by @var{cmpnum_result_p}.
+
+@example
+mmux_libc_str_t  str1, str2;
+
+/* Build the strings. */
+@{
+  mmux_asciizcp_t          str_asciiz_1 = "The colour of water.";
+  mmux_asciizcp_t          str_asciiz_2 = "The colour of quicksilver.";
+  mmux_libc_str_factory_t  str_factory;
+
+  mmux_libc_string_factory_static(str_factory);
+  if (mmux_libc_make_string(str1, str_factory, str_asciiz_1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string(str2, str_factory, str_asciiz_2)) @{
+    /* error */
+  @}
+@}
+
+/* Compare the strings. */
+@{
+  mmux_ternary_comparison_result_t  cmpnum;
+
+  if (mmux_libc_string_compare(&cmpnum, ptn1, ptn2)) @{
+    /* error */
+  @}
+  if (mmux_ternary_comparison_result_is_equal(cmpnum)) @{
+    ...
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_unmake_string(str1)) @{
+    /* error */
+  @};
+  if (mmux_libc_unmake_string(str2)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_equal (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if the two given strings are equal when
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+
+@example
+mmux_libc_str_t  str1, str2;
+
+/* Build the file system pathnames. */
+@{
+  mmux_asciizcp_t          str_asciiz_1 = "AAA";
+  mmux_asciizcp_t          str_asciiz_2 = "BBB";
+  mmux_libc_str_factory_t  str_factory;
+
+  mmux_libc_string_factory_static(str_factory);
+  if (mmux_libc_make_string(str1, str_factory, str_asciiz_1)) @{
+    /* error */
+  @}
+  if (mmux_libc_make_string(str2, str_factory, str_asciiz_2)) @{
+    /* error */
+  @}
+@}
+
+/* Compare the file system pathnames. */
+@{
+  bool  result;
+
+  if (mmux_libc_string_equal(&result, ptn1, ptn2)) @{
+    /* error */
+  @}
+  if (result) @{
+    ...
+  @}
+@}
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_unmake_string(str1)) @{
+    /* error */
+  @};
+  if (mmux_libc_unmake_string(str2)) @{
+    /* error */
+  @}
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_not_equal (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if the two given strings are different
+when compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_less (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{str} < @varii{str}} when
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_greater (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{str} > @varii{str}} when
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_less_equal (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{str} <= @varii{str}} when
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_greater_equal (bool * @var{result_p}, mmux_libc_str_arg_t @vari{str}, mmux_libc_str_arg_t @varii{str})
+Store @ctrue{} in the variable referenced by @var{result_p} if @samp{@vari{str} >= @varii{str}} when
+compared as @MmuxAsciiZ{} strings; otherwise store @cfalse{}.
+@end deftypefun
 
 @c page
 @node characters
@@ -7260,6 +7965,12 @@ Print to @var{fd} the string representation of @var{value}.
 
 @anchor{mmux_libc_dprintf_fs_ptn_segment}
 @deftypefun bool mmux_libc_dprintf_fs_ptn_segment (mmux_libc_fd_arg_t @var{fd}, mmux_libc_fs_ptn_segment_arg_t @var{value})
+Print to @var{fd} the string representation of @var{value}.
+@end deftypefun
+
+
+@anchor{mmux_libc_dprintf_str}
+@deftypefun bool mmux_libc_dprintf_str (mmux_libc_fd_arg_t @var{fd}, mmux_libc_str_arg_t @var{value})
 Print to @var{fd} the string representation of @var{value}.
 @end deftypefun
 
