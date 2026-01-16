@@ -166,10 +166,18 @@ typedef bool mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_libc_str_arg_t str_prefix, mmux_libc_str_arg_t str_suffix);
 
+/* Forward declaration. */
+typedef struct mmux_libc_memory_file_descriptor_t	mmux_libc_memory_file_descriptor_t;
+
+typedef bool mmux_libc_string_factory_make_string_from_memfd_fun_t
+   (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
+    mmux_libc_memory_file_descriptor_t const * mfd);
+
 struct mmux_libc_string_factory_class_t {
   mmux_libc_string_factory_make_from_asciiz_fun_t *		make_from_asciiz;
   mmux_libc_string_factory_make_from_ascii_len_fun_t *		make_from_ascii_len;
   mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t *	make_from_prefix_and_suffix;
+  mmux_libc_string_factory_make_string_from_memfd_fun_t *	make_from_memfd;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most

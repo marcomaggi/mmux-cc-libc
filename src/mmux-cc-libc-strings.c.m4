@@ -411,10 +411,22 @@ mmux_libc_string_factory_static_make_from_prefix_and_suffix
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
+bool
+mmux_libc_string_factory_static_make_from_memfd
+    (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
+     mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
+     mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
+/* This function is the implementation of the method "make_from_memfd" for the string
+   factory "mmux_libc_string_factory_static". */
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
+  return true;
+}
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_static__class = {
   .make_from_asciiz		= mmux_libc_string_factory_static_make_from_asciiz,
   .make_from_ascii_len		= mmux_libc_string_factory_static_make_from_ascii_len,
   .make_from_prefix_and_suffix	= mmux_libc_string_factory_static_make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_static_make_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_static__object = {
   .class = &mmux_libc_string_factory_static__class,
@@ -589,10 +601,42 @@ mmux_libc_string_factory_dynamic_make_from_prefix_and_suffix
     }
   }
 }
+bool
+mmux_libc_string_factory_dynamic_make_from_memfd (mmux_libc_str_t		str_result,
+						  mmux_libc_str_factory_arg_t	str_factory MMUX_CC_LIBC_UNUSED,
+						  mmux_libc_memfd_arg_t		mfd)
+/* This function is the implementation of the method "make_from_memfd" for the string
+   factory "mmux_libc_string_factory_dynamic". */
+{
+  mmux_libc_string_class_t const *	class = &mmux_libc_string_class_dynamic;
+  mmux_usize_t		str_length_excluding_nul, str_length_including_nul;
+  mmux_asciizp_t	str_asciiz;
+
+  if (mmux_libc_memfd_length(&str_length_excluding_nul, mfd)) {
+    return true;
+  }
+  str_length_including_nul = mmux_ctype_incr(str_length_excluding_nul);
+
+  if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &str_asciiz, str_length_including_nul)) {
+    return true;
+  } else {
+    if (mmux_libc_memfd_read_buffer(mfd, str_asciiz, str_length_excluding_nul)) {
+      if (mmux_libc_memory_allocator_free(class->memory_allocator, str_asciiz)) {
+	return true;
+      }
+      return true;
+    }
+    str_asciiz[str_length_excluding_nul.value] = '\0';
+    str_result->value = str_asciiz;
+    str_result->class = class;
+    return false;
+  }
+}
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_dynamic__class = {
   .make_from_asciiz		= mmux_libc_string_factory_dynamic_make_from_asciiz,
   .make_from_ascii_len		= mmux_libc_string_factory_dynamic_make_from_ascii_len,
   .make_from_prefix_and_suffix	= mmux_libc_string_factory_dynamic_make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_dynamic_make_from_memfd,
 };
 static mmux_libc_string_factory_copying_t	const mmux_libc_string_factory_dynamic__object = {
   .class		= &mmux_libc_string_factory_dynamic__class,
@@ -705,10 +749,22 @@ mmux_libc_string_factory_swallow_make_from_prefix_and_suffix
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
+bool
+mmux_libc_string_factory_swallow_make_from_memfd
+    (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
+     mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
+     mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
+/* This function is the implementation of the method "make_from_memfd" for the string
+   factory "mmux_libc_string_factory_swallow". */
+{
+  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
+  return true;
+}
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_swallow__class = {
   .make_from_asciiz		= mmux_libc_string_factory_swallow_make_from_asciiz,
   .make_from_ascii_len		= mmux_libc_string_factory_swallow_make_from_ascii_len,
   .make_from_prefix_and_suffix	= mmux_libc_string_factory_swallow_make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_swallow_make_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_swallow__object = {
   .class		= &mmux_libc_string_factory_swallow__class,
@@ -746,6 +802,13 @@ mmux_libc_make_string_concat (mmux_libc_str_t				str_result,
 			      mmux_libc_str_arg_t			str_suffix)
 {
   return str_factory->class->make_from_prefix_and_suffix(str_result, str_factory, str_prefix, str_suffix);
+}
+bool
+mmux_libc_make_string_from_memfd (mmux_libc_str_t			str_result,
+				  mmux_libc_str_factory_copying_arg_t	str_factory,
+				  mmux_libc_memfd_arg_t			mfd)
+{
+  return str_factory->class->make_from_memfd(str_result, str_factory, mfd);
 }
 bool
 mmux_libc_unmake_string (mmux_libc_str_t str)

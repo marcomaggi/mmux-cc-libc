@@ -72,6 +72,8 @@ print_string (void)
       }
     }
   }
+
+  printf_message("DONE: %s\n", __func__);
 }
 static void
 test_string_length (void)
@@ -99,6 +101,8 @@ test_string_length (void)
   }
 
   mmux_libc_unmake_string(str);
+
+  printf_message("DONE: %s\n", __func__);
 }
 
 
@@ -222,6 +226,8 @@ test_string_factory_dynamic2 (void)
   if (mmux_libc_unmake_string(str)) {
     handle_error();
   }
+
+  printf_message("DONE: %s\n", __func__);
 }
 
 
@@ -581,6 +587,8 @@ test_compare_different_strings_greater (void)
 
   mmux_libc_unmake_string(str1);
   mmux_libc_unmake_string(str2);
+
+  printf_message("DONE: %s\n", __func__);
 }
 
 
@@ -659,6 +667,85 @@ string_concatenation (void)
   one_concatenation_case("Alpha",	"",		"Alpha");
   one_concatenation_case("",		"Beta",		"Beta");
   one_concatenation_case("A",		"B",		"AB");
+
+  printf_message("DONE: %s\n", __func__);
+}
+
+
+/** --------------------------------------------------------------------
+ ** Strings from memfds.
+ ** ----------------------------------------------------------------- */
+
+static void
+string_from_memfd (void)
+{
+  printf_message("running test: %s", __func__);
+
+  {
+    mmux_libc_str_t  str;
+
+    /* Build the object. */
+    {
+      mmux_libc_memfd_t  mfd;
+
+      if (mmux_libc_make_memfd(mfd)) {
+	handle_error();
+      }
+
+      {
+	if (mmux_libc_dprintf(mfd, "%s", "The colour of water and quicksilver.")) {
+	  handle_error();
+	}
+
+	/* Actually build the string. */
+	{
+	  mmux_libc_str_factory_copying_t  str_factory;
+
+	  mmux_libc_string_factory_dynamic(str_factory);
+	  if (mmux_libc_make_string_from_memfd(str, str_factory, mfd)) {
+	    handle_error();
+	  }
+	}
+      }
+
+      if (mmux_libc_close(mfd)) {
+	handle_error();
+      }
+    }
+
+    if (true) {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_dprintfer_no_error("%s: the built string is: '", __func__);
+      if (mmux_libc_dprintf_str(er, str)) {
+	handle_error();
+      }
+      mmux_libc_dprintfer_no_error("'\n");
+    }
+
+    /* Compare the built string with the expected string. */
+    {
+      bool	cmpbool;
+
+      if (mmux_libc_strequ(&cmpbool, str->value, "The colour of water and quicksilver.")) {
+	handle_error();
+      }
+      if (cmpbool) {
+	printf_message("equal: strings compared as expected");
+      } else {
+	print_error("equal: strings not compared as expected");
+	mmux_libc_exit_failure();
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_string(str);
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
 }
 
 
@@ -687,6 +774,8 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	test_compare_different_strings_greater();	}
 
   if (1) {	string_concatenation();				}
+
+  if (1) {	string_from_memfd();				}
 
   mmux_libc_exit_success();
 }

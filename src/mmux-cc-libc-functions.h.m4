@@ -1016,6 +1016,11 @@ mmux_cc_libc_decl bool mmux_libc_make_string_concat (mmux_libc_str_t				str_resu
 						     mmux_libc_str_arg_t			str_suffix)
   __attribute__((__nonnull__(1,2,3,4)));
 
+mmux_cc_libc_decl bool mmux_libc_make_string_from_memfd (mmux_libc_str_t			str_result,
+							 mmux_libc_str_factory_copying_arg_t	str_factory,
+							 mmux_libc_memfd_arg_t			mfd)
+  __attribute__((__nonnull__(1,2,3)));
+
 mmux_cc_libc_decl bool mmux_libc_unmake_string (mmux_libc_str_t str)
   __attribute__((__nonnull__(1)));
 
