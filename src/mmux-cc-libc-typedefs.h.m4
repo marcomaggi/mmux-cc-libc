@@ -131,9 +131,9 @@ typedef struct mmux_libc_string_t		mmux_libc_string_t;
 typedef bool mmux_libc_string_unmake_fun_t (mmux_libc_string_t * str);
 
 struct mmux_libc_string_class_t {
-  mmux_libc_interface_specification_t	const	* const	interface_specification;
-  mmux_libc_string_unmake_fun_t			* const	unmake;
+  mmux_libc_interface_specification_t	const	interface_specification;
   mmux_libc_memory_allocator_t		const	* const memory_allocator;
+  mmux_libc_string_unmake_fun_t			* const	unmake;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
