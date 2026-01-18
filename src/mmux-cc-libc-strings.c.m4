@@ -324,8 +324,8 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DIRNAME]]],[[[
  ** Custom strings: global variables.
  ** ----------------------------------------------------------------- */
 
-static bool
-mmux_libc_string_class_unmake (mmux_libc_str_t str)
+bool
+mmux_libc_string_class__unmake (mmux_libc_str_t str)
 {
   if (str->class->memory_allocator->class->free(str->class->memory_allocator, (mmux_pointer_t)str->value)) {
     return true;
@@ -343,7 +343,7 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_static = {
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_fake_memory_allocator,
-  .unmake		= mmux_libc_string_class_unmake,
+  .unmake		= mmux_libc_string_class__unmake,
 };
 
 static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
@@ -354,7 +354,7 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_default_memory_allocator,
-  .unmake		= mmux_libc_string_class_unmake,
+  .unmake		= mmux_libc_string_class__unmake,
 };
 
 
@@ -377,8 +377,8 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
  *   }
  */
 
-static bool
-mmux_libc_string_factory_static_make_from_asciiz
+bool
+mmux_libc_string_factory_class_static__make_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
@@ -412,8 +412,8 @@ mmux_libc_string_factory_static_make_from_asciiz
     return false;
   }
 }
-static bool
-mmux_libc_string_factory_static_make_from_ascii_len
+bool
+mmux_libc_string_factory_class_static__make_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
@@ -424,8 +424,8 @@ mmux_libc_string_factory_static_make_from_ascii_len
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
-static bool
-mmux_libc_string_factory_static_make_from_prefix_and_suffix
+bool
+mmux_libc_string_factory_class_static__make_from_prefix_and_suffix
     (mmux_libc_str_t str_result				MMUX_CC_LIBC_UNUSED,
      mmux_libc_string_factory_t const * str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix			MMUX_CC_LIBC_UNUSED,
@@ -437,7 +437,7 @@ mmux_libc_string_factory_static_make_from_prefix_and_suffix
   return true;
 }
 bool
-mmux_libc_string_factory_static_make_from_memfd
+mmux_libc_string_factory_class_static__make_from_memfd
     (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
@@ -448,10 +448,16 @@ mmux_libc_string_factory_static_make_from_memfd
   return true;
 }
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_static__class = {
-  .make_from_asciiz		= mmux_libc_string_factory_static_make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_static_make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_static_make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_static_make_from_memfd,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-string-factory-static",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_string_factory_class_static__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_string_factory_class_static__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_static__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_static__make_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_static__object = {
   .class = &mmux_libc_string_factory_static__class,
@@ -483,8 +489,8 @@ mmux_libc_string_factory_static (mmux_libc_str_factory_t str_factory)
  *   }
  */
 
-static bool
-mmux_libc_string_factory_dynamic_make_from_asciiz
+bool
+mmux_libc_string_factory_class_dynamic__make_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
@@ -529,8 +535,8 @@ mmux_libc_string_factory_dynamic_make_from_asciiz
     }
   }
 }
-static bool
-mmux_libc_string_factory_dynamic_make_from_ascii_len
+bool
+mmux_libc_string_factory_class_dynamic__make_from_ascii_len
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t str_source_ascii, mmux_usize_t str_source_length_no_nul)
@@ -574,8 +580,8 @@ mmux_libc_string_factory_dynamic_make_from_ascii_len
     }
   }
 }
-static bool
-mmux_libc_string_factory_dynamic_make_from_prefix_and_suffix
+bool
+mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix,
@@ -627,9 +633,10 @@ mmux_libc_string_factory_dynamic_make_from_prefix_and_suffix
   }
 }
 bool
-mmux_libc_string_factory_dynamic_make_from_memfd (mmux_libc_str_t		str_result,
-						  mmux_libc_str_factory_arg_t	str_factory MMUX_CC_LIBC_UNUSED,
-						  mmux_libc_memfd_arg_t		mfd)
+mmux_libc_string_factory_class_dynamic__make_from_memfd
+    (mmux_libc_str_t			str_result,
+     mmux_libc_str_factory_arg_t	str_factory MMUX_CC_LIBC_UNUSED,
+     mmux_libc_memfd_arg_t		mfd)
 /* This function is the implementation of the method "make_from_memfd" for the string
    factory "mmux_libc_string_factory_dynamic". */
 {
@@ -658,10 +665,16 @@ mmux_libc_string_factory_dynamic_make_from_memfd (mmux_libc_str_t		str_result,
   }
 }
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_dynamic__class = {
-  .make_from_asciiz		= mmux_libc_string_factory_dynamic_make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_dynamic_make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_dynamic_make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_dynamic_make_from_memfd,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-string-factory-dynamic",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_string_factory_class_dynamic__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_string_factory_class_dynamic__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_dynamic__make_from_memfd,
 };
 static mmux_libc_string_factory_copying_t	const mmux_libc_string_factory_dynamic__object = {
   .class		= &mmux_libc_string_factory_dynamic__class,
@@ -713,8 +726,8 @@ mmux_libc_string_factory_dynamic (mmux_libc_str_factory_copying_t str_factory)
  *   }
  */
 
-static bool
-mmux_libc_string_factory_swallow_make_from_asciiz
+bool
+mmux_libc_string_factory_class_swallow__make_from_asciiz
 (mmux_libc_str_t str_result,
  mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
  mmux_asciizcp_t str_source_asciiz)
@@ -750,8 +763,8 @@ mmux_libc_string_factory_swallow_make_from_asciiz
     return false;
   }
 }
-static bool
-mmux_libc_string_factory_swallow_make_from_ascii_len
+bool
+mmux_libc_string_factory_class_swallow__make_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
@@ -762,8 +775,8 @@ mmux_libc_string_factory_swallow_make_from_ascii_len
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
-static bool
-mmux_libc_string_factory_swallow_make_from_prefix_and_suffix
+bool
+mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix
     (mmux_libc_str_t str_result				MMUX_CC_LIBC_UNUSED,
      mmux_libc_string_factory_t const * str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix			MMUX_CC_LIBC_UNUSED,
@@ -775,7 +788,7 @@ mmux_libc_string_factory_swallow_make_from_prefix_and_suffix
   return true;
 }
 bool
-mmux_libc_string_factory_swallow_make_from_memfd
+mmux_libc_string_factory_class_swallow__make_from_memfd
     (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
@@ -786,10 +799,16 @@ mmux_libc_string_factory_swallow_make_from_memfd
   return true;
 }
 static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_swallow__class = {
-  .make_from_asciiz		= mmux_libc_string_factory_swallow_make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_swallow_make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_swallow_make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_swallow_make_from_memfd,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-string-factory-swallow",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_string_factory_class_swallow__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_string_factory_class_swallow__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_swallow__make_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_swallow__object = {
   .class		= &mmux_libc_string_factory_swallow__class,

@@ -10491,6 +10491,7 @@ examples for file system pathnames}.
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_t
+@deftpx {Parent Struct Type} mmux_libc_string_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_arg_t
 Structure data type representing a file system pathname as a non--@cnull{} pointer to non--empty
@@ -10506,6 +10507,7 @@ typedef struct mmux_libc_file_system_pathname_t const *  mmux_libc_fs_ptn_arg_t;
 
 
 @deftp {Struct Typedef} mmux_libc_file_system_pathname_factory_t
+@deftpx {Parent Struct Type} mmux_libc_string_factory_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_t
 @deftpx {Struct Pointer Type} mmux_libc_fs_ptn_factory_arg_t
 Structure data type representing a factory for file system pathnames.  It allows the selection of a

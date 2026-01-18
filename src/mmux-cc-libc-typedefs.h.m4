@@ -131,9 +131,9 @@ typedef struct mmux_libc_string_t		mmux_libc_string_t;
 typedef bool mmux_libc_string_unmake_fun_t (mmux_libc_string_t * str);
 
 struct mmux_libc_string_class_t {
-  mmux_libc_interface_specification_t	const	interface_specification;
-  mmux_libc_memory_allocator_t		const	* const memory_allocator;
-  mmux_libc_string_unmake_fun_t			* const	unmake;
+  mmux_libc_interface_specification_t		interface_specification;
+  mmux_libc_memory_allocator_t		const * memory_allocator;
+  mmux_libc_string_unmake_fun_t		      *	unmake;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
@@ -174,6 +174,7 @@ typedef bool mmux_libc_string_factory_make_string_from_memfd_fun_t
     mmux_libc_memory_file_descriptor_t const * mfd);
 
 struct mmux_libc_string_factory_class_t {
+  mmux_libc_interface_specification_t				interface_specification;
   mmux_libc_string_factory_make_from_asciiz_fun_t *		make_from_asciiz;
   mmux_libc_string_factory_make_from_ascii_len_fun_t *		make_from_ascii_len;
   mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t *	make_from_prefix_and_suffix;
@@ -309,17 +310,14 @@ typedef struct mmux_libc_file_system_pathname_t		mmux_libc_file_system_pathname_
 typedef bool mmux_libc_file_system_pathname_unmake_fun_t (mmux_libc_file_system_pathname_t * fs_ptn);
 
 struct mmux_libc_file_system_pathname_class_t {
-  mmux_libc_interface_specification_t		const	* const	interface_specification;
-  mmux_libc_file_system_pathname_unmake_fun_t		* const	unmake;
-  mmux_libc_memory_allocator_t			const	* const memory_allocator;
+  mmux_libc_string_class_t;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
    two machine words, because we will always want  to be able to pass it by value, if
    there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
 struct mmux_libc_file_system_pathname_t {
-  mmux_asciizcp_t					value;
-  mmux_libc_file_system_pathname_class_t const *	class;
+  mmux_libc_string_t;
 };
 
 typedef mmux_libc_file_system_pathname_t		mmux_libc_fs_ptn_t[1];
@@ -341,15 +339,14 @@ typedef bool mmux_libc_file_system_pathname_factory_make_from_ascii_len_fun_t
     mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len);
 
 struct mmux_libc_file_system_pathname_factory_class_t {
-  mmux_libc_file_system_pathname_factory_make_from_asciiz_fun_t *	make_from_asciiz;
-  mmux_libc_file_system_pathname_factory_make_from_ascii_len_fun_t *	make_from_ascii_len;
+  mmux_libc_string_factory_class_t;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
    two machine words, because we will always want  to be able to pass it by value, if
    there is the need.  So keep it small!  (Marco Maggi; Oct 20, 2025) */
 struct mmux_libc_file_system_pathname_factory_t {
-  mmux_libc_file_system_pathname_factory_class_t const *	class;
+  mmux_libc_string_factory_t;
 };
 
 struct mmux_libc_file_system_pathname_factory_copying_t {

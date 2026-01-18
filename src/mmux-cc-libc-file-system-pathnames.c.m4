@@ -33,12 +33,37 @@
  ** Global variables.
  ** ----------------------------------------------------------------- */
 
+bool
+mmux_libc_file_system_pathname_class__unmake (mmux_libc_str_t ptn)
+{
+  if (ptn->class->memory_allocator->class->free(ptn->class->memory_allocator, (mmux_pointer_t)ptn->value)) {
+    return true;
+  } else {
+    ptn->value = NULL;
+    return false;
+  }
+}
+
 mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_class_static = {
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-file-system-pathname",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
   .memory_allocator	= &mmux_libc_fake_memory_allocator,
+  .unmake		= mmux_libc_file_system_pathname_class__unmake,
 };
 
 mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_class_dynamic = {
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-file-system-pathname",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
   .memory_allocator	= &mmux_libc_default_memory_allocator,
+  .unmake		= mmux_libc_file_system_pathname_class__unmake,
 };
 
 
@@ -353,10 +378,10 @@ mmux_libc_file_system_pathname_validate_length_no_nul (mmux_usize_t fs_ptn_len)
  *   }
  */
 
-static bool
-mmux_libc_file_system_pathname_factory_static_make_from_asciiz
-    (mmux_libc_fs_ptn_t fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+bool
+mmux_libc_file_system_pathname_factory_static_class__make_from_asciiz
+    (mmux_libc_str_t fs_ptn_result,
+     mmux_libc_str_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t src_ptn_asciiz)
 /* This function  is the  implementation of the  method "make_from_asciiz()"  for the
    file system factory "mmux_libc_file_system_pathname_factory_class_static".
@@ -390,26 +415,25 @@ mmux_libc_file_system_pathname_factory_static_make_from_asciiz
 
   /* Construct the resulting data structure. */
   {
-    fs_ptn_result->value = src_ptn_asciiz;
-    fs_ptn_result->class = &mmux_libc_file_system_pathname_class_static;
-    return false;
+    if (mmux_libc_string_factory_class_static__make_from_asciiz(fs_ptn_result, fs_ptn_factory, src_ptn_asciiz)) {
+      return true;
+    } else {
+      fs_ptn_result->class = &mmux_libc_file_system_pathname_class_static;
+      return false;
+    }
   }
 }
-static bool
-mmux_libc_file_system_pathname_factory_static_make_from_ascii_len
-    (mmux_libc_fs_ptn_t			fs_ptn_result		MMUX_CC_LIBC_UNUSED,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory		MMUX_CC_LIBC_UNUSED,
-     mmux_asciicp_t			src_ptn_ascii		MMUX_CC_LIBC_UNUSED,
-     mmux_usize_t			src_ptn_len_no_nul	MMUX_CC_LIBC_UNUSED)
-/* This function is the implementation  of the method "make_from_ascii_len()" for the
-   file system factory "mmux_libc_file_system_pathname_factory_class_static". */
-{
-  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
-  return true;
-}
 static mmux_libc_file_system_pathname_factory_class_t const mmux_libc_file_system_pathname_factory_class_static = {
-  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_static_make_from_asciiz,
-  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_static_make_from_ascii_len,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-file-system-pathname-factory-static",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_file_system_pathname_factory_static_class__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_string_factory_class_static__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_static__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_static__make_from_memfd,
 };
 static mmux_libc_file_system_pathname_factory_t const mmux_libc_file_system_pathname_factory_static_object = {
   .class		= &mmux_libc_file_system_pathname_factory_class_static,
@@ -441,10 +465,10 @@ mmux_libc_file_system_pathname_factory_static (mmux_libc_fs_ptn_factory_t ptn_fa
  *   }
  */
 
-static bool
-mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz
-    (mmux_libc_fs_ptn_t fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+bool
+mmux_libc_file_system_pathname_factory_class_dynamic__make_from_asciiz
+    (mmux_libc_str_t fs_ptn_result,
+     mmux_libc_str_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t src_ptn_asciiz)
 /* This function  is the  implementation of the  method "make_from_asciiz()"  for the
    file system factory "mmux_libc_file_system_pathname_factory_class_dynamic".
@@ -478,24 +502,18 @@ mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz
 
   /* Construct the resulting data structure. */
   {
-    mmux_libc_file_system_pathname_class_t const *  class = &mmux_libc_file_system_pathname_class_dynamic;
-    mmux_asciizcp_t	dst_ptn_asciiz;
-
-    if (mmux_libc_memory_allocator_malloc_and_copy(class->memory_allocator,
-						   &dst_ptn_asciiz, src_ptn_asciiz,
-						   src_ptn_len_plus_nil)) {
+    if (mmux_libc_string_factory_class_dynamic__make_from_asciiz(fs_ptn_result, fs_ptn_factory, src_ptn_asciiz)) {
       return true;
     } else {
-      fs_ptn_result->value = dst_ptn_asciiz;
-      fs_ptn_result->class = class;
+      fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
       return false;
     }
   }
 }
-static bool
-mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len
-    (mmux_libc_fs_ptn_t fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+bool
+mmux_libc_file_system_pathname_factory_class_dynamic__make_from_ascii_len
+    (mmux_libc_str_t fs_ptn_result,
+     mmux_libc_str_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len_no_nul)
 /* This function is the implementation  of the method "make_from_ascii_len()" for the
    file system factory "mmux_libc_file_system_pathname_factory_class_dynamic".
@@ -526,26 +544,29 @@ mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len
 
   /* Construct the resulting data structure. */
   {
-    mmux_libc_file_system_pathname_class_t const *  class = &mmux_libc_file_system_pathname_class_dynamic;
-    mmux_asciizp_t	dst_ptn_asciiz;
-
-    if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &dst_ptn_asciiz, dst_ptn_len_with_nul)) {
+    if (mmux_libc_string_factory_class_dynamic__make_from_ascii_len(fs_ptn_result, fs_ptn_factory,
+								    src_ptn_ascii, src_ptn_len_no_nul)) {
       return true;
     } else {
-      mmux_libc_memcpy(dst_ptn_asciiz, src_ptn_ascii, src_ptn_len_no_nul);
-      dst_ptn_asciiz[src_ptn_len_no_nul.value] = '\0';
-      fs_ptn_result->value = dst_ptn_asciiz;
-      fs_ptn_result->class = class;
+      fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
       return false;
     }
   }
 }
 static mmux_libc_file_system_pathname_factory_class_t mmux_libc_file_system_pathname_factory_class_dynamic = {
-  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_dynamic_make_from_asciiz,
-  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_dynamic_make_from_ascii_len,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-file-system-pathname-factory-dynamic",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_file_system_pathname_factory_class_dynamic__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_file_system_pathname_factory_class_dynamic__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_dynamic__make_from_memfd,
 };
 static mmux_libc_file_system_pathname_factory_copying_t const mmux_libc_file_system_pathname_factory_dynamic_object = {
-  .class		= &mmux_libc_file_system_pathname_factory_class_dynamic,
+  .class	= &mmux_libc_file_system_pathname_factory_class_dynamic,
 };
 bool
 mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_copying_t fs_ptn_factory)
@@ -559,10 +580,10 @@ mmux_libc_file_system_pathname_factory_dynamic (mmux_libc_fs_ptn_factory_copying
  ** File system pathnames: pathnames factory, swallowed dynamically allocated strings, default allocator.
  ** ----------------------------------------------------------------- */
 
-static bool
-mmux_libc_file_system_pathname_factory_swallow_make_from_asciiz
-    (mmux_libc_fs_ptn_t fs_ptn_result,
-     mmux_libc_fs_ptn_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
+bool
+mmux_libc_file_system_pathname_factory_class_swallow__make_from_asciiz
+    (mmux_libc_str_t fs_ptn_result,
+     mmux_libc_str_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t src_ptn_asciiz)
 /* This function  is the  implementation of the  method "make_from_asciiz()"  for the
    file system factory "mmux_libc_file_system_pathname_factory_class_swallow".
@@ -598,29 +619,28 @@ mmux_libc_file_system_pathname_factory_swallow_make_from_asciiz
 
   /* Construct the resulting data structure. */
   {
-    fs_ptn_result->value = src_ptn_asciiz;
-    fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
-    return false;
+    if (mmux_libc_string_factory_class_swallow__make_from_asciiz(fs_ptn_result, fs_ptn_factory, src_ptn_asciiz)) {
+      return true;
+    } else {
+      fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
+      return false;
+    }
   }
 }
-static bool
-mmux_libc_file_system_pathname_factory_swallow_make_from_ascii_len
-    (mmux_libc_fs_ptn_t			fs_ptn_result		MMUX_CC_LIBC_UNUSED,
-     mmux_libc_fs_ptn_factory_arg_t	fs_ptn_factory		MMUX_CC_LIBC_UNUSED,
-     mmux_asciicp_t			src_ptn_ascii		MMUX_CC_LIBC_UNUSED,
-     mmux_usize_t			src_ptn_len_no_nul	MMUX_CC_LIBC_UNUSED)
-/* This function is the implementation  of the method "make_from_ascii_len()" for the
-   file system factory "mmux_libc_file_system_pathname_factory_class_swallow". */
-{
-  mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
-  return true;
-}
 static mmux_libc_file_system_pathname_factory_class_t mmux_libc_file_system_pathname_factory_class_swallow = {
-  .make_from_asciiz	= mmux_libc_file_system_pathname_factory_swallow_make_from_asciiz,
-  .make_from_ascii_len	= mmux_libc_file_system_pathname_factory_swallow_make_from_ascii_len,
+  .interface_specification = {
+    .is_name		= "mmux-cc-libc-file-system-pathname-factory-swallow",
+    .is_current		= 0,
+    .is_revision	= 0,
+    .is_age		= 0,
+  },
+  .make_from_asciiz		= mmux_libc_file_system_pathname_factory_class_swallow__make_from_asciiz,
+  .make_from_ascii_len		= mmux_libc_string_factory_class_swallow__make_from_ascii_len,
+  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix,
+  .make_from_memfd		= mmux_libc_string_factory_class_swallow__make_from_memfd,
 };
 static mmux_libc_file_system_pathname_factory_t const mmux_libc_file_system_pathname_factory_swallow_object = {
-  .class		= &mmux_libc_file_system_pathname_factory_class_swallow,
+  .class	= &mmux_libc_file_system_pathname_factory_class_swallow,
 };
 bool
 mmux_libc_file_system_pathname_factory_swallow (mmux_libc_fs_ptn_factory_t fs_ptn_factory)
@@ -651,12 +671,7 @@ mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn,
 bool
 mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn)
 {
-  if (fs_ptn->class->memory_allocator->class->free(fs_ptn->class->memory_allocator, (mmux_pointer_t)fs_ptn->value)) {
-    return true;
-  } else {
-    fs_ptn->value = NULL;
-    return false;
-  }
+  return fs_ptn->class->unmake(fs_ptn);
 }
 bool
 mmux_libc_unmake_file_system_pathname_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
