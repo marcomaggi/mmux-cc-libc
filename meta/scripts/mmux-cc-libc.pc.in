@@ -21,6 +21,7 @@ sysconfdir=@sysconfdir@
 Name: @PACKAGE_NAME@
 Description: C11 language library interfacing the GNU C Library
 Version: @MMUX_PKG_CONFIG_VERSION@
+Requires: mmux-cc-types >= 0.1.0
 Libs: -L${libdir} -lmmux-cc-libc
 Cflags: -I${includedir}
 
