@@ -8,7 +8,7 @@ m4_dnl Abstract
 m4_dnl
 m4_dnl		This library defines macros to configure the package.
 m4_dnl
-m4_dnl Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+m4_dnl Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 m4_dnl
 m4_dnl
 m4_dnl This program is free  software: you can redistribute it and/or  modify it under the
@@ -207,6 +207,20 @@ m4_define([[[mmux_libc_VALUEOF_EKEYREVOKED]]],			[[[@MMUX_VALUEOF_EKEYREVOKED@]]
 m4_define([[[mmux_libc_VALUEOF_EKEYREJECTED]]],			[[[@MMUX_VALUEOF_EKEYREJECTED@]]])
 m4_define([[[mmux_libc_VALUEOF_EOWNERDEAD]]],			[[[@MMUX_VALUEOF_EOWNERDEAD@]]])
 m4_define([[[mmux_libc_VALUEOF_ENOTRECOVERABLE]]],		[[[@MMUX_VALUEOF_ENOTRECOVERABLE@]]])
+m4_define([[[mmux_libc_VALUEOF_EPROCLIM]]],			[[[@MMUX_VALUEOF_EPROCLIM@]]])
+m4_define([[[mmux_libc_VALUEOF_EBADRPC]]],			[[[@MMUX_VALUEOF_EBADRPC@]]])
+m4_define([[[mmux_libc_VALUEOF_ERPCMISMATCH]]],			[[[@MMUX_VALUEOF_ERPCMISMATCH@]]])
+m4_define([[[mmux_libc_VALUEOF_EPROGUNAVAIL]]],			[[[@MMUX_VALUEOF_EPROGUNAVAIL@]]])
+m4_define([[[mmux_libc_VALUEOF_EPROGMISMATCH]]],		[[[@MMUX_VALUEOF_EPROGMISMATCH@]]])
+m4_define([[[mmux_libc_VALUEOF_EPROCUNAVAIL]]],			[[[@MMUX_VALUEOF_EPROCUNAVAIL@]]])
+m4_define([[[mmux_libc_VALUEOF_EFTYPE]]],			[[[@MMUX_VALUEOF_EFTYPE@]]])
+m4_define([[[mmux_libc_VALUEOF_EAUTH]]],			[[[@MMUX_VALUEOF_EAUTH@]]])
+m4_define([[[mmux_libc_VALUEOF_ENEEDAUTH]]],			[[[@MMUX_VALUEOF_ENEEDAUTH@]]])
+m4_define([[[mmux_libc_VALUEOF_EBACKGROUND]]],			[[[@MMUX_VALUEOF_EBACKGROUND@]]])
+m4_define([[[mmux_libc_VALUEOF_EDIED]]],			[[[@MMUX_VALUEOF_EDIED@]]])
+m4_define([[[mmux_libc_VALUEOF_ERFKILL]]],			[[[@MMUX_VALUEOF_ERFKILL@]]])
+m4_define([[[mmux_libc_VALUEOF_EHWPOISON]]],			[[[@MMUX_VALUEOF_EHWPOISON@]]])
+
 m4_define([[[mmux_libc_VALUEOF_AT_EACCESS]]],			[[[@MMUX_VALUEOF_AT_EACCESS@]]])
 m4_define([[[mmux_libc_VALUEOF_AT_EMPTY_PATH]]],		[[[@MMUX_VALUEOF_AT_EMPTY_PATH@]]])
 m4_define([[[mmux_libc_VALUEOF_AT_FDCWD]]],			[[[@MMUX_VALUEOF_AT_FDCWD@]]])

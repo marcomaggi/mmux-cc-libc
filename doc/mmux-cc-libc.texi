@@ -803,6 +803,20 @@ Error code @code{\NAME\}.
 @MmuxLibcDefineErrnoConstant{EOWNERDEAD}
 @MmuxLibcDefineErrnoConstant{ENOTRECOVERABLE}
 
+@MmuxLibcDefineErrnoConstant{EPROCLIM}
+@MmuxLibcDefineErrnoConstant{EBADRPC}
+@MmuxLibcDefineErrnoConstant{ERPCMISMATCH}
+@MmuxLibcDefineErrnoConstant{EPROGUNAVAIL}
+@MmuxLibcDefineErrnoConstant{EPROGMISMATCH}
+@MmuxLibcDefineErrnoConstant{EPROCUNAVAIL}
+@MmuxLibcDefineErrnoConstant{EFTYPE}
+@MmuxLibcDefineErrnoConstant{EAUTH}
+@MmuxLibcDefineErrnoConstant{ENEEDAUTH}
+@MmuxLibcDefineErrnoConstant{EBACKGROUND}
+@MmuxLibcDefineErrnoConstant{EDIED}
+@MmuxLibcDefineErrnoConstant{ERFKILL}
+@MmuxLibcDefineErrnoConstant{EHWPOISON}
+
 @c page
 @node memory
 @chapter Memory management
