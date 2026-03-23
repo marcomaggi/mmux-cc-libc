@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -21,7 +21,7 @@
 
 
 static void
-test_address_make_from_string (void)
+test_address_init_from_string (void)
 /* Setting the IPv6 address from an ASCIIZ string. */
 {
   mmux_asciizcp_t		address_presentation = "1:2:3:4:5:6:7:8";
@@ -121,7 +121,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
     PROGNAME = "test-networking-sockets-struct-infour-six";
   }
 
-  if (true) {	test_address_make_from_string();	}
+  if (true) {	test_address_init_from_string();	}
   if (true) {	test_address_any();			}
   if (true) {	test_address_loopback();		}
 

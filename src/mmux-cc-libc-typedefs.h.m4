@@ -276,28 +276,28 @@ typedef struct mmux_libc_string_factory_class_t		mmux_libc_string_factory_class_
 typedef struct mmux_libc_string_factory_t		mmux_libc_string_factory_t;
 typedef struct mmux_libc_string_factory_copying_t	mmux_libc_string_factory_copying_t;
 
-typedef bool mmux_libc_string_factory_make_from_asciiz_fun_t
+typedef bool mmux_libc_string_factory_init_from_asciiz_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_asciizcp_t src_str_asciiz);
 
-typedef bool mmux_libc_string_factory_make_from_ascii_len_fun_t
+typedef bool mmux_libc_string_factory_init_from_ascii_len_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_asciicp_t src_str_ascii, mmux_usize_t src_str_len);
 
-typedef bool mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t
+typedef bool mmux_libc_string_factory_init_from_prefix_and_suffix_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_libc_str_arg_t str_prefix, mmux_libc_str_arg_t str_suffix);
 
-typedef bool mmux_libc_string_factory_make_string_from_memfd_fun_t
+typedef bool mmux_libc_string_factory_init_from_memfd_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_libc_memory_file_descriptor_t const * mfd);
 
 struct mmux_libc_string_factory_class_t {
   mmux_libc_interface_specification_t				interface_specification;
-  mmux_libc_string_factory_make_from_asciiz_fun_t *		make_from_asciiz;
-  mmux_libc_string_factory_make_from_ascii_len_fun_t *		make_from_ascii_len;
-  mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t *	make_from_prefix_and_suffix;
-  mmux_libc_string_factory_make_string_from_memfd_fun_t *	make_from_memfd;
+  mmux_libc_string_factory_init_from_asciiz_fun_t *		init_from_asciiz;
+  mmux_libc_string_factory_init_from_ascii_len_fun_t *		init_from_ascii_len;
+  mmux_libc_string_factory_init_from_prefix_and_suffix_fun_t *	init_from_prefix_and_suffix;
+  mmux_libc_string_factory_init_from_memfd_fun_t *		init_from_memfd;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
@@ -431,11 +431,11 @@ typedef struct mmux_libc_file_system_pathname_factory_class_t	mmux_libc_file_sys
 typedef struct mmux_libc_file_system_pathname_factory_t		mmux_libc_file_system_pathname_factory_t;
 typedef struct mmux_libc_file_system_pathname_factory_copying_t mmux_libc_file_system_pathname_factory_copying_t;
 
-typedef bool mmux_libc_file_system_pathname_factory_make_from_asciiz_fun_t
+typedef bool mmux_libc_file_system_pathname_factory_init_from_asciiz_fun_t
    (mmux_libc_fs_ptn_t ptn_result, mmux_libc_file_system_pathname_factory_t const * fs_ptn_factory,
     mmux_asciizcp_t src_ptn_asciiz);
 
-typedef bool mmux_libc_file_system_pathname_factory_make_from_ascii_len_fun_t
+typedef bool mmux_libc_file_system_pathname_factory_init_from_ascii_len_fun_t
    (mmux_libc_fs_ptn_t ptn_result, mmux_libc_file_system_pathname_factory_t const * fs_ptn_factory,
     mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len);
 

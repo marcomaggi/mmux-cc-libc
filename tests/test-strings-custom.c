@@ -38,7 +38,7 @@ print_string (void)
   mmux_libc_strlen(&str_len, str_asciiz);
 
   mmux_libc_string_factory_static(str_factory);
-  if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+  if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
     handle_error();
   } else if (mmux_libc_make_memfd(mfd)) {
     handle_error();
@@ -88,7 +88,7 @@ test_string_length (void)
     mmux_libc_str_factory_t	str_factory;
 
     mmux_libc_string_factory_static(str_factory);
-    if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+    if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
       handle_error();
     }
   }
@@ -100,7 +100,7 @@ test_string_length (void)
     printf_message("the string length is: %lu", len_no_nul.value);
   }
 
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 
   printf_message("DONE: %s\n", __func__);
 }
@@ -132,7 +132,7 @@ test_string_factory_swallow (void)
       mmux_libc_str_factory_t	str_factory;
 
       mmux_libc_string_factory_swallow(str_factory);
-      if (mmux_libc_make_string(str, str_factory, bufptr)) {
+      if (mmux_libc_string_init(str, str_factory, bufptr)) {
 	handle_error();
       }
     }
@@ -149,7 +149,7 @@ test_string_factory_swallow (void)
 	handle_error();
       }
     }
-    if (mmux_libc_unmake_string(str)) {
+    if (mmux_libc_string_final(str)) {
       handle_error();
     }
   }
@@ -167,7 +167,7 @@ test_string_factory_dynamic (void)
     mmux_libc_str_factory_copying_t	str_factory;
 
     mmux_libc_string_factory_dynamic(str_factory);
-    if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+    if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
       printf_error("error making custom string");
       handle_error();
     }
@@ -184,7 +184,7 @@ test_string_factory_dynamic (void)
       handle_error();
     }
   }
-  if (mmux_libc_unmake_string(str)) {
+  if (mmux_libc_string_final(str)) {
     handle_error();
   }
 }
@@ -205,7 +205,7 @@ test_string_factory_dynamic2 (void)
     mmux_libc_str_factory_copying_t	str_factory;
 
     mmux_libc_string_factory_dynamic(str_factory);
-    if (mmux_libc_make_string2(str, str_factory, str_asciiz, str_len_no_nul)) {
+    if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_len_no_nul)) {
       printf_error("error making custom string");
       handle_error();
     }
@@ -223,7 +223,7 @@ test_string_factory_dynamic2 (void)
       handle_error();
     }
   }
-  if (mmux_libc_unmake_string(str)) {
+  if (mmux_libc_string_final(str)) {
     handle_error();
   }
 
@@ -247,10 +247,10 @@ test_compare_equal_strings (void)
     mmux_libc_str_factory_t	str_factory;
 
     mmux_libc_string_factory_static(str_factory);
-    if (mmux_libc_make_string(str1, str_factory, str_asciiz)) {
+    if (mmux_libc_string_init(str1, str_factory, str_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_string(str2, str_factory, str_asciiz)) {
+    if (mmux_libc_string_init(str2, str_factory, str_asciiz)) {
       handle_error();
     }
   }
@@ -347,8 +347,8 @@ test_compare_equal_strings (void)
     }
   }
 
-  mmux_libc_unmake_string(str1);
-  mmux_libc_unmake_string(str2);
+  mmux_libc_string_final(str1);
+  mmux_libc_string_final(str2);
 }
 
 /* ------------------------------------------------------------------ */
@@ -366,10 +366,10 @@ test_compare_different_strings_less (void)
     mmux_libc_str_factory_t	str_factory;
 
     mmux_libc_string_factory_static(str_factory);
-    if (mmux_libc_make_string(str1, str_factory, str_asciiz1)) {
+    if (mmux_libc_string_init(str1, str_factory, str_asciiz1)) {
       handle_error();
     }
-    if (mmux_libc_make_string(str2, str_factory, str_asciiz2)) {
+    if (mmux_libc_string_init(str2, str_factory, str_asciiz2)) {
       handle_error();
     }
   }
@@ -466,8 +466,8 @@ test_compare_different_strings_less (void)
     }
   }
 
-  mmux_libc_unmake_string(str1);
-  mmux_libc_unmake_string(str2);
+  mmux_libc_string_final(str1);
+  mmux_libc_string_final(str2);
 }
 
 /* ------------------------------------------------------------------ */
@@ -485,10 +485,10 @@ test_compare_different_strings_greater (void)
     mmux_libc_str_factory_t	str_factory;
 
     mmux_libc_string_factory_static(str_factory);
-    if (mmux_libc_make_string(str1, str_factory, str_asciiz1)) {
+    if (mmux_libc_string_init(str1, str_factory, str_asciiz1)) {
       handle_error();
     }
-    if (mmux_libc_make_string(str2, str_factory, str_asciiz2)) {
+    if (mmux_libc_string_init(str2, str_factory, str_asciiz2)) {
       handle_error();
     }
   }
@@ -585,8 +585,8 @@ test_compare_different_strings_greater (void)
     }
   }
 
-  mmux_libc_unmake_string(str1);
-  mmux_libc_unmake_string(str2);
+  mmux_libc_string_final(str1);
+  mmux_libc_string_final(str2);
 
   printf_message("DONE: %s\n", __func__);
 }
@@ -610,13 +610,13 @@ one_concatenation_case (mmux_asciizcp_t prefix_str_asciiz, mmux_asciizcp_t suffi
     mmux_libc_str_factory_copying_t	str_factory;
 
     mmux_libc_string_factory_dynamic(str_factory);
-    if (mmux_libc_make_string(prefix_str, str_factory, prefix_str_asciiz)) {
+    if (mmux_libc_string_init(prefix_str, str_factory, prefix_str_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_string(suffix_str, str_factory, suffix_str_asciiz)) {
+    if (mmux_libc_string_init(suffix_str, str_factory, suffix_str_asciiz)) {
       handle_error();
     }
-    if (mmux_libc_make_string_concat(result_str, str_factory, prefix_str, suffix_str)) {
+    if (mmux_libc_string_init_concat(result_str, str_factory, prefix_str, suffix_str)) {
       printf_error("concatenating strings");
       handle_error();
     }
@@ -647,13 +647,13 @@ one_concatenation_case (mmux_asciizcp_t prefix_str_asciiz, mmux_asciizcp_t suffi
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_string(prefix_str)) {
+    if (mmux_libc_string_final(prefix_str)) {
       handle_error();
     }
-    if (mmux_libc_unmake_string(suffix_str)) {
+    if (mmux_libc_string_final(suffix_str)) {
       handle_error();
     }
-    if (mmux_libc_unmake_string(result_str)) {
+    if (mmux_libc_string_final(result_str)) {
       handle_error();
     }
   }
@@ -701,7 +701,7 @@ string_from_memfd (void)
 	mmux_libc_str_factory_copying_t  str_factory;
 
 	mmux_libc_string_factory_dynamic(str_factory);
-	if (mmux_libc_make_string_from_memfd(str, str_factory, mfd)) {
+	if (mmux_libc_string_init_from_memfd(str, str_factory, mfd)) {
 	  handle_error();
 	}
       }
@@ -739,7 +739,7 @@ string_from_memfd (void)
 
     /* Final cleanup. */
     {
-      mmux_libc_unmake_string(str);
+      mmux_libc_string_final(str);
     }
   }
 
@@ -765,7 +765,7 @@ string_object_is_empty (void)
       mmux_libc_str_factory_copying_t	str_factory;
 
       mmux_libc_string_factory_dynamic(str_factory);
-      if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+      if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
 	handle_error();
       }
     }
@@ -787,7 +787,7 @@ string_object_is_empty (void)
 
     /* Final cleanup. */
     {
-      mmux_libc_unmake_string(str);
+      mmux_libc_string_final(str);
     }
   }
 
@@ -807,7 +807,7 @@ string_object_is_not_empty (void)
       mmux_libc_str_factory_copying_t	str_factory;
 
       mmux_libc_string_factory_dynamic(str_factory);
-      if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+      if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
 	handle_error();
       }
     }
@@ -829,7 +829,7 @@ string_object_is_not_empty (void)
 
     /* Final cleanup. */
     {
-      mmux_libc_unmake_string(str);
+      mmux_libc_string_final(str);
     }
   }
 

@@ -369,20 +369,20 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
  *   mmux_libc_str_t          str;
  *
  *   mmux_libc_string_factory_static(str_factory);
- *   if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+ *   if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
  *     // error
  *   } else {
  *     ...
- *     mmux_libc_unmake_string(str);
+ *     mmux_libc_string_final(str);
  *   }
  */
 
 bool
-mmux_libc_string_factory_class_static__make_from_asciiz
+mmux_libc_string_factory_class_static__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
-/* This  function is  the implementation  of  the method  "make_from_asciiz" for  the
+/* This  function is  the implementation  of  the method  "init_from_asciiz" for  the
    string factory "mmux_libc_string_factory_static".
 
    This function constructs a new string data structure and stores it in the variable
@@ -413,35 +413,35 @@ mmux_libc_string_factory_class_static__make_from_asciiz
   }
 }
 bool
-mmux_libc_string_factory_class_static__make_from_ascii_len
+mmux_libc_string_factory_class_static__init_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
      mmux_usize_t			src_str_len_no_nul	MMUX_CC_LIBC_UNUSED)
-/* This function  is the implementation  of the method "make_from_ascii_len"  for the
+/* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_static". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 bool
-mmux_libc_string_factory_class_static__make_from_prefix_and_suffix
+mmux_libc_string_factory_class_static__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result				MMUX_CC_LIBC_UNUSED,
      mmux_libc_string_factory_t const * str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix			MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_suffix			MMUX_CC_LIBC_UNUSED)
-/* This function  is the  implementation of the  method "make_from_prefix_and_suffix"
+/* This function  is the  implementation of the  method "init_from_prefix_and_suffix"
    for the string factory "mmux_libc_string_factory_static". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 bool
-mmux_libc_string_factory_class_static__make_from_memfd
+mmux_libc_string_factory_class_static__init_from_memfd
     (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
-/* This function is the implementation of the method "make_from_memfd" for the string
+/* This function is the implementation of the method "init_from_memfd" for the string
    factory "mmux_libc_string_factory_static". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
@@ -454,10 +454,10 @@ static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_static__
     .is_revision	= 0,
     .is_age		= 0,
   },
-  .make_from_asciiz		= mmux_libc_string_factory_class_static__make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_class_static__make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_static__make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_class_static__make_from_memfd,
+  .init_from_asciiz		= mmux_libc_string_factory_class_static__init_from_asciiz,
+  .init_from_ascii_len		= mmux_libc_string_factory_class_static__init_from_ascii_len,
+  .init_from_prefix_and_suffix	= mmux_libc_string_factory_class_static__init_from_prefix_and_suffix,
+  .init_from_memfd		= mmux_libc_string_factory_class_static__init_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_static__object = {
   .class = &mmux_libc_string_factory_static__class,
@@ -481,20 +481,20 @@ mmux_libc_string_factory_static (mmux_libc_str_factory_t str_factory)
  *   mmux_libc_str_t          str;
  *
  *   mmux_libc_string_factory_dynamic(str_factory);
- *   if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+ *   if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
  *     // error
  *   } else {
  *     ...
- *     mmux_libc_unmake_string(str);
+ *     mmux_libc_string_final(str);
  *   }
  */
 
 bool
-mmux_libc_string_factory_class_dynamic__make_from_asciiz
+mmux_libc_string_factory_class_dynamic__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
-/* This  function is  the implementation  of  the method  "make_from_asciiz" for  the
+/* This  function is  the implementation  of  the method  "init_from_asciiz" for  the
    string factory "mmux_libc_string_factory_dynamic".
 
    This function Constructs a new string data structure and stores it in the variable
@@ -536,11 +536,11 @@ mmux_libc_string_factory_class_dynamic__make_from_asciiz
   }
 }
 bool
-mmux_libc_string_factory_class_dynamic__make_from_ascii_len
+mmux_libc_string_factory_class_dynamic__init_from_ascii_len
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t str_source_ascii, mmux_usize_t str_source_length_no_nul)
-/* This function  is the implementation  of the method "make_from_ascii_len"  for the
+/* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_dynamic".
 
    This funcion constructs a new string data  structure and stores it in the variable
@@ -581,12 +581,12 @@ mmux_libc_string_factory_class_dynamic__make_from_ascii_len
   }
 }
 bool
-mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix
+mmux_libc_string_factory_class_dynamic__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
-/* This function  is the  implementation of the  method "make_from_prefix_and_suffix"
+/* This function  is the  implementation of the  method "init_from_prefix_and_suffix"
    for the string factory "mmux_libc_string_factory_dynamic". */
 {
   mmux_usize_t	result_length_including_nul;
@@ -633,11 +633,11 @@ mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix
   }
 }
 bool
-mmux_libc_string_factory_class_dynamic__make_from_memfd
+mmux_libc_string_factory_class_dynamic__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory MMUX_CC_LIBC_UNUSED,
      mmux_libc_memfd_arg_t		mfd)
-/* This function is the implementation of the method "make_from_memfd" for the string
+/* This function is the implementation of the method "init_from_memfd" for the string
    factory "mmux_libc_string_factory_dynamic". */
 {
   mmux_libc_string_class_t const *	class = &mmux_libc_string_class_dynamic;
@@ -671,10 +671,10 @@ static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_dynamic_
     .is_revision	= 0,
     .is_age		= 0,
   },
-  .make_from_asciiz		= mmux_libc_string_factory_class_dynamic__make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_class_dynamic__make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_class_dynamic__make_from_memfd,
+  .init_from_asciiz		= mmux_libc_string_factory_class_dynamic__init_from_asciiz,
+  .init_from_ascii_len		= mmux_libc_string_factory_class_dynamic__init_from_ascii_len,
+  .init_from_prefix_and_suffix	= mmux_libc_string_factory_class_dynamic__init_from_prefix_and_suffix,
+  .init_from_memfd		= mmux_libc_string_factory_class_dynamic__init_from_memfd,
 };
 static mmux_libc_string_factory_copying_t	const mmux_libc_string_factory_dynamic__object = {
   .class		= &mmux_libc_string_factory_dynamic__class,
@@ -713,7 +713,7 @@ mmux_libc_string_factory_dynamic (mmux_libc_str_factory_copying_t str_factory)
  *     mmux_libc_str_factory_t  str_factory;
  *
  *     mmux_libc_string_factory_swallow(str_factory);
- *     if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+ *     if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
  *       // error
  *     }
  *   }
@@ -722,16 +722,16 @@ mmux_libc_string_factory_dynamic (mmux_libc_str_factory_copying_t str_factory)
  *
  *   // Final cleanup.
  *   {
- *     mmux_libc_unmake_string(str);
+ *     mmux_libc_string_final(str);
  *   }
  */
 
 bool
-mmux_libc_string_factory_class_swallow__make_from_asciiz
+mmux_libc_string_factory_class_swallow__init_from_asciiz
 (mmux_libc_str_t str_result,
  mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
  mmux_asciizcp_t str_source_asciiz)
-/* This  function is  the implementation  of  the method  "make_from_asciiz" for  the
+/* This  function is  the implementation  of  the method  "init_from_asciiz" for  the
    string factory "mmux_libc_string_factory_swallow".
 
    This function constructs a new string data structure and stores it in the variable
@@ -764,35 +764,35 @@ mmux_libc_string_factory_class_swallow__make_from_asciiz
   }
 }
 bool
-mmux_libc_string_factory_class_swallow__make_from_ascii_len
+mmux_libc_string_factory_class_swallow__init_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
      mmux_usize_t			src_str_len_no_nul	MMUX_CC_LIBC_UNUSED)
-/* This function  is the implementation  of the method "make_from_ascii_len"  for the
+/* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_swallow". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 bool
-mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix
+mmux_libc_string_factory_class_swallow__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result				MMUX_CC_LIBC_UNUSED,
      mmux_libc_string_factory_t const * str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_prefix			MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_arg_t str_suffix			MMUX_CC_LIBC_UNUSED)
-/* This function  is the  implementation of the  method "make_from_prefix_and_suffix"
+/* This function  is the  implementation of the  method "init_from_prefix_and_suffix"
    for the string factory "mmux_libc_string_factory_swallow". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
   return true;
 }
 bool
-mmux_libc_string_factory_class_swallow__make_from_memfd
+mmux_libc_string_factory_class_swallow__init_from_memfd
     (mmux_libc_str_t			str_result	MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory	MMUX_CC_LIBC_UNUSED,
      mmux_libc_memfd_arg_t		mfd		MMUX_CC_LIBC_UNUSED)
-/* This function is the implementation of the method "make_from_memfd" for the string
+/* This function is the implementation of the method "init_from_memfd" for the string
    factory "mmux_libc_string_factory_swallow". */
 {
   mmux_libc_errno_set(MMUX_LIBC_ENOTSUP);
@@ -805,10 +805,10 @@ static mmux_libc_string_factory_class_t		const mmux_libc_string_factory_swallow_
     .is_revision	= 0,
     .is_age		= 0,
   },
-  .make_from_asciiz		= mmux_libc_string_factory_class_swallow__make_from_asciiz,
-  .make_from_ascii_len		= mmux_libc_string_factory_class_swallow__make_from_ascii_len,
-  .make_from_prefix_and_suffix	= mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix,
-  .make_from_memfd		= mmux_libc_string_factory_class_swallow__make_from_memfd,
+  .init_from_asciiz		= mmux_libc_string_factory_class_swallow__init_from_asciiz,
+  .init_from_ascii_len		= mmux_libc_string_factory_class_swallow__init_from_ascii_len,
+  .init_from_prefix_and_suffix	= mmux_libc_string_factory_class_swallow__init_from_prefix_and_suffix,
+  .init_from_memfd		= mmux_libc_string_factory_class_swallow__init_from_memfd,
 };
 static mmux_libc_string_factory_t		const mmux_libc_string_factory_swallow__object = {
   .class		= &mmux_libc_string_factory_swallow__class,
@@ -826,49 +826,49 @@ mmux_libc_string_factory_swallow (mmux_libc_str_factory_t str_factory)
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_make_string (mmux_libc_str_t str,
+mmux_libc_string_init (mmux_libc_str_t str,
 		       mmux_libc_str_factory_arg_t str_factory,
 		       mmux_asciizcp_t src_str_asciiz)
 {
-  return str_factory->class->make_from_asciiz(str, str_factory, src_str_asciiz);
+  return str_factory->class->init_from_asciiz(str, str_factory, src_str_asciiz);
 }
 bool
-mmux_libc_make_string2 (mmux_libc_str_t str,
+mmux_libc_string_init2 (mmux_libc_str_t str,
 			mmux_libc_str_factory_copying_arg_t str_factory,
 			mmux_asciicp_t src_str_ascii, mmux_usize_t src_str_len_no_nul)
 {
-  return str_factory->class->make_from_ascii_len(str, str_factory, src_str_ascii, src_str_len_no_nul);
+  return str_factory->class->init_from_ascii_len(str, str_factory, src_str_ascii, src_str_len_no_nul);
 }
 bool
-mmux_libc_make_string_concat (mmux_libc_str_t				str_result,
+mmux_libc_string_init_concat (mmux_libc_str_t				str_result,
 			      mmux_libc_str_factory_copying_arg_t	str_factory,
 			      mmux_libc_str_arg_t			str_prefix,
 			      mmux_libc_str_arg_t			str_suffix)
 {
-  return str_factory->class->make_from_prefix_and_suffix(str_result, str_factory, str_prefix, str_suffix);
+  return str_factory->class->init_from_prefix_and_suffix(str_result, str_factory, str_prefix, str_suffix);
 }
 bool
-mmux_libc_make_string_from_memfd (mmux_libc_str_t			str_result,
+mmux_libc_string_init_from_memfd (mmux_libc_str_t			str_result,
 				  mmux_libc_str_factory_copying_arg_t	str_factory,
 				  mmux_libc_memfd_arg_t			mfd)
 {
-  return str_factory->class->make_from_memfd(str_result, str_factory, mfd);
+  return str_factory->class->init_from_memfd(str_result, str_factory, mfd);
 }
 bool
-mmux_libc_unmake_string (mmux_libc_str_t str)
+mmux_libc_string_final (mmux_libc_str_t str)
 {
   return str->class->unmake(str);
 }
 bool
-mmux_libc_unmake_string_variable (mmux_libc_str_t * str_p)
+mmux_libc_string_final_variable (mmux_libc_str_t * str_p)
 /* This is an experimental function to be used with the GCC extension "cleanup":
  *
  *   mmux_libc_str_t  str2 = str1
- *     __attribute__((__cleanup__(mmux_libc_unmake_string_variable)));
+ *     __attribute__((__cleanup__(mmux_libc_string_final_variable)));
  *
  */
 {
-  return mmux_libc_unmake_string(*str_p);
+  return mmux_libc_string_final(*str_p);
 }
 
 

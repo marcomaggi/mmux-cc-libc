@@ -2981,7 +2981,7 @@ mmux_libc_str_t  str;
   mmux_libc_str_factory_t  str_factory;
 
   mmux_libc_string_factory_static(str_factory);
-  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+  if (mmux_libc_string_init(str, str_factory, str_asciiz)) @{
     /* error */
   @}
 @}
@@ -2990,7 +2990,7 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 
@@ -3127,7 +3127,7 @@ typedef struct mmux_libc_string_factory_copying_t const *  mmux_libc_str_factory
 @subsubsection Static string construction factory
 
 
-To use the @emph{static factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+To use the @emph{static factory} with the constructor @cfunc{mmux_libc_string_init}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3138,7 +3138,7 @@ mmux_libc_str_t  str;
   mmux_libc_str_factory_t  str_factory;
 
   mmux_libc_string_factory_static(str_factory);
-  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+  if (mmux_libc_string_init(str, str_factory, str_asciiz)) @{
     /* error */
   @}
 @}
@@ -3147,7 +3147,7 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 
@@ -3161,7 +3161,7 @@ been already allocated and initialised, and the new custom string object will re
 factory uses the ``fake'' memory allocator, @ref{memory allocators fake, Fake memory allocator}.  We
 can use this factory to reference a hard--coded string.
 
-We can use this factory only with the constructor @cfunc{mmux_libc_make_string}; if we use it with
+We can use this factory only with the constructor @cfunc{mmux_libc_string_init}; if we use it with
 the other constructors: the constructor call will fail and @code{errno} will be set to
 @code{ENOTSUP}.
 @end deftypefun
@@ -3171,7 +3171,7 @@ the other constructors: the constructor call will fail and @code{errno} will be 
 @subsubsection Dynamic string construction factory
 
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3182,7 +3182,7 @@ mmux_libc_str_t  str;
   mmux_libc_str_factory_copying_t  str_factory;
 
   mmux_libc_string_factory_dynamic(str_factory);
-  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+  if (mmux_libc_string_init(str, str_factory, str_asciiz)) @{
     /* error */
   @}
 @}
@@ -3191,11 +3191,11 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string2}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init2}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3208,7 +3208,7 @@ mmux_libc_str_t  str;
 
   mmux_libc_string_factory_dynamic(str_factory);
   mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
-  if (mmux_libc_make_string2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+  if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
     /* error */
   @}
 @}
@@ -3217,11 +3217,11 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string_concat}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init_concat}, we do:
 
 @example
 mmux_libc_str_t  str_prefix;
@@ -3232,22 +3232,22 @@ mmux_libc_str_t  str_prefix;
   mmux_libc_str_factory_copying_t  str_factory;
 
   mmux_libc_string_factory_dynamic(str_factory);
-  if (mmux_libc_make_string(str_prefix, str_factory, "The colour of water")) @{
+  if (mmux_libc_string_init(str_prefix, str_factory, "The colour of water")) @{
     /* error */
   @}
-  if (mmux_libc_make_string(str_suffix, str_factory, " and quicksilver.")) @{
+  if (mmux_libc_string_init(str_suffix, str_factory, " and quicksilver.")) @{
     /* error */
   @}
-  if (mmux_libc_make_string_concat(str_result, str_factory, str_prefix, str_suffix)) @{
+  if (mmux_libc_string_init_concat(str_result, str_factory, str_prefix, str_suffix)) @{
     /* error */
   @}
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_string(str_prefix)) @{
+    if (mmux_libc_string_final(str_prefix)) @{
       /* error */
     @}
-    if (mmux_libc_unmake_string(str_suffix)) @{
+    if (mmux_libc_string_final(str_suffix)) @{
       /* error */
     @}
   @}
@@ -3257,7 +3257,7 @@ mmux_libc_str_t  str_prefix;
 
 /* Final clenaup. */
 @{
-  if (mmux_libc_unmake_string(str_result)) @{
+  if (mmux_libc_string_final(str_result)) @{
     /* error */
   @}
 @}
@@ -3273,8 +3273,8 @@ allocated using the default memory allocator, @ref{memory allocators default, De
 allocator}.  We can use this factory when we need to build a custom string by creating a copy of an
 existing string.
 
-We can use this factory with the constructors @cfunc{mmux_libc_make_string},
-@cfunc{mmux_libc_make_string2}, @cfunc{mmux_libc_make_string_concat}.
+We can use this factory with the constructors @cfunc{mmux_libc_string_init},
+@cfunc{mmux_libc_string_init2}, @cfunc{mmux_libc_string_init_concat}.
 @end deftypefun
 
 @c page
@@ -3282,7 +3282,7 @@ We can use this factory with the constructors @cfunc{mmux_libc_make_string},
 @subsubsection Swallow string construction factory
 
 
-To use the @emph{swallow factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+To use the @emph{swallow factory} with the constructor @cfunc{mmux_libc_string_init}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3309,7 +3309,7 @@ mmux_libc_str_t  str;
     mmux_libc_str_factory_t  str_factory;
 
     mmux_libc_string_factory_swallow(str_factory);
-    if (mmux_libc_make_string(str, str_factory, bufptr)) @{
+    if (mmux_libc_string_init(str, str_factory, bufptr)) @{
       /* error */
     @}
   @}
@@ -3319,7 +3319,7 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_string(str)) @{
+  if (mmux_libc_string_final(str)) @{
     /* error */
   @}
 @}
@@ -3338,7 +3338,7 @@ Default memory allocator}.
 The string objects that result from using this factory take full ownership of the dynamically
 allocated memory.
 
-We can use this factory only with the constructor @cfunc{mmux_libc_make_string}; if we use it with
+We can use this factory only with the constructor @cfunc{mmux_libc_string_init}; if we use it with
 the other constructors: the constructor call will fail and @code{errno} will be set to
 @code{ENOTSUP}.
 @end deftypefun
@@ -3358,14 +3358,14 @@ the other constructors: the constructor call will fail and @code{errno} will be 
 @cindex custom strings, suffix
 
 
-@deftypefun bool mmux_libc_make_string (mmux_libc_str_t @var{str_result}, @
+@deftypefun bool mmux_libc_string_init (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_arg_t @var{str_factory}, @
   mmux_asciizcp_t @var{str_asciiz})
 Make a new custom string object, using the given @var{str_factory} and the @MmuxAsciiZ{} string
 referenced by @var{str_asciiz}.  The pointer @var{str_asciiz} must not be @cnull{}, but it can
 reference an empty string (that is: a string for which @code{'\0' == @var{str_asciiz}[0]}).
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3376,7 +3376,7 @@ mmux_libc_str_t  str;
   mmux_libc_str_factory_copying_t  str_factory;
 
   mmux_libc_string_factory_dynamic(str_factory);
-  if (mmux_libc_make_string(str, str_factory, str_asciiz)) @{
+  if (mmux_libc_string_init(str, str_factory, str_asciiz)) @{
     /* error */
   @}
 @}
@@ -3385,14 +3385,14 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_string2 (mmux_libc_str_t @var{str_result}, @
+@deftypefun bool mmux_libc_string_init2 (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
   mmux_asciicp_t @var{str_ascii}, @
   mmux_usize_t @var{str_length_excluding_nul})
@@ -3404,7 +3404,7 @@ This constructor always allocates new memory and makes a copy of the given @var{
 so the given @var{str_factory} must support this operation, otherwise @ctrue{} is returned and
 @cerrno{} set to @code{MMUX_LIBC_ENOTSUP}.
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string2}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init2}, we do:
 
 @example
 mmux_libc_str_t  str;
@@ -3417,7 +3417,7 @@ mmux_libc_str_t  str;
 
   mmux_libc_string_factory_dynamic(str_factory);
   mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
-  if (mmux_libc_make_string2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+  if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
     /* error */
   @}
 @}
@@ -3426,20 +3426,20 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 @end deftypefun
 
 @c ------------------------------------------------------------------------
 
-@deftypefun bool mmux_libc_make_string_concat (mmux_libc_str_t @var{str_result}, @
+@deftypefun bool mmux_libc_string_init_concat (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
   mmux_libc_str_arg_t @var{prefix}, @
   mmux_libc_str_arg_t @var{suffix})
 Make a new custom string by concatenating the @var{prefix} with the @var{suffix}.
 
-To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_make_string_concat}, we do:
+To use the @emph{dynamic factory} with the constructor @cfunc{mmux_libc_string_init_concat}, we do:
 
 @example
 mmux_libc_str_t  str_prefix;
@@ -3450,22 +3450,22 @@ mmux_libc_str_t  str_prefix;
   mmux_libc_str_factory_copying_t  str_factory;
 
   mmux_libc_string_factory_dynamic(str_factory);
-  if (mmux_libc_make_string(str_prefix, str_factory, "The colour of water")) @{
+  if (mmux_libc_string_init(str_prefix, str_factory, "The colour of water")) @{
     /* error */
   @}
-  if (mmux_libc_make_string(str_suffix, str_factory, " and quicksilver.")) @{
+  if (mmux_libc_string_init(str_suffix, str_factory, " and quicksilver.")) @{
     /* error */
   @}
-  if (mmux_libc_make_string_concat(str_result, str_factory, str_prefix, str_suffix)) @{
+  if (mmux_libc_string_init_concat(str_result, str_factory, str_prefix, str_suffix)) @{
     /* error */
   @}
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_string(str_prefix)) @{
+    if (mmux_libc_string_final(str_prefix)) @{
       /* error */
     @}
-    if (mmux_libc_unmake_string(str_suffix)) @{
+    if (mmux_libc_string_final(str_suffix)) @{
       /* error */
     @}
   @}
@@ -3475,7 +3475,7 @@ mmux_libc_str_t  str_prefix;
 
 /* Final clenaup. */
 @{
-  if (mmux_libc_unmake_string(str_result)) @{
+  if (mmux_libc_string_final(str_result)) @{
     /* error */
   @}
 @}
@@ -3483,7 +3483,7 @@ mmux_libc_str_t  str_prefix;
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_unmake_string (mmux_libc_str_t @var{str})
+@deftypefun bool mmux_libc_string_final (mmux_libc_str_t @var{str})
 Finalise the custom string object referenced by @var{str}, appropriately releasing all the
 referenced asynchronous resources.
 @end deftypefun
@@ -3571,10 +3571,10 @@ mmux_libc_str_t  str1, str2;
   mmux_libc_str_factory_t  str_factory;
 
   mmux_libc_string_factory_static(str_factory);
-  if (mmux_libc_make_string(str1, str_factory, str_asciiz_1)) @{
+  if (mmux_libc_string_init(str1, str_factory, str_asciiz_1)) @{
     /* error */
   @}
-  if (mmux_libc_make_string(str2, str_factory, str_asciiz_2)) @{
+  if (mmux_libc_string_init(str2, str_factory, str_asciiz_2)) @{
     /* error */
   @}
 @}
@@ -3593,10 +3593,10 @@ mmux_libc_str_t  str1, str2;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_string(str1)) @{
+  if (mmux_libc_string_final(str1)) @{
     /* error */
   @};
-  if (mmux_libc_unmake_string(str2)) @{
+  if (mmux_libc_string_final(str2)) @{
     /* error */
   @}
 @}
@@ -3618,10 +3618,10 @@ mmux_libc_str_t  str1, str2;
   mmux_libc_str_factory_t  str_factory;
 
   mmux_libc_string_factory_static(str_factory);
-  if (mmux_libc_make_string(str1, str_factory, str_asciiz_1)) @{
+  if (mmux_libc_string_init(str1, str_factory, str_asciiz_1)) @{
     /* error */
   @}
-  if (mmux_libc_make_string(str2, str_factory, str_asciiz_2)) @{
+  if (mmux_libc_string_init(str2, str_factory, str_asciiz_2)) @{
     /* error */
   @}
 @}
@@ -3640,10 +3640,10 @@ mmux_libc_str_t  str1, str2;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_string(str1)) @{
+  if (mmux_libc_string_final(str1)) @{
     /* error */
   @};
-  if (mmux_libc_unmake_string(str2)) @{
+  if (mmux_libc_string_final(str2)) @{
     /* error */
   @}
 @}
@@ -3708,7 +3708,7 @@ mmux_libc_str_t  str;
     mmux_libc_str_factory_copying_t  str_factory;
 
     mmux_libc_string_factory_dynamic(str_factory);
-    if (mmux_libc_make_string_from_memfd(str, str_factory, mfd)) @{
+    if (mmux_libc_string_init_from_memfd(str, str_factory, mfd)) @{
       /* error */
     @}
   @}
@@ -3725,12 +3725,12 @@ mmux_libc_str_t  str;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_string(str);
+  mmux_libc_string_final(str);
 @}
 @end example
 
 
-@deftypefun bool mmux_libc_make_string_from_memfd (mmux_libc_str_t @var{str_result}, @
+@deftypefun bool mmux_libc_string_init_from_memfd (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
   mmux_libc_memfd_arg_t @var{mfd})
 Make a new custom string object, using the given @var{str_factory} and memory--mapped file

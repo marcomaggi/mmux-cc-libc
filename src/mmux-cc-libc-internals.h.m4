@@ -443,27 +443,27 @@ mmux_cc_libc_private_decl bool mmux_libc_string_class__unmake (mmux_libc_str_t s
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)
@@ -471,27 +471,27 @@ mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_static__make_from_
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)
@@ -499,27 +499,27 @@ mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_dynamic__make_from
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)
@@ -532,27 +532,27 @@ mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_class__unmake (mmu
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_static_make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_static_init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_static__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)
@@ -560,27 +560,27 @@ mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_stat
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dynamic__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)
@@ -588,27 +588,27 @@ mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_dyna
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__make_from_asciiz
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__init_from_asciiz
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
      mmux_asciizcp_t str_asciiz_source)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__make_from_ascii_len
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__init_from_ascii_len
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_asciicp_t			src_str_ascii,
      mmux_usize_t			src_str_len_no_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__make_from_prefix_and_suffix
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__init_from_prefix_and_suffix
     (mmux_libc_str_t str_result,
      mmux_libc_string_factory_t const * str_factory,
      mmux_libc_str_arg_t str_prefix,
      mmux_libc_str_arg_t str_suffix)
   __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__make_from_memfd
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_factory_class_swallow__init_from_memfd
     (mmux_libc_str_t			str_result,
      mmux_libc_str_factory_arg_t	str_factory,
      mmux_libc_memfd_arg_t		mfd)

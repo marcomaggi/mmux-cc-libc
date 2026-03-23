@@ -1065,32 +1065,32 @@ mmux_cc_libc_decl bool mmux_libc_string_factory_dynamic (mmux_libc_str_factory_c
 mmux_cc_libc_decl bool mmux_libc_string_factory_swallow (mmux_libc_str_factory_t str_factory)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_make_string (mmux_libc_str_t str_result,
+mmux_cc_libc_decl bool mmux_libc_string_init (mmux_libc_str_t str_result,
 					      mmux_libc_str_factory_arg_t str_factory,
 					      mmux_asciizcp_t src_str_asciiz)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_string2 (mmux_libc_str_t str_result,
+mmux_cc_libc_decl bool mmux_libc_string_init2 (mmux_libc_str_t str_result,
 					       mmux_libc_str_factory_copying_arg_t str_factory,
 					       mmux_asciicp_t src_str_ascii,
 					       mmux_usize_t   src_str_len_excluding_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_make_string_concat (mmux_libc_str_t				str_result,
+mmux_cc_libc_decl bool mmux_libc_string_init_concat (mmux_libc_str_t				str_result,
 						     mmux_libc_str_factory_copying_arg_t	str_factory,
 						     mmux_libc_str_arg_t			str_prefix,
 						     mmux_libc_str_arg_t			str_suffix)
   __attribute__((__nonnull__(1,2,3,4)));
 
-mmux_cc_libc_decl bool mmux_libc_make_string_from_memfd (mmux_libc_str_t			str_result,
+mmux_cc_libc_decl bool mmux_libc_string_init_from_memfd (mmux_libc_str_t			str_result,
 							 mmux_libc_str_factory_copying_arg_t	str_factory,
 							 mmux_libc_memfd_arg_t			mfd)
   __attribute__((__nonnull__(1,2,3)));
 
-mmux_cc_libc_decl bool mmux_libc_unmake_string (mmux_libc_str_t str)
+mmux_cc_libc_decl bool mmux_libc_string_final (mmux_libc_str_t str)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_unmake_string_variable (mmux_libc_str_t * str_p)
+mmux_cc_libc_decl bool mmux_libc_string_final_variable (mmux_libc_str_t * str_p)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */
