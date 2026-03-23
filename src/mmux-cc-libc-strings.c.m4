@@ -893,6 +893,19 @@ mmux_libc_string_len_including_nul_ref (mmux_usize_t * str_len_including_nul_res
   return mmux_libc_strlen_plus_nil(str_len_including_nul_result_p, str->value);
 }
 
+bool
+mmux_libc_string_is_empty (bool * is_empty_result, mmux_libc_str_arg_t str)
+{
+  *is_empty_result = (0 == strlen(str->value))? true : false;
+  return false;
+}
+bool
+mmux_libc_string_is_not_empty (bool * is_not_empty_result, mmux_libc_str_arg_t str)
+{
+  *is_not_empty_result = (0 == strlen(str->value))? false : true;
+  return false;
+}
+
 
 /** --------------------------------------------------------------------
  ** Custom strings: comparison operations.

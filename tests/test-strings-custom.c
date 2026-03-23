@@ -692,19 +692,17 @@ string_from_memfd (void)
 	handle_error();
       }
 
+      if (mmux_libc_dprintf(mfd, "%s", "The colour of water and quicksilver.")) {
+	handle_error();
+      }
+
+      /* Actually build the string. */
       {
-	if (mmux_libc_dprintf(mfd, "%s", "The colour of water and quicksilver.")) {
+	mmux_libc_str_factory_copying_t  str_factory;
+
+	mmux_libc_string_factory_dynamic(str_factory);
+	if (mmux_libc_make_string_from_memfd(str, str_factory, mfd)) {
 	  handle_error();
-	}
-
-	/* Actually build the string. */
-	{
-	  mmux_libc_str_factory_copying_t  str_factory;
-
-	  mmux_libc_string_factory_dynamic(str_factory);
-	  if (mmux_libc_make_string_from_memfd(str, str_factory, mfd)) {
-	    handle_error();
-	  }
 	}
       }
 
@@ -750,6 +748,96 @@ string_from_memfd (void)
 
 
 /** --------------------------------------------------------------------
+ ** Strings inspection: empty objects.
+ ** ----------------------------------------------------------------- */
+
+static void
+string_object_is_empty (void)
+{
+  printf_message("running test: %s", __func__);
+
+  {
+    mmux_libc_str_t  str;
+
+    /* Build the string. */
+    {
+      mmux_asciizcp_t			str_asciiz = "The colour of water and quicksilver.";
+      mmux_libc_str_factory_copying_t	str_factory;
+
+      mmux_libc_string_factory_dynamic(str_factory);
+      if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+	handle_error();
+      }
+    }
+
+    /* Compare the built string with the expected string. */
+    {
+      bool	is_empty;
+
+      if (mmux_libc_string_is_empty(&is_empty, str)) {
+	handle_error();
+      }
+      if (is_empty) {
+	print_error("is_empty: string wrongly recognised as empty");
+	mmux_libc_exit_failure();
+      } else {
+	printf_message("is_empty: string correctly recognised as not-empty");
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_string(str);
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
+}
+static void
+string_object_is_not_empty (void)
+{
+  printf_message("running test: %s", __func__);
+
+  {
+    mmux_libc_str_t  str;
+
+    /* Build the string. */
+    {
+      mmux_asciizcp_t			str_asciiz = "The colour of water and quicksilver.";
+      mmux_libc_str_factory_copying_t	str_factory;
+
+      mmux_libc_string_factory_dynamic(str_factory);
+      if (mmux_libc_make_string(str, str_factory, str_asciiz)) {
+	handle_error();
+      }
+    }
+
+    /* Compare the built string with the expected string. */
+    {
+      bool	is_not_empty;
+
+      if (mmux_libc_string_is_not_empty(&is_not_empty, str)) {
+	handle_error();
+      }
+      if (is_not_empty) {
+	printf_message("is_not_empty: string correctly recognised as not-empty");
+      } else {
+	print_error("is_not_empty: string wrongly recognised as empty");
+	mmux_libc_exit_failure();
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_unmake_string(str);
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
+}
+
+
+/** --------------------------------------------------------------------
  ** Let's go.
  ** ----------------------------------------------------------------- */
 
@@ -776,6 +864,9 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	string_concatenation();				}
 
   if (1) {	string_from_memfd();				}
+
+  if (1) {	string_object_is_empty();			}
+  if (1) {	string_object_is_not_empty();			}
 
   mmux_libc_exit_success();
 }

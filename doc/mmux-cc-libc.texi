@@ -3538,6 +3538,18 @@ mmux_libc_string_len_including_nul_ref(&len_including_nul, str);
 @end example
 @end deftypefun
 
+
+@deftypefun bool mmux_libc_string_is_empty (bool * @var{is_empty_result}, mmux_libc_str_arg_t @var{str})
+Store @ctrue{} in the variable referenced by @var{is_empty_result} if @var{str} represents a string
+of length zero; otherwise store @cfalse{}.
+@end deftypefun
+
+
+@deftypefun bool mmux_libc_string_is_not_empty (bool * @var{is_not_empty_result}, mmux_libc_str_arg_t @var{str})
+Store @ctrue{} in the variable referenced by @var{is_empty_result} if @var{str} represents a string
+of length non--zero; otherwise store @cfalse{}.
+@end deftypefun
+
 @c page
 @node strings objects comparison
 @subsection Comparing string objects
