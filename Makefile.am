@@ -237,7 +237,8 @@ tests_test_errors_strerror_LDADD			= $(mmux_cc_libc_tests_ldadd)
 check_PROGRAMS	+= \
 	tests/test-memory-core				\
 	tests/test-memory-search-and-stuff		\
-	tests/test-memory-allocator
+	tests/test-memory-allocator			\
+	tests/test-memory-mapping-core
 
 tests_test_memory_core_CPPFLAGS				= $(mmux_cc_libc_tests_cppflags)
 tests_test_memory_core_LDADD				= $(mmux_cc_libc_tests_ldadd)
@@ -247,6 +248,9 @@ tests_test_memory_search_and_stuff_LDADD		= $(mmux_cc_libc_tests_ldadd)
 
 tests_test_memory_allocator_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
 tests_test_memory_allocator_LDADD			= $(mmux_cc_libc_tests_ldadd)
+
+tests_test_memory_mapping_core_CPPFLAGS			= $(mmux_cc_libc_tests_cppflags)
+tests_test_memory_mapping_core_LDADD			= $(mmux_cc_libc_tests_ldadd)
 
 ## ------------------------------------------------------------------------
 ## strings

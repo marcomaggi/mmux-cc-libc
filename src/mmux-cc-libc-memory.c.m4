@@ -7,7 +7,7 @@
 
 	This module implements the memory management API.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -189,6 +189,113 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_MEMMEM]]],[[[
   *result_p = memmem(haystack_ptr, haystack_len.value, needle_ptr, needle_len.value);
   return false;
 ]]])
+}
+
+
+/** --------------------------------------------------------------------
+ ** Memory mapping.
+ ** ----------------------------------------------------------------- */
+
+bool
+mmux_libc_munmap (mmux_libc_mmap_buffer_arg_t mapping)
+{
+  int	rv = munmap(mapping->bufptr, mapping->buflen.value);
+
+  if (0 == rv) {
+    return false;
+  } else {
+    return true;
+  }
+}
+bool
+mmux_libc_mmap_upon_storage (mmux_libc_mmap_storage_t			mapping_result,
+			     mmux_libc_mmap_upon_storage_request_arg_t	mapping_request,
+			     mmux_libc_mmap_upon_storage_factory_arg_t	mapping_factory)
+{
+  void *	address = mmap(mapping_request->bufptr,
+			       mapping_request->buflen.value,
+			       mapping_factory->protect.value,
+			       mapping_factory->flags.value,
+			       mapping_factory->filedes.value,
+			       mapping_request->offset.value);
+
+  if (MAP_FAILED == address) {
+    return true;
+  } else {
+    mapping_result->bufptr	= address;
+    mapping_result->buflen	= mapping_request->buflen;
+    return false;
+  }
+}
+bool
+mmux_libc_mmap_upon_heap (mmux_libc_mmap_heap_t				mapping_result,
+			  mmux_libc_mmap_upon_heap_request_arg_t	mapping_request,
+			  mmux_libc_mmap_upon_heap_factory_arg_t	mapping_factory)
+{
+  mmux_standard_sint_t	flags = (mapping_factory->flags.value | MMUX_LIBC_VALUEOF_MAP_ANONYMOUS);
+  {
+    /* With this variant: the arguments "fd" and "offset" are ignored. */
+    void *	address = mmap(NULL,
+			       mapping_request->buflen.value,
+			       mapping_factory->protect.value,
+			       flags, 0, 0);
+
+    if (MAP_FAILED == address) {
+      return true;
+    } else {
+      mapping_result->bufptr	= address;
+      mapping_result->buflen	= mapping_request->buflen;
+      return false;
+    }
+  }
+}
+bool
+mmux_libc_mremap (mmux_libc_mmap_buffer_t			mapping_result,
+		  mmux_libc_mmap_upon_heap_request_arg_t	requested_mapping,
+		  mmux_libc_mmap_heap_arg_t			old_mapping,
+		  mmux_libc_mremap_factory_arg_t		remap_factory)
+{
+  void *	address;
+
+  if (NULL == requested_mapping->bufptr) {
+    if (MMUX_LIBC_VALUEOF_MREMAP_FIXED & remap_factory->flags.value) {
+      /* If the  flag MREMAP_FIXED  was included:  "mremap()" accepts  the additional
+	 argument that represents the actual new address.  It is an error here. */
+      mmux_libc_errno_set_to_einval();
+      return true;
+    } else {
+      /* Call "mremap()" with  FOUR arguments to let the kernel  select the requested
+	 new address. */
+      address = mremap(old_mapping->bufptr,
+		       old_mapping->buflen.value,
+		       requested_mapping->buflen.value,
+		       remap_factory->flags.value);
+    }
+  } else {
+    /* Include the  flags required to remap  at a given address.
+
+       If we make a  bit of reasoning: when requesting a remapping  to a given target
+       address, if the new address is different from the old address, the kernel must
+       move  the  mapped  memory;  so  it   is  obvious  that  we  must  include  the
+       "MREMAP_MAYMOVE" flag. */
+    mmux_standard_sint_t	flags = (remap_factory->flags.value	| \
+					 MMUX_LIBC_VALUEOF_MREMAP_FIXED	| \
+					 MMUX_LIBC_VALUEOF_MREMAP_MAYMOVE);
+    /* Call "mremap()" with FIVE arguments to specify the requested new address. */
+    address = mremap(old_mapping->bufptr,
+		     old_mapping->buflen.value,
+		     requested_mapping->buflen.value,
+		     flags,
+		     requested_mapping->bufptr);
+  }
+
+  if (MAP_FAILED == address) {
+    return true;
+  } else {
+    mapping_result->bufptr = address;
+    mapping_result->buflen = requested_mapping->buflen;
+    return false;
+  }
 }
 
 

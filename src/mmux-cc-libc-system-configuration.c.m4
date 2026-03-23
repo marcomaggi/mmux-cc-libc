@@ -7,7 +7,7 @@
 
 	This module implements the system configuration API.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -113,6 +113,21 @@ mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd,
  no_error:
   *result_p = result;
   return false;
+}
+
+/* ------------------------------------------------------------------ */
+
+bool
+mmux_libc_sysconf_page_size_ref (mmux_usize_t * value_p)
+{
+  mmux_slong_t	value;
+
+  if (mmux_libc_sysconf(&value, MMUX_LIBC__SC_PAGESIZE)) {
+    return true;
+  } else {
+    value_p->value = (mmux_standard_usize_t) value.value;
+    return false;
+  }
 }
 
 

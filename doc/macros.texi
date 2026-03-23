@@ -207,6 +207,17 @@
 @acronym{RFC}
 @end macro
 
+@ifhtml
+@macro MmuxRAM{}
+@acronym{ram}
+@end macro
+@end ifhtml
+@ifnothtml
+@macro MmuxRAM{}
+@acronym{RAM}
+@end macro
+@end ifnothtml
+
 @c ------------------------------------------------------------
 
 @macro sftp{}

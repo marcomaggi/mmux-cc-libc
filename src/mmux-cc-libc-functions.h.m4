@@ -287,6 +287,31 @@ mmux_cc_libc_decl bool mmux_libc_toupper (mmux_char_t * result_p, mmux_char_t ch
  ** Memory.
  ** ----------------------------------------------------------------- */
 
+mmux_cc_libc_inline_decl mmux_libc_memory_map_protection_t
+mmux_libc_memory_map_protection (mmux_standard_sint_t prot)
+{
+  return (mmux_libc_memory_map_protection_t){ .value = prot };
+}
+mmux_cc_libc_inline_decl bool
+mmux_libc_memory_map_protection_equal (mmux_libc_memory_map_protection_t prot1,
+				       mmux_libc_memory_map_protection_t prot2)
+{
+  return (prot1.value == prot2.value)? true : false;
+}
+
+mmux_cc_libc_inline_decl mmux_libc_memory_map_flags_t
+mmux_libc_memory_map_flags (mmux_standard_sint_t flags)
+{
+  return (mmux_libc_memory_map_flags_t){ .value = flags };
+}
+mmux_cc_libc_inline_decl mmux_libc_memory_remap_flags_t
+mmux_libc_memory_remap_flags (mmux_standard_sint_t flags)
+{
+  return (mmux_libc_memory_remap_flags_t){ .value = flags };
+}
+
+/* ------------------------------------------------------------------ */
+
 #define mmux_libc_malloc(POINTERP,LEN)			\
   mmux_libc_malloc_(((mmux_pointer_t *)(POINTERP)),(LEN))
 
@@ -377,6 +402,47 @@ mmux_cc_libc_decl bool mmux_libc_memmem_ (mmux_pointer_t * result_p,
 
 #define mmux_libc_memmem(RESULTP,HAYSTACK_PTR,HAYSTACK_LEN,NEEDLE_PTR,NEEDLE_LEN) \
   mmux_libc_memmem_((mmux_pointer_t *)(RESULTP),(HAYSTACK_PTR),(HAYSTACK_LEN),(NEEDLE_PTR),(NEEDLE_LEN))
+
+/* ------------------------------------------------------------------ */
+
+mmux_cc_libc_inline_decl bool
+mmux_libc_mmap_upon_heap_factory_init (mmux_libc_mmap_upon_heap_factory_t	factory,
+				       mmux_libc_memory_map_protection_t	protection,
+				       mmux_libc_memory_map_flags_t		flags)
+{
+  factory->protect	= protection;
+  factory->flags	= flags;
+  return false;
+}
+
+mmux_cc_libc_inline_decl bool
+mmux_libc_mmap_upon_heap_request_init (mmux_libc_mmap_upon_heap_request_t	request,
+				       mmux_pointer_t				bufptr,
+				       mmux_usize_t				buflen)
+{
+  request->bufptr = bufptr;
+  request->buflen = buflen;
+  return false;
+}
+
+mmux_cc_libc_decl bool mmux_libc_munmap (mmux_libc_mmap_buffer_arg_t mapping)
+  __attribute__((__nonnull__(1)));
+
+mmux_cc_libc_decl bool mmux_libc_mmap_upon_storage (mmux_libc_mmap_storage_t			mapping_result,
+						    mmux_libc_mmap_upon_storage_request_arg_t	mapping_request,
+						    mmux_libc_mmap_upon_storage_factory_arg_t	mapping_factory)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_mmap_upon_heap (mmux_libc_mmap_heap_t			mapping_result,
+						 mmux_libc_mmap_upon_heap_request_arg_t	mapping_request,
+						 mmux_libc_mmap_upon_heap_factory_arg_t	mapping_factory)
+  __attribute__((__nonnull__(1,2,3)));
+
+mmux_cc_libc_decl bool mmux_libc_mremap (mmux_libc_mmap_buffer_t		mapping_result,
+					 mmux_libc_mmap_upon_heap_request_arg_t	requested_mapping,
+					 mmux_libc_mmap_heap_arg_t		old_mapping,
+					 mmux_libc_mremap_factory_arg_t		remap_factory)
+  __attribute__((__nonnull__(1,2,3,4)));
 
 /* ------------------------------------------------------------------ */
 
@@ -1234,6 +1300,9 @@ mmux_cc_libc_decl bool mmux_libc_pathconf (mmux_slong_t * result_p, mmux_libc_fs
 
 mmux_cc_libc_decl bool mmux_libc_fpathconf (mmux_slong_t * result_p, mmux_libc_fd_arg_t fd,
 					    mmux_libc_sysconf_pathname_parameter_t parameter)
+  __attribute__((__nonnull__(1),__warn_unused_result__));
+
+mmux_cc_libc_decl bool mmux_libc_sysconf_page_size_ref (mmux_usize_t * value_p)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */

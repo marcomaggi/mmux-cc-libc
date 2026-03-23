@@ -11,7 +11,7 @@
 #
 #               m4_include(path/to/mmux.m4)
 #
-# Copyright (c) 2018, 2019, 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+# Copyright (c) 2018, 2019, 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public  License as  published by  the Free Software  Foundation, either  version 3  of the
@@ -659,7 +659,7 @@ AC_DEFUN([MMUX_LANG_GCC23],[
   AX_CHECK_COMPILE_FLAG([-std=c23],
     [AX_APPEND_FLAG([-std=c23], [CC])],
     [AC_MSG_ERROR([*** Compiler does not support -std=c23])],
-    [-pedantic])
+    [-Wpedantic])
 
   AX_CHECK_COMPILE_FLAG([-fplan9-extensions],
     [AX_APPEND_FLAG([-fplan9-extensions], [CC])],
@@ -673,7 +673,7 @@ AC_DEFUN([MMUX_LANG_GCC23],[
 
   # These flags are for every compiler.
   AS_VAR_IF(ax_is_release,'no',
-    [AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -pedantic], [MMUX_CFLAGS], [-Werror])])
+    [AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wpedantic], [MMUX_CFLAGS], [-Werror])])
 
   # These flags are for GCC only.
   AS_VAR_IF(ax_is_release,'no',

@@ -1,13 +1,13 @@
 /*
   Part of: MMUX CC Libc
-  Contents: core functions
+  Contents: library functions
   Date: Dec  8, 2024
 
   Abstract
 
-	This module implements core functions.
+	This module implements library functions.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   This program is free  software: you can redistribute it and/or  modify it under the
   terms  of  the  GNU General  Public  License  as  published  by the  Free  Software
@@ -34,7 +34,7 @@
  ** ----------------------------------------------------------------- */
 
 static mmux_libc_interface_specification_t const mmux_libc_the_interface_specification = {
-  .is_name      = "My Spiffy Project",
+  .is_name      = "MMUX CC Libc",
   .is_current   = mmux_cc_libc_VERSION_INTERFACE_CURRENT,
   .is_revision  = mmux_cc_libc_VERSION_INTERFACE_REVISION,
   .is_age       = mmux_cc_libc_VERSION_INTERFACE_AGE,

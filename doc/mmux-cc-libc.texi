@@ -1,7 +1,7 @@
 \input texinfo.tex
 @c %**start of header
 @setfilename mmux-cc-libc.info
-@settitle MMUX CC Types
+@settitle MMUX CC Libc
 @c %**end of header
 
 @c @include version.texi
@@ -548,6 +548,11 @@ if (mmux_libc_errno_ref(&errnum)) @{
 @end deftypefun
 
 
+@deftypefun bool mmux_libc_errno_set_to_einval (void)
+Call @cfunc{mmux_libc_errno_set} to set the error variable to @code{MMUX_LIBC_EINVAL}.
+@end deftypefun
+
+
 @deftypefun bool mmux_libc_errno_clear (void)
 Set @code{errno} to zero.  Always return @cfalse{}.
 @end deftypefun
@@ -825,6 +830,7 @@ Error code @code{\NAME\}.
 @menu
 * memory core::                 Core memory allocation operations.
 * memory operations::           Memory operations.
+* memory mapping::              Memory mapping.
 * memory allocators::           Memory allocator.
 @end menu
 
@@ -1313,6 +1319,419 @@ mmux_libc_memcpy(dstptr, srcptr, buflen);
 @}
 @end example
 @end deftypefn
+
+@c page
+@node memory mapping
+@section Memory mapping
+
+
+@menu
+* memory mapping intro::        Introduction to memory-mapping.
+* memory mapping protection::   Protection configuration for memory-mapping creation.
+* memory mapping flags::        Configuration flags for memory-mapping creation.
+* memory mapping reflags::      Configuration flags for memory-mapping remapping.
+* memory mapping heap::         Creating in--memory memory-mappings.
+* memory mapping device::       Creating memory-mappings on underlying devices.
+* memory mapping delete::       Deleting memory-mappings.
+@end menu
+
+@c page
+@node memory mapping intro
+@subsection Introduction to memory--mapping
+
+
+It is beyond the scope of this document to comprehensibly explain memory--management on modern
+hardware architectures and operating systems; here is just a simplified introduction to the topic.
+
+A @dfn{memory--mapping} is the definition of two layers of memory, the @dfn{upperlying memory} and
+the @dfn{underlying memory}, such that we can access the upperlying memory to read from, or write
+to, data in the underlying memory using standard, C language, memory pointers.
+
+The upperlying memory is always an abstraction over the random--access memory (@MmuxRAM{}) and it
+represents the virtual address space of the operating system process that calls the @cfunc{mmap}
+function.
+
+The underlying memory can be an abstraction over random--access memory or an abstraction over mass
+storage on an underlying device, like a file system's regular file; such device is referenced by a
+file descriptor.  Recursively, the underlying device can be an abstraction over something else.
+
+By calling @cfunc{mmap} we reserve a @dfn{memory--mapping allocation} in the address space of the
+upperlying memory, and use it to access a memory allocation in the address space of the underlying
+memory.  The upperlying memory allocation is described by a couple of values: the memory address of
+its first byte and the number of allocated bytes; the number of allocated bytes must be an exact
+multiple of the system's memory page size (often @math{4096} bytes).
+
+@float
+@example
+        upperlying address
+               |
+               v  upperlying allocation
+    |..........+------------------------+.......| upperlying memory
+    ^          |                        |
+  NULL          --                       --
+                  |                        |
+                  v                        v
+  |...............+------------------------+.............| underlying memory
+  ^               ^  underlying allocation
+NULL              |
+           underlying address
+
+  |_______________|________________________|
+       offset          number of bytes
+@end example
+@end float
+
+After a memory--mapping allocation is defined: we can redefine it (with some limitations) so that
+the upperlying allocation is used to reference a different underlying allocation; in particular: we
+can enlarge or shrink the allocations.
+
+If, when redefining a memory--mapping allocation, the region of reserved memory has to be moved into
+the upperlying address space: the old addresses referencing data in the allocation will be
+invalidated.  This means, in the upperlying process, we have to reference data in an allocation
+using offsets from the memory address of the first allocated byte; this is an inconvenience, but
+life is hard.
+
+@float
+@example
+ old upperlying address
+      |
+      v      old upperlying allocation
+  |...+--------------------------------------+............| upperlying memory
+  ^
+NULL
+
+    new upperlying address
+         |
+         v      new upperlying allocation
+  |......+---------------------------------------------+..| upperlying memory
+  ^
+NULL
+@end example
+@ignore
+@caption{Redefining an old allocation into a new allocation, by enlarging the number of allocated
+bytes.}
+@end ignore
+@end float
+
+Multiple, non--overlapping, regions of the upperlying memory can be mapped to different regions of
+the underlying memory for the same device.
+
+@float
+@example
+      upperlying
+      allocation 1         upperlying allocation 2
+|....+--------+...........+-----------------------+.....| upperlying memory
+     |        |           |                       |
+    -        -            |                       |
+   |        |             |                       |
+   |        |             |                       |
+   |        |             |                       |
+   v        v             v                       v
+|..+--------+.............+-----------------------+.........| underlying memory
+    underlying             underlying allocation 2
+    allocation 1
+@end example
+@end float
+
+Multiple, non--overlapping, regions of the upperlying memory can be mapped to regions of the
+underlying memory for multiple, different, devices.
+
+@float
+@example
+      upperlying
+      allocation 1                       upperlying allocation 2
+|....+--------+.........................+-----------------------+.....| upperlying memory
+     |        |                         |                       |
+    -        -                           -------                 -------
+   |        |                                   |                       |
+   |        |                                   |                       |
+   |        |                                   |                       |
+   v        v                                   |                       |
+|..+--------+....| underlying memory, device 1  |                       |
+    underlying allocation                       |                       |
+                                                v                       v
+underlying memory, device 2 |...................+-----------------------+....|
+                                                  underlying allocation
+@end example
+@end float
+
+@c page
+@node memory mapping protection
+@subsection Protection configuration for memory mapping creation
+
+
+@deftp {Struct Typedef} mmux_libc_memory_map_protection_t
+@deftpx {Parent Struct Type} mmux_sint_t
+Data structure representing the memory protection to configure for a memory mapping; the value must
+be a bitwise OR combination of the values @samp{MMUX_LIBC_PROT_}.
+@end deftp
+
+
+@deftypefun mmux_libc_memory_map_protection_t mmux_libc_memory_map_protection (mmux_standard_sint_t @var{prot})
+Build and return a new instance of @objtype{mmux_libc_memory_map_protection_t}.
+
+@example
+auto  requested_protection = \
+  mmux_libc_memory_map_protection(MMUX_LIBC_PROT_READ,
+                                  MMUX_LIBC_PROT_WRITE);
+@end example
+@end deftypefun
+
+
+@macro MmuxDefineMemoryMappingProtectionConstant{NAME}
+@deftypevr {Struct Constant} mmux_libc_memory_map_protection_t MMUX_LIBC_\NAME\
+@deftypevrx {Preprocessor Symbol} int MMUX_LIBC_VALUEOF_\NAME\
+@deftypevrx {Preprocessor Symbol} int HAVE_MMUX_LIBC_\NAME\
+The symbol @samp{MMUX_LIBC_\NAME\} evaluates to an instance of @objtype{mmux_standard_sint_t}
+representing the standard constant @samp{\NAME\}.
+
+The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} expands into the constant's raw numeric value.
+
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined, and defined to @samp{1}, if the symbol
+@samp{MMUX_LIBC_\NAME\} is available.
+@end deftypevr
+
+@end macro
+
+@MmuxDefineMemoryMappingProtectionConstant{PROT_EXEC}
+@MmuxDefineMemoryMappingProtectionConstant{PROT_NONE}
+@MmuxDefineMemoryMappingProtectionConstant{PROT_READ}
+@MmuxDefineMemoryMappingProtectionConstant{PROT_WRITE}
+
+@c page
+@node memory mapping flags
+@subsection Configuration flags for memory mapping creation
+
+
+@deftp {Struct Typedef} mmux_libc_memory_map_flags_t
+@deftpx {Parent Struct Type} mmux_sint_t
+Data structure representing the configuration flags for a memory mapping; the value must be a
+bitwise OR combination of the values @samp{MMUX_LIBC_MAP_}.
+@end deftp
+
+
+@deftypefun mmux_libc_memory_map_flags_t mmux_libc_memory_map_flags (mmux_standard_sint_t @var{prot})
+Build and return a new instance of @objtype{mmux_libc_memory_map_flags_t}.
+
+@example
+auto  configuration_flags = mmux_libc_memory_map_flags(MMUX_LIBC_MAP_PRIVATE);
+@end example
+@end deftypefun
+
+
+@macro MmuxDefineMemoryMappingFlagConstant{NAME}
+@defvr {Constant} MMUX_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
+The symbol @samp{MMUX_LIBC_\NAME\} evaluates to a constant value of type
+@objtype{mmux_standard_sint_t} representing the value of the standard constant @samp{\NAME\}; it can
+be defined or not depending on the features of the underlying platform.
+
+The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} expands into the constant's raw numeric value.
+
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{MMUX_LIBC_\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineMemoryMappingFlagConstant{MAP_32BIT}
+@MmuxDefineMemoryMappingFlagConstant{MAP_ANON}
+@MmuxDefineMemoryMappingFlagConstant{MAP_ANONYMOUS}
+@MmuxDefineMemoryMappingFlagConstant{MAP_DENYWRITE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_EXECUTABLE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_FILE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_FIXED}
+@MmuxDefineMemoryMappingFlagConstant{MAP_FIXED_NOREPLACE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_GROWSDOWN}
+@MmuxDefineMemoryMappingFlagConstant{MAP_HUGETLB}
+@MmuxDefineMemoryMappingFlagConstant{MAP_HUGE_1GB}
+@MmuxDefineMemoryMappingFlagConstant{MAP_HUGE_2MB}
+@MmuxDefineMemoryMappingFlagConstant{MAP_LOCKED}
+@MmuxDefineMemoryMappingFlagConstant{MAP_NONBLOCK}
+@MmuxDefineMemoryMappingFlagConstant{MAP_NORESERVE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_POPULATE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_PRIVATE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_SHARED}
+@MmuxDefineMemoryMappingFlagConstant{MAP_SHARED_VALIDATE}
+@MmuxDefineMemoryMappingFlagConstant{MAP_STACK}
+@MmuxDefineMemoryMappingFlagConstant{MAP_SYNC}
+@MmuxDefineMemoryMappingFlagConstant{MAP_UNINITIALIZED}
+
+@c page
+@node memory mapping reflags
+@subsection Configuration flags for memory mapping remapping
+
+
+@deftp {Struct Typedef} mmux_libc_memory_remap_flags_t
+@deftpx {Parent Struct Type} mmux_sint_t
+Data structure representing the configuration flags for a memory mapping; the value must be a
+bitwise OR combination of the values @samp{MMUX_LIBC_MAP_}.
+@end deftp
+
+
+@deftypefun mmux_libc_memory_remap_flags_t mmux_libc_memory_remap_flags (mmux_standard_sint_t @var{prot})
+Build and return a new instance of @objtype{mmux_libc_memory_remap_flags_t}.
+
+@example
+auto  configuration_flags = \
+  mmux_libc_memory_remap_flags(MMUX_LIBC_REMAP_FIXED | MMUX_LIBC_REMAP_MAYMOVE);
+@end example
+@end deftypefun
+
+
+@macro MmuxDefineMemoryReMappingFlagConstant{NAME}
+@defvr {Constant} MMUX_LIBC_\NAME\
+@defvrx {Preprocessor Symbol} HAVE_MMUX_LIBC_\NAME\
+The symbol @samp{MMUX_LIBC_\NAME\} evaluates to a constant value of type
+@objtype{mmux_standard_sint_t} representing the value of the standard constant @samp{\NAME\}; it can
+be defined or not depending on the features of the underlying platform.
+
+The symbol @samp{MMUX_LIBC_VALUEOF_\NAME\} expands into the constant's raw numeric value.
+
+The symbol @samp{HAVE_MMUX_LIBC_\NAME\} is defined and it evaluates to @samp{1} if the symbol
+@samp{MMUX_LIBC_\NAME\} is available.
+@end defvr
+
+@end macro
+
+@MmuxDefineMemoryReMappingFlagConstant{MREMAP_FIXED}
+@MmuxDefineMemoryReMappingFlagConstant{MREMAP_MAYMOVE}
+@MmuxDefineMemoryReMappingFlagConstant{MREMAP_DONTUNMAP}
+
+@c page
+@node memory mapping heap
+@subsection Creating in--memory memory-mappings
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_mmap_heap (mmux_pointer_t * @var{upperlying_address_result_p}, @
+mmux_usize_t @var{number_of_bytes}, @
+mmux_libc_memory_map_protection_t @var{protect}, @
+mmux_libc_memory_map_flags_t @var{flags})
+@deftypefnx {Function} bool mmux_libc_mmap_heap_ (mmux_pointer_t * @var{upperlying_address_result_p}, @
+mmux_usize_t @var{number_of_bytes}, @
+mmux_libc_memory_map_protection_t @var{protect}, @
+mmux_libc_memory_map_flags_t @var{flags})
+@MmuxCInterface{mmap}.  The preprocessor macro casts the pointer--to--pointer argument
+@var{upperlying_address_result_p} from any pointer--to--pointer type to @code{mmux_pointer_t *},
+then it calls the function with the same arguments.
+
+This is a specialised form of calling @cfunc{mmap} that allocates a block of memory in the address
+space of the calling process: it works somewhat like @cfunc{malloc}.  The kernel decides at which
+address to allocate memory.  The @var{number_of_bytes} is arbitrary: it does @strong{not} need to be
+an exact multiple of the page size; there exist uses of @cfunc{mmap} to allocate heaps of memory in
+which if @var{number_of_bytes} is an exact multiple of the page size, the performance is better.
+
+@cfunc{mmux_libc_mmap_heap} always internally composes @var{flags} with
+@samp{MMUX_LIBC_MAP_ANONYMOUS}, so the caller does not need to include it.
+@end deftypefn
+
+
+To allocate two contiguous memory pages to use as a data heap, we do:
+
+@example
+mmux_byte_t *  mapping_address;
+mmux_usize_t   mapping_length_in_bytes;
+
+/* Create the memory-mapping allocation. */
+@{
+  auto  requested_protection = mmux_libc_memory_map_protection(MMUX_LIBC_PROT_READ | MMUX_LIBC_PROT_WRITE);
+  auto  configuration_flags  = mmux_libc_memory_map_flags(MMUX_LIBC_MAP_PRIVATE);
+  mmux_usize_t  page_size;
+
+  if (mmux_libc_sysconf_page_size_ref(&page_size)) @{
+    /* error */
+  @}
+  mapping_length_in_bytes = mmux_ctype_mul(mmux_usize_constant_two(), page_size);
+  if (mmux_libc_mmap_heap(&mapping_address, mapping_length_in_bytes, requested_protection, configuration_flags)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with the heap. */
+
+/* Final cleanup. */
+@{
+  if (mmux_libc_munmap(mapping_address, mapping_length_in_bytes)) @{
+    /* error */
+  @}
+@}
+@end example
+
+@c page
+@node memory mapping device
+@subsection Creating memory-mappings on underlying devices
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_mmap (mmux_pointer_t * @var{upperlying_address_result_p}, @
+mmux_pointerc_t @var{upperlying_requested_address}, @
+mmux_usize_t @var{number_of_bytes}, @
+mmux_libc_memory_map_protection_t @var{protect}, @
+mmux_libc_memory_map_flags_t @var{flags}, @
+mmux_libc_fd_arg_t @var{underlying_device}, @
+mmux_off_t @var{underlying_offset})
+@deftypefnx {Function} bool mmux_libc_mmap_ (mmux_pointer_t * @var{upperlying_address_result_p}, @
+mmux_pointerc_t @var{upperlying_requested_address}, @
+mmux_usize_t @var{number_of_bytes}, @
+mmux_libc_memory_map_protection_t @var{protect}, @
+mmux_libc_memory_map_flags_t @var{flags}, @
+mmux_libc_fd_arg_t @var{underlying_device}, @
+mmux_off_t @var{underlying_device_offset})
+
+@MmuxCInterface{mmap}.  The preprocessor macro casts any data pointer type to
+@objtype{mmux_pointer_t}, then it calls the function with the same arguments.
+
+Create a new memory--mapping allocation starting at address @var{upperlying_requested_address} and
+@var{number_of_bytes} wide.  If the address is @cnull{}: the kernel will select an address
+appropriately.  If the address is not @cnull{}: the kernel considers the value
+@var{upperlying_requested_address} as a hint for how to select an address.
+
+The argument @var{underlying_device} select the underlying memory upon which to create the
+memory--mapping allocation; such allocation starts at @var{underlying_device_offset} and it is
+@var{number_of_bytes} wide; the argument @var{underlying_device_offset} must be an exact multiple of
+the machine's page size as determined by @cfunc{mmux_libc_sysconf_page_size_ref}.
+@end deftypefn
+
+@c page
+@node memory mapping delete
+@subsection Deleting memory-mappings
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_munmap (mmux_pointer_t @var{upperlying_address}, @
+mmux_usize_t @var{number_of_bytes_to_unmap})
+@deftypefnx {Function} bool mmux_libc_munmap_ (mmux_pointer_t @var{upperlying_address}, @
+mmux_usize_t @var{number_of_bytes_to_unmap})
+@MmuxCInterface{munmap}.
+@end deftypefn
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_mremap (mmux_pointer_t * @var{new_upperlying_address_result_p}, @
+mmux_usize_t @var{new_number_of_bytes}, @ mmux_pointerc_t @var{old_upperlying_address}, @
+mmux_usize_t @var{old_number_of_bytes}, @
+mmux_libc_memory_remap_flags_t @var{flags})
+@deftypefnx {Function} bool mmux_libc_mremap_ (mmux_pointer_t * @var{new_upperlying_address_result_p}, @
+mmux_usize_t @var{new_number_of_bytes}, @
+mmux_pointerc_t @var{old_upperlying_address}, @
+mmux_usize_t @var{old_number_of_bytes}, @
+mmux_libc_memory_remap_flags_t @var{flags})
+
+@MmuxCInterface{mremap}.
+@end deftypefn
+
+
+@deftypefn {Preprocessor Macro} bool mmux_libc_mremap_at_address (mmux_pointerc_t @var{new_upperlying_address}, @
+mmux_usize_t @var{new_number_of_bytes}, @
+mmux_pointerc_t @var{old_upperlying_address}, @
+mmux_usize_t @var{old_number_of_bytes}, @
+mmux_libc_memory_remap_flags_t @var{flags})
+@deftypefnx {Function} bool mmux_libc_mremap_at_address_ (mmux_pointerc_t @var{new_upperlying_address}, @
+mmux_usize_t @var{new_number_of_bytes}, @
+mmux_pointerc_t @var{old_upperlying_address}, @
+mmux_usize_t @var{old_number_of_bytes}, @
+mmux_libc_memory_remap_flags_t @var{flags})
+
+@MmuxCInterface{mremap}.
+@end deftypefn
+
 
 @c page
 @node memory allocators
@@ -4144,6 +4563,14 @@ if (mmux_libc_sysconf(&result, MMUX_LIBC__SC_PAGESIZE)) @{
   /* the result is in "result" */
 @}
 @end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
+@deftypefun bool mmux_libc_sysconf_page_size_ref (mmux_usize_t * @var{result_p})
+Wrapper for @cfunc{mmux_libc_sysconf} that acquires the parameters associated to
+@samp{MMUX_LIBC__SC_PAGESIZE} and returns it as a @objtype{mmux_usize_t}, rather than a
+@objtype{mmux_slong_t}.
 @end deftypefun
 
 @c ------------------------------------------------------------------------

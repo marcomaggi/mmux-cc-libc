@@ -27,6 +27,31 @@
 
 
 /** --------------------------------------------------------------------
+ ** Forward declarations.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_file_descriptor_identity_t {
+  bool	is_for_input:		1;
+  bool	is_for_ouput:		1;
+  bool	is_directory:		1;
+  bool	is_networking_socket:	1;
+  bool	is_path_only:		1;
+  bool	is_signal_fd:		1;
+  bool	is_closed_for_reading:	1;
+  bool	is_closed_for_writing:	1;
+} mmux_libc_file_descriptor_identity_t;
+
+typedef struct mmux_libc_file_descriptor_t {
+  mmux_sint_t;
+  mmux_libc_file_descriptor_identity_t	identity;
+} mmux_libc_file_descriptor_t;
+typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t[1];
+typedef mmux_libc_file_descriptor_t const *	mmux_libc_fd_arg_t;
+
+typedef struct mmux_libc_memory_file_descriptor_t	mmux_libc_memory_file_descriptor_t;
+
+
+/** --------------------------------------------------------------------
  ** Interface specification.
  ** ----------------------------------------------------------------- */
 
@@ -36,6 +61,103 @@ typedef struct mmux_libc_interface_specification_t {
   mmux_standard_uint_t	is_revision;
   mmux_standard_uint_t	is_age;
 } mmux_libc_interface_specification_t;
+
+
+/** --------------------------------------------------------------------
+ ** Memory.
+ ** ----------------------------------------------------------------- */
+
+typedef struct mmux_libc_memory_map_protection_t { mmux_sint_t; } mmux_libc_memory_map_protection_t;
+typedef struct mmux_libc_memory_map_flags_t      { mmux_sint_t; } mmux_libc_memory_map_flags_t;
+typedef struct mmux_libc_memory_remap_flags_t    { mmux_sint_t; } mmux_libc_memory_remap_flags_t;
+
+typedef struct mmux_libc_memory_mapped_buffer_t {
+  /* The kernel will choose this address as a page-aligned address. */
+  mmux_pointer_t	bufptr;
+  /* This  number   of  bytes  equals   the  same  field   of  the  objedt   of  type
+     "mmux_libc_memory_mapped_buffer_request_t" that was used to request the creation
+     of the memory-mapped allocation. */
+  mmux_usize_t		buflen;
+} mmux_libc_memory_mapped_buffer_t;
+
+typedef struct mmux_libc_memory_mapped_heap_t {
+  mmux_libc_memory_mapped_buffer_t;
+} mmux_libc_memory_mapped_heap_t;
+
+typedef struct mmux_libc_memory_mapped_storage_t {
+  mmux_libc_memory_mapped_buffer_t;
+} mmux_libc_memory_mapped_storage_t;
+
+typedef mmux_libc_memory_mapped_buffer_t			mmux_libc_mmap_buffer_t[1];
+typedef mmux_libc_memory_mapped_buffer_t const *		mmux_libc_mmap_buffer_arg_t;
+
+typedef mmux_libc_memory_mapped_heap_t				mmux_libc_mmap_heap_t[1];
+typedef mmux_libc_memory_mapped_heap_t const *			mmux_libc_mmap_heap_arg_t;
+
+typedef mmux_libc_memory_mapped_storage_t			mmux_libc_mmap_storage_t[1];
+typedef mmux_libc_memory_mapped_storage_t const *		mmux_libc_mmap_storage_arg_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_memory_mapping_factory_t {
+  mmux_libc_memory_map_protection_t	protect;
+  mmux_libc_memory_map_flags_t		flags;
+} mmux_libc_memory_mapping_factory_t;
+
+typedef struct mmux_libc_memory_mapping_upon_heap_factory_t {
+  mmux_libc_memory_mapping_factory_t;
+} mmux_libc_memory_mapping_upon_heap_factory_t;
+
+typedef struct mmux_libc_memory_mapping_upon_storage_factory_t {
+  mmux_libc_memory_mapping_factory_t;
+  mmux_libc_file_descriptor_t		filedes;
+  mmux_off_t				offset;
+} mmux_libc_memory_mapping_upon_storage_factory_t;
+
+typedef mmux_libc_memory_mapping_upon_heap_factory_t		mmux_libc_mmap_upon_heap_factory_t[1];
+typedef mmux_libc_memory_mapping_upon_heap_factory_t const *	mmux_libc_mmap_upon_heap_factory_arg_t;
+
+typedef mmux_libc_memory_mapping_upon_storage_factory_t		mmux_libc_mmap_upon_storage_factory_t[1];
+typedef mmux_libc_memory_mapping_upon_storage_factory_t const *	mmux_libc_mmap_upon_storage_factory_arg_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_memory_remapping_factory_t {
+  mmux_libc_memory_remap_flags_t	flags;
+} mmux_libc_memory_remapping_factory_t;
+
+typedef mmux_libc_memory_remapping_factory_t		mmux_libc_mremap_factory_t[1];
+typedef mmux_libc_memory_remapping_factory_t const *	mmux_libc_mremap_factory_arg_t;
+
+/* ------------------------------------------------------------------ */
+
+typedef struct mmux_libc_memory_mapped_buffer_request_t {
+  /* When requesting the creation of a  memory-mapped allocation: we might suggest an
+     address  by setting  "bufptr" to  non-NULL; but  then the  kernel will  select a
+     page-aligned address. */
+  mmux_pointer_t	bufptr;
+  /* This  number of  bytes is  not required  to  be an  exact multiple  of the  page
+     size. */
+  mmux_usize_t		buflen;
+} mmux_libc_memory_mapped_buffer_request_t;
+
+typedef struct mmux_libc_memory_mapped_buffer_upon_heap_request_t {
+  mmux_libc_memory_mapped_buffer_request_t;
+} mmux_libc_memory_mapped_buffer_upon_heap_request_t;
+
+typedef struct mmux_libc_memory_mapped_buffer_upon_storage_request_t {
+  mmux_libc_memory_mapped_buffer_request_t;
+  mmux_off_t	offset;
+} mmux_libc_memory_mapped_buffer_upon_storage_request_t;
+
+typedef mmux_libc_memory_mapped_buffer_request_t			mmux_libc_mmap_request_t[1];
+typedef mmux_libc_memory_mapped_buffer_request_t const *		mmux_libc_mmap_request_arg_t;
+
+typedef mmux_libc_memory_mapped_buffer_upon_heap_request_t		mmux_libc_mmap_upon_heap_request_t[1];
+typedef mmux_libc_memory_mapped_buffer_upon_heap_request_t const *	mmux_libc_mmap_upon_heap_request_arg_t;
+
+typedef mmux_libc_memory_mapped_buffer_upon_storage_request_t		mmux_libc_mmap_upon_storage_request_t[1];
+typedef mmux_libc_memory_mapped_buffer_upon_storage_request_t const *	mmux_libc_mmap_upon_storage_request_arg_t;
 
 
 /** --------------------------------------------------------------------
@@ -166,9 +288,6 @@ typedef bool mmux_libc_string_factory_make_from_prefix_and_suffix_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_libc_str_arg_t str_prefix, mmux_libc_str_arg_t str_suffix);
 
-/* Forward declaration. */
-typedef struct mmux_libc_memory_file_descriptor_t	mmux_libc_memory_file_descriptor_t;
-
 typedef bool mmux_libc_string_factory_make_string_from_memfd_fun_t
    (mmux_libc_str_t str_result, mmux_libc_string_factory_t const * str_factory,
     mmux_libc_memory_file_descriptor_t const * mfd);
@@ -202,24 +321,6 @@ typedef mmux_libc_string_factory_copying_t const *	mmux_libc_str_factory_copying
 /** --------------------------------------------------------------------
  ** Input/output.
  ** ----------------------------------------------------------------- */
-
-typedef struct mmux_libc_file_descriptor_identity_t {
-  bool	is_for_input:		1;
-  bool	is_for_ouput:		1;
-  bool	is_directory:		1;
-  bool	is_networking_socket:	1;
-  bool	is_path_only:		1;
-  bool	is_signal_fd:		1;
-  bool	is_closed_for_reading:	1;
-  bool	is_closed_for_writing:	1;
-} mmux_libc_file_descriptor_identity_t;
-
-typedef struct mmux_libc_file_descriptor_t {
-  mmux_sint_t;
-  mmux_libc_file_descriptor_identity_t	identity;
-} mmux_libc_file_descriptor_t;
-typedef mmux_libc_file_descriptor_t		mmux_libc_fd_t[1];
-typedef mmux_libc_file_descriptor_t const *	mmux_libc_fd_arg_t;
 
 typedef struct mmux_libc_file_descriptor_input_t {
   mmux_libc_file_descriptor_t;

@@ -81,7 +81,8 @@ AC_CACHE_SAVE
 
 # These are not checked in the "mmux.m4" file, even though the common includes have them.
 AC_CHECK_HEADERS([grp.h pwd.h utime.h sys/uio.h sys/socket.h sys/un.h netinet/in.h net/if.h
-                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h dirent.h sys/signalfd.h])
+                  arpa/inet.h netdb.h sys/syscall.h sys/mman.h signal.h dirent.h sys/signalfd.h
+                  sys/mman.h])
 
 dnl Right now, on my Slackware64 15.0, including this  header is in conflict with sys/wait.h so I do
 dnl not include it.  The  reason for including it is to get the  definition of the constant P_PIDFD,
@@ -378,6 +379,15 @@ MMUX_CONSTANT_TESTS([SYS_SECCOMP])
 
 ## interprocess signals: signalfd
 MMUX_CONSTANT_TESTS([SFD_NONBLOCK SFD_CLOEXEC])
+
+## memory mapping
+MMUX_CONSTANT_TESTS([PROT_EXEC PROT_READ PROT_WRITE PROT_NONE])
+MMUX_CONSTANT_TESTS([MAP_SHARED MAP_SHARED_VALIDATE MAP_PRIVATE MAP_32BIT MAP_ANON
+                     MAP_ANONYMOUS MAP_DENYWRITE MAP_EXECUTABLE MAP_FILE MAP_FIXED
+                     MAP_FIXED_NOREPLACE MAP_GROWSDOWN MAP_HUGETLB MAP_HUGE_2MB
+                     MAP_HUGE_1GB MAP_LOCKED MAP_NONBLOCK MAP_NORESERVE MAP_POPULATE
+                     MAP_STACK MAP_SYNC MAP_UNINITIALIZED])
+MMUX_CONSTANT_TESTS([MREMAP_FIXED MREMAP_MAYMOVE MREMAP_DONTUNMAP])
 
 ## miscellaneous
 MMUX_CONSTANT_TESTS([EOF FD_SETSIZE CLOCKS_PER_SEC])
