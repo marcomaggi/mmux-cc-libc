@@ -855,6 +855,13 @@ mmux_libc_string_init_from_memfd (mmux_libc_str_t			str_result,
   return str_factory->class->init_from_memfd(str_result, str_factory, mfd);
 }
 bool
+mmux_libc_string_init_from_string (mmux_libc_str_t		str_result,
+				   mmux_libc_str_factory_arg_t	str_factory,
+				   mmux_libc_str_arg_t		str_source)
+{
+  return mmux_libc_string_init(str_result, str_factory, str_source->value);
+}
+bool
 mmux_libc_string_final (mmux_libc_str_t str)
 {
   return str->class->unmake(str);

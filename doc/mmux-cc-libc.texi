@@ -3433,6 +3433,47 @@ mmux_libc_str_t  str;
 
 @c ------------------------------------------------------------------------
 
+@deftypefun bool mmux_libc_string_init_from_string (mmux_libc_str_t @var{str_result}, @
+  mmux_libc_str_factory_arg_t @var{str_factory}, @
+  mmux_libc_str_arg_t @var{str_source})
+Make a new string object by copying an already existing string object.
+
+@example
+mmux_libc_str_t  str_src, str_dst;
+
+/* Build the source string. */
+@{
+  mmux_asciizcp_t           str_asciiz = "The colour of water and quicksilver.";
+  mmux_libc_str_factory_t   str_factory;
+
+  mmux_libc_string_factory_static(str_factory);
+  if (mmux_libc_string_init(str_src, str_factory, str_asciiz)) @{
+    /* error */
+  @}
+@}
+
+/* Build the destination string. */
+@{
+  mmux_libc_str_factory_copying_t  str_factory;
+
+  mmux_libc_string_factory_dynamic(str_factory);
+  if (mmux_libc_string_init_from_string(str_dst, str_factory, str_src)) @{
+    /* error */
+  @}
+@}
+
+/* Do something with the strings. */
+
+/* Final cleanup. */
+@{
+  mmux_libc_string_final(str_src);
+  mmux_libc_string_final(str_dst);
+@}
+@end example
+@end deftypefun
+
+@c ------------------------------------------------------------------------
+
 @deftypefun bool mmux_libc_string_init_concat (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
   mmux_libc_str_arg_t @var{prefix}, @

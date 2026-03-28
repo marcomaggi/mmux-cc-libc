@@ -748,6 +748,76 @@ string_from_memfd (void)
 
 
 /** --------------------------------------------------------------------
+ ** Strings from strings.
+ ** ----------------------------------------------------------------- */
+
+static void
+string_from_string (void)
+{
+  printf_message("running test: %s", __func__);
+
+  {
+    mmux_libc_str_t  str_src, str_dst;
+
+    /* Build the source string. */
+    {
+      mmux_asciizcp_t		str_asciiz = "The colour of water and quicksilver.";
+      mmux_libc_str_factory_t	str_factory;
+
+      mmux_libc_string_factory_static(str_factory);
+      if (mmux_libc_string_init(str_src, str_factory, str_asciiz)) {
+	handle_error();
+      }
+    }
+
+    /* Build the destination string. */
+    {
+      mmux_libc_str_factory_copying_t  str_factory;
+
+      mmux_libc_string_factory_dynamic(str_factory);
+      if (mmux_libc_string_init_from_string(str_dst, str_factory, str_src)) {
+	handle_error();
+      }
+    }
+
+    if (true) {
+      mmux_libc_oufd_t	er;
+
+      mmux_libc_stder(er);
+      mmux_libc_dprintfer_no_error("%s: the built string is: '", __func__);
+      if (mmux_libc_dprintf_str(er, str_dst)) {
+	handle_error();
+      }
+      mmux_libc_dprintfer_no_error("'\n");
+    }
+
+    /* Compare the built string with the expected string. */
+    {
+      bool	cmpbool;
+
+      if (mmux_libc_strequ(&cmpbool, str_dst->value, "The colour of water and quicksilver.")) {
+	handle_error();
+      }
+      if (cmpbool) {
+	printf_message("equal: strings compared as expected");
+      } else {
+	print_error("equal: strings not compared as expected");
+	mmux_libc_exit_failure();
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_string_final(str_src);
+      mmux_libc_string_final(str_dst);
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
+}
+
+
+/** --------------------------------------------------------------------
  ** Strings inspection: empty objects.
  ** ----------------------------------------------------------------- */
 
@@ -864,6 +934,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	string_concatenation();				}
 
   if (1) {	string_from_memfd();				}
+  if (1) {	string_from_string();				}
 
   if (1) {	string_object_is_empty();			}
   if (1) {	string_object_is_not_empty();			}

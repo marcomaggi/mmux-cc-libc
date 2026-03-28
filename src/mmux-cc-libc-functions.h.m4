@@ -1087,6 +1087,11 @@ mmux_cc_libc_decl bool mmux_libc_string_init_from_memfd (mmux_libc_str_t			str_r
 							 mmux_libc_memfd_arg_t			mfd)
   __attribute__((__nonnull__(1,2,3)));
 
+mmux_cc_libc_decl bool mmux_libc_string_init_from_string (mmux_libc_str_t		str_result,
+							  mmux_libc_str_factory_arg_t	str_factory,
+							  mmux_libc_str_arg_t		str_source)
+  __attribute__((__nonnull__(1,2,3)));
+
 mmux_cc_libc_decl bool mmux_libc_string_final (mmux_libc_str_t str)
   __attribute__((__nonnull__(1)));
 
