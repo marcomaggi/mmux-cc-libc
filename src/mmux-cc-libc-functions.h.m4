@@ -1112,6 +1112,9 @@ mmux_cc_libc_decl bool mmux_libc_string_len_including_nul_ref
 (mmux_usize_t * str_len_including_nul_result_p, mmux_libc_str_arg_t str)
   __attribute__((__nonnull__(1,2)));
 
+mmux_cc_libc_decl bool mmux_libc_string_ref (mmux_char_t * char_result_p, mmux_libc_str_arg_t str, mmux_usize_t idx)
+  __attribute__((__nonnull__(1,2)));
+
 mmux_cc_libc_decl bool mmux_libc_string_is_empty (bool * is_empty_result,
 						  mmux_libc_str_arg_t str)
   __attribute__((__nonnull__(1,2)));

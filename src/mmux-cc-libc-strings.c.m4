@@ -899,6 +899,19 @@ mmux_libc_string_len_including_nul_ref (mmux_usize_t * str_len_including_nul_res
 {
   return mmux_libc_strlen_plus_nil(str_len_including_nul_result_p, str->value);
 }
+bool
+mmux_libc_string_ref (mmux_char_t * char_result_p, mmux_libc_str_arg_t str, mmux_usize_t idx)
+{
+  mmux_usize_t	len;
+
+  mmux_libc_string_len_ref(&len, str);
+  if (mmux_ctype_less(idx, len)) {
+    *char_result_p = mmux_char(str->value[idx.value]);
+    return false;
+  } else {
+    return true;
+  }
+}
 
 bool
 mmux_libc_string_is_empty (bool * is_empty_result, mmux_libc_str_arg_t str)

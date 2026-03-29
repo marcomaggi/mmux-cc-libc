@@ -818,6 +818,69 @@ string_from_string (void)
 
 
 /** --------------------------------------------------------------------
+ ** Strings inspection: char ref.
+ ** ----------------------------------------------------------------- */
+
+static void
+string_object_char_ref (void)
+{
+  printf_message("running test: %s", __func__);
+
+  {
+    mmux_libc_str_t  str;
+
+    /* Build the string. */
+    {
+      //                                              0123456
+      mmux_asciizcp_t			str_asciiz = "The colour of water and quicksilver.";
+      mmux_libc_str_factory_copying_t	str_factory;
+
+      mmux_libc_string_factory_dynamic(str_factory);
+      if (mmux_libc_string_init(str, str_factory, str_asciiz)) {
+	handle_error();
+      }
+    }
+
+    /* Extract the character at index zero. */
+    {
+      auto		idx = mmux_usize_constant_zero();
+      mmux_char_t	ch;
+
+      if (mmux_libc_string_ref(&ch, str, idx)) {
+	printf_error("unexpected error extracting character at index 0");
+	handle_error();
+      } else {
+	printf_message("successfully extracted character at index 0: '%c'", ch.value);
+      }
+    }
+
+    /* Extract the character at index six. */
+    {
+      auto		idx = mmux_usize_literal(6);
+      mmux_char_t	ch;
+
+      if (mmux_libc_string_ref(&ch, str, idx)) {
+	printf_error("unexpected error extracting character at index 6");
+	handle_error();
+      } else if (mmux_ctype_equal(mmux_char('l'), ch)) {
+	printf_message("successfully extracted character at index 6: '%c'", ch.value);
+      } else {
+	printf_error("extracted wrong character at index 6, expected 'l', got: '%c'", ch.value);
+	handle_error();
+      }
+    }
+
+    /* Final cleanup. */
+    {
+      mmux_libc_string_final(str);
+    }
+  }
+
+  printf_message("DONE: %s\n", __func__);
+}
+
+
+/** --------------------------------------------------------------------
  ** Strings inspection: empty objects.
  ** ----------------------------------------------------------------- */
 
@@ -936,6 +999,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
   if (1) {	string_from_memfd();				}
   if (1) {	string_from_string();				}
 
+  if (1) {	string_object_char_ref();			}
   if (1) {	string_object_is_empty();			}
   if (1) {	string_object_is_not_empty();			}
 
