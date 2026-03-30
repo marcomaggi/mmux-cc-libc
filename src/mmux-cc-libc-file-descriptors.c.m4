@@ -1734,11 +1734,14 @@ mmux_libc_copy_file_range (mmux_usize_t * number_of_bytes_copied_p,
 MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_COPY_FILE_RANGE]]],[[[
   if ((true == input_fd->identity.is_for_input) && (true == ouput_fd->identity.is_for_ouput)) {
 
+    _Pragma("GCC diagnostic push")
+    _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")
     mmux_standard_ssize_t	number_of_bytes_copied =
       copy_file_range(input_fd->value, &(input_position_p->value),
 		      ouput_fd->value, &(ouput_position_p->value),
 		      number_of_bytes_to_copy.value,
 		      flags.value);
+    _Pragma("GCC diagnostic pop")
 
     if (0 <= number_of_bytes_copied) {
       *number_of_bytes_copied_p = mmux_usize(number_of_bytes_copied);

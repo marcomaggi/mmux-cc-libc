@@ -348,31 +348,46 @@ mmux_libc_localtime (mmux_libc_tm_t result_p, mmux_time_t T)
 {
   /* A call to "localtime()" returns a  pointer to a "struct tm" statically allocated
      by the C library. */
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   *((struct tm *) result_p) = *(localtime(&T.value));
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
 mmux_libc_localtime_r (mmux_libc_tm_t result_p, mmux_time_t T)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   localtime_r(&T.value, result_p);
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
 mmux_libc_gmtime (mmux_libc_tm_t result_p, mmux_time_t T)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   *((struct tm *) result_p) = *(gmtime(&T.value));
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
 mmux_libc_gmtime_r (mmux_libc_tm_t result_p, mmux_time_t T)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   gmtime_r(&T.value, result_p);
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
 mmux_libc_mktime (mmux_time_t * result_p, mmux_libc_tm_arg_t tm_p)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   *result_p = mmux_time(mktime((struct tm *)tm_p));
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
@@ -401,13 +416,19 @@ mmux_libc_asctime_r (mmux_asciizp_t result_p, mmux_libc_tm_arg_t tm_p)
 bool
 mmux_libc_ctime (mmux_asciizcpp_t result_p, mmux_time_t T)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   *result_p = ctime(&T.value);
+  _Pragma("GCC diagnostic pop");
   return false;
 }
 bool
 mmux_libc_ctime_r (mmux_asciizp_t result_p, mmux_time_t T)
 {
+  _Pragma("GCC diagnostic push");
+  _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
   mmux_asciizcp_t	rv = ctime_r(&T.value, result_p);
+  _Pragma("GCC diagnostic pop");
 
   if (NULL == rv) {
     return true;
