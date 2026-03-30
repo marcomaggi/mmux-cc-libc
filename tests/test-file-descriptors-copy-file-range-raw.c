@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -65,10 +65,10 @@ obtain_the_file_descriptors (mmux_libc_fd_t fd_src, mmux_libc_fd_t fd_dst)
 
   /* Local cleanup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn_dst)) {
+    if (mmux_libc_file_system_pathname_final(fs_ptn_dst)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn_src)) {
+    if (mmux_libc_file_system_pathname_final(fs_ptn_src)) {
       handle_error();
     }
   }

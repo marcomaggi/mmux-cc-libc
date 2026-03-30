@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -2262,7 +2262,7 @@ test_mmux_libc_dprintf_fs_ptn (void)
       } else {
 	compare_mfd_string_to_expected_string(mfd, expected_str_asciiz);
       }
-      mmux_libc_unmake_file_system_pathname(value);
+      mmux_libc_file_system_pathname_final(value);
     }
     if (mmux_libc_close(mfd)) {
       handle_error();
@@ -2313,7 +2313,7 @@ test_mmux_libc_dprintf_fs_ptn_extension (void)
 
       /* Local cleanup. */
       {
-	mmux_libc_unmake_file_system_pathname(fs_ptn);
+	mmux_libc_file_system_pathname_final(fs_ptn);
       }
     }
     if (mmux_libc_close(mfd)) {
@@ -2365,7 +2365,7 @@ test_mmux_libc_dprintf_fs_ptn_segment (void)
 
       /* Local cleanup. */
       {
-	mmux_libc_unmake_file_system_pathname(fs_ptn);
+	mmux_libc_file_system_pathname_final(fs_ptn);
       }
     }
     if (mmux_libc_close(mfd)) {

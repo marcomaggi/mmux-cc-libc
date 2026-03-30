@@ -250,12 +250,12 @@ typedef mmux_libc_broken_down_time_t const *	mmux_libc_tm_arg_t;
 typedef struct mmux_libc_string_class_t		mmux_libc_string_class_t;
 typedef struct mmux_libc_string_t		mmux_libc_string_t;
 
-typedef bool mmux_libc_string_unmake_fun_t (mmux_libc_string_t * str);
+typedef bool mmux_libc_string_final_fun_t (mmux_libc_string_t * str);
 
 struct mmux_libc_string_class_t {
   mmux_libc_interface_specification_t		interface_specification;
   mmux_libc_memory_allocator_t		const * memory_allocator;
-  mmux_libc_string_unmake_fun_t		      *	unmake;
+  mmux_libc_string_final_fun_t		      *	final;
 };
 
 /* NOTE Whatever changes we  make in the future: this data structure  must be at most
@@ -408,7 +408,7 @@ typedef mmux_libc_file_system_dirent_ptr_t const *	mmux_libc_dirent_arg_t;
 typedef struct mmux_libc_file_system_pathname_class_t	mmux_libc_file_system_pathname_class_t;
 typedef struct mmux_libc_file_system_pathname_t		mmux_libc_file_system_pathname_t;
 
-typedef bool mmux_libc_file_system_pathname_unmake_fun_t (mmux_libc_file_system_pathname_t * fs_ptn);
+typedef bool mmux_libc_file_system_pathname_final_fun_t (mmux_libc_file_system_pathname_t * fs_ptn);
 
 struct mmux_libc_file_system_pathname_class_t {
   mmux_libc_string_class_t;

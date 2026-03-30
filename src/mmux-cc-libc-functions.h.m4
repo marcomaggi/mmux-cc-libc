@@ -2243,10 +2243,10 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t 
 							     mmux_usize_t   src_ptn_len_excluding_nul)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
-mmux_cc_libc_decl bool mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_final (mmux_libc_fs_ptn_t fs_ptn)
   __attribute__((__nonnull__(1)));
 
-mmux_cc_libc_decl bool mmux_libc_unmake_file_system_pathname_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
+mmux_cc_libc_decl bool mmux_libc_file_system_pathname_final_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
   __attribute__((__nonnull__(1)));
 
 /* ------------------------------------------------------------------ */

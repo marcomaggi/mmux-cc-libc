@@ -250,7 +250,7 @@ test_fd_map_read_write_unmap (void)
 
       /* Local cleanup */
       {
-	mmux_libc_unmake_file_system_pathname(fs_ptn);
+	mmux_libc_file_system_pathname_final(fs_ptn);
       }
     }
 

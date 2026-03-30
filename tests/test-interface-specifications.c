@@ -7,7 +7,7 @@
 
 	Test file for version functions.
 
-  Copyright (C) 2024, 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2024, 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */

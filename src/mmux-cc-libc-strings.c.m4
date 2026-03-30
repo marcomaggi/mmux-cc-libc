@@ -325,7 +325,7 @@ MMUX_CONDITIONAL_FUNCTION_BODY([[[HAVE_DIRNAME]]],[[[
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_string_class__unmake (mmux_libc_str_t str)
+mmux_libc_string_class__final (mmux_libc_str_t str)
 {
   if (str->class->memory_allocator->class->free(str->class->memory_allocator, (mmux_pointer_t)str->value)) {
     return true;
@@ -343,7 +343,7 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_static = {
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_fake_memory_allocator,
-  .unmake		= mmux_libc_string_class__unmake,
+  .final		= mmux_libc_string_class__final,
 };
 
 static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
@@ -354,7 +354,7 @@ static mmux_libc_string_class_t const	mmux_libc_string_class_dynamic = {
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_default_memory_allocator,
-  .unmake		= mmux_libc_string_class__unmake,
+  .final		= mmux_libc_string_class__final,
 };
 
 
@@ -864,7 +864,7 @@ mmux_libc_string_init_from_string (mmux_libc_str_t		str_result,
 bool
 mmux_libc_string_final (mmux_libc_str_t str)
 {
-  return str->class->unmake(str);
+  return str->class->final(str);
 }
 bool
 mmux_libc_string_final_variable (mmux_libc_str_t * str_p)

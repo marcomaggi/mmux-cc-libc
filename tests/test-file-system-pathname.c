@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -98,7 +98,7 @@ test_file_system_pathname_length (void)
     printf_message("the pathname length is: %lu", len_no_nul.value);
   }
 
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 }
 
 
@@ -148,7 +148,7 @@ test_file_system_pathname_factory_swallow (void)
 	handle_error();
       }
     }
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+    if (mmux_libc_file_system_pathname_final(fs_ptn)) {
       handle_error();
     }
   }
@@ -183,7 +183,7 @@ test_file_system_pathname_factory_dynamic (void)
       handle_error();
     }
   }
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) {
     handle_error();
   }
 }
@@ -222,7 +222,7 @@ test_file_system_pathname_factory_dynamic2 (void)
       handle_error();
     }
   }
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) {
     handle_error();
   }
 }
@@ -344,8 +344,8 @@ test_compare_equal_pathnames (void)
     }
   }
 
-  mmux_libc_unmake_file_system_pathname(ptn1);
-  mmux_libc_unmake_file_system_pathname(ptn2);
+  mmux_libc_file_system_pathname_final(ptn1);
+  mmux_libc_file_system_pathname_final(ptn2);
 }
 
 /* ------------------------------------------------------------------ */
@@ -463,8 +463,8 @@ test_compare_different_pathnames_less (void)
     }
   }
 
-  mmux_libc_unmake_file_system_pathname(ptn1);
-  mmux_libc_unmake_file_system_pathname(ptn2);
+  mmux_libc_file_system_pathname_final(ptn1);
+  mmux_libc_file_system_pathname_final(ptn2);
 }
 
 /* ------------------------------------------------------------------ */
@@ -582,8 +582,8 @@ test_compare_different_pathnames_greater (void)
     }
   }
 
-  mmux_libc_unmake_file_system_pathname(ptn1);
-  mmux_libc_unmake_file_system_pathname(ptn2);
+  mmux_libc_file_system_pathname_final(ptn1);
+  mmux_libc_file_system_pathname_final(ptn2);
 }
 
 
@@ -670,7 +670,7 @@ one_predicate (test_pathname_predicate_t * P)
     mmux_libc_exit_failure();
   }
 
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 }
 static void
 file_system_pathname_predicates (void)
@@ -794,7 +794,7 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 	handle_error();
       } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the rootname of '%s' is '%s'", ptn_asciiz, root_ptn_asciiz);
-	mmux_libc_unmake_file_system_pathname(root_ptn);
+	mmux_libc_file_system_pathname_final(root_ptn);
       } else {
 	printf_error("invalid rootname of '%s' got '%s'", ptn_asciiz, root_ptn_asciiz);
 	mmux_libc_exit_failure();
@@ -804,10 +804,10 @@ one_rootname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_root_ptn
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(ptn)) {
+    if (mmux_libc_file_system_pathname_final(ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(root_ptn)) {
+    if (mmux_libc_file_system_pathname_final(root_ptn)) {
       handle_error();
     }
   }
@@ -901,7 +901,7 @@ one_tailname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_tail_ptn
 	handle_error();
       } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the tailname of '%s' is '%s'", ptn_asciiz, tail_ptn_asciiz);
-	mmux_libc_unmake_file_system_pathname(tail_ptn);
+	mmux_libc_file_system_pathname_final(tail_ptn);
       } else {
 	printf_error("invalid tailname of '%s' got '%s'", ptn_asciiz, tail_ptn_asciiz);
 	mmux_libc_exit_failure();
@@ -911,10 +911,10 @@ one_tailname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_tail_ptn
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(ptn)) {
+    if (mmux_libc_file_system_pathname_final(ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(tail_ptn)) {
+    if (mmux_libc_file_system_pathname_final(tail_ptn)) {
       handle_error();
     }
   }
@@ -981,7 +981,7 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_file_ptn
 	handle_error();
       } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the filename of '%s' is '%s'", ptn_asciiz, file_ptn_asciiz);
-	mmux_libc_unmake_file_system_pathname(file_ptn);
+	mmux_libc_file_system_pathname_final(file_ptn);
       } else {
 	printf_error("invalid filename of '%s' got '%s'", ptn_asciiz, file_ptn_asciiz);
 	mmux_libc_exit_failure();
@@ -991,10 +991,10 @@ one_filename_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_file_ptn
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(ptn)) {
+    if (mmux_libc_file_system_pathname_final(ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(file_ptn)) {
+    if (mmux_libc_file_system_pathname_final(file_ptn)) {
       handle_error();
     }
   }
@@ -1087,7 +1087,7 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_dirname_p
 	handle_error();
       } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the dirname of '%s' is '%s'", ptn_asciiz, dirname_ptn_asciiz);
-	mmux_libc_unmake_file_system_pathname(dirname_ptn);
+	mmux_libc_file_system_pathname_final(dirname_ptn);
       } else {
 	printf_error("invalid dirname of '%s' got '%s'", ptn_asciiz, dirname_ptn_asciiz);
 	mmux_libc_exit_failure();
@@ -1097,10 +1097,10 @@ one_dirname_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_dirname_p
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(ptn)) {
+    if (mmux_libc_file_system_pathname_final(ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(dirname_ptn)) {
+    if (mmux_libc_file_system_pathname_final(dirname_ptn)) {
       handle_error();
     }
   }
@@ -1167,7 +1167,7 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
 	handle_error();
       } else if (mmux_ternary_comparison_result_is_equal(result)) {
 	printf_message("the normalisation of '%s' is '%s'", ptn_asciiz, normal_ptn_asciiz);
-	mmux_libc_unmake_file_system_pathname(normal_ptn);
+	mmux_libc_file_system_pathname_final(normal_ptn);
       } else {
 	printf_error("invalid normalisation of '%s' got '%s'", ptn_asciiz, normal_ptn_asciiz);
 	mmux_libc_exit_failure();
@@ -1177,10 +1177,10 @@ one_normalisation_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_nor
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(ptn)) {
+    if (mmux_libc_file_system_pathname_final(ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(normal_ptn)) {
+    if (mmux_libc_file_system_pathname_final(normal_ptn)) {
       handle_error();
     }
   }
@@ -1343,13 +1343,13 @@ one_concatenation_case (mmux_asciizcp_t prefix_ptn_asciiz, mmux_asciizcp_t suffi
 
   /* Final clenaup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(prefix_ptn)) {
+    if (mmux_libc_file_system_pathname_final(prefix_ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(suffix_ptn)) {
+    if (mmux_libc_file_system_pathname_final(suffix_ptn)) {
       handle_error();
     }
-    if (mmux_libc_unmake_file_system_pathname(result_ptn)) {
+    if (mmux_libc_file_system_pathname_final(result_ptn)) {
       handle_error();
     }
   }

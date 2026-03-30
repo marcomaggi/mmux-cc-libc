@@ -438,7 +438,7 @@ typedef struct mmux_libc_network_socket_address_info_t {
  ** Internal functions.
  ** ----------------------------------------------------------------- */
 
-mmux_cc_libc_private_decl bool mmux_libc_string_class__unmake (mmux_libc_str_t str)
+mmux_cc_libc_private_decl bool mmux_libc_string_class__final (mmux_libc_str_t str)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */
@@ -527,7 +527,7 @@ mmux_cc_libc_private_decl bool mmux_libc_string_factory_class_swallow__init_from
 
 /* ------------------------------------------------------------------ */
 
-mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_class__unmake (mmux_libc_str_t ptn)
+mmux_cc_libc_private_decl bool mmux_libc_file_system_pathname_class__final (mmux_libc_str_t ptn)
   __attribute__((__nonnull__(1),__warn_unused_result__));
 
 /* ------------------------------------------------------------------ */

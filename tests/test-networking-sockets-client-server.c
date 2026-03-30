@@ -11,7 +11,7 @@
 	that:  we can  be sure  that we  create a  server for  localhost:8080 without
 	concurrencty between different files.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -87,7 +87,7 @@ build_sockaddr_local (mmux_libc_sockaddr_local_t sockaddr, mmux_libc_socklen_t *
 
   /* Local cleanup. */
   {
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+    if (mmux_libc_file_system_pathname_final(fs_ptn)) {
       handle_error();
     }
   }

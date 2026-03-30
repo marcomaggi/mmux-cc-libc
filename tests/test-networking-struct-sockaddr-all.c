@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -56,7 +56,7 @@ test_sockaddr_local (void)
 
       /* Local cleanup. */
       {
-	if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+	if (mmux_libc_file_system_pathname_final(fs_ptn)) {
 	  handle_error();
 	}
       }
@@ -148,10 +148,10 @@ test_sockaddr_local (void)
 
       /* Final cleanup. */
       {
-	if (mmux_libc_unmake_file_system_pathname(field_fs_ptn)) {
+	if (mmux_libc_file_system_pathname_final(field_fs_ptn)) {
 	  handle_error();
 	}
-	if (mmux_libc_unmake_file_system_pathname(expected_fs_ptn)) {
+	if (mmux_libc_file_system_pathname_final(expected_fs_ptn)) {
 	  handle_error();
 	}
       }
@@ -197,7 +197,7 @@ test_sockaddr_local (void)
 
 	/* Local cleanup. */
 	{
-	  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) {
+	  if (mmux_libc_file_system_pathname_final(fs_ptn)) {
 	    handle_error();
 	  }
 	}
@@ -275,10 +275,10 @@ test_sockaddr_local (void)
 
 	/* Local cleanup. */
 	{
-	  if (mmux_libc_unmake_file_system_pathname(fs_ptn1)) {
+	  if (mmux_libc_file_system_pathname_final(fs_ptn1)) {
 	    handle_error();
 	  }
-	  if (mmux_libc_unmake_file_system_pathname(fs_ptn2)) {
+	  if (mmux_libc_file_system_pathname_final(fs_ptn2)) {
 	    handle_error();
 	  }
 	}

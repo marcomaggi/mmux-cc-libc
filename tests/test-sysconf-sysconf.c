@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -106,7 +106,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	assert(false == mmux_libc_dprintf(fd, "'\n"));
       }
     }
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 
   /* mmux_libc_fpathconf() */
@@ -131,7 +131,7 @@ main (int argc MMUX_CC_LIBC_UNUSED, char const *const argv[] MMUX_CC_LIBC_UNUSED
 	  handle_error();
 	}
       }
-      mmux_libc_unmake_file_system_pathname(fs_ptn);
+      mmux_libc_file_system_pathname_final(fs_ptn);
     }
     {
       mmux_slong_t	result;

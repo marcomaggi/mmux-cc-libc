@@ -34,7 +34,7 @@
  ** ----------------------------------------------------------------- */
 
 bool
-mmux_libc_file_system_pathname_class__unmake (mmux_libc_str_t ptn)
+mmux_libc_file_system_pathname_class__final (mmux_libc_str_t ptn)
 {
   if (ptn->class->memory_allocator->class->free(ptn->class->memory_allocator, (mmux_pointer_t)ptn->value)) {
     return true;
@@ -52,7 +52,7 @@ mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_clas
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_fake_memory_allocator,
-  .unmake		= mmux_libc_file_system_pathname_class__unmake,
+  .final		= mmux_libc_file_system_pathname_class__final,
 };
 
 mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_class_dynamic = {
@@ -63,7 +63,7 @@ mmux_libc_file_system_pathname_class_t const	mmux_libc_file_system_pathname_clas
     .is_age		= 0,
   },
   .memory_allocator	= &mmux_libc_default_memory_allocator,
-  .unmake		= mmux_libc_file_system_pathname_class__unmake,
+  .final		= mmux_libc_file_system_pathname_class__final,
 };
 
 
@@ -374,7 +374,7 @@ mmux_libc_file_system_pathname_validate_length_no_nul (mmux_usize_t fs_ptn_len)
  *     ... error ...
  *   } else {
  *     ...
- *     mmux_libc_unmake_file_system_pathname(fs_ptn);
+ *     mmux_libc_file_system_pathname_final(fs_ptn);
  *   }
  */
 
@@ -461,7 +461,7 @@ mmux_libc_file_system_pathname_factory_static (mmux_libc_fs_ptn_factory_t ptn_fa
  *     ... error ...
  *   } else {
  *     ...
- *     mmux_libc_unmake_file_system_pathname(fs_ptn);
+ *     mmux_libc_file_system_pathname_final(fs_ptn);
  *   }
  */
 
@@ -669,20 +669,20 @@ mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn,
   return fs_ptn_factory->class->init_from_ascii_len(fs_ptn, fs_ptn_factory, src_ptn_ascii, src_ptn_len_no_nul);
 }
 bool
-mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn)
+mmux_libc_file_system_pathname_final (mmux_libc_fs_ptn_t fs_ptn)
 {
-  return fs_ptn->class->unmake(fs_ptn);
+  return fs_ptn->class->final(fs_ptn);
 }
 bool
-mmux_libc_unmake_file_system_pathname_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
+mmux_libc_file_system_pathname_final_variable (mmux_libc_fs_ptn_t * fs_ptn_p)
 /* This is an experimental function to be used with the GCC extension "cleanup":
  *
  *   mmux_libc_fs_ptn_t  fs_ptn2 = fs_ptn1
- *     __attribute__((__cleanup__(mmux_libc_unmake_file_system_pathname_variable)));
+ *     __attribute__((__cleanup__(mmux_libc_file_system_pathname_final_variable)));
  *
  */
 {
-  return mmux_libc_unmake_file_system_pathname(*fs_ptn_p);
+  return mmux_libc_file_system_pathname_final(*fs_ptn_p);
 }
 
 
@@ -2034,7 +2034,7 @@ mmux_libc_make_file_system_pathname_concat (mmux_libc_fs_ptn_t				fs_ptn_result,
       } else {
 	bool	rv = mmux_libc_make_file_system_pathname_normalised(fs_ptn_result, fs_ptn_factory,
 								    fs_ptn_result_not_normalised);
-	mmux_libc_unmake_file_system_pathname(fs_ptn_result_not_normalised);
+	mmux_libc_file_system_pathname_final(fs_ptn_result_not_normalised);
 	return rv;
       }
     }

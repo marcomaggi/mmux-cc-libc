@@ -7,7 +7,7 @@
 
 	Common facilities for testing.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -245,7 +245,7 @@ cleanfiles (void)
 	printf_message("common: unexistent cleanfile[%lu]: \"%s\"", i, fs_ptn->value);
       }
     }
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -275,7 +275,7 @@ test_create_data_file (mmux_asciizcp_t pathname_asciiz)
       }
     }
 
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 
   /* Write data to the source file. */
@@ -327,7 +327,7 @@ test_create_directory (mmux_asciizcp_t pathname_asciiz)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+    mmux_libc_file_system_pathname_final(fs_ptn_directory);
   }
 
   return false;

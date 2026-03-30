@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -98,7 +98,7 @@ making_a_segment_from_raw_arguments (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -170,7 +170,7 @@ making_the_last_segment_from_pathname (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -255,7 +255,7 @@ segment_accessors (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -478,8 +478,8 @@ one_comparison (mmux_standard_sint_t expected_cmpnum, mmux_asciizcp_t ptn_asciiz
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn1);
-    mmux_libc_unmake_file_system_pathname(fs_ptn2);
+    mmux_libc_file_system_pathname_final(fs_ptn1);
+    mmux_libc_file_system_pathname_final(fs_ptn2);
   }
 }
 
@@ -591,8 +591,8 @@ one_comparison_predicate (bool expected_equal,
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn1);
-    mmux_libc_unmake_file_system_pathname(fs_ptn2);
+    mmux_libc_file_system_pathname_final(fs_ptn1);
+    mmux_libc_file_system_pathname_final(fs_ptn2);
   }
 }
 static void

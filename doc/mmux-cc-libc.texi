@@ -4955,7 +4955,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
     /* error */
   @}
 @}
-mmux_libc_unmake_file_system_pathname(fs_ptn);
+mmux_libc_file_system_pathname_final(fs_ptn);
 @end example
 @end deftypefun
 
@@ -4985,7 +4985,7 @@ mmux_libc_fd_t  fd;
       /* error */
     @}
   @}
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 
 @{
@@ -8115,7 +8115,7 @@ mmux_libc_dirfd_t  dirfd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+    mmux_libc_file_system_pathname_final(fs_ptn_directory);
   @}
 @}
 
@@ -8303,7 +8303,7 @@ mmux_libc_oufd_t  fd;
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+    if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
       /* error */
     @}
   @}
@@ -8604,7 +8604,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -8655,7 +8655,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -8817,7 +8817,7 @@ mmux_libc_fd_t    fd;
 
   /* Local cleanup */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -9039,7 +9039,7 @@ mmux_libc_fd_t  fd1, fd2;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -9096,7 +9096,7 @@ mmux_libc_fd_t  fd1, fd2;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -9154,7 +9154,7 @@ mmux_libc_fd_t  fd1, fd2;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -9816,10 +9816,10 @@ mmux_libc_fd_t   fd_src, fd_dst;
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn_src)) @{
+    if (mmux_libc_file_system_pathname_final(fs_ptn_src)) @{
       /* error */
     @}
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn_dst)) @{
+    if (mmux_libc_file_system_pathname_final(fs_ptn_dst)) @{
       /* error */
     @}
   @}
@@ -10705,7 +10705,7 @@ mmux_libc_fd_t  fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 @end example
@@ -11106,7 +11106,7 @@ so the given @var{fs_ptn_factory} must support this operation, otherwise @ctrue{
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_unmake_file_system_pathname (mmux_libc_fs_ptn_t @var{fs_ptn})
+@deftypefun bool mmux_libc_file_system_pathname_final (mmux_libc_fs_ptn_t @var{fs_ptn})
 Finalise the file system pathname object referenced by @var{fs_ptn}, appropriately releasing all the
 referenced asynchronous resources.
 @end deftypefun
@@ -11224,8 +11224,8 @@ mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn1);
-  mmux_libc_unmake_file_system_pathname(fs_ptn2);
+  mmux_libc_file_system_pathname_final(fs_ptn1);
+  mmux_libc_file_system_pathname_final(fs_ptn2);
 @}
 @end example
 @end deftypefun
@@ -11267,8 +11267,8 @@ mmux_libc_fs_ptn_t  fs_ptn1, fs_ptn2;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn1);
-  mmux_libc_unmake_file_system_pathname(fs_ptn2);
+  mmux_libc_file_system_pathname_final(fs_ptn1);
+  mmux_libc_file_system_pathname_final(fs_ptn2);
 @}
 @end example
 @end deftypefun
@@ -11390,8 +11390,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_root;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_root);
+  mmux_libc_file_system_pathname_final(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn_root);
 @}
 @end example
 
@@ -11569,8 +11569,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_norm;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_norm);
+  mmux_libc_file_system_pathname_final(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn_norm);
 @}
 @end example
 @end deftypefun
@@ -11628,9 +11628,9 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_prefix, fs_ptn_suffix;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_prefix);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_suffix);
+  mmux_libc_file_system_pathname_final(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn_prefix);
+  mmux_libc_file_system_pathname_final(fs_ptn_suffix);
 @}
 @end example
 @end deftypefun
@@ -11767,7 +11767,7 @@ mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -11823,7 +11823,7 @@ mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -11990,7 +11990,7 @@ mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -12033,7 +12033,7 @@ mmux_libc_fs_ptn_extension_t  fs_ptn_ext;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -12168,7 +12168,7 @@ mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -12219,7 +12219,7 @@ mmux_libc_fs_ptn_segment_t  fs_ptn_seg;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -12394,7 +12394,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
     /* error */
   @}
 @}
@@ -12428,7 +12428,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
     /* error */
   @}
 @}
@@ -12475,7 +12475,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
     /* error */
   @}
 @}
@@ -12512,7 +12512,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
     /* error */
   @}
 @}
@@ -12694,7 +12694,7 @@ mmux_libc_dirstream_t  dirstream;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+    mmux_libc_file_system_pathname_final(fs_ptn_directory);
   @}
 @}
 
@@ -12770,7 +12770,7 @@ mmux_libc_dirstream_t  dirstream;
 
     /* Local cleanup. */
     @{
-      mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+      mmux_libc_file_system_pathname_final(fs_ptn_directory);
     @}
   @}
 
@@ -12845,7 +12845,7 @@ mmux_libc_dirfd_t      dirfd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_directory);
+    mmux_libc_file_system_pathname_final(fs_ptn_directory);
   @}
 @}
 
@@ -12947,7 +12947,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -12983,7 +12983,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -13019,7 +13019,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -13062,7 +13062,7 @@ mmux_libc_fs_ptn_t          fs_ptn_cwd;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_cwd);
+  mmux_libc_file_system_pathname_final(fs_ptn_cwd);
 @}
 @end example
 @end deftypefun
@@ -13093,7 +13093,7 @@ mmux_libc_fs_ptn_t          fs_ptn_cwd;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_cwd);
+  mmux_libc_file_system_pathname_final(fs_ptn_cwd);
 @}
 @end example
 @end deftypefn
@@ -13148,7 +13148,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -13187,7 +13187,7 @@ mmux_libc_dirfd_t   dirfd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -13269,8 +13269,8 @@ mmux_libc_fs_ptn_t  fs_ptn_old, fs_ptn_new;
     /* error */
   @}
 @}
-mmux_libc_unmake_file_system_pathname(fs_ptn_old);
-mmux_libc_unmake_file_system_pathname(fs_ptn_new);
+mmux_libc_file_system_pathname_final(fs_ptn_old);
+mmux_libc_file_system_pathname_final(fs_ptn_new);
 @end example
 @end deftypefun
 
@@ -13322,8 +13322,8 @@ mmux_libc_fs_ptn_t  fs_ptn_old, fs_ptn_new;
     /* error */
   @}
 @}
-mmux_libc_unmake_file_system_pathname(fs_ptn_old);
-mmux_libc_unmake_file_system_pathname(fs_ptn_new);
+mmux_libc_file_system_pathname_final(fs_ptn_old);
+mmux_libc_file_system_pathname_final(fs_ptn_new);
 @end example
 @end deftypefun
 
@@ -13371,7 +13371,7 @@ mmux_libc_fs_ptn_t  fs_ptn_new;
 
   /* Intermediate cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_old);
+    mmux_libc_file_system_pathname_final(fs_ptn_old);
   @}
 @}
 
@@ -13392,7 +13392,7 @@ mmux_libc_fs_ptn_t  fs_ptn_new;
   if (mmux_libc_close(fd_old)) @{
     /* error */
   @}
-  mmux_libc_unmake_file_system_pathname(fs_ptn_new);
+  mmux_libc_file_system_pathname_final(fs_ptn_new);
 @}
 @end example
 @end deftypefun
@@ -13430,8 +13430,8 @@ if (mmux_libc_symlink(fs_ptn_src, fs_ptn_dst)) @{
   /* error */
 @}
 
-mmux_libc_unmake_file_system_pathname(fs_ptn_src);
-mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
+mmux_libc_file_system_pathname_final(fs_ptn_src);
+mmux_libc_file_system_pathname_final(fs_ptn_dst);
 @end example
 @end deftypefun
 
@@ -13465,8 +13465,8 @@ mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
   @}
 @}
 
-mmux_libc_unmake_file_system_pathname(fs_ptn_src);
-mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
+mmux_libc_file_system_pathname_final(fs_ptn_src);
+mmux_libc_file_system_pathname_final(fs_ptn_dst);
 @end example
 @end deftypefun
 
@@ -13522,8 +13522,8 @@ mmux_libc_fs_ptn_t  fs_ptn_symlink, fs_ptn_real;
 
 /* Final cleanup. */
 @{
-  mmux_unmake_file_system_pathname(fs_ptn_symlink);
-  mmux_unmake_file_system_pathname(fs_ptn_real);
+  mmux_file_system_pathname_final(fs_ptn_symlink);
+  mmux_file_system_pathname_final(fs_ptn_real);
 @}
 @end example
 @end deftypefun
@@ -13570,8 +13570,8 @@ mmux_libc_fs_ptn_t  fs_ptn_symlink, fs_ptn_real;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
+  mmux_libc_file_system_pathname_final(fs_ptn_symlink);
+  mmux_libc_file_system_pathname_final(fs_ptn_real);
 @}
 @end example
 @end deftypefun
@@ -13612,8 +13612,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_canonicalised;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_canonicalised);
+  mmux_libc_file_system_pathname_final(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn_canonicalised);
 @}
 @end example
 @end deftypefn
@@ -13652,8 +13652,8 @@ mmux_libc_fs_ptn_t  fs_ptn, fs_ptn_real;;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
+  mmux_libc_file_system_pathname_final(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn_real);
 @}
 @end example
 @end deftypefun
@@ -13703,7 +13703,7 @@ mmux_libc_fs_ptn_t  fs_ptn_real;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
+    mmux_libc_file_system_pathname_final(fs_ptn_symlink);
   @}
 @}
 
@@ -13724,7 +13724,7 @@ mmux_libc_fs_ptn_t  fs_ptn_real;
 /* Final cleanup. */
 @{
   mmux_libc_close(fd_symlink);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_real);
+  mmux_libc_file_system_pathname_final(fs_ptn_real);
 @}
 @end example
 @end deftypefun
@@ -13753,7 +13753,7 @@ if (mmux_libc_unlink(fs_ptn)) @{
   /* error */
 @}
 
-mmux_libc_unmake_file_system_pathname(fs_ptn);
+mmux_libc_file_system_pathname_final(fs_ptn);
 @end example
 @end deftypefun
 
@@ -13799,7 +13799,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -13832,7 +13832,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -13864,7 +13864,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -13904,8 +13904,8 @@ mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_src);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
+  mmux_libc_file_system_pathname_final(fs_ptn_src);
+  mmux_libc_file_system_pathname_final(fs_ptn_dst);
 @}
 @end example
 @end deftypefun
@@ -13944,8 +13944,8 @@ mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_src);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
+  mmux_libc_file_system_pathname_final(fs_ptn_src);
+  mmux_libc_file_system_pathname_final(fs_ptn_dst);
 @}
 @end example
 @end deftypefun
@@ -13995,8 +13995,8 @@ mmux_libc_fs_ptn_t  fs_ptn_src, fs_ptn_dst;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_src);
-  mmux_libc_unmake_file_system_pathname(fs_ptn_dst);
+  mmux_libc_file_system_pathname_final(fs_ptn_src);
+  mmux_libc_file_system_pathname_final(fs_ptn_dst);
 @}
 @end example
 @end deftypefn
@@ -14049,7 +14049,7 @@ mmux_libc_gid_t	    gid;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14090,7 +14090,7 @@ mmux_libc_gid_t  gid;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -14190,7 +14190,7 @@ mmux_libc_gid_t     gid;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14243,7 +14243,7 @@ mmux_libc_gid_t  gid;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -14362,7 +14362,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14405,7 +14405,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -14474,7 +14474,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14550,7 +14550,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14618,7 +14618,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14675,7 +14675,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefn
@@ -14738,7 +14738,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -14850,7 +14850,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -14893,7 +14893,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -14952,7 +14952,7 @@ mmux_libc_fs_ptn_t  fs_ptn_symlink;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn_symlink);
+  mmux_libc_file_system_pathname_final(fs_ptn_symlink);
 @}
 @end example
 @end deftypefun
@@ -15005,7 +15005,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15062,7 +15062,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -15151,7 +15151,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -15237,7 +15237,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -15295,7 +15295,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 
@@ -15392,7 +15392,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15433,7 +15433,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -15490,7 +15490,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15529,7 +15529,7 @@ mmux_libc_fd_t  fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -15699,7 +15699,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15748,7 +15748,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15797,7 +15797,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -15840,7 +15840,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -15912,7 +15912,7 @@ mmux_libc_fd_t   fd;
 
   /* Local cleanup. */
   @{
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   @}
 @}
 
@@ -16007,7 +16007,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  mmux_libc_unmake_file_system_pathname(fs_ptn);
+  mmux_libc_file_system_pathname_final(fs_ptn);
 @}
 @end example
 @end deftypefun
@@ -17511,7 +17511,7 @@ mmux_libc_sockaddr_local_t  sockaddr_local;
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+    if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
       /* error */
     @}
   @}
@@ -17608,7 +17608,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
 
 /* Final cleanup. */
 @{
-  if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+  if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
     /* error */
   @}
 @}
@@ -20082,7 +20082,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
     /* Local cleanup. */
     @{
-      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
         /* error */
       @}
     @}
@@ -20294,7 +20294,7 @@ mmux_libc_sockfd_t  client_sockfd;
 
     /* Local cleanup. */
     @{
-      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
         /* error */
       @}
     @}
@@ -20631,7 +20631,7 @@ mmux_libc_sockfd_t  server_sockfd;
 
     /* Local cleanup. */
     @{
-      if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+      if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
         /* error */
       @}
     @}
@@ -20830,7 +20830,7 @@ mmux_libc_socklen_t         server_sockaddr_length;
 
   /* Local cleanup. */
   @{
-    if (mmux_libc_unmake_file_system_pathname(fs_ptn)) @{
+    if (mmux_libc_file_system_pathname_final(fs_ptn)) @{
       /* error */
     @}
   @}

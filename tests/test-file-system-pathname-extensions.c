@@ -7,7 +7,7 @@
 
 	Test file for functions.
 
-  Copyright (C) 2025 Marco Maggi <mrc.mgg@gmail.com>
+  Copyright (C) 2025, 2026 Marco Maggi <mrc.mgg@gmail.com>
 
   See the COPYING file.
 */
@@ -76,7 +76,7 @@ making_an_extension_from_raw_arguments (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -131,7 +131,7 @@ making_an_extension_from_pathname (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -192,7 +192,7 @@ extension_accessors (void)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -290,7 +290,7 @@ one_common_case (mmux_asciizcp_t ptn_asciiz, mmux_asciizcp_t expected_asciiz)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 static void
@@ -329,7 +329,7 @@ one_error_case (mmux_asciizcp_t ptn_asciiz)
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
@@ -425,8 +425,8 @@ one_comparison (mmux_standard_sint_t expected_standard_cmpnum, mmux_asciizcp_t p
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn1);
-    mmux_libc_unmake_file_system_pathname(fs_ptn2);
+    mmux_libc_file_system_pathname_final(fs_ptn1);
+    mmux_libc_file_system_pathname_final(fs_ptn2);
   }
 }
 
@@ -538,8 +538,8 @@ one_comparison_predicate (bool expected_equal,
 
   /* Final cleanup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn1);
-    mmux_libc_unmake_file_system_pathname(fs_ptn2);
+    mmux_libc_file_system_pathname_final(fs_ptn1);
+    mmux_libc_file_system_pathname_final(fs_ptn2);
   }
 }
 static void
@@ -621,7 +621,7 @@ one_pathname_has_extension (bool expected_result, mmux_asciizcp_t ptn_asciiz, mm
 
   /* Final clenaup. */
   {
-    mmux_libc_unmake_file_system_pathname(fs_ptn);
+    mmux_libc_file_system_pathname_final(fs_ptn);
   }
 }
 
