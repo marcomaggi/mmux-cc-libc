@@ -204,7 +204,7 @@ test_file_system_pathname_factory_dynamic2 (void)
     mmux_libc_fs_ptn_factory_copying_t	fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
-    if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory, ptn_asciiz, ptn_len_no_nul)) {
+    if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory, ptn_asciiz, &ptn_len_no_nul)) {
       printf_error("error making file system pathname");
       handle_error();
     }

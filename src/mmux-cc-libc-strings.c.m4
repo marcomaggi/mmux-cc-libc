@@ -417,7 +417,7 @@ mmux_libc_string_factory_class_static__init_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
-     mmux_usize_t			src_str_len_no_nul	MMUX_CC_LIBC_UNUSED)
+     mmux_usize_t *			src_str_len_no_nul_p	MMUX_CC_LIBC_UNUSED)
 /* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_static". */
 {
@@ -539,7 +539,8 @@ bool
 mmux_libc_string_factory_class_dynamic__init_from_ascii_len
     (mmux_libc_str_t str_result,
      mmux_libc_str_factory_arg_t str_factory MMUX_CC_LIBC_UNUSED,
-     mmux_asciicp_t str_source_ascii, mmux_usize_t str_source_length_no_nul)
+     mmux_asciicp_t str_source_ascii,
+     mmux_usize_t * str_source_length_no_nul_p)
 /* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_dynamic".
 
@@ -566,14 +567,14 @@ mmux_libc_string_factory_class_dynamic__init_from_ascii_len
   /* Construct the resulting data structure. */
   {
     mmux_libc_string_class_t const *	class = &mmux_libc_string_class_dynamic;
-    auto		str_result_length_with_nul = mmux_ctype_incr(str_source_length_no_nul);
+    auto		str_result_length_with_nul = mmux_ctype_incr(*str_source_length_no_nul_p);
     mmux_asciizp_t	str_result_asciiz;
 
     if (mmux_libc_memory_allocator_malloc(class->memory_allocator, &str_result_asciiz, str_result_length_with_nul)) {
       return true;
     } else {
-      mmux_libc_memcpy(str_result_asciiz, str_source_ascii, str_source_length_no_nul);
-      str_result_asciiz[str_source_length_no_nul.value] = '\0';
+      mmux_libc_memcpy(str_result_asciiz, str_source_ascii, *str_source_length_no_nul_p);
+      str_result_asciiz[str_source_length_no_nul_p->value] = '\0';
       str_result->value = str_result_asciiz;
       str_result->class = class;
       return false;
@@ -768,7 +769,7 @@ mmux_libc_string_factory_class_swallow__init_from_ascii_len
     (mmux_libc_str_t			str_result		MMUX_CC_LIBC_UNUSED,
      mmux_libc_str_factory_arg_t	str_factory		MMUX_CC_LIBC_UNUSED,
      mmux_asciicp_t			src_str_ascii		MMUX_CC_LIBC_UNUSED,
-     mmux_usize_t			src_str_len_no_nul	MMUX_CC_LIBC_UNUSED)
+     mmux_usize_t *			src_str_len_no_nul_p	MMUX_CC_LIBC_UNUSED)
 /* This function  is the implementation  of the method "init_from_ascii_len"  for the
    string factory "mmux_libc_string_factory_swallow". */
 {
@@ -835,9 +836,10 @@ mmux_libc_string_init (mmux_libc_str_t str,
 bool
 mmux_libc_string_init2 (mmux_libc_str_t str,
 			mmux_libc_str_factory_copying_arg_t str_factory,
-			mmux_asciicp_t src_str_ascii, mmux_usize_t src_str_len_no_nul)
+			mmux_asciicp_t src_str_ascii,
+			mmux_usize_t * src_str_len_no_nul_p)
 {
-  return str_factory->class->init_from_ascii_len(str, str_factory, src_str_ascii, src_str_len_no_nul);
+  return str_factory->class->init_from_ascii_len(str, str_factory, src_str_ascii, src_str_len_no_nul_p);
 }
 bool
 mmux_libc_string_init_concat (mmux_libc_str_t				str_result,

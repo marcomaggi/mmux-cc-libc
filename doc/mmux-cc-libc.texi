@@ -3208,7 +3208,7 @@ mmux_libc_str_t  str;
 
   mmux_libc_string_factory_dynamic(str_factory);
   mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
-  if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+  if (mmux_libc_string_init2(str, str_factory, str_asciiz, &str_length_excluding_nul)) @{
     /* error */
   @}
 @}
@@ -3395,10 +3395,11 @@ mmux_libc_str_t  str;
 @deftypefun bool mmux_libc_string_init2 (mmux_libc_str_t @var{str_result}, @
   mmux_libc_str_factory_copying_arg_t @var{str_factory}, @
   mmux_asciicp_t @var{str_ascii}, @
-  mmux_usize_t @var{str_length_excluding_nul})
+  mmux_usize_t * @var{str_length_excluding_nul_p})
+@c
 Make a new custom string object using the given @var{str_factory} and the @MmuxAscii{} string
-referenced by @var{str_ascii}, which must have length @var{str_length_excluding_nul} which itself
-cannot be zero.
+referenced by @var{str_ascii}, which must have length @code{*@var{str_length_excluding_nul_p}} which
+itself cannot be zero.
 
 This constructor always allocates new memory and makes a copy of the given @var{str_ascii} string,
 so the given @var{str_factory} must support this operation, otherwise @ctrue{} is returned and
@@ -3417,7 +3418,7 @@ mmux_libc_str_t  str;
 
   mmux_libc_string_factory_dynamic(str_factory);
   mmux_libc_strlen(&str_length_excluding_nul, str_asciiz);
-  if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_length_excluding_nul)) @{
+  if (mmux_libc_string_init2(str, str_factory, str_asciiz, &str_length_excluding_nul)) @{
     /* error */
   @}
 @}
@@ -11095,10 +11096,14 @@ the string length must not be zero: the first character must not be null.
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t @var{fs_ptn_result}, mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, mmux_asciicp_t @var{ptn_ascii}, mmux_usize_t @var{ptn_len_excluding_nul})
+@deftypefun bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t @var{fs_ptn_result}, @
+  mmux_libc_fs_ptn_factory_copying_arg_t @var{fs_ptn_factory}, @
+  mmux_asciicp_t @var{ptn_ascii}, @
+  mmux_usize_t * @var{ptn_len_excluding_nul_p})
+@c
 Make a new file system pathname value, using the given @var{fs_ptn_factory}, using the @MmuxAscii{}
-string referenced by @var{ptn_ascii}, which must have length @var{ptn_len_excluding_nul} which
-itself cannot be zero.
+string referenced by @var{ptn_ascii}, which must have length @code{*@var{ptn_len_excluding_nul_p}}
+which itself cannot be zero.
 
 This constructor always allocates new memory and makes a copy of the given @var{ptn_ascii} string,
 so the given @var{fs_ptn_factory} must support this operation, otherwise @ctrue{} is returned and
@@ -12416,8 +12421,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
   mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
   mmux_libc_file_system_pathname_factory_dynamic(fs_ptn_factory);
-  if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory,
-                                           ptn_asciiz, ptn_len)) @{
+  if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory, ptn_asciiz, &ptn_len)) @{
     /* error */
   @}
 @}
@@ -12463,7 +12467,7 @@ mmux_libc_fs_ptn_t  fs_ptn;
     mmux_libc_fs_ptn_factory_t  fs_ptn_factory;
 
     mmux_libc_file_system_pathname_factory_swallow(fs_ptn_factory);
-    if (mmux_libc_make_file_system_pathname2(fs_ptn, fs_ptn_factory, bufptr)) @{
+    if (mmux_libc_make_file_system_pathname(fs_ptn, fs_ptn_factory, bufptr)) @{
       /* error */
     @}
   @}

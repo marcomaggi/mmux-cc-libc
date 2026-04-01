@@ -1073,8 +1073,8 @@ mmux_cc_libc_decl bool mmux_libc_string_init (mmux_libc_str_t str_result,
 mmux_cc_libc_decl bool mmux_libc_string_init2 (mmux_libc_str_t str_result,
 					       mmux_libc_str_factory_copying_arg_t str_factory,
 					       mmux_asciicp_t src_str_ascii,
-					       mmux_usize_t   src_str_len_excluding_nul)
-  __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
+					       mmux_usize_t * src_str_len_excluding_nul_p)
+  __attribute__((__nonnull__(1,2,3,4),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_string_init_concat (mmux_libc_str_t				str_result,
 						     mmux_libc_str_factory_copying_arg_t	str_factory,
@@ -2240,7 +2240,7 @@ mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t f
 mmux_cc_libc_decl bool mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn_result,
 							     mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory,
 							     mmux_asciicp_t src_ptn_ascii,
-							     mmux_usize_t   src_ptn_len_excluding_nul)
+							     mmux_usize_t *  src_ptn_len_excluding_nul_p)
   __attribute__((__nonnull__(1,2,3),__warn_unused_result__));
 
 mmux_cc_libc_decl bool mmux_libc_file_system_pathname_final (mmux_libc_fs_ptn_t fs_ptn)

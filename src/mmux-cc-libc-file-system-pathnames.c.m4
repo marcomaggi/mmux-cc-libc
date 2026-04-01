@@ -514,7 +514,8 @@ bool
 mmux_libc_file_system_pathname_factory_class_dynamic__init_from_ascii_len
     (mmux_libc_str_t fs_ptn_result,
      mmux_libc_str_factory_arg_t fs_ptn_factory MMUX_CC_LIBC_UNUSED,
-     mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len_no_nul)
+     mmux_asciicp_t src_ptn_ascii,
+     mmux_usize_t * src_ptn_len_no_nul_p)
 /* This function is the implementation  of the method "init_from_ascii_len()" for the
    file system factory "mmux_libc_file_system_pathname_factory_class_dynamic".
 
@@ -525,7 +526,7 @@ mmux_libc_file_system_pathname_factory_class_dynamic__init_from_ascii_len
    constructor using the factory's memory allocator.
 */
 {
-  auto	dst_ptn_len_with_nul = mmux_ctype_incr(src_ptn_len_no_nul);
+  auto	dst_ptn_len_with_nul = mmux_ctype_incr(*src_ptn_len_no_nul_p);
 
   /* Validate the arguments. */
   {
@@ -545,7 +546,7 @@ mmux_libc_file_system_pathname_factory_class_dynamic__init_from_ascii_len
   /* Construct the resulting data structure. */
   {
     if (mmux_libc_string_factory_class_dynamic__init_from_ascii_len(fs_ptn_result, fs_ptn_factory,
-								    src_ptn_ascii, src_ptn_len_no_nul)) {
+								    src_ptn_ascii, src_ptn_len_no_nul_p)) {
       return true;
     } else {
       fs_ptn_result->class = &mmux_libc_file_system_pathname_class_dynamic;
@@ -664,9 +665,10 @@ mmux_libc_make_file_system_pathname (mmux_libc_fs_ptn_t fs_ptn,
 bool
 mmux_libc_make_file_system_pathname2 (mmux_libc_fs_ptn_t fs_ptn,
 				      mmux_libc_fs_ptn_factory_copying_arg_t fs_ptn_factory,
-				      mmux_asciicp_t src_ptn_ascii, mmux_usize_t src_ptn_len_no_nul)
+				      mmux_asciicp_t src_ptn_ascii,
+				      mmux_usize_t * src_ptn_len_no_nul_p)
 {
-  return fs_ptn_factory->class->init_from_ascii_len(fs_ptn, fs_ptn_factory, src_ptn_ascii, src_ptn_len_no_nul);
+  return fs_ptn_factory->class->init_from_ascii_len(fs_ptn, fs_ptn_factory, src_ptn_ascii, src_ptn_len_no_nul_p);
 }
 bool
 mmux_libc_file_system_pathname_final (mmux_libc_fs_ptn_t fs_ptn)
@@ -819,7 +821,7 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t			fs_ptn_result
 	}
 
 	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						    fs_ptn_input->value, fs_ptn_result_len_no_nul);
+						    fs_ptn_input->value, &fs_ptn_result_len_no_nul);
       } else {
 	/* The extension is not empty. */
 	mmux_usize_t	fs_ptn_result_len_no_nul;
@@ -828,7 +830,7 @@ mmux_libc_make_file_system_pathname_rootname (mmux_libc_fs_ptn_t			fs_ptn_result
 	fs_ptn_result_len_no_nul.value -= ext->len.value;
 
 	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						    fs_ptn_input->value, fs_ptn_result_len_no_nul);
+						    fs_ptn_input->value, &fs_ptn_result_len_no_nul);
       }
     }
   }
@@ -847,7 +849,7 @@ mmux_libc_make_file_system_pathname_tailname (mmux_libc_fs_ptn_t			fs_ptn_result
       return true;
     } else {
       return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						  last_segment->ptr, last_segment->len);
+						  last_segment->ptr, &(last_segment->len));
     }
   }
 }
@@ -872,7 +874,7 @@ mmux_libc_make_file_system_pathname_filename (mmux_libc_fs_ptn_t			fs_ptn_result
 	goto invalid_pathname;
       } else {
 	return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						    last_segment->ptr, last_segment->len);
+						    last_segment->ptr, &(last_segment->len));
       }
     }
   }
@@ -910,9 +912,8 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t				fs_ptn_result
 	  /* The pathname's last segment is "."  so copy it as dirname, stripping the
 	     ending  dot.   For example  the  dirname  of "/path/to/directory/."   is
 	     "/path/to/directory/". */
-	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory,
-						      fs_ptn_input->value,
-						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len));
+	  auto	len = mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len);
+	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value, &len);
 	}
       } else if (segment_is_double_dot(last_segment)) {
 	/* If the pathname's last segment is ".." just copy it as dirname. */
@@ -927,8 +928,8 @@ mmux_libc_make_file_system_pathname_dirname (mmux_libc_fs_ptn_t				fs_ptn_result
 	  /* If  we are  here: the  dirname  is the  pathname with  the last  segment
 	     removed.    For   example   the   dirname   of   "path/to/file.ext"   is
 	     "path/to/". */
-	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value,
-						      mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len));
+	  auto	len = mmux_ctype_sub(fs_ptn_len_no_nul, last_segment->len);
+	  return mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, fs_ptn_input->value, &len);
 	}
       }
     }
@@ -1956,7 +1957,7 @@ mmux_libc_make_file_system_pathname_normalised (mmux_libc_fs_ptn_t			fs_ptn_resu
       goto error_invalid_input_pathname;
     } else if (normalisation_pass_remove_double_dot_segments(&one_len, one, two, two_len)) {
       goto error_invalid_input_pathname;
-    } else if (mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, one, one_len)) {
+    } else if (mmux_libc_make_file_system_pathname2(fs_ptn_result, fs_ptn_factory, one, &one_len)) {
       return true;
     } else {
       return false;

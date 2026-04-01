@@ -205,7 +205,7 @@ test_string_factory_dynamic2 (void)
     mmux_libc_str_factory_copying_t	str_factory;
 
     mmux_libc_string_factory_dynamic(str_factory);
-    if (mmux_libc_string_init2(str, str_factory, str_asciiz, str_len_no_nul)) {
+    if (mmux_libc_string_init2(str, str_factory, str_asciiz, &str_len_no_nul)) {
       printf_error("error making custom string");
       handle_error();
     }
