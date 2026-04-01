@@ -843,7 +843,7 @@ string_object_char_ref (void)
 
     /* Extract the character at index zero. */
     {
-      auto		idx = mmux_usize_constant_zero();
+      auto		idx = mmux_index_constant_zero();
       mmux_char_t	ch;
 
       if (mmux_libc_string_ref(&ch, str, idx)) {
@@ -856,7 +856,7 @@ string_object_char_ref (void)
 
     /* Extract the character at index six. */
     {
-      auto		idx = mmux_usize_literal(6);
+      auto		idx = mmux_index_literal(6);
       mmux_char_t	ch;
 
       if (mmux_libc_string_ref(&ch, str, idx)) {

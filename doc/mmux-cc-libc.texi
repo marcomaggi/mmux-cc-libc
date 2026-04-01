@@ -3580,7 +3580,7 @@ mmux_libc_string_len_including_nul_ref(&len_including_nul, str);
 @end deftypefun
 
 
-@deftypefun bool mmux_libc_string_ref (mmux_char_t * @var{char_result_p}, mmux_libc_str_arg_t @var{str}, mmux_usize_t @var{idx})
+@deftypefun bool mmux_libc_string_ref (mmux_char_t * @var{char_result_p}, mmux_libc_str_arg_t @var{str}, mmux_index_t @var{idx})
 If @var{idx} is a valid index for characters in the string @var{str}: store the character at index
 @var{idx} in the variable referenced by @var{char_result_p}, then return @ctrue{}.  Otherwise leave
 @var{char_result_p} untouched and return @cfalse{}.
