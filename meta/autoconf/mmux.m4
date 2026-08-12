@@ -317,60 +317,79 @@ AC_DEFUN([MMUX_OUTPUT],[
 #       Inspect  the value  of the  variable "target_os"  and defines  variables, substitutions  and
 #       Automake conditionals according to it.
 #
-#       The following variables, substitutions and preprocessor macros are defined:
-#
-#       MMUX_ON_LINUX - set to 1 on a GNU+Linux system, otherwise set to 0.
-#
-#       MMUX_ON_BSD: set to 1 on a BSD system, otherwise set to 0.
-#
-#       MMUX_ON_CYGWIN: set to 1 on a CYGWIN system, otherwise set to 0.
-#
-#       MMUX_ON_DARWIN: set to 1 on a Darwin system, otherwise set to 0.
-#
-#       The following GNU Automake conditionals are defined:
-#
-#       ON_LINUX: set to 1 on a GNU+Linux system, otherwise set to 0.
-#
-#       ON_BSD: set to 1 on a BSD system, otherwise set to 0.
-#
-#       ON_CYGWIN: set to 1 on a CYGWIN system, otherwise set to 0.
-#
-#       ON_DARWIN: set to 1 on a Darwin system, otherwise set to 0.
+#       The macro AC_CANONICAL_TARGET defines the variable  "target_os" (for GNU Autoconf 2.73 it is
+#       in "lib/autoconf/general.m4"); the  target name is determined by  "config.guess" using tools
+#       like  "uname".  I  have found  no official  list  of target  names, from  various sources  I
+#       gathered some possible values (in alphabetical order): "bsd", "cygwin", "darwin", "freebsd",
+#       "ios", "linux", "openbsd".  (Marco Maggi; Aug 12, 2026)
 #
 AC_DEFUN([MMUX_CHECK_TARGET_OS],
-  [AS_VAR_SET([MMUX_ON_LINUX], [0])
-   AS_VAR_SET([MMUX_ON_BSD],   [0])
-   AS_VAR_SET([MMUX_ON_CYGWIN],[0])
-   AS_VAR_SET([MMUX_ON_DARWIN],[0])
+  [AC_REQUIRE([AC_CANONICAL_TARGET])
+
+   AS_VAR_SET([MMUX_TARGET_OS])
+
+   AS_VAR_SET([MMUX_ON_BSD],     [0])
+   AS_VAR_SET([MMUX_ON_CYGWIN],  [0])
+   AS_VAR_SET([MMUX_ON_DARWIN],  [0])
+   AS_VAR_SET([MMUX_ON_FREEBSD], [0])
+   AS_VAR_SET([MMUX_ON_IOS],     [0])
+   AS_VAR_SET([MMUX_ON_LINUX],   [0])
+   AS_VAR_SET([MMUX_ON_OPENBSD], [0])
 
    AS_CASE("$target_os",
-     [*linux*],
-     [AS_VAR_SET([MMUX_ON_LINUX],[1])
-      AC_MSG_NOTICE([detected OS: linux])],
      [*bsd*],
      [AS_VAR_SET([MMUX_ON_BSD],[1])
+      AS_VAR_SET([MMUX_TARGET_OS],[bsd])
       AC_MSG_NOTICE([detected OS: BSD])],
      [*cygwin*],
      [AS_VAR_SET([MMUX_ON_CYGWIN],[1])
-      AC_MSG_NOTICE([detected OS: CYGWIN])],
+      AS_VAR_SET([MMUX_TARGET_OS],[cygwin])
+      AC_MSG_NOTICE([detected OS: Cygwin])],
      [*darwin*],
      [AS_VAR_SET([MMUX_ON_DARWIN],[1])
-      AC_MSG_NOTICE([detected OS: DARWIN])])
+      AS_VAR_SET([MMUX_TARGET_OS],[darwin])
+      AC_MSG_NOTICE([detected OS: Darwin])],
+     [*freebsd*],
+     [AS_VAR_SET([MMUX_ON_FREEBSD],[1])
+      AS_VAR_SET([MMUX_TARGET_OS],[freebsd])
+      AC_MSG_NOTICE([detected OS: FreeBSD])],
+     [*ios*],
+     [AS_VAR_SET([MMUX_ON_IOS],[1])
+      AS_VAR_SET([MMUX_TARGET_OS],[ios])
+      AC_MSG_NOTICE([detected OS: iOS])],
+     [*linux*],
+     [AS_VAR_SET([MMUX_ON_LINUX],[1])
+      AS_VAR_SET([MMUX_TARGET_OS],[linux])
+      AC_MSG_NOTICE([detected OS: Linux])],
+     [*OPENBSD*],
+     [AS_VAR_SET([MMUX_ON_OPENBSD],[1])
+      AS_VAR_SET([MMUX_TARGET_OS],[openbsd])
+      AC_MSG_NOTICE([detected OS: OpenBSD])])
 
-   AM_CONDITIONAL([ON_LINUX], [mmux_test_variable_is_one([MMUX_ON_LINUX])])
-   AM_CONDITIONAL([ON_BSD],   [mmux_test_variable_is_one([MMUX_ON_BSD])])
-   AM_CONDITIONAL([ON_CYGWIN],[mmux_test_variable_is_one([MMUX_ON_CYGWIN])])
-   AM_CONDITIONAL([ON_DARWIN],[mmux_test_variable_is_one([MMUX_ON_DARWIN])])
+   AM_CONDITIONAL([ON_BSD],     [mmux_test_variable_is_one([MMUX_ON_BSD])])
+   AM_CONDITIONAL([ON_CYGWIN],  [mmux_test_variable_is_one([MMUX_ON_CYGWIN])])
+   AM_CONDITIONAL([ON_DARWIN],  [mmux_test_variable_is_one([MMUX_ON_DARWIN])])
+   AM_CONDITIONAL([ON_FREEBSD], [mmux_test_variable_is_one([MMUX_ON_FREEBSD])])
+   AM_CONDITIONAL([ON_IOS],     [mmux_test_variable_is_one([MMUX_ON_IOS])])
+   AM_CONDITIONAL([ON_LINUX],   [mmux_test_variable_is_one([MMUX_ON_LINUX])])
+   AM_CONDITIONAL([ON_OPENBSD], [mmux_test_variable_is_one([MMUX_ON_OPENBSD])])
 
-   AC_SUBST([MMUX_ON_LINUX])
+   AC_SUBST([MMUX_TARGET_OS])
    AC_SUBST([MMUX_ON_BSD])
    AC_SUBST([MMUX_ON_CYGWIN])
    AC_SUBST([MMUX_ON_DARWIN])
+   AC_SUBST([MMUX_ON_FREEBSD])
+   AC_SUBST([MMUX_ON_IOS])
+   AC_SUBST([MMUX_ON_LINUX])
+   AC_SUBST([MMUX_ON_OPENBSD])
 
-   AC_DEFINE_UNQUOTED([MMUX_ON_LINUX], [$MMUX_ON_LINUX],  [True if the underlying platform is GNU+Linux])
-   AC_DEFINE_UNQUOTED([MMUX_ON_BSD],   [$MMUX_ON_BSD],    [True if the underlying platform is BSD])
-   AC_DEFINE_UNQUOTED([MMUX_ON_CYGWIN],[$MMUX_ON_CYGWIN], [True if the underlying platform is Cygwin])
-   AC_DEFINE_UNQUOTED([MMUX_ON_DARWIN],[$MMUX_ON_DARWIN], [True if the underlying platform is Darwin])
+   AC_DEFINE_UNQUOTED([MMUX_ON_BSD],     [$MMUX_ON_BSD],      [True if the underlying platform is BSD])
+   AC_DEFINE_UNQUOTED([MMUX_ON_CYGWIN],  [$MMUX_ON_CYGWIN],   [True if the underlying platform is Cygwin])
+   AC_DEFINE_UNQUOTED([MMUX_ON_DARWIN],  [$MMUX_ON_DARWIN],   [True if the underlying platform is Darwin])
+   AC_DEFINE_UNQUOTED([MMUX_ON_FREEBSD], [$MMUX_ON_FREEBSD],  [True if the underlying platform is FreeBSD])
+   AC_DEFINE_UNQUOTED([MMUX_ON_IOS],     [$MMUX_ON_IOS],      [True if the underlying platform is iOS])
+   AC_DEFINE_UNQUOTED([MMUX_ON_LINUX],   [$MMUX_ON_LINUX],    [True if the underlying platform is GNU+Linux])
+   AC_DEFINE_UNQUOTED([MMUX_ON_OPENBSD], [$MMUX_ON_OPENBSD],  [True if the underlying platform is OpenBSD])
    ])
 
 

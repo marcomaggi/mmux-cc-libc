@@ -1363,12 +1363,12 @@ multiple of the system's memory page size (often @math{4096} bytes).
 
 @float
 @example
-        upperlying address
-               |
-               v  upperlying allocation
-    |..........+------------------------+.......| upperlying memory
-    ^          |                        |
-  NULL          --                       --
+           upperlying address
+                  |
+                  v  upperlying allocation
+       |..........+------------------------+.......| upperlying memory
+       ^          |                        |
+     NULL         |                        |
                   |                        |
                   v                        v
   |...............+------------------------+.............| underlying memory
@@ -1420,11 +1420,9 @@ the underlying memory for the same device.
 @example
       upperlying
       allocation 1         upperlying allocation 2
-|....+--------+...........+-----------------------+.....| upperlying memory
-     |        |           |                       |
-    -        -            |                       |
-   |        |             |                       |
-   |        |             |                       |
+ |....+--------+......+-----------------------+.....| upperlying memory
+      |        |      |                       |
+    --       --        ---                     ---
    |        |             |                       |
    v        v             v                       v
 |..+--------+.............+-----------------------+.........| underlying memory
@@ -1443,8 +1441,6 @@ underlying memory for multiple, different, devices.
 |....+--------+.........................+-----------------------+.....| upperlying memory
      |        |                         |                       |
     -        -                           -------                 -------
-   |        |                                   |                       |
-   |        |                                   |                       |
    |        |                                   |                       |
    v        v                                   |                       |
 |..+--------+....| underlying memory, device 1  |                       |
